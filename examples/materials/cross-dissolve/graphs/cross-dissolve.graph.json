@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/graph/v1.json",
+  "graphVersion": "1.0.0",
+  "nodeSet": "aelion.visual.nodes/1.0.0",
+  "nodes": [
+    {
+      "id": "easedProgress",
+      "type": "time.transition-curve",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "progress": {
+          "system": "transitionProgress"
+        },
+        "curve": {
+          "parameter": "curve"
+        }
+      }
+    },
+    {
+      "id": "mixFrames",
+      "type": "composite.mix",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "a": {
+          "inputPort": "from"
+        },
+        "b": {
+          "inputPort": "to"
+        },
+        "amount": {
+          "node": "easedProgress",
+          "output": "value"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "result": {
+      "node": "mixFrames",
+      "output": "frame"
+    }
+  }
+}

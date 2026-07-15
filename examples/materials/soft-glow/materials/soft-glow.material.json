@@ -1,0 +1,142 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/definition/v1.json",
+  "protocolVersion": "1.0.0",
+  "id": "soft-glow",
+  "kind": "visual-effect",
+  "display": {
+    "name": "Soft Glow",
+    "description": "Extracts highlights, blurs them, and composites a soft glow over the source.",
+    "category": "light",
+    "tags": ["glow", "bloom", "light"]
+  },
+  "scopes": ["item", "track", "sequence"],
+  "ports": [
+    {
+      "id": "source",
+      "direction": "input",
+      "type": "visual-frame",
+      "role": "source",
+      "binding": "host",
+      "required": true
+    },
+    {
+      "id": "result",
+      "direction": "output",
+      "type": "visual-frame",
+      "role": "result",
+      "binding": "host",
+      "required": true
+    }
+  ],
+  "parameters": [
+    {
+      "id": "threshold",
+      "type": "float",
+      "default": 0.72,
+      "range": {
+        "min": 0,
+        "max": 1,
+        "softMin": 0.4,
+        "softMax": 1,
+        "step": 0.01
+      },
+      "unit": "ratio",
+      "animatable": true,
+      "interpolation": "linear",
+      "affects": "uniform",
+      "ui": {
+        "control": "slider",
+        "group": "glow",
+        "order": 10,
+        "label": "Threshold"
+      }
+    },
+    {
+      "id": "radiusPx",
+      "type": "float",
+      "default": 18,
+      "range": {
+        "min": 0,
+        "max": 64,
+        "softMin": 0,
+        "softMax": 32,
+        "step": 1
+      },
+      "unit": "px",
+      "animatable": true,
+      "interpolation": "linear",
+      "affects": "uniform",
+      "ui": {
+        "control": "slider",
+        "group": "glow",
+        "order": 20,
+        "label": "Radius"
+      }
+    },
+    {
+      "id": "intensity",
+      "type": "float",
+      "default": 0.55,
+      "range": {
+        "min": 0,
+        "max": 2,
+        "softMin": 0,
+        "softMax": 1,
+        "step": 0.01
+      },
+      "unit": "ratio",
+      "animatable": true,
+      "interpolation": "linear",
+      "affects": "uniform",
+      "ui": {
+        "control": "slider",
+        "group": "glow",
+        "order": 30,
+        "label": "Intensity"
+      }
+    }
+  ],
+  "bundledResources": [],
+  "resourceSlots": [],
+  "execution": {
+    "color": {
+      "input": "working-linear",
+      "output": "working-linear"
+    },
+    "alpha": {
+      "input": "premultiplied",
+      "output": "premultiplied",
+      "preservesTransparency": true
+    },
+    "resolution": {
+      "policy": "same-as-host"
+    },
+    "spatialPadding": {
+      "mode": "parameter-bound",
+      "parameter": "radiusPx",
+      "maximumPixels": 64
+    },
+    "temporal": {
+      "pastUs": 0,
+      "futureUs": 0,
+      "stateful": false,
+      "seekPolicy": "stateless"
+    },
+    "determinism": "backend-tolerant",
+    "supports": {
+      "realtime": true,
+      "offline": true,
+      "alpha": true,
+      "hdr": true,
+      "tiled": true
+    }
+  },
+  "implementations": [
+    {
+      "type": "graph",
+      "graph": "graphs/soft-glow.graph.json",
+      "nodeSet": "aelion.visual.nodes/1.0.0"
+    }
+  ],
+  "splitPolicy": "copy"
+}

@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    { "path": "../audio" },
+    { "path": "../capability" },
+    { "path": "../core" },
+    { "path": "../export" },
+    { "path": "../material-compiler" },
+    { "path": "../media" },
+    { "path": "../project-schema" },
+    { "path": "../render-ir" },
+    { "path": "../renderer-worker" },
+    { "path": "../transaction" }
+  ]
+}

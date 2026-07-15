@@ -1,0 +1,274 @@
+{
+  "evidenceVersion": "1.0.0",
+  "command": "pnpm report:capability:matrix",
+  "engine": "chromium",
+  "report": {
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-07-13T02:38:16.769Z",
+    "tier": "a",
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+      "platform": "macOS",
+      "language": "zh-CN",
+      "hardwareConcurrency": 6,
+      "deviceMemoryGiB": 16,
+      "crossOriginIsolated": true,
+      "secureContext": true,
+      "origin": "http://127.0.0.1:4174"
+    },
+    "codecs": [
+      {
+        "id": "decode-h264-1080p",
+        "kind": "video-decoder",
+        "codec": "avc1.42001e",
+        "supported": true,
+        "config": {
+          "codec": "avc1.42001e",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "flip": false,
+          "hardwareAcceleration": "no-preference",
+          "rotation": 0
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-vp9-1080p",
+        "kind": "video-decoder",
+        "codec": "vp09.00.10.08",
+        "supported": true,
+        "config": {
+          "codec": "vp09.00.10.08",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "flip": false,
+          "hardwareAcceleration": "no-preference",
+          "rotation": 0
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-h264-1080p30",
+        "kind": "video-encoder",
+        "codec": "avc1.42001e",
+        "supported": false,
+        "config": {
+          "alpha": "discard",
+          "avc": {
+            "format": "avc"
+          },
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "avc1.42001e",
+          "contentHint": "",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_CONFIG_UNSUPPORTED",
+            "severity": "warning",
+            "message": "VideoEncoder does not support avc1.42001e",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-vp9-1080p30",
+        "kind": "video-encoder",
+        "codec": "vp09.00.10.08",
+        "supported": true,
+        "config": {
+          "alpha": "discard",
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "vp09.00.10.08",
+          "contentHint": "",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-aac-stereo",
+        "kind": "audio-decoder",
+        "codec": "mp4a.40.2",
+        "supported": true,
+        "config": {
+          "codec": "mp4a.40.2",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-opus-stereo",
+        "kind": "audio-decoder",
+        "codec": "opus",
+        "supported": true,
+        "config": {
+          "codec": "opus",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-aac-stereo",
+        "kind": "audio-encoder",
+        "codec": "mp4a.40.2",
+        "supported": true,
+        "config": {
+          "bitrate": 192000,
+          "bitrateMode": "variable",
+          "codec": "mp4a.40.2",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-opus-stereo",
+        "kind": "audio-encoder",
+        "codec": "opus",
+        "supported": true,
+        "config": {
+          "bitrate": 192000,
+          "bitrateMode": "variable",
+          "codec": "opus",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      }
+    ],
+    "gpu": {
+      "worker": {
+        "status": "supported",
+        "available": true
+      },
+      "offscreenCanvas": {
+        "status": "supported",
+        "available": true
+      },
+      "webgl2": {
+        "status": "supported",
+        "available": true,
+        "details": {
+          "renderer": "WebKit WebGL"
+        }
+      },
+      "webgpu": {
+        "status": "supported",
+        "available": true
+      },
+      "adapter": {
+        "features": [
+          "bgra8unorm-storage",
+          "clip-distances",
+          "core-features-and-limits",
+          "depth-clip-control",
+          "depth32float-stencil8",
+          "dual-source-blending",
+          "float32-blendable",
+          "float32-filterable",
+          "indirect-first-instance",
+          "rg11b10ufloat-renderable",
+          "shader-f16",
+          "subgroups",
+          "texture-component-swizzle",
+          "texture-compression-bc",
+          "texture-compression-bc-sliced-3d",
+          "texture-formats-tier1",
+          "texture-formats-tier2",
+          "timestamp-query"
+        ],
+        "limits": {
+          "maxTextureDimension1D": 16384,
+          "maxTextureDimension2D": 16384,
+          "maxTextureDimension3D": 2048,
+          "maxTextureArrayLayers": 2048,
+          "maxBindGroups": 4,
+          "maxBindGroupsPlusVertexBuffers": 24,
+          "maxBindingsPerBindGroup": 1000,
+          "maxDynamicUniformBuffersPerPipelineLayout": 10,
+          "maxDynamicStorageBuffersPerPipelineLayout": 8,
+          "maxSampledTexturesPerShaderStage": 48,
+          "maxSamplersPerShaderStage": 16,
+          "maxStorageBuffersPerShaderStage": 10,
+          "maxStorageTexturesPerShaderStage": 8,
+          "maxUniformBuffersPerShaderStage": 12,
+          "maxUniformBufferBindingSize": 65536,
+          "maxStorageBufferBindingSize": 2147483644,
+          "minUniformBufferOffsetAlignment": 256,
+          "minStorageBufferOffsetAlignment": 256,
+          "maxVertexBuffers": 8,
+          "maxBufferSize": 2147483648,
+          "maxVertexAttributes": 30,
+          "maxVertexBufferArrayStride": 2048,
+          "maxInterStageShaderVariables": 28,
+          "maxColorAttachments": 8,
+          "maxColorAttachmentBytesPerSample": 128,
+          "maxComputeWorkgroupStorageSize": 32768,
+          "maxComputeInvocationsPerWorkgroup": 1024,
+          "maxComputeWorkgroupSizeX": 1024,
+          "maxComputeWorkgroupSizeY": 1024,
+          "maxComputeWorkgroupSizeZ": 64,
+          "maxComputeWorkgroupsPerDimension": 65535,
+          "maxStorageBuffersInFragmentStage": 10,
+          "maxStorageTexturesInFragmentStage": 8,
+          "maxStorageBuffersInVertexStage": 10,
+          "maxStorageTexturesInVertexStage": 8
+        }
+      }
+    },
+    "audio": {
+      "audioContext": {
+        "status": "supported",
+        "available": true
+      },
+      "audioWorklet": {
+        "status": "supported",
+        "available": true
+      },
+      "sharedArrayBuffer": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "storage": {
+      "opfs": {
+        "status": "supported",
+        "available": true
+      },
+      "fileSystemAccess": {
+        "status": "supported",
+        "available": true
+      },
+      "transferableStreams": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "wasm": {
+      "available": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "diagnostics": [
+      {
+        "code": "CAPABILITY_CODEC_CONFIG_UNSUPPORTED",
+        "severity": "warning",
+        "message": "VideoEncoder does not support avc1.42001e",
+        "recoverable": true
+      }
+    ]
+  }
+}

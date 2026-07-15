@@ -1,0 +1,48 @@
+{
+  "name": "@aelion/export",
+  "version": "0.1.0-alpha.0",
+  "description": "Streaming WebCodecs and WebM export pipeline for AelionSDK",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git",
+    "directory": "packages/export"
+  },
+  "keywords": [
+    "aelion",
+    "video",
+    "webcodecs",
+    "export"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "corepack pnpm run build && node ../../scripts/package-artifacts.mjs stage",
+    "postpack": "node ../../scripts/package-artifacts.mjs clean"
+  },
+  "dependencies": {
+    "@aelion/core": "workspace:*",
+    "@aelion/media": "workspace:*",
+    "@aelion/render-ir": "workspace:*",
+    "mediabunny": "1.50.8"
+  }
+}

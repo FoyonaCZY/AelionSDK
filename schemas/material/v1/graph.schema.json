@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aelion.dev/material/graph/v1.json",
+  "title": "Aelion Material Graph v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "graphVersion", "nodeSet", "nodes", "outputs"],
+  "properties": {
+    "$schema": {
+      "const": "https://schemas.aelion.dev/material/graph/v1.json"
+    },
+    "graphVersion": {
+      "const": "1.0.0"
+    },
+    "nodeSet": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 8,
+      "additionalProperties": {
+        "$ref": "#/$defs/nodeReference"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/localIdentifier"
+      }
+    }
+  },
+  "$defs": {
+    "jsonValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 4096 },
+        {
+          "type": "array",
+          "maxItems": 1024,
+          "items": { "$ref": "#/$defs/jsonValue" }
+        },
+        {
+          "type": "object",
+          "maxProperties": 128,
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        }
+      ]
+    },
+    "localIdentifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "typeVersion", "inputs"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/localIdentifier"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"
+        },
+        "typeVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "inputs": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": {
+            "$ref": "#/$defs/graphValue"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/localIdentifier"
+          }
+        },
+        "config": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      }
+    },
+    "graphValue": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value"],
+          "properties": {
+            "value": { "$ref": "#/$defs/jsonValue" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["parameter"],
+          "properties": {
+            "parameter": { "$ref": "#/$defs/localIdentifier" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["resource"],
+          "properties": {
+            "resource": { "$ref": "#/$defs/localIdentifier" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["inputPort"],
+          "properties": {
+            "inputPort": { "$ref": "#/$defs/localIdentifier" }
+          }
+        },
+        {
+          "$ref": "#/$defs/nodeReference"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["system"],
+          "properties": {
+            "system": {
+              "enum": [
+                "sequenceTimeUs",
+                "itemTimeUs",
+                "itemDurationUs",
+                "normalizedItemTime",
+                "transitionProgress",
+                "frameIndex",
+                "frameDurationUs",
+                "outputSizePx",
+                "pixelSizeUv",
+                "workingColorSpace",
+                "qualityScale",
+                "randomSeed"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nodeReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "output"],
+      "properties": {
+        "node": { "$ref": "#/$defs/localIdentifier" },
+        "output": { "$ref": "#/$defs/localIdentifier" }
+      }
+    }
+  }
+}

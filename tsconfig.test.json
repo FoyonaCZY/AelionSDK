@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "types": ["node", "vitest/globals", "@vitest/browser/providers/playwright"]
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/test/**/*.ts",
+    "apps/*/src/**/*.test.ts",
+    "examples/materials/authoring-sdk/**/*.ts",
+    "benchmarks/**/*.ts",
+    "vitest.config.ts",
+    "vitest.browser.config.ts",
+    "vitest.firefox.config.ts",
+    "vitest.golden.config.ts"
+  ]
+}

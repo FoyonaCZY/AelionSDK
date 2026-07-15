@@ -1,0 +1,35 @@
+{
+  "evidenceVersion": "1.0.0",
+  "generatedAt": "2026-07-10T19:11:09+08:00",
+  "method": "Source copied to a fresh /tmp directory with node_modules, .git and build caches excluded",
+  "environment": {
+    "node": "20.20.2",
+    "pnpm": "10.13.1",
+    "os": "macOS 15.6.1"
+  },
+  "steps": [
+    {
+      "command": "corepack pnpm install --frozen-lockfile",
+      "status": "passed",
+      "packages": 206
+    },
+    {
+      "command": "corepack pnpm verify:environment",
+      "status": "passed",
+      "fixtures": 5
+    },
+    {
+      "command": "corepack pnpm run ci",
+      "status": "passed",
+      "unitTests": 84,
+      "schemaTests": 11
+    },
+    {
+      "command": "corepack pnpm exec vite --config apps/capability-lab/vite.config.ts --port 4183 --strictPort",
+      "status": "passed",
+      "httpStatus": 200,
+      "crossOriginIsolatedHeaders": true
+    }
+  ],
+  "discovery": "The reproduction found and fixed two command-contract defects: pnpm ci conflicts with pnpm's reserved command and nested scripts could not assume a global pnpm binary. The supported command is corepack pnpm run ci."
+}

@@ -1,0 +1,56 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Material compiler deterministic golden > emits stable shader identity for the frozen Cross Dissolve graph 1`] = `
+{
+  "backend": "webgl2",
+  "graphHash": "3a7326ab",
+  "inputPorts": [
+    "from",
+    "to",
+  ],
+  "shader": "#version 300 es
+precision highp float;
+uniform sampler2D u_input_from;
+uniform sampler2D u_input_to;
+uniform float u_system_transitionProgress;
+in vec2 v_uv;
+out vec4 out_color;
+
+vec4 aelion_temperature(vec4 color, float amount) {
+  vec3 scale = vec3(1.0 + amount, 1.0 + amount * 0.15, 1.0 - amount * 0.55);
+  return vec4(max(color.rgb * scale, vec3(0.0)), color.a);
+}
+vec4 aelion_lift_black(vec4 color, float amount) {
+  return vec4(mix(color.rgb, vec3(1.0), clamp(amount, 0.0, 1.0)), color.a);
+}
+vec4 aelion_scale_rgb(vec4 color, float scale) {
+  return vec4(max(color.rgb * scale, vec3(0.0)), color.a);
+}
+vec4 aelion_screen(vec4 base, vec4 overlay) {
+  return vec4(1.0 - (1.0 - base.rgb) * (1.0 - overlay.rgb), base.a + overlay.a - base.a * overlay.a);
+}
+vec4 aelion_contrast(vec4 color, float amount) {
+  return vec4((color.rgb - vec3(0.5)) * amount + vec3(0.5), color.a);
+}
+vec4 aelion_saturation(vec4 color, float amount) {
+  float luma = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
+  return vec4(mix(vec3(luma), color.rgb, amount), color.a);
+}
+vec4 aelion_invert(vec4 color) { return vec4(color.a - color.rgb, color.a); }
+vec4 aelion_multiply(vec4 base, vec4 overlay) { return vec4(base.rgb * overlay.rgb, base.a * overlay.a); }
+vec4 aelion_add(vec4 base, vec4 overlay) { return min(base + overlay, vec4(1.0)); }
+
+void main() { out_color = mix(texture(u_input_from, v_uv), texture(u_input_to, v_uv), clamp(smoothstep(0.0, 1.0, clamp(u_system_transitionProgress, 0.0, 1.0)), 0.0, 1.0)); }
+",
+  "uniforms": [
+    {
+      "name": "u_system_transitionProgress",
+      "source": {
+        "id": "transitionProgress",
+        "kind": "system",
+      },
+      "type": "float",
+    },
+  ],
+}
+`;

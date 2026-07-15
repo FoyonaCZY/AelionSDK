@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/graph/v1.json",
+  "graphVersion": "1.0.0",
+  "nodeSet": "aelion.visual.nodes/1.0.0",
+  "nodes": [
+    {
+      "id": "warm",
+      "type": "color.temperature",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "source": {
+          "inputPort": "source"
+        },
+        "amount": {
+          "value": 0.12
+        }
+      }
+    },
+    {
+      "id": "fade",
+      "type": "color.lift-black",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "source": {
+          "node": "warm",
+          "output": "frame"
+        },
+        "amount": {
+          "value": 0.035
+        }
+      }
+    },
+    {
+      "id": "mix",
+      "type": "composite.mix",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "a": {
+          "inputPort": "source"
+        },
+        "b": {
+          "node": "fade",
+          "output": "frame"
+        },
+        "amount": {
+          "parameter": "intensity"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "result": {
+      "node": "mix",
+      "output": "frame"
+    }
+  }
+}

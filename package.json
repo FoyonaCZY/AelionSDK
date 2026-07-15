@@ -1,0 +1,81 @@
+{
+  "name": "aelion-sdk",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "description": "Browser-first real-time editing, rendering and export SDK",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git"
+  },
+  "homepage": "https://github.com/FoyonaCZY/AelionSDK#readme",
+  "bugs": {
+    "url": "https://github.com/FoyonaCZY/AelionSDK/issues"
+  },
+  "keywords": [
+    "video",
+    "audio",
+    "editor",
+    "webcodecs",
+    "webgl",
+    "webgpu"
+  ],
+  "type": "module",
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=20.19 <21"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fixtures:generate": "node scripts/generate-media-fixtures.mjs",
+    "report:capability": "node scripts/capture-capability-report.mjs",
+    "report:capability:matrix": "node scripts/capture-capability-matrix.mjs",
+    "report:export": "node scripts/capture-export-evidence.mjs",
+    "report:vertical": "node scripts/capture-vertical-slice-evidence.mjs",
+    "report:alpha": "node scripts/capture-alpha-evidence.mjs",
+    "report:seek": "node scripts/capture-seek-evidence.mjs",
+    "report:performance": "node scripts/capture-performance-evidence.mjs",
+    "report:phase1:gates": "node scripts/capture-phase-1-final-gates.mjs --results reports/baseline/phase-1-gate-results.json",
+    "report:phase1:blocker-template": "node scripts/create-phase-1-blocker-review.mjs --results reports/baseline/phase-1-gate-results.json",
+    "report:browser:chromium": "vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json",
+    "report:browser:firefox": "vitest run --config vitest.firefox.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-firefox.json",
+    "test": "vitest run && corepack pnpm --filter @aelion/vite-plugin run test && corepack pnpm run test:evidence-scripts",
+    "test:evidence-scripts": "node --test scripts/*.test.mjs",
+    "test:watch": "vitest",
+    "test:schema": "node scripts/validate-material-examples.mjs && vitest run packages/project-schema",
+    "schemas:check": "node scripts/check-default-schemas.mjs && node scripts/check-material-sdk-schemas.mjs",
+    "schemas:update": "node scripts/check-default-schemas.mjs --write && node scripts/check-material-sdk-schemas.mjs --write && prettier --write packages/sdk/src/default-schemas.ts packages/material-sdk/src/bundled-schemas.ts",
+    "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test:browser:firefox": "vitest run --config vitest.firefox.config.ts",
+    "test:golden": "vitest run --config vitest.golden.config.ts",
+    "bench": "vitest bench --run",
+    "dev:lab": "vite --config apps/capability-lab/vite.config.ts",
+    "ci": "corepack pnpm run format:check && corepack pnpm run schemas:check && corepack pnpm run lint && corepack pnpm run typecheck && corepack pnpm run test && corepack pnpm run test:schema && corepack pnpm run build && corepack pnpm run api:snapshot",
+    "api:snapshot": "corepack pnpm --filter @aelion/sdk run api:snapshot",
+    "test:pack": "corepack pnpm run build && node scripts/test-package-consumer.mjs",
+    "release:dry-run": "corepack pnpm run build && node scripts/release-dry-run.mjs",
+    "test:consumer": "corepack pnpm run build && node scripts/test-package-consumer.mjs --browser",
+    "test:phase1:final": "node scripts/run-phase-1-final-gates.mjs",
+    "verify:environment": "node scripts/verify-clean-environment.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.31.0",
+    "@types/node": "20.19.8",
+    "@vitest/browser": "3.2.4",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "eslint": "9.31.0",
+    "fast-check": "4.2.0",
+    "playwright": "1.54.1",
+    "prettier": "3.6.2",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.38.0",
+    "vite": "7.0.6",
+    "vitest": "3.2.4"
+  }
+}

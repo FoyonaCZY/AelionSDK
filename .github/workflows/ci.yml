@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 18 * * *'
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run ci
+      - run: pnpm run test:pack
+      - run: pnpm run release:dry-run
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps firefox
+      - run: pnpm test:browser
+      - run: pnpm test:browser:firefox
+      - run: pnpm test:consumer
+
+  nightly-evidence:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm test:browser
+      - run: pnpm test:browser:firefox
+      - run: pnpm test:golden
+      - run: pnpm bench
+      - run: pnpm report:capability:matrix
+      - run: pnpm report:seek
+      - run: pnpm report:performance
+      - run: pnpm report:vertical
+      - run: pnpm report:alpha
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aelion-nightly-evidence
+          path: |
+            reports/baseline/*.json
+            reports/baseline/*.webm

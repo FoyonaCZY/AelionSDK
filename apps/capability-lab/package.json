@@ -1,0 +1,13 @@
+{
+  "name": "@aelion/capability-lab",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aelion/capability": "workspace:*"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  }
+}

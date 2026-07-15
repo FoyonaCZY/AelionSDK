@@ -1,0 +1,46 @@
+{
+  "name": "@aelion/transaction",
+  "version": "0.1.0-alpha.0",
+  "description": "Atomic project transactions, inverses and change sets for AelionSDK",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git",
+    "directory": "packages/transaction"
+  },
+  "keywords": [
+    "aelion",
+    "timeline",
+    "transaction",
+    "undo"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "corepack pnpm run build && node ../../scripts/package-artifacts.mjs stage",
+    "postpack": "node ../../scripts/package-artifacts.mjs clean"
+  },
+  "dependencies": {
+    "@aelion/core": "workspace:*",
+    "@aelion/project-schema": "workspace:*"
+  }
+}

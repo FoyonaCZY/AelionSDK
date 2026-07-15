@@ -1,0 +1,21 @@
+{
+  "name": "@aelion/evidence-runner",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aelion/audio": "workspace:*",
+    "@aelion/export": "workspace:*",
+    "@aelion/material-compiler": "workspace:*",
+    "@aelion/media": "workspace:*",
+    "@aelion/project-schema": "workspace:*",
+    "@aelion/render-ir": "workspace:*",
+    "@aelion/renderer-worker": "workspace:*",
+    "@aelion/sdk": "workspace:*",
+    "@aelion/transaction": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

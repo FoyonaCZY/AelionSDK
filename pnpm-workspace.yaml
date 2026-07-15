@@ -1,0 +1,10 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+catalog:
+  '@aelion/core': 'workspace:*'
+  '@aelion/project-schema': 'workspace:*'
+
+onlyBuiltDependencies:
+  - esbuild

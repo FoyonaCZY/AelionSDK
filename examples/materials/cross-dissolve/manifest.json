@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/package/v1.json",
+  "protocolVersion": "1.0.0",
+  "package": {
+    "id": "dev.aelion.examples.transitions",
+    "version": "1.0.0",
+    "displayName": "Aelion Example Transitions",
+    "publisher": {
+      "id": "dev.aelion.examples",
+      "name": "Aelion Examples"
+    },
+    "license": "MIT",
+    "engines": {
+      "aelion": ">=1.0.0 <2.0.0",
+      "nodeSet": "aelion.visual.nodes/1.0.0"
+    },
+    "trust": "declarative"
+  },
+  "materials": [
+    {
+      "id": "cross-dissolve",
+      "kind": "visual-transition",
+      "definition": "materials/cross-dissolve.material.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "graphs/cross-dissolve.graph.json",
+      "mediaType": "application/vnd.aelion.material-graph+json",
+      "bytes": 847,
+      "sha256": "4acadb46dc6d021c3c71dd390fd1fab76084be50f0056c1598e13963808c08a9"
+    },
+    {
+      "path": "materials/cross-dissolve.material.json",
+      "mediaType": "application/vnd.aelion.material+json",
+      "bytes": 2068,
+      "sha256": "764ea7db9b35c8e3fb1089847668e2a4b48becf1df6d1fd0c5184faebc08a189"
+    }
+  ]
+}

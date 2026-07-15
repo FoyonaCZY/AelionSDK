@@ -1,0 +1,55 @@
+{
+  "name": "@aelion/vite-plugin",
+  "version": "0.1.0-alpha.0",
+  "description": "Official Vite integration for AelionSDK Worker and AudioWorklet assets",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git",
+    "directory": "packages/vite-plugin"
+  },
+  "homepage": "https://github.com/FoyonaCZY/AelionSDK#readme",
+  "bugs": {
+    "url": "https://github.com/FoyonaCZY/AelionSDK/issues"
+  },
+  "keywords": [
+    "aelion",
+    "vite",
+    "video",
+    "worker",
+    "audioworklet"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "corepack pnpm run build && node test/vite-plugin.test-runner.mjs",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "corepack pnpm run build && node ../../scripts/package-artifacts.mjs stage",
+    "postpack": "node ../../scripts/package-artifacts.mjs clean"
+  },
+  "dependencies": {
+    "@aelion/audio": "workspace:*",
+    "@aelion/renderer-worker": "workspace:*"
+  },
+  "peerDependencies": {
+    "vite": "^7.0.0"
+  }
+}

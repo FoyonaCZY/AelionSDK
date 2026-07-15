@@ -1,0 +1,62 @@
+{
+  "name": "@aelion/sdk",
+  "version": "0.1.0-alpha.0",
+  "description": "Browser-first real-time editing, preview and export SDK facade",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/FoyonaCZY/AelionSDK#readme",
+  "bugs": {
+    "url": "https://github.com/FoyonaCZY/AelionSDK/issues"
+  },
+  "keywords": [
+    "video",
+    "audio",
+    "editor",
+    "webcodecs",
+    "webgl",
+    "webgpu"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.19"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false",
+    "api:snapshot": "corepack pnpm run build && node check-api-snapshot.mjs",
+    "api:snapshot:update": "corepack pnpm run build && node check-api-snapshot.mjs --update",
+    "prepack": "corepack pnpm run build && node ../../scripts/package-artifacts.mjs stage",
+    "postpack": "node ../../scripts/package-artifacts.mjs clean"
+  },
+  "dependencies": {
+    "@aelion/audio": "workspace:*",
+    "@aelion/capability": "workspace:*",
+    "@aelion/core": "workspace:*",
+    "@aelion/export": "workspace:*",
+    "@aelion/material-compiler": "workspace:*",
+    "@aelion/media": "workspace:*",
+    "@aelion/project-schema": "workspace:*",
+    "@aelion/render-ir": "workspace:*",
+    "@aelion/renderer-worker": "workspace:*",
+    "@aelion/transaction": "workspace:*"
+  }
+}

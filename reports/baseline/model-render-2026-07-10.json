@@ -1,0 +1,60 @@
+{
+  "evidenceVersion": "1.0.0",
+  "generatedAt": "2026-07-13T10:45:00+08:00",
+  "environment": {
+    "os": "macOS",
+    "node": "20.20.2",
+    "pnpm": "10.13.1",
+    "browser": "Google Chrome via Playwright"
+  },
+  "commands": {
+    "unit": "pnpm test",
+    "browser": "pnpm test:browser",
+    "golden": "pnpm test:golden",
+    "benchmark": "pnpm bench"
+  },
+  "results": {
+    "unit": {
+      "files": 13,
+      "tests": 84,
+      "passed": 84
+    },
+    "browserLastTargetedRun": {
+      "files": 7,
+      "tests": 38,
+      "passed": 38,
+      "coverage": [
+        "MP4 H.264/AAC exact seek and PCM decode",
+        "WebM VP9/Opus exact seek and PCM decode",
+        "Worker WebGPU primary transition",
+        "Material Graph generated WGSL for Cross Dissolve and Warm Film",
+        "Worker WebGL2 material fallback",
+        "Project to Render IR to Material Graph preview/export parity",
+        "streaming WebM export, OPFS, independent demux/decode readback and failure cleanup",
+        "30-second Project vertical slice with real media, Filter and Transition",
+        "bounded non-isolated Transferable PCM AudioWorklet fallback",
+        "four-pass Soft Glow and backend loss diagnostics"
+      ]
+    },
+    "firefoxBrowser": {
+      "files": 5,
+      "tests": 35,
+      "passed": 35,
+      "tier": "b"
+    },
+    "golden": {
+      "files": 1,
+      "tests": 1,
+      "passed": 1
+    },
+    "renderIrBenchmark": {
+      "fixtureClips": 1000,
+      "coldCompileMeanMs": 101.24,
+      "incrementalNoopMeanMs": 1.4461,
+      "incrementalSpeedup": 70.01,
+      "singleFieldTransactionMeanMs": 0.5039,
+      "schemaValidatedFieldCommitMeanMs": 7.782,
+      "note": "Final Phase 0 gate on 2026-07-13; raw Vitest benchmark output varies by host and must be regenerated before an external SLO is approved."
+    }
+  }
+}

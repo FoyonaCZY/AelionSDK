@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts", "vite.config.ts"],
+  "references": [
+    { "path": "../../packages/audio" },
+    { "path": "../../packages/export" },
+    { "path": "../../packages/material-compiler" },
+    { "path": "../../packages/media" },
+    { "path": "../../packages/project-schema" },
+    { "path": "../../packages/render-ir" },
+    { "path": "../../packages/renderer-worker" },
+    { "path": "../../packages/sdk" },
+    { "path": "../../packages/transaction" }
+  ]
+}

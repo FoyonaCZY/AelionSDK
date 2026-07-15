@@ -1,0 +1,10 @@
+{
+  "evidenceVersion": "1.0.0",
+  "command": "pnpm report:capability:matrix",
+  "engine": "webkit",
+  "blocked": true,
+  "diagnostic": {
+    "code": "COMPATIBILITY_RUNTIME_BLOCKED",
+    "message": "browserType.launch: Executable doesn't exist at /Users/zhongyu/Library/Caches/ms-playwright/webkit-2191/pw_run.sh\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     pnpm exec playwright install                                        ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+  }
+}

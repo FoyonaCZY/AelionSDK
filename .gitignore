@@ -1,0 +1,24 @@
+.DS_Store
+node_modules/
+dist/
+apps/*/vite.config.js
+apps/*/vite.config.d.ts
+apps/*/vite.config.d.ts.map
+coverage/
+.vitest/
+.vite/
+playwright-report/
+test-results/
+**/__screenshots__/
+*.tsbuildinfo
+*.log
+
+# Generated benchmark and browser artifacts.
+benchmarks/reports/*
+!benchmarks/reports/.gitkeep
+reports/*
+!reports/.gitkeep
+!reports/baseline/
+!reports/baseline/**
+
+# Phase 0 conformance corpus is small, CC0, content-addressed and committed so CI is hermetic.

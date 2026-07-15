@@ -1,0 +1,48 @@
+{
+  "name": "@aelion/material-sdk",
+  "version": "0.1.0-alpha.0",
+  "description": "Type-safe authoring, validation and packaging tools for Aelion materials",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FoyonaCZY/AelionSDK.git",
+    "directory": "packages/material-sdk"
+  },
+  "keywords": [
+    "aelion",
+    "material",
+    "shader",
+    "effects"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false",
+    "prepack": "corepack pnpm run build && node ../../scripts/package-artifacts.mjs stage",
+    "postpack": "node ../../scripts/package-artifacts.mjs clean"
+  },
+  "dependencies": {
+    "@aelion/core": "workspace:*",
+    "@aelion/material-compiler": "workspace:*",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1"
+  }
+}

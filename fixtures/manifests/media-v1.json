@@ -1,0 +1,130 @@
+{
+  "manifestVersion": "1.0.0",
+  "generator": {
+    "command": "pnpm fixtures:generate",
+    "ffmpegVersion": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "fixtures": [
+    {
+      "id": "mp4-moov-head-h264-aac",
+      "file": "fixtures/media/mp4-moov-head-h264-aac.mp4",
+      "sha256": "9f70332e7cd4490c130422aa08145bb72067e75e74c909f8db418af3e43ff025",
+      "bytes": 151713,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["moov-head", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-fragmented-h264-aac",
+      "file": "fixtures/media/mp4-fragmented-h264-aac.mp4",
+      "sha256": "3ebc4e35f8cb7852254d2dd021fb58162dcc1420e7f357c21fd20d1e65284382",
+      "bytes": 150873,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["fragmented", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-moov-tail-h264-aac",
+      "file": "fixtures/media/mp4-moov-tail-h264-aac.mp4",
+      "sha256": "2fa7bc887bdd3103104e7fbb8c6727e53b97c876559336032fd5d417cb51449d",
+      "bytes": 151713,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["moov-tail", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-nonzero-pts-h264-aac",
+      "file": "fixtures/media/mp4-nonzero-pts-h264-aac.mp4",
+      "sha256": "ab5563faad53e961172d6fee64424f844d4bba92c431a8a60e49970f424fee73",
+      "bytes": 151737,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["nonzero-pts", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "firstPresentationUs": 500000,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "webm-vp9-opus-vfr",
+      "file": "fixtures/media/webm-vp9-opus-vfr.webm",
+      "sha256": "d49e1d29712a1858fe11d246ae4905289575cfec664abe05fd9a8af0e7d7b21e",
+      "bytes": 118300,
+      "license": "CC0-1.0",
+      "container": "webm",
+      "features": ["vfr", "vp9", "opus", "multiple-clusters", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "vp9",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": true,
+          "hasBFrames": false
+        },
+        "audio": {
+          "codecFamily": "opus",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    }
+  ]
+}

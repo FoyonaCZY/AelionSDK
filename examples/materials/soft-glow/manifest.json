@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/package/v1.json",
+  "protocolVersion": "1.0.0",
+  "package": {
+    "id": "dev.aelion.examples.effects",
+    "version": "1.0.0",
+    "displayName": "Aelion Example Effects",
+    "publisher": {
+      "id": "dev.aelion.examples",
+      "name": "Aelion Examples"
+    },
+    "license": "MIT",
+    "engines": {
+      "aelion": ">=1.0.0 <2.0.0",
+      "nodeSet": "aelion.visual.nodes/1.0.0"
+    },
+    "trust": "declarative"
+  },
+  "materials": [
+    {
+      "id": "soft-glow",
+      "kind": "visual-effect",
+      "definition": "materials/soft-glow.material.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "graphs/soft-glow.graph.json",
+      "mediaType": "application/vnd.aelion.material-graph+json",
+      "bytes": 1344,
+      "sha256": "217204de14035101081fc3754ed22bc18fc82ba1b022e8d05ae528fed0590e52"
+    },
+    {
+      "path": "materials/soft-glow.material.json",
+      "mediaType": "application/vnd.aelion.material+json",
+      "bytes": 3038,
+      "sha256": "0e4edff486fdbfcf8a5aee7021e2c4b1e3ea6ee705c3e37a7f7cffea22684f8a"
+    }
+  ]
+}

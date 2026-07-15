@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/package/v1.json",
+  "protocolVersion": "1.0.0",
+  "package": {
+    "id": "dev.aelion.examples.filters",
+    "version": "1.0.0",
+    "displayName": "Aelion Example Filters",
+    "publisher": {
+      "id": "dev.aelion.examples",
+      "name": "Aelion Examples"
+    },
+    "license": "MIT",
+    "engines": {
+      "aelion": ">=1.0.0 <2.0.0",
+      "nodeSet": "aelion.visual.nodes/1.0.0"
+    },
+    "trust": "declarative"
+  },
+  "materials": [
+    {
+      "id": "warm-film",
+      "kind": "visual-filter",
+      "definition": "materials/warm-film.material.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "graphs/warm-film.graph.json",
+      "mediaType": "application/vnd.aelion.material-graph+json",
+      "bytes": 1068,
+      "sha256": "a99a0e1019c2906f069f155f0c3aabcf6fc59ce1edb0c99221c7aa560e90a0fd"
+    },
+    {
+      "path": "materials/warm-film.material.json",
+      "mediaType": "application/vnd.aelion.material+json",
+      "bytes": 2038,
+      "sha256": "6cc9f4a96394c508885eb998ef9d6465f3971b2a3dfc7ab7ad11bf7adbaf9632"
+    }
+  ]
+}

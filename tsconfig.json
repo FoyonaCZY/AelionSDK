@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/capability" },
+    { "path": "./packages/project-schema" },
+    { "path": "./packages/media" },
+    { "path": "./packages/renderer-worker" },
+    { "path": "./packages/vite-plugin" },
+    { "path": "./packages/sdk" },
+    { "path": "./packages/audio" },
+    { "path": "./packages/export" },
+    { "path": "./packages/material-compiler" },
+    { "path": "./packages/material-sdk" },
+    { "path": "./packages/render-ir" },
+    { "path": "./packages/transaction" },
+    { "path": "./apps/capability-lab" },
+    { "path": "./apps/evidence-runner" }
+  ]
+}

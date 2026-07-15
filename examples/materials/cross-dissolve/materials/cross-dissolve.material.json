@@ -1,0 +1,96 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/definition/v1.json",
+  "protocolVersion": "1.0.0",
+  "id": "cross-dissolve",
+  "kind": "visual-transition",
+  "display": {
+    "name": "Cross Dissolve",
+    "description": "Blends linearly between the outgoing and incoming frames.",
+    "category": "basic",
+    "tags": ["dissolve", "fade"]
+  },
+  "scopes": ["transition"],
+  "ports": [
+    {
+      "id": "from",
+      "direction": "input",
+      "type": "visual-frame",
+      "role": "from",
+      "binding": "host",
+      "required": true
+    },
+    {
+      "id": "to",
+      "direction": "input",
+      "type": "visual-frame",
+      "role": "to",
+      "binding": "host",
+      "required": true
+    },
+    {
+      "id": "result",
+      "direction": "output",
+      "type": "visual-frame",
+      "role": "result",
+      "binding": "host",
+      "required": true
+    }
+  ],
+  "parameters": [
+    {
+      "id": "curve",
+      "type": "enum",
+      "default": "smooth",
+      "values": ["linear", "smooth"],
+      "animatable": false,
+      "affects": "specialization",
+      "ui": {
+        "control": "segmented",
+        "group": "timing",
+        "order": 10,
+        "label": "Curve"
+      }
+    }
+  ],
+  "bundledResources": [],
+  "resourceSlots": [],
+  "execution": {
+    "color": {
+      "input": "working-linear",
+      "output": "working-linear"
+    },
+    "alpha": {
+      "input": "premultiplied",
+      "output": "premultiplied",
+      "preservesTransparency": true
+    },
+    "resolution": {
+      "policy": "same-as-host"
+    },
+    "spatialPadding": {
+      "mode": "none"
+    },
+    "temporal": {
+      "pastUs": 0,
+      "futureUs": 0,
+      "stateful": false,
+      "seekPolicy": "stateless"
+    },
+    "determinism": "strict",
+    "supports": {
+      "realtime": true,
+      "offline": true,
+      "alpha": true,
+      "hdr": true,
+      "tiled": true
+    }
+  },
+  "implementations": [
+    {
+      "type": "graph",
+      "graph": "graphs/cross-dissolve.graph.json",
+      "nodeSet": "aelion.visual.nodes/1.0.0"
+    }
+  ],
+  "splitPolicy": "copy"
+}

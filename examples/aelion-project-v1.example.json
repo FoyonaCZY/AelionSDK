@@ -1,0 +1,684 @@
+{
+  "$schema": "https://schemas.aelion.dev/project/v1.json",
+  "schemaVersion": "1.0.0",
+  "projectId": "prj_aelion_demo",
+  "metadata": {
+    "title": "AelionSDK v1 protocol demo",
+    "createdAt": "2026-07-10T00:00:00.000Z"
+  },
+  "settings": {
+    "defaultSequenceId": "seq_main",
+    "defaultStillDurationUs": 3000000,
+    "locale": "zh-CN",
+    "missingAssetPolicy": "placeholder",
+    "missingMaterialPolicy": "placeholder",
+    "missingPluginPolicy": "placeholder"
+  },
+  "assets": {
+    "asset_a": {
+      "id": "asset_a",
+      "kind": "video",
+      "name": "Opening shot",
+      "locator": {
+        "type": "url",
+        "uri": "https://media.example.com/opening.mp4"
+      },
+      "mimeType": "video/mp4",
+      "probeHint": {
+        "durationUs": 8000000,
+        "width": 1920,
+        "height": 1080,
+        "videoCodec": "avc1.640028",
+        "audioCodec": "mp4a.40.2"
+      }
+    },
+    "asset_b": {
+      "id": "asset_b",
+      "kind": "video",
+      "name": "Closing shot",
+      "locator": {
+        "type": "runtime-binding",
+        "bindingId": "user-file-closing"
+      },
+      "mimeType": "video/mp4"
+    },
+    "asset_music": {
+      "id": "asset_music",
+      "kind": "audio",
+      "name": "Background music",
+      "locator": {
+        "type": "url",
+        "uri": "https://media.example.com/music.m4a"
+      },
+      "mimeType": "audio/mp4"
+    },
+    "asset_font": {
+      "id": "asset_font",
+      "kind": "font",
+      "name": "Brand Sans",
+      "locator": {
+        "type": "url",
+        "uri": "https://media.example.com/fonts/brand-sans.woff2"
+      },
+      "mimeType": "font/woff2"
+    }
+  },
+  "sequences": {
+    "seq_main": {
+      "id": "seq_main",
+      "name": "Main",
+      "format": {
+        "width": 1920,
+        "height": 1080,
+        "pixelAspectRatio": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "frameRate": {
+          "numerator": 30,
+          "denominator": 1
+        },
+        "sampleRate": 48000,
+        "channelLayout": "stereo",
+        "workingColorSpace": "srgb-linear",
+        "backgroundColor": {
+          "space": "srgb-linear",
+          "rgba": [0, 0, 0, 1]
+        }
+      },
+      "duration": {
+        "mode": "content"
+      },
+      "trackIds": [
+        "track_video_main",
+        "track_title",
+        "track_audio_sync",
+        "track_music"
+      ],
+      "transitionIds": [
+        "transition_ab"
+      ],
+      "materialInstanceIds": [],
+      "markerIds": [
+        "marker_review"
+      ]
+    }
+  },
+  "tracks": {
+    "track_video_main": {
+      "id": "track_video_main",
+      "sequenceId": "seq_main",
+      "kind": "visual",
+      "name": "Main video",
+      "enabled": true,
+      "locked": false,
+      "itemIds": [
+        "item_video_a",
+        "item_video_b"
+      ],
+      "materialInstanceIds": []
+    },
+    "track_title": {
+      "id": "track_title",
+      "sequenceId": "seq_main",
+      "kind": "visual",
+      "name": "Titles",
+      "enabled": true,
+      "locked": false,
+      "itemIds": [
+        "item_title"
+      ],
+      "materialInstanceIds": []
+    },
+    "track_audio_sync": {
+      "id": "track_audio_sync",
+      "sequenceId": "seq_main",
+      "kind": "audio",
+      "name": "Synchronized audio",
+      "enabled": true,
+      "locked": false,
+      "itemIds": [
+        "item_audio_a",
+        "item_audio_b"
+      ],
+      "materialInstanceIds": [],
+      "audio": {
+        "gainDb": 0,
+        "pan": 0,
+        "muted": false
+      }
+    },
+    "track_music": {
+      "id": "track_music",
+      "sequenceId": "seq_main",
+      "kind": "audio",
+      "name": "Music",
+      "enabled": true,
+      "locked": false,
+      "itemIds": [
+        "item_music"
+      ],
+      "materialInstanceIds": [],
+      "audio": {
+        "gainDb": -9,
+        "pan": 0,
+        "muted": false
+      }
+    }
+  },
+  "items": {
+    "item_video_a": {
+      "id": "item_video_a",
+      "trackId": "track_video_main",
+      "type": "video",
+      "name": "Opening video",
+      "enabled": true,
+      "range": {
+        "startUs": 0,
+        "durationUs": 5200000
+      },
+      "source": {
+        "assetId": "asset_a",
+        "stream": {
+          "type": "video",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 1000000,
+          "durationUs": 5200000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "error"
+        }
+      },
+      "visual": {
+        "fit": "cover",
+        "transform": {
+          "positionPx": {
+            "x": 960,
+            "y": 540
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "rotationDeg": 0,
+          "skewDeg": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "materialInstanceIds": [
+        "mat_warm_film"
+      ],
+      "linkGroupId": "link_av_a"
+    },
+    "item_video_b": {
+      "id": "item_video_b",
+      "trackId": "track_video_main",
+      "type": "video",
+      "name": "Closing video",
+      "enabled": true,
+      "range": {
+        "startUs": 4800000,
+        "durationUs": 5200000
+      },
+      "source": {
+        "assetId": "asset_b",
+        "stream": {
+          "type": "video",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 5200000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "error"
+        }
+      },
+      "visual": {
+        "fit": "cover",
+        "transform": {
+          "positionPx": {
+            "x": 960,
+            "y": 540
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "rotationDeg": 0,
+          "skewDeg": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "materialInstanceIds": [],
+      "linkGroupId": "link_av_b"
+    },
+    "item_audio_a": {
+      "id": "item_audio_a",
+      "trackId": "track_audio_sync",
+      "type": "audio",
+      "name": "Opening sync audio",
+      "enabled": true,
+      "range": {
+        "startUs": 0,
+        "durationUs": 5200000
+      },
+      "source": {
+        "assetId": "asset_a",
+        "stream": {
+          "type": "audio",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 1000000,
+          "durationUs": 5200000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "error"
+        }
+      },
+      "audio": {
+        "gainDb": 0,
+        "pan": 0,
+        "fadeInUs": 10000,
+        "fadeOutUs": 300000
+      },
+      "materialInstanceIds": [],
+      "linkGroupId": "link_av_a"
+    },
+    "item_audio_b": {
+      "id": "item_audio_b",
+      "trackId": "track_audio_sync",
+      "type": "audio",
+      "name": "Closing sync audio",
+      "enabled": true,
+      "range": {
+        "startUs": 4800000,
+        "durationUs": 5200000
+      },
+      "source": {
+        "assetId": "asset_b",
+        "stream": {
+          "type": "audio",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 5200000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "error"
+        }
+      },
+      "audio": {
+        "gainDb": 0,
+        "pan": 0,
+        "fadeInUs": 300000,
+        "fadeOutUs": 10000
+      },
+      "materialInstanceIds": [],
+      "linkGroupId": "link_av_b"
+    },
+    "item_music": {
+      "id": "item_music",
+      "trackId": "track_music",
+      "type": "audio",
+      "name": "Background music",
+      "enabled": true,
+      "range": {
+        "startUs": 0,
+        "durationUs": 10000000
+      },
+      "source": {
+        "assetId": "asset_music",
+        "stream": {
+          "type": "audio",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 10000000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "error"
+        }
+      },
+      "audio": {
+        "gainDb": {
+          "animation": {
+            "timeSpace": "item",
+            "preInfinity": "hold",
+            "postInfinity": "hold",
+            "keyframes": [
+              {
+                "timeUs": 0,
+                "value": -40,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 700000,
+                "value": -9,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 9000000,
+                "value": -9,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 10000000,
+                "value": -40,
+                "interpolation": "linear"
+              }
+            ]
+          }
+        },
+        "pan": 0
+      },
+      "materialInstanceIds": []
+    },
+    "item_title": {
+      "id": "item_title",
+      "trackId": "track_title",
+      "type": "text",
+      "name": "Main title",
+      "enabled": true,
+      "range": {
+        "startUs": 900000,
+        "durationUs": 3000000
+      },
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 1560,
+        "height": 300
+      },
+      "overflow": "auto-fit",
+      "writingMode": "horizontal-tb",
+      "paragraphs": [
+        {
+          "style": {
+            "alignment": "center",
+            "lineHeight": 1.1
+          },
+          "runs": [
+            {
+              "text": "AelionSDK",
+              "style": {
+                "fontAssetId": "asset_font",
+                "fontSizePx": 112,
+                "fontWeight": 700,
+                "fontStyle": "normal",
+                "letterSpacingPx": 2,
+                "fill": {
+                  "type": "solid",
+                  "color": {
+                    "space": "srgb-linear",
+                    "rgba": [1, 1, 1, 1]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "visual": {
+        "fit": "none",
+        "transform": {
+          "positionPx": {
+            "animation": {
+              "timeSpace": "item",
+              "preInfinity": "hold",
+              "postInfinity": "hold",
+              "keyframes": [
+                {
+                  "timeUs": 0,
+                  "value": {
+                    "x": 960,
+                    "y": 600
+                  },
+                  "interpolation": "cubic-bezier",
+                  "easing": {
+                    "type": "cubic-bezier",
+                    "x1": 0.2,
+                    "y1": 0.8,
+                    "x2": 0.2,
+                    "y2": 1
+                  }
+                },
+                {
+                  "timeUs": 500000,
+                  "value": {
+                    "x": 960,
+                    "y": 540
+                  },
+                  "interpolation": "linear"
+                }
+              ]
+            }
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "rotationDeg": 0,
+          "skewDeg": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "opacity": {
+          "animation": {
+            "timeSpace": "item",
+            "preInfinity": "hold",
+            "postInfinity": "hold",
+            "keyframes": [
+              {
+                "timeUs": 0,
+                "value": 0,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 400000,
+                "value": 1,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 2600000,
+                "value": 1,
+                "interpolation": "linear"
+              },
+              {
+                "timeUs": 3000000,
+                "value": 0,
+                "interpolation": "linear"
+              }
+            ]
+          }
+        },
+        "blendMode": "normal"
+      },
+      "materialInstanceIds": [
+        "mat_title_glow"
+      ]
+    }
+  },
+  "materialInstances": {
+    "mat_warm_film": {
+      "id": "mat_warm_film",
+      "definition": {
+        "packageId": "dev.aelion.examples.filters",
+        "packageVersion": "1.0.0",
+        "packageIntegrity": "sha256:f6c5dbb1edea12d3d328853679dd7b01f5b1465851305cd3310677d541cee24a",
+        "materialId": "warm-film"
+      },
+      "name": "Warm film opening",
+      "enabled": true,
+      "previewPolicy": "required",
+      "parameters": {
+        "intensity": 0.65
+      }
+    },
+    "mat_title_glow": {
+      "id": "mat_title_glow",
+      "definition": {
+        "packageId": "dev.aelion.examples.effects",
+        "packageVersion": "1.0.0",
+        "packageIntegrity": "sha256:92f6ce10dacbcf313a41dc0f0eab934848d4729bf54cabce857fe3e3392e57dc",
+        "materialId": "soft-glow"
+      },
+      "name": "Title glow",
+      "enabled": true,
+      "previewPolicy": "skippable-when-degraded",
+      "parameters": {
+        "threshold": 0.72,
+        "radiusPx": 18,
+        "intensity": 0.55
+      }
+    },
+    "mat_cross_dissolve": {
+      "id": "mat_cross_dissolve",
+      "definition": {
+        "packageId": "dev.aelion.examples.transitions",
+        "packageVersion": "1.0.0",
+        "packageIntegrity": "sha256:dd2c34233a9999702b486a4e84e8123dc0e949b9b231f922cb2525677715a491",
+        "materialId": "cross-dissolve"
+      },
+      "name": "Cross dissolve",
+      "enabled": true,
+      "previewPolicy": "required",
+      "parameters": {
+        "curve": "smooth"
+      }
+    }
+  },
+  "transitions": {
+    "transition_ab": {
+      "id": "transition_ab",
+      "sequenceId": "seq_main",
+      "trackId": "track_video_main",
+      "kind": "visual",
+      "fromItemId": "item_video_a",
+      "toItemId": "item_video_b",
+      "range": {
+        "startUs": 4800000,
+        "durationUs": 400000
+      },
+      "materialInstanceId": "mat_cross_dissolve"
+    }
+  },
+  "markers": {
+    "marker_review": {
+      "id": "marker_review",
+      "owner": {
+        "type": "sequence",
+        "id": "seq_main"
+      },
+      "timeUs": 4800000,
+      "durationUs": 400000,
+      "label": "Review transition",
+      "color": "#ffcc00"
+    }
+  },
+  "linkGroups": {
+    "link_av_a": {
+      "id": "link_av_a",
+      "kind": "av-sync",
+      "itemIds": [
+        "item_video_a",
+        "item_audio_a"
+      ],
+      "syncOffsetsUs": {
+        "item_video_a": 0,
+        "item_audio_a": 0
+      }
+    },
+    "link_av_b": {
+      "id": "link_av_b",
+      "kind": "av-sync",
+      "itemIds": [
+        "item_video_b",
+        "item_audio_b"
+      ],
+      "syncOffsetsUs": {
+        "item_video_b": 0,
+        "item_audio_b": 0
+      }
+    }
+  },
+  "extensions": {
+    "com.example.editor": {
+      "templateId": "brand-launch-v2"
+    }
+  }
+}

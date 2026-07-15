@@ -1,0 +1,311 @@
+{
+  "$schema": "https://schemas.aelion.dev/project/v1.json",
+  "schemaVersion": "1.0.0",
+  "projectId": "prj_alpha_60s",
+  "metadata": {
+    "title": "AelionSDK Phase 1 60-second Alpha fixture",
+    "description": "Deterministic 60-second integration fixture. Short repository media are explicitly looped by the Project time mapping."
+  },
+  "settings": {
+    "defaultSequenceId": "seq_vertical",
+    "defaultStillDurationUs": 3000000,
+    "missingAssetPolicy": "error",
+    "missingMaterialPolicy": "error",
+    "missingPluginPolicy": "error"
+  },
+  "assets": {
+    "asset_opening": {
+      "id": "asset_opening",
+      "kind": "video",
+      "locator": {
+        "type": "runtime-binding",
+        "bindingId": "fixture-mp4-opening"
+      },
+      "mimeType": "video/mp4"
+    },
+    "asset_closing": {
+      "id": "asset_closing",
+      "kind": "video",
+      "locator": {
+        "type": "runtime-binding",
+        "bindingId": "fixture-webm-closing"
+      },
+      "mimeType": "video/webm"
+    },
+    "asset_music": {
+      "id": "asset_music",
+      "kind": "audio",
+      "locator": {
+        "type": "runtime-binding",
+        "bindingId": "fixture-opus-music"
+      },
+      "mimeType": "audio/webm"
+    }
+  },
+  "sequences": {
+    "seq_vertical": {
+      "id": "seq_vertical",
+      "name": "60-second Alpha integration sequence",
+      "format": {
+        "width": 320,
+        "height": 180,
+        "pixelAspectRatio": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "frameRate": {
+          "numerator": 30,
+          "denominator": 1
+        },
+        "sampleRate": 48000,
+        "channelLayout": "stereo",
+        "workingColorSpace": "srgb-linear",
+        "backgroundColor": {
+          "space": "srgb-linear",
+          "rgba": [0, 0, 0, 1]
+        }
+      },
+      "duration": {
+        "mode": "fixed",
+        "durationUs": 60000000,
+        "overflow": "clip"
+      },
+      "trackIds": ["track_video", "track_audio"],
+      "transitionIds": ["transition_center"],
+      "materialInstanceIds": [],
+      "markerIds": []
+    }
+  },
+  "tracks": {
+    "track_video": {
+      "id": "track_video",
+      "sequenceId": "seq_vertical",
+      "kind": "visual",
+      "enabled": true,
+      "locked": false,
+      "itemIds": ["item_opening", "item_closing"],
+      "materialInstanceIds": []
+    },
+    "track_audio": {
+      "id": "track_audio",
+      "sequenceId": "seq_vertical",
+      "kind": "audio",
+      "enabled": true,
+      "locked": false,
+      "itemIds": ["item_music"],
+      "materialInstanceIds": [],
+      "audio": {
+        "gainDb": 0,
+        "pan": 0,
+        "muted": false
+      }
+    }
+  },
+  "items": {
+    "item_opening": {
+      "id": "item_opening",
+      "trackId": "track_video",
+      "type": "video",
+      "enabled": true,
+      "range": {
+        "startUs": 0,
+        "durationUs": 31000000
+      },
+      "source": {
+        "assetId": "asset_opening",
+        "stream": {
+          "type": "video",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 3000000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "loop"
+        }
+      },
+      "visual": {
+        "fit": "fill",
+        "transform": {
+          "positionPx": {
+            "x": 160,
+            "y": 90
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "rotationDeg": 0,
+          "skewDeg": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "opacity": 1,
+        "blendMode": "normal"
+      },
+      "materialInstanceIds": ["mat_warm"]
+    },
+    "item_closing": {
+      "id": "item_closing",
+      "trackId": "track_video",
+      "type": "video",
+      "enabled": true,
+      "range": {
+        "startUs": 29000000,
+        "durationUs": 31000000
+      },
+      "source": {
+        "assetId": "asset_closing",
+        "stream": {
+          "type": "video",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 3000000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "loop"
+        }
+      },
+      "visual": {
+        "fit": "fill",
+        "transform": {
+          "positionPx": {
+            "x": 160,
+            "y": 90
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "rotationDeg": 0,
+          "skewDeg": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "opacity": 0.9,
+        "blendMode": "normal"
+      },
+      "materialInstanceIds": []
+    },
+    "item_music": {
+      "id": "item_music",
+      "trackId": "track_audio",
+      "type": "audio",
+      "enabled": true,
+      "range": {
+        "startUs": 0,
+        "durationUs": 60000000
+      },
+      "source": {
+        "assetId": "asset_music",
+        "stream": {
+          "type": "audio",
+          "index": 0
+        },
+        "sourceRange": {
+          "startUs": 0,
+          "durationUs": 3000000
+        },
+        "timeMapping": {
+          "type": "linear",
+          "rate": {
+            "numerator": 1,
+            "denominator": 1
+          },
+          "reverse": false,
+          "boundary": "loop"
+        }
+      },
+      "audio": {
+        "gainDb": -6,
+        "pan": 0
+      },
+      "materialInstanceIds": []
+    }
+  },
+  "materialInstances": {
+    "mat_warm": {
+      "id": "mat_warm",
+      "definition": {
+        "packageId": "dev.aelion.examples.filters",
+        "packageVersion": "1.0.0",
+        "packageIntegrity": "sha256:f6c5dbb1edea12d3d328853679dd7b01f5b1465851305cd3310677d541cee24a",
+        "materialId": "warm-film"
+      },
+      "enabled": true,
+      "previewPolicy": "required",
+      "parameters": {
+        "intensity": 0.65
+      }
+    },
+    "mat_dissolve": {
+      "id": "mat_dissolve",
+      "definition": {
+        "packageId": "dev.aelion.examples.transitions",
+        "packageVersion": "1.0.0",
+        "packageIntegrity": "sha256:dd2c34233a9999702b486a4e84e8123dc0e949b9b231f922cb2525677715a491",
+        "materialId": "cross-dissolve"
+      },
+      "enabled": true,
+      "previewPolicy": "required",
+      "parameters": {
+        "curve": "smooth"
+      }
+    }
+  },
+  "transitions": {
+    "transition_center": {
+      "id": "transition_center",
+      "sequenceId": "seq_vertical",
+      "trackId": "track_video",
+      "kind": "visual",
+      "fromItemId": "item_opening",
+      "toItemId": "item_closing",
+      "range": {
+        "startUs": 29000000,
+        "durationUs": 2000000
+      },
+      "materialInstanceId": "mat_dissolve"
+    }
+  },
+  "markers": {},
+  "linkGroups": {},
+  "extensions": {}
+}

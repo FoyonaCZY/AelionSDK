@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schemas.aelion.dev/material/graph/v1.json",
+  "graphVersion": "1.0.0",
+  "nodeSet": "aelion.visual.nodes/1.0.0",
+  "nodes": [
+    {
+      "id": "highlights",
+      "type": "color.extract-highlights",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "source": {
+          "inputPort": "source"
+        },
+        "threshold": {
+          "parameter": "threshold"
+        }
+      }
+    },
+    {
+      "id": "blurred",
+      "type": "blur.gaussian",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "source": {
+          "node": "highlights",
+          "output": "frame"
+        },
+        "radiusPx": {
+          "parameter": "radiusPx"
+        }
+      }
+    },
+    {
+      "id": "glow",
+      "type": "color.scale-rgb",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "source": {
+          "node": "blurred",
+          "output": "frame"
+        },
+        "scale": {
+          "parameter": "intensity"
+        }
+      }
+    },
+    {
+      "id": "composite",
+      "type": "composite.screen",
+      "typeVersion": "1.0.0",
+      "inputs": {
+        "base": {
+          "inputPort": "source"
+        },
+        "overlay": {
+          "node": "glow",
+          "output": "frame"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "result": {
+      "node": "composite",
+      "output": "frame"
+    }
+  }
+}

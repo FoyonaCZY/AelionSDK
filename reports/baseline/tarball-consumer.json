@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "1.0.0",
+  "sdkVersion": "0.1.0-alpha.0",
+  "generatedAt": "2026-07-15T03:41:51.280Z",
+  "command": "corepack pnpm test:consumer",
+  "bundlerAdapter": {
+    "id": "@aelion/vite-plugin",
+    "package": "@aelion/vite-plugin",
+    "version": "0.1.0-alpha.0",
+    "packageSha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a",
+    "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
+    "public": true,
+    "zeroConfigVite": false,
+    "configuration": "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
+    "viteConfigSha256": "385ca60213b3f1bbd910a1aefc27b5921f6280dc48eb33c95750131eea5d8c29",
+    "note": "The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. No repository path aliases or private test transforms are used."
+  },
+  "consumerContract": {
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "dependencyContractSha256": "73ae22c35077311200866ce4d608d6c461832cce0891df4c997be2685894861b",
+    "dependencyContract": {
+      "@aelion/audio": "aelion-audio-0.1.0-alpha.0.tgz",
+      "@aelion/capability": "aelion-capability-0.1.0-alpha.0.tgz",
+      "@aelion/core": "aelion-core-0.1.0-alpha.0.tgz",
+      "@aelion/export": "aelion-export-0.1.0-alpha.0.tgz",
+      "@aelion/material-compiler": "aelion-material-compiler-0.1.0-alpha.0.tgz",
+      "@aelion/material-sdk": "aelion-material-sdk-0.1.0-alpha.0.tgz",
+      "@aelion/media": "aelion-media-0.1.0-alpha.0.tgz",
+      "@aelion/project-schema": "aelion-project-schema-0.1.0-alpha.0.tgz",
+      "@aelion/render-ir": "aelion-render-ir-0.1.0-alpha.0.tgz",
+      "@aelion/renderer-worker": "aelion-renderer-worker-0.1.0-alpha.0.tgz",
+      "@aelion/sdk": "aelion-sdk-0.1.0-alpha.0.tgz",
+      "@aelion/transaction": "aelion-transaction-0.1.0-alpha.0.tgz",
+      "@aelion/vite-plugin": "aelion-vite-plugin-0.1.0-alpha.0.tgz",
+      "@esbuild/darwin-x64": "esbuild-darwin-x64-0.25.12.tgz",
+      "@rollup/rollup-darwin-x64": "rollup-rollup-darwin-x64-4.62.2.tgz",
+      "@types/dom-mediacapture-transform": "types-dom-mediacapture-transform-0.1.12.tgz",
+      "@types/dom-webcodecs": "types-dom-webcodecs-0.1.13.tgz",
+      "@types/estree": "types-estree-1.0.9.tgz",
+      "@types/node": "types-node-20.19.8.tgz",
+      "ajv": "ajv-8.17.1.tgz",
+      "ajv-formats": "ajv-formats-3.0.1.tgz",
+      "esbuild": "esbuild-0.25.12.tgz",
+      "fast-deep-equal": "fast-deep-equal-3.1.3.tgz",
+      "fast-uri": "fast-uri-3.1.3.tgz",
+      "fdir": "fdir-6.5.0.tgz",
+      "fsevents": "fsevents-2.3.3.tgz",
+      "json-schema-traverse": "json-schema-traverse-1.0.0.tgz",
+      "mediabunny": "mediabunny-1.50.8.tgz",
+      "nanoid": "nanoid-3.3.15.tgz",
+      "picocolors": "picocolors-1.1.1.tgz",
+      "picomatch": "picomatch-4.0.5.tgz",
+      "postcss": "postcss-8.5.16.tgz",
+      "require-from-string": "require-from-string-2.0.2.tgz",
+      "rollup": "rollup-4.62.2.tgz",
+      "source-map-js": "source-map-js-1.2.1.tgz",
+      "tinyglobby": "tinyglobby-0.2.17.tgz",
+      "typescript": "typescript-5.8.3.tgz",
+      "undici-types": "undici-types-6.21.0.tgz",
+      "vite": "vite-7.0.6.tgz"
+    },
+    "packageJsonSha256": "042738a6740cd5c4c27d39b24ab611c85580fd4f32ae7feb7b0cd273856a2722",
+    "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
+    "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
+  },
+  "packages": [
+    {
+      "name": "@aelion/audio",
+      "version": "0.1.0-alpha.0",
+      "sha256": "9aafa85ebf931da1034ce6c07f3680a3b0fd5a42fdf9d788abc87e90aae1f95c"
+    },
+    {
+      "name": "@aelion/capability",
+      "version": "0.1.0-alpha.0",
+      "sha256": "264a0635795a6c524508563bbd7bcfc474b7d9956a288399819e820449ccc0bf"
+    },
+    {
+      "name": "@aelion/core",
+      "version": "0.1.0-alpha.0",
+      "sha256": "6be3692ac1de68727bd3ed9c409fb2bbda8a67f8b8afac157377b13e323038c1"
+    },
+    {
+      "name": "@aelion/export",
+      "version": "0.1.0-alpha.0",
+      "sha256": "7152c38e6d790fbe506ae2d115d234c1550f27737beb649351453e2487b55f77"
+    },
+    {
+      "name": "@aelion/material-compiler",
+      "version": "0.1.0-alpha.0",
+      "sha256": "1bbc870510ec7e5b5d89e2dd4e59c5622dea0772c72da2f68863421a9df21db0"
+    },
+    {
+      "name": "@aelion/material-sdk",
+      "version": "0.1.0-alpha.0",
+      "sha256": "4cdbccc243fee843ced35058ab694a757bd19ed7835d0b406107cd5deb684765"
+    },
+    {
+      "name": "@aelion/media",
+      "version": "0.1.0-alpha.0",
+      "sha256": "b7e29eb2dcd9ed46a45b49ba59a8ad714c1b03ee147196e0e74bfe29bb6ed4c6"
+    },
+    {
+      "name": "@aelion/project-schema",
+      "version": "0.1.0-alpha.0",
+      "sha256": "af60724e31b8fe4a530ae2dc723ace68c8eaf934be8950d18793077f6cc95c49"
+    },
+    {
+      "name": "@aelion/render-ir",
+      "version": "0.1.0-alpha.0",
+      "sha256": "d9833399ad857e5ff1e6dad4da0fbe573dadc42b28f716ab9a7014d3dc33bc2f"
+    },
+    {
+      "name": "@aelion/renderer-worker",
+      "version": "0.1.0-alpha.0",
+      "sha256": "5810eea9e7a9d375fb1ae0a97a54491f233ce06af396cc437183875d669c0e74"
+    },
+    {
+      "name": "@aelion/sdk",
+      "version": "0.1.0-alpha.0",
+      "sha256": "97cc80eaec4638b4c0e35c18514a6f497d7175ab0e830eb41a8bb44d9b1a0948"
+    },
+    {
+      "name": "@aelion/transaction",
+      "version": "0.1.0-alpha.0",
+      "sha256": "2abb0566ffcaf88cddb7b8d09969eea03ebd558e45e20f354da45c49bfbfd172"
+    },
+    {
+      "name": "@aelion/vite-plugin",
+      "version": "0.1.0-alpha.0",
+      "sha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a"
+    }
+  ],
+  "runtimeAssets": [
+    {
+      "id": "pcm-player-worklet",
+      "publicUrl": "/assets/aelion-audio-pcm-player.worklet.js-BpHuow3p.js",
+      "file": "dist/assets/aelion-audio-pcm-player.worklet.js-BpHuow3p.js",
+      "bytes": 637,
+      "sha256": "accfff12a6fda486429f418d02fabee76c73ed83edc0d4ccd7ec9d3988124038"
+    },
+    {
+      "id": "pcm-message-player-worklet",
+      "publicUrl": "/assets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js",
+      "file": "dist/assets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js",
+      "bytes": 1939,
+      "sha256": "07821e3ca194be57d0c497a112927331e5c095005c7b904dfa6e54ef6b36a3c8"
+    },
+    {
+      "id": "webgl2-worker",
+      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-BGTr4J-E.js",
+      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-BGTr4J-E.js",
+      "bytes": 11038,
+      "sha256": "3f5d04a431affd3487c372b79d736d91013827a261c51a01348e4847585bf88d"
+    }
+  ],
+  "browsers": [
+    {
+      "browser": "chromium",
+      "report": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+        "crossOriginIsolated": true,
+        "workerCompositor": {
+          "backend": "webgl2",
+          "graphHash": "a080cd2e",
+          "pixel": [
+            245,
+            235,
+            225,
+            255
+          ],
+          "workerTimingUs": 60785
+        },
+        "audioWorkletClock": {
+          "contextState": "suspended",
+          "sampleRate": 48000,
+          "quantumFrames": 128,
+          "queuedFrames": 24000,
+          "capacityFrames": 96000,
+          "availableReadFrames": 23744,
+          "playedFrames": 256,
+          "underrunFrames": 0,
+          "timeUs": 5333
+        },
+        "sessionFacade": {
+          "revision": "3",
+          "state": "ready",
+          "backend": "webgl2",
+          "width": 16,
+          "height": 16
+        }
+      }
+    },
+    {
+      "browser": "firefox",
+      "report": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0",
+        "crossOriginIsolated": true,
+        "workerCompositor": {
+          "backend": "webgl2",
+          "graphHash": "a080cd2e",
+          "pixel": [
+            245,
+            235,
+            225,
+            255
+          ],
+          "workerTimingUs": 65700
+        },
+        "audioWorkletClock": {
+          "contextState": "suspended",
+          "sampleRate": 48000,
+          "quantumFrames": 128,
+          "queuedFrames": 24000,
+          "capacityFrames": 96000,
+          "availableReadFrames": 23488,
+          "playedFrames": 512,
+          "underrunFrames": 0,
+          "timeUs": 10667
+        },
+        "sessionFacade": {
+          "revision": "3",
+          "state": "ready",
+          "backend": "webgl2",
+          "width": 16,
+          "height": 16
+        }
+      }
+    }
+  ]
+}

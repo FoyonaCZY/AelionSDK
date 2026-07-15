@@ -1,0 +1,1985 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceKind": "aelion-phase-1-final-gates",
+  "generatedAt": "2026-07-13T10:58:16.733Z",
+  "generator": "scripts/capture-phase-1-final-gates.mjs",
+  "environment": {
+    "node": "v20.20.2",
+    "pnpm": "10.13.1",
+    "expectedPackageManager": "pnpm@10.13.1",
+    "os": {
+      "platform": "darwin",
+      "type": "Darwin",
+      "release": "24.6.0",
+      "version": "Darwin Kernel Version 24.6.0: Mon Jul 14 11:28:17 PDT 2025; root:xnu-11417.140.69~1/RELEASE_X86_64",
+      "productVersion": "15.6.1",
+      "architecture": "x64"
+    }
+  },
+  "sourceIdentity": {
+    "kind": "workspace-input-manifest",
+    "algorithm": "sha256(stable-json(files))",
+    "exclusions": [
+      "VCS/dependency/build/cache directories",
+      "reports/** and benchmarks/reports/** (outputs, hashed separately where relevant)",
+      ".DS_Store, *.log, *.tsbuildinfo and generated app Vite declarations"
+    ],
+    "fileCount": 279,
+    "totalBytes": 2176364,
+    "manifestSha256": "fe8316219c1076dabc3009c596e396b914102abe6c5cbef76f053182f2d71f1d",
+    "files": [
+      {
+        "path": ".github/workflows/ci.yml",
+        "bytes": 2331,
+        "sha256": "c6f9012a6368eebeb3639914fc3af6f0f6de7570b6da7a657840f6599b02ac66"
+      },
+      {
+        "path": ".gitignore",
+        "bytes": 463,
+        "sha256": "dfd6d4593c493ba95e351b827d6c6eb4419b4cea86d258b93823c160e31c1a2f"
+      },
+      {
+        "path": ".node-version",
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
+      },
+      {
+        "path": ".npmrc",
+        "bytes": 101,
+        "sha256": "f43e3805c7f6fffeca6529d9ebc9a47b62d28bb52804513c211c0ac3560513dd"
+      },
+      {
+        "path": ".nvmrc",
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
+      },
+      {
+        "path": ".prettierignore",
+        "bytes": 297,
+        "sha256": "b3e58e396dc9d9463aa7800eef456fdf360843935855a9f881720989a732c20e"
+      },
+      {
+        "path": ".prettierrc.json",
+        "bytes": 179,
+        "sha256": "a46e9114af4cd5cccbc0395eab7cd90302e13bf2be6368b4a42c54fbe8ceedd9"
+      },
+      {
+        "path": "CHANGELOG.md",
+        "bytes": 6326,
+        "sha256": "0cf520c0eefc1bb6969c0008a6a8a539c2657823fe2ed3c05096449de01d8d5c"
+      },
+      {
+        "path": "CODE_OF_CONDUCT.md",
+        "bytes": 702,
+        "sha256": "5716bd6b73d7cf5808e724cdb1148515443c587983748603af4780e60a3046aa"
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "bytes": 1870,
+        "sha256": "87e7454c0c4949e004338d9dafc994940b3e097a3c2b1bb55ce4757d90d032f7"
+      },
+      {
+        "path": "LICENSE",
+        "bytes": 11352,
+        "sha256": "3b115db5159be3694258a85982e0b8507d23b9b086e66261e03bae0d33dbe6e6"
+      },
+      {
+        "path": "README.md",
+        "bytes": 9077,
+        "sha256": "4a0df7fb528c0cfd983a5e8acd8e8e5c2335c840a54efa75432e7fc7cf846c10"
+      },
+      {
+        "path": "SECURITY.md",
+        "bytes": 930,
+        "sha256": "81aff4efb97802d1c0b9ea99d2faf59f2bb67a95250c3402bd1e56908e30c686"
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "bytes": 988,
+        "sha256": "d35885fb488c103999efc32903adde676d2ede64b76acf31a86c7a5a8c673aa7"
+      },
+      {
+        "path": "apps/capability-lab/index.html",
+        "bytes": 359,
+        "sha256": "459a37c97abab94e5b137c5aee7591fd0c09adf3d86035004493a96581052f92"
+      },
+      {
+        "path": "apps/capability-lab/package.json",
+        "bytes": 238,
+        "sha256": "b575912e89d592339fdb5e7e2e96cf87fd6f9ea7f8455165fdaab8ea4b5c5bab"
+      },
+      {
+        "path": "apps/capability-lab/src/main.ts",
+        "bytes": 5555,
+        "sha256": "ef7a8c1dd293efaba1827984a78b97aebc9b9fa20b223133a20a929546c33e07"
+      },
+      {
+        "path": "apps/capability-lab/src/style.css",
+        "bytes": 5798,
+        "sha256": "bf8b6730ea0f564aa208f9ac23e7580bdebc5e824ac36126bb441081cf8dc76e"
+      },
+      {
+        "path": "apps/capability-lab/tsconfig.json",
+        "bytes": 342,
+        "sha256": "bcab94ec24647d21fada3411663c702e0e002df92993a503975c77b50dddbcd2"
+      },
+      {
+        "path": "apps/capability-lab/vite.config.ts",
+        "bytes": 762,
+        "sha256": "af188eeaa3273578592964f20f29fd12c9820f7856d8f1b64ba14820ee49cfc9"
+      },
+      {
+        "path": "apps/evidence-runner/alpha.html",
+        "bytes": 387,
+        "sha256": "d988178b7d7e3b56d3a008ba918f2bcd6877e12a2f770515998881c8f362b30b"
+      },
+      {
+        "path": "apps/evidence-runner/index.html",
+        "bytes": 365,
+        "sha256": "5dac38a8c1fd498a276f3fe80d6580c00581092925c51e8a330301037eb12c5c"
+      },
+      {
+        "path": "apps/evidence-runner/package.json",
+        "bytes": 581,
+        "sha256": "9ea4acaaf4df3970efa8daa76a6f0dfee61173f00a21db4b834d2b3860761b63"
+      },
+      {
+        "path": "apps/evidence-runner/performance.html",
+        "bytes": 389,
+        "sha256": "1f9e16ea4ac663000f8f39825cad2af377656db34c1dc503077ece547c12a08c"
+      },
+      {
+        "path": "apps/evidence-runner/seek.html",
+        "bytes": 375,
+        "sha256": "03eb32a6e080019a1115ce57a88bd2654d7af05ddbf223037b01f636df07d15a"
+      },
+      {
+        "path": "apps/evidence-runner/src/alpha.ts",
+        "bytes": 10040,
+        "sha256": "ece3a90761b77242a2ba71bf9a0686dfc4fa9562cde3480f22c3e277d75d9b61"
+      },
+      {
+        "path": "apps/evidence-runner/src/main.ts",
+        "bytes": 10553,
+        "sha256": "863a34b10cc06aa5b4d9a19fa48ddc15f882f87a910668ebb9d9917538505c4c"
+      },
+      {
+        "path": "apps/evidence-runner/src/performance.ts",
+        "bytes": 9172,
+        "sha256": "968ffbf9c3a8bed23ed445e528022cb561112746baf325f0e7c96d346ee7f7d9"
+      },
+      {
+        "path": "apps/evidence-runner/src/seek.ts",
+        "bytes": 4223,
+        "sha256": "e95c05ea80ee8ffcdc62bb5a387a334c1b0079ab6fc4d06a63f2857b5f57ea7e"
+      },
+      {
+        "path": "apps/evidence-runner/tsconfig.json",
+        "bytes": 627,
+        "sha256": "bf78abd14b2b0eb0767ff1caf02c2c6f4a5f9823098a0efa59f8834e9374f40e"
+      },
+      {
+        "path": "apps/evidence-runner/vite.config.ts",
+        "bytes": 1674,
+        "sha256": "a53d0cc2a3ea7d0c5ac40c7b46258d7254cc72cb991f3fe3ca0b15ef3ed174f1"
+      },
+      {
+        "path": "benchmarks/render-ir.bench.ts",
+        "bytes": 4904,
+        "sha256": "9cd3b02bfb82b6ed45bdd7f52ba47cf4c1faa15a83578539102d3ad41d2bfb6c"
+      },
+      {
+        "path": "docs/Aelion-Material-Protocol-v1.md",
+        "bytes": 48387,
+        "sha256": "be9701215ae35c98e3d394dee76cd8310619899a30c8ddcbd74b571d160bede1"
+      },
+      {
+        "path": "docs/AelionSDK-Development-Workflow.md",
+        "bytes": 23231,
+        "sha256": "9b2ee3f568556a223daac14192930211820b330cd2077c9f7656336c6cd62192"
+      },
+      {
+        "path": "docs/AelionSDK-Technical-Design-v0.1.md",
+        "bytes": 113544,
+        "sha256": "aee5f15ec8fb0dac633dd0517e0d1019dc5d15ae9c364530a131d132663608c3"
+      },
+      {
+        "path": "docs/GOAL-PHASE-1.md",
+        "bytes": 6843,
+        "sha256": "54d1b21764b3da5fe1d424f65f0f7e653cd96f2373181e71d24f2ae476d6043b"
+      },
+      {
+        "path": "docs/GOAL.md",
+        "bytes": 12855,
+        "sha256": "967382862ba9a7564b9b33af8bb1bca3864f73866434d752dc95a5316fee3e8d"
+      },
+      {
+        "path": "docs/adr/001-project-json-and-transaction.md",
+        "bytes": 1272,
+        "sha256": "f57f2dec8e369bc4c69c3cd4579c8c6b157ba1157402ea1cbf97f836ab9d3f46"
+      },
+      {
+        "path": "docs/adr/002-integer-microsecond-time.md",
+        "bytes": 1141,
+        "sha256": "2a1d31f78542c7842ef742ec75a91f64188a549d652ff1079ced9a865fe80db2"
+      },
+      {
+        "path": "docs/adr/003-normalized-project-entities.md",
+        "bytes": 1041,
+        "sha256": "63ed6cf6da77e53cddd964be79943e75270a6b09605fad213c8f0693bdad77d4"
+      },
+      {
+        "path": "docs/adr/004-shared-render-ir.md",
+        "bytes": 1579,
+        "sha256": "3af4fefd65f0f84cfdd021736bf720121fc64636a41e6703c03464c305666535"
+      },
+      {
+        "path": "docs/adr/005-capability-selected-backends.md",
+        "bytes": 1576,
+        "sha256": "1f5fe512096ea00fd59031d65209875a4620de6562e2c0677a2bb58b681cb36e"
+      },
+      {
+        "path": "docs/adr/006-audio-master-clock.md",
+        "bytes": 1686,
+        "sha256": "f19f4d51823ff033a55d06bc791f51b96778edd8eae78b93d62b46c03cd76cfd"
+      },
+      {
+        "path": "docs/adr/007-offline-streaming-export.md",
+        "bytes": 1726,
+        "sha256": "e946c45d64a4af57184309c732accae6a77a754f0a450251bd85c3c41ee5fc0e"
+      },
+      {
+        "path": "docs/adr/008-no-project-executable-code.md",
+        "bytes": 1200,
+        "sha256": "34608b5d26200771222d06f4306035de44f8456824c155cd68cfa30d5d3838f2"
+      },
+      {
+        "path": "docs/adr/009-media-container-adapter.md",
+        "bytes": 2128,
+        "sha256": "88fadef29cbdc99556514ffc2a8116a2911a15babe0c418d004230e77b33e913"
+      },
+      {
+        "path": "docs/adr/010-sample-index-capability-gating.md",
+        "bytes": 2520,
+        "sha256": "0a1e580b4ad9ca4811aa2435a8a9c15816b52ab927deca3f2692546e1705d370"
+      },
+      {
+        "path": "docs/adr/011-phase-0-certified-scope.md",
+        "bytes": 3379,
+        "sha256": "9d6f7f988a12415a1efe61c724b09defcd5da8c59a9469d9292f98026c80d386"
+      },
+      {
+        "path": "docs/adr/012-alpha-public-api.md",
+        "bytes": 4390,
+        "sha256": "b93edfbb8d380e1b2203956286c75a72f04846d97aa4c21b0da882a0af8958f2"
+      },
+      {
+        "path": "docs/adr/013-multi-package-and-tarball-consumer.md",
+        "bytes": 3750,
+        "sha256": "c7038fe1f45a87d874dc03fe66b4aa68d2253f81e664fb7e42651ba8df41b482"
+      },
+      {
+        "path": "docs/adr/014-premultiplied-multi-layer-composition.md",
+        "bytes": 3526,
+        "sha256": "9a781a148681282a17ca2d71ca2a656f14556847eaf5c42641c528281c36f962"
+      },
+      {
+        "path": "docs/adr/015-material-authoring-integrity-and-trust.md",
+        "bytes": 3503,
+        "sha256": "9615a113ea346ae95931ae1c0e503686b5c5b2ee91d9096a22e94dae8945200e"
+      },
+      {
+        "path": "docs/adr/README.md",
+        "bytes": 1965,
+        "sha256": "bf981a3cf57989cebfc6c94d47fe687fa9284686cacfefff2027f9957c1ce717"
+      },
+      {
+        "path": "docs/compatibility/phase-0-matrix.md",
+        "bytes": 4346,
+        "sha256": "6d817d99faf297a7432e39673c47170df96c21f77a26e9c94cedf2b0934308cd"
+      },
+      {
+        "path": "docs/compatibility/phase-1-alpha-matrix.md",
+        "bytes": 7019,
+        "sha256": "a46c5a968468bad2ed9be5c09776698737723d26dcefeebccf6bdb2e55e2ae65"
+      },
+      {
+        "path": "docs/contracts/phase-1-editing-commands.md",
+        "bytes": 5245,
+        "sha256": "3eba41040cccb683936fcf2b5f353ea032d0a4a2d9d2edc82b9afe18c8f1801f"
+      },
+      {
+        "path": "docs/decisions/phase-0-exit.md",
+        "bytes": 8301,
+        "sha256": "07120d3dad58d3300a361cc8cee13ee88350c32be8a1e62d2e2a4c2b8343cf45"
+      },
+      {
+        "path": "docs/decisions/phase-1-exit.md",
+        "bytes": 9112,
+        "sha256": "6bccc4c90afee6d31a79961f09f3a82ebce58a58d4a47a267b3132fc17157c2b"
+      },
+      {
+        "path": "docs/evidence/phase-1-completion-audit.md",
+        "bytes": 10253,
+        "sha256": "4308c321826a4fa3bf8fd6e681cd1375b6b7e346e233f19025f53bdbd73e1424"
+      },
+      {
+        "path": "docs/evidence/phase-1-index.md",
+        "bytes": 10424,
+        "sha256": "9df023dbdde0f8dd739c34b89a078631b0613a8c6f5516f3278b630e29c50c28"
+      },
+      {
+        "path": "docs/guides/alpha-quick-start.md",
+        "bytes": 9171,
+        "sha256": "77f41043e6aef8cfb1d5f895a6a687f13408c028118661368b3d2d9f91c16312"
+      },
+      {
+        "path": "docs/guides/browser-deployment.md",
+        "bytes": 5382,
+        "sha256": "aee3b24efb5575f979c90f54d23c22d8bc1d42f8876d950bd1c5147cac0905cf"
+      },
+      {
+        "path": "docs/guides/material-authoring.md",
+        "bytes": 6486,
+        "sha256": "a47b23253e1006fd5265be4906f881377827fa30272f2e9746d39d8542bfb237"
+      },
+      {
+        "path": "docs/guides/media-provider.md",
+        "bytes": 5606,
+        "sha256": "b88e152967ae63761574f0f57f0946b93137157296997a0a4e7f0ab080b4f741"
+      },
+      {
+        "path": "docs/guides/resource-lifecycle.md",
+        "bytes": 6349,
+        "sha256": "ec681c363a4bd5f5b831b3320718ec2c25870e2d2554f797b32c7f2d60662177"
+      },
+      {
+        "path": "docs/phase-1-backlog.md",
+        "bytes": 11212,
+        "sha256": "d45517985019fe8bbf9c62f49509bd113fca1bde24b14a136c8e51c6dcffbcfc"
+      },
+      {
+        "path": "docs/reference/diagnostic-codes.md",
+        "bytes": 14873,
+        "sha256": "f3e9fc8bb8ab83216ddeab8ee94c05ecc4b9cf02f778feb0752905b062b4a6da"
+      },
+      {
+        "path": "docs/versioning-and-breaking-changes.md",
+        "bytes": 6616,
+        "sha256": "f1906cfdf3d8ad9820e15b86f2ec2fdf0bca0106ebe16dab1e4a99b3ef780324"
+      },
+      {
+        "path": "eslint.config.mjs",
+        "bytes": 1729,
+        "sha256": "819ac9b91fbb990ad4526e7adef70ee5c6f30c9aaaa49301963c59bee6634215"
+      },
+      {
+        "path": "examples/README.md",
+        "bytes": 2216,
+        "sha256": "5ac9eeed58dcab730b90c22d334897595cba26f8f6f7723f76407a1258f53166"
+      },
+      {
+        "path": "examples/aelion-alpha-60s.project.json",
+        "bytes": 7309,
+        "sha256": "2089d101a7ca2c77b6a153a145f57f76853113aca73643448b9433bb44942880"
+      },
+      {
+        "path": "examples/aelion-project-v1.example.json",
+        "bytes": 15937,
+        "sha256": "104a44c16d18e7ca7a8ac2db1dc46e56a53d1a239672522c82d0e49dce4986da"
+      },
+      {
+        "path": "examples/aelion-vertical-slice-30s.project.json",
+        "bytes": 7166,
+        "sha256": "c4ad05bc056b714c546c8ed318e2443aa725ce4d6eb975b6ee86ec18d6e9f7b7"
+      },
+      {
+        "path": "examples/materials/README.md",
+        "bytes": 1530,
+        "sha256": "34b53be6fe8dc8061f8427517acb2f01216cd2c19d3618467ce79e8316eadd67"
+      },
+      {
+        "path": "examples/materials/authoring-sdk/cross-dissolve.ts",
+        "bytes": 1323,
+        "sha256": "adf3c8b3daad602336dd6d6068a9cbbbaeb6ba2eb17ebc45c5c148698a25bfce"
+      },
+      {
+        "path": "examples/materials/cross-dissolve/graphs/cross-dissolve.graph.json",
+        "bytes": 847,
+        "sha256": "4acadb46dc6d021c3c71dd390fd1fab76084be50f0056c1598e13963808c08a9"
+      },
+      {
+        "path": "examples/materials/cross-dissolve/manifest.json",
+        "bytes": 1131,
+        "sha256": "b79b4281283b4be02788f0ddac22ad529480f6c80a83d759f1cde1c306eb37ce"
+      },
+      {
+        "path": "examples/materials/cross-dissolve/materials/cross-dissolve.material.json",
+        "bytes": 2068,
+        "sha256": "764ea7db9b35c8e3fb1089847668e2a4b48becf1df6d1fd0c5184faebc08a189"
+      },
+      {
+        "path": "examples/materials/soft-glow/graphs/soft-glow.graph.json",
+        "bytes": 1344,
+        "sha256": "217204de14035101081fc3754ed22bc18fc82ba1b022e8d05ae528fed0590e52"
+      },
+      {
+        "path": "examples/materials/soft-glow/manifest.json",
+        "bytes": 1100,
+        "sha256": "2bd9b996a32b4c452b9f773e0da104672684f496eef80afa5a8e6b6701577c81"
+      },
+      {
+        "path": "examples/materials/soft-glow/materials/soft-glow.material.json",
+        "bytes": 3038,
+        "sha256": "0e4edff486fdbfcf8a5aee7021e2c4b1e3ea6ee705c3e37a7f7cffea22684f8a"
+      },
+      {
+        "path": "examples/materials/warm-film/graphs/warm-film.graph.json",
+        "bytes": 1068,
+        "sha256": "a99a0e1019c2906f069f155f0c3aabcf6fc59ce1edb0c99221c7aa560e90a0fd"
+      },
+      {
+        "path": "examples/materials/warm-film/manifest.json",
+        "bytes": 1100,
+        "sha256": "f62695f2090c2df7dd53c7fcb8f7e3b67d71df1de3e481e47d27dc60da39aa60"
+      },
+      {
+        "path": "examples/materials/warm-film/materials/warm-film.material.json",
+        "bytes": 2038,
+        "sha256": "6cc9f4a96394c508885eb998ef9d6465f3971b2a3dfc7ab7ad11bf7adbaf9632"
+      },
+      {
+        "path": "fixtures/manifests/media-v1.json",
+        "bytes": 3750,
+        "sha256": "02c2e42d46a0349fd8ee1c37e41c2fc5582cedede80e633ad0d1f935fde91975"
+      },
+      {
+        "path": "fixtures/manifests/media-v1.schema.json",
+        "bytes": 2928,
+        "sha256": "5e387cb826516ca370967a8444dc242bb683c02e5f5a3fd800631f4e0a25aa78"
+      },
+      {
+        "path": "fixtures/media/.gitkeep",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      },
+      {
+        "path": "fixtures/media/mp4-fragmented-h264-aac.mp4",
+        "bytes": 150873,
+        "sha256": "3ebc4e35f8cb7852254d2dd021fb58162dcc1420e7f357c21fd20d1e65284382"
+      },
+      {
+        "path": "fixtures/media/mp4-moov-head-h264-aac.mp4",
+        "bytes": 151713,
+        "sha256": "9f70332e7cd4490c130422aa08145bb72067e75e74c909f8db418af3e43ff025"
+      },
+      {
+        "path": "fixtures/media/mp4-moov-tail-h264-aac.mp4",
+        "bytes": 151713,
+        "sha256": "2fa7bc887bdd3103104e7fbb8c6727e53b97c876559336032fd5d417cb51449d"
+      },
+      {
+        "path": "fixtures/media/mp4-nonzero-pts-h264-aac.mp4",
+        "bytes": 151737,
+        "sha256": "ab5563faad53e961172d6fee64424f844d4bba92c431a8a60e49970f424fee73"
+      },
+      {
+        "path": "fixtures/media/webm-vp9-opus-vfr.webm",
+        "bytes": 118300,
+        "sha256": "d49e1d29712a1858fe11d246ae4905289575cfec664abe05fd9a8af0e7d7b21e"
+      },
+      {
+        "path": "package.json",
+        "bytes": 3663,
+        "sha256": "3dbc8b62cb9250528bbf7808b6004a4369df1a20be9a26fb088031eddbde3611"
+      },
+      {
+        "path": "packages/audio/package.json",
+        "bytes": 1052,
+        "sha256": "b0ad7bebb954b59c23316d8d444f01dbf79870ea1bee028e520b6eeb7aca2b7e"
+      },
+      {
+        "path": "packages/audio/src/index.ts",
+        "bytes": 230,
+        "sha256": "dbd1d80c6a8ac1b7562e3ab648f7415e736e7ab2879a3f561c90c6ac87c877ba"
+      },
+      {
+        "path": "packages/audio/src/ir-mixer.ts",
+        "bytes": 6478,
+        "sha256": "c2169ed87e77444b3b26e1d2c976ca43039b93c0e589291b4a1684147d48a44f"
+      },
+      {
+        "path": "packages/audio/src/pcm-message-player.worklet.ts",
+        "bytes": 5164,
+        "sha256": "32f1d3585c4604ac2c4ee5b64f577c43a499ed1c0a9a7cfe9f0f9f9b18c00d7e"
+      },
+      {
+        "path": "packages/audio/src/pcm-player.worklet.ts",
+        "bytes": 2129,
+        "sha256": "4da54343e6249b5e8b1cff28c012a159c0985020f0e901c13a6aeab8ba78b341"
+      },
+      {
+        "path": "packages/audio/src/pcm-ring.ts",
+        "bytes": 7027,
+        "sha256": "1c08d026f56c0b6a4ac50e2ed5099b2d0dc71cc7afbe84f5e6078bcf902575ea"
+      },
+      {
+        "path": "packages/audio/src/transferable-pcm-queue.ts",
+        "bytes": 3082,
+        "sha256": "2f80bff1520ac52c121f3d03a47efbafebcd858110ea988edf3573d6d6d6cf63"
+      },
+      {
+        "path": "packages/audio/src/transferable-worklet-clock.ts",
+        "bytes": 5823,
+        "sha256": "f6f2f02b67e81fed0a677ebd59354f68d51b73a519df6a92af9796c1411b3052"
+      },
+      {
+        "path": "packages/audio/src/video-scheduler.ts",
+        "bytes": 4084,
+        "sha256": "aabb2464848ca1d85b26c0d7c5b907d44c7c1355d11b78c2168f2393840a6d08"
+      },
+      {
+        "path": "packages/audio/src/worklet-clock.ts",
+        "bytes": 6900,
+        "sha256": "8e53071ff481cb8c4a578ff12fa154baf0f374e8df66fd806a355b811b5a3586"
+      },
+      {
+        "path": "packages/audio/test/__screenshots__/worklet.browser.test.ts/AudioWorklet-master-clock-consumes-a-bounded-PCM-ring-and-advances-the-hardware-clock-without-underrun-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/audio/test/__screenshots__/worklet.browser.test.ts/non-isolated-AudioWorklet-fallback-uses-a-bounded-acknowledged-Transferable-queue-without-SAB-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/audio/test/ir-mixer.test.ts",
+        "bytes": 6463,
+        "sha256": "5c6e1cc1a0b1fa192129195674d94d8ae808b123f95ce3ceddaa956251c8b670"
+      },
+      {
+        "path": "packages/audio/test/pcm-ring.test.ts",
+        "bytes": 3099,
+        "sha256": "96608f931c99b57faec0b2e8aba27f11cd9297434c222b81c1b39d903647ec3e"
+      },
+      {
+        "path": "packages/audio/test/transferable-pcm-queue.test.ts",
+        "bytes": 1360,
+        "sha256": "1f2d21583d19f266a2b7d5b7f7c7fd3552f8d7c5d4378d5c4de3ad5dc00ac6ec"
+      },
+      {
+        "path": "packages/audio/test/video-scheduler.test.ts",
+        "bytes": 3924,
+        "sha256": "d069fd60d73ad661ef7d36107c94987bc793f766b42840451b56efe85ebc03fe"
+      },
+      {
+        "path": "packages/audio/test/worklet.browser.test.ts",
+        "bytes": 4731,
+        "sha256": "a237ab754736e28baff3d660e16e712c7176f4656b6ec75c2977c3d1e5c23821"
+      },
+      {
+        "path": "packages/audio/tsconfig.json",
+        "bytes": 258,
+        "sha256": "7aab32ddb0433c994b4c708910bac71b815cb51d1382bf9ac8b97a3c2d90397b"
+      },
+      {
+        "path": "packages/capability/package.json",
+        "bytes": 1003,
+        "sha256": "33e2d567475d3cb008b2f43d4588af5f5f7b2199406b44b8952f1861f37dce02"
+      },
+      {
+        "path": "packages/capability/src/index.ts",
+        "bytes": 56,
+        "sha256": "11ab7d327ab34f5be6fa7ab6d077717649d034950e779c342b4aad03e4510602"
+      },
+      {
+        "path": "packages/capability/src/probe.ts",
+        "bytes": 13397,
+        "sha256": "b27543c9dd46ba55c42a2945fbd6ad6198ea6c2b8936aca874fdd665c77281c2"
+      },
+      {
+        "path": "packages/capability/src/types.ts",
+        "bytes": 2279,
+        "sha256": "af26cdc1ce6211664bf162482e413c1898d07deb4f1ce8e3e2f54f8b5e22b2a5"
+      },
+      {
+        "path": "packages/capability/test/__screenshots__/capability.browser.test.ts/browser-capability-report-probes-real-browser-configurations-and-returns-a-serializable-report-1.png",
+        "bytes": 5714,
+        "sha256": "3d16994dcdc895dfef7fe91896a3b6086d765476fbfd1edebc04fdf9126204f5"
+      },
+      {
+        "path": "packages/capability/test/capability.browser.test.ts",
+        "bytes": 1444,
+        "sha256": "8d98c3138e00091d0f4b0a1b8a52f08a0e35458f168e61d1657efcf24402d359"
+      },
+      {
+        "path": "packages/capability/tsconfig.json",
+        "bytes": 230,
+        "sha256": "03d4942a90e259c2f072fda8bf222ec19917c57c1b1a8712ba38c451d5c7da9b"
+      },
+      {
+        "path": "packages/core/package.json",
+        "bytes": 944,
+        "sha256": "f68cb16a910e14b3f080cf6fa7c470710b2ab215bb1091a0a15a2109fc69b1cc"
+      },
+      {
+        "path": "packages/core/src/diagnostic.ts",
+        "bytes": 1816,
+        "sha256": "aecb3e24637f89cb44488c852d189d9511cdd50f241801cb0028dc6407a8b171"
+      },
+      {
+        "path": "packages/core/src/disposable.ts",
+        "bytes": 1179,
+        "sha256": "afd57039dbc4012d36ce30215d5c13cb3f5846bf4ba414c690cab26d45e2a53e"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "bytes": 159,
+        "sha256": "927db5de93d2d93d4d13c6e3e18e7923843b0f287eac06d577de3dae568f5403"
+      },
+      {
+        "path": "packages/core/src/json.ts",
+        "bytes": 200,
+        "sha256": "ea01ca6186a1610487b1d81183550fbaa0a251d4974035f0673bfa9c9f77d0e2"
+      },
+      {
+        "path": "packages/core/src/resource-tracker.ts",
+        "bytes": 1133,
+        "sha256": "fbb3160a039332a958723d9d59a835412e1e8502ef125ebe3404273c9fbd8ec7"
+      },
+      {
+        "path": "packages/core/src/time.ts",
+        "bytes": 6602,
+        "sha256": "6efbd50ebe6587f989181f73fb14654162c3af93580e32851e2f9703fc0ca7cb"
+      },
+      {
+        "path": "packages/core/test/resource.test.ts",
+        "bytes": 989,
+        "sha256": "d57e09c3d62be2725f0be77c0a72348e59412173f942d16a0aa5f79659718651"
+      },
+      {
+        "path": "packages/core/test/time.test.ts",
+        "bytes": 3132,
+        "sha256": "bd8b7a082763823f7727d4f95ceb5baccbfa79c6f095162e11596d6052432c64"
+      },
+      {
+        "path": "packages/core/tsconfig.json",
+        "bytes": 189,
+        "sha256": "ae40c0b8ea329898be2c509314c0702a9f2f243e51ffc6ebc7d47ee4d383bf50"
+      },
+      {
+        "path": "packages/export/package.json",
+        "bytes": 1110,
+        "sha256": "0ac4e8b65390a6754b235f733f0309875619e990686b163131fbe2c7643ff775"
+      },
+      {
+        "path": "packages/export/src/index.ts",
+        "bytes": 130,
+        "sha256": "eaeb42321456a588d140ecfc12439fad639564d17485820fab16517e550a538b"
+      },
+      {
+        "path": "packages/export/src/memory-sink.ts",
+        "bytes": 2086,
+        "sha256": "b286961e1953a10521df335b2cb2eeba439dcadfa010e91666374ac2948f2880"
+      },
+      {
+        "path": "packages/export/src/opfs-sink.ts",
+        "bytes": 2770,
+        "sha256": "06533c82f992ec84f2ee675a677077d756dcd8eb7ea4d0994e7be79df48ea389"
+      },
+      {
+        "path": "packages/export/src/session.ts",
+        "bytes": 4809,
+        "sha256": "e51306ccb72e8996bb5c502b672c54d2b70b56b8bbf5725f12b11b2b154d9076"
+      },
+      {
+        "path": "packages/export/src/webm-export.ts",
+        "bytes": 7880,
+        "sha256": "7e379e41c8141d4671681c0e2d9ac32d93612208557b345fd279deee8375c6f9"
+      },
+      {
+        "path": "packages/export/test/__screenshots__/export.browser.test.ts/offline-WebCodecs---streaming-WebM-export-cancels-during-rendering-and-aborts-the-partial-sink-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/export/test/__screenshots__/export.browser.test.ts/offline-WebCodecs---streaming-WebM-export-releases-a-rejected-frame-and-clears-the-sink-after-encoder-ingest-failure-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/export/test/__screenshots__/export.browser.test.ts/offline-WebCodecs---streaming-WebM-export-returns-a-stable-diagnostic-and-clears-partial-output-after-a-storage-failure-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/export/test/export.browser.test.ts",
+        "bytes": 12964,
+        "sha256": "26f56d6e612bb5af655b7c662d0e4614e46e017de73fd0ba68cf3ef1396e5da0"
+      },
+      {
+        "path": "packages/export/tsconfig.json",
+        "bytes": 282,
+        "sha256": "f852379619712847252b5fa39f6020f7933ae27eb920f061fe881c0834a00a7d"
+      },
+      {
+        "path": "packages/material-compiler/package.json",
+        "bytes": 1029,
+        "sha256": "5d5004352b26e588d85c9eb1d9e4b43381aab8af3020ed7f2a89c4e1493c911a"
+      },
+      {
+        "path": "packages/material-compiler/src/compiler.ts",
+        "bytes": 14993,
+        "sha256": "10a3e338b7b8f77555dd462435eb755fb89b6d9d48d0a0c533b5366b158444ee"
+      },
+      {
+        "path": "packages/material-compiler/src/index.ts",
+        "bytes": 153,
+        "sha256": "3976796bb579e46bb69ee1f2360ede4e31707e8bc3d9bfa3eacfa7d8f6b5e400"
+      },
+      {
+        "path": "packages/material-compiler/src/node-registry.ts",
+        "bytes": 4468,
+        "sha256": "f49dd202e2f9faa37eafe506da26528a5023cda96b48da945663e9194446131c"
+      },
+      {
+        "path": "packages/material-compiler/src/types.ts",
+        "bytes": 5554,
+        "sha256": "4193aee287ae2b3de380beaa5ade9edd8035358b48da7d197c9a83b3d70b0515"
+      },
+      {
+        "path": "packages/material-compiler/src/webgl2.ts",
+        "bytes": 15547,
+        "sha256": "c527200e73c1fa26bae292c3fd54e0b2987d62286e0f7821617f73104dbb932b"
+      },
+      {
+        "path": "packages/material-compiler/src/webgpu.ts",
+        "bytes": 9472,
+        "sha256": "e02ae0d3953ff83f29b65fac49eeca7ae52a80096c395bf36c7fa3c6c9455a7b"
+      },
+      {
+        "path": "packages/material-compiler/test/compiler.test.ts",
+        "bytes": 8861,
+        "sha256": "4895e7408601d954fba9600d25b1febf4a9c5bd64d2f48070919b8bbfc2d9de8"
+      },
+      {
+        "path": "packages/material-compiler/tsconfig.json",
+        "bytes": 230,
+        "sha256": "03d4942a90e259c2f072fda8bf222ec19917c57c1b1a8712ba38c451d5c7da9b"
+      },
+      {
+        "path": "packages/material-sdk/package.json",
+        "bytes": 1081,
+        "sha256": "680cbacc259a1efbc9f520ccb6358b47fa3cafeb0ae05e6eccdc928e34b63e71"
+      },
+      {
+        "path": "packages/material-sdk/src/canonical.ts",
+        "bytes": 1368,
+        "sha256": "40584e9b0f7d78e8e045938fee8ba59d6b21d1348b0e5de4c1876c5ab658f670"
+      },
+      {
+        "path": "packages/material-sdk/src/definition-builder.ts",
+        "bytes": 7356,
+        "sha256": "f2e277e54db4161ec3f3a3805bac5b37a4b287efdccece3b47999e6f2209172e"
+      },
+      {
+        "path": "packages/material-sdk/src/graph-builder.ts",
+        "bytes": 6854,
+        "sha256": "a6a8472fdbb5b72e060f055c39599bba7e978d6e1c88b8d7c703d8eabf24811d"
+      },
+      {
+        "path": "packages/material-sdk/src/index.ts",
+        "bytes": 257,
+        "sha256": "e82ff3d0a51d016dff97c7c520d5e105a8a7a7286e2d9ff85b2a279f7950b0bd"
+      },
+      {
+        "path": "packages/material-sdk/src/package-snapshot.ts",
+        "bytes": 891,
+        "sha256": "003f3d4391121bbca45cd269f271218ecdaefc925a80faa37311394ddba2196e"
+      },
+      {
+        "path": "packages/material-sdk/src/package.ts",
+        "bytes": 7614,
+        "sha256": "98d9d8235c9f2efd1da8bbdf24a3ce62a1d10cf6843866ffd651f934700cb84b"
+      },
+      {
+        "path": "packages/material-sdk/src/registry.ts",
+        "bytes": 7174,
+        "sha256": "c375c12a0bdbe8730f3df3d92c1f4274236196d29b74b77df5202834154dd9be"
+      },
+      {
+        "path": "packages/material-sdk/src/types.ts",
+        "bytes": 8353,
+        "sha256": "3bf2ead0ef7f08befd57650db67e6bce3bd3fefb60d130d9adead71c2da83d12"
+      },
+      {
+        "path": "packages/material-sdk/src/validation.ts",
+        "bytes": 6445,
+        "sha256": "28326a8f54bd32b0723cc9b674c4f63d1a1f4fde0daaf22b8baf2fac8ed85630"
+      },
+      {
+        "path": "packages/material-sdk/src/zip.ts",
+        "bytes": 2811,
+        "sha256": "3b4eb5f9018216fa409d0c75baeb7814ba4d2cb52a2ca5abfd6d264fa1b8d4df"
+      },
+      {
+        "path": "packages/material-sdk/test/material-sdk.test.ts",
+        "bytes": 8656,
+        "sha256": "0bee61458ba93e130faf5ac6cc0dec8045b4c0610e895b9f7a698e9560202057"
+      },
+      {
+        "path": "packages/material-sdk/tsconfig.json",
+        "bytes": 266,
+        "sha256": "c1c471086959e1dec8a5c94674cef7e6ac0c0c18a18d456be1c050126d18adcf"
+      },
+      {
+        "path": "packages/media/package.json",
+        "bytes": 1036,
+        "sha256": "da37e3874a10d62fca612f59c750605bcb2490d09a3e5425da88c795b74ba239"
+      },
+      {
+        "path": "packages/media/src/index.ts",
+        "bytes": 131,
+        "sha256": "50bbc1702c935229fb27f0d1da41293c76f1b127bcbbdb6a0045d06ff2ebde1a"
+      },
+      {
+        "path": "packages/media/src/mediabunny-adapter.ts",
+        "bytes": 18910,
+        "sha256": "19e79805e4e74c5b824114a138174b449b7b71cdddae7c1bd8bba62be3d21fd5"
+      },
+      {
+        "path": "packages/media/src/range-reader.ts",
+        "bytes": 7652,
+        "sha256": "9ef07396ea6e0c03cbbfcb23b80ab6356a11eb5a2d45a80c38486ec88e2b7b5a"
+      },
+      {
+        "path": "packages/media/src/seek.ts",
+        "bytes": 2447,
+        "sha256": "1db2cc884f1a3911c2104db1051eb8187b6c6912af04ff86b2fe6f9ed72d9113"
+      },
+      {
+        "path": "packages/media/src/types.ts",
+        "bytes": 3243,
+        "sha256": "6d8f5629d2da777f9c40f51809d78656c3e8fb67e2a6a7eeb27774aaade70d88"
+      },
+      {
+        "path": "packages/media/test/__screenshots__/decode.browser.test.ts/WebCodecs-exact-seek-decodes-the-oracle-presentation-frame-from-mp4-fragmented-h264-aac-mp4-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/media/test/__screenshots__/decode.browser.test.ts/WebCodecs-exact-seek-decodes-the-oracle-presentation-frame-from-mp4-moov-head-h264-aac-mp4-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/media/test/__screenshots__/decode.browser.test.ts/WebCodecs-exact-seek-decodes-the-oracle-presentation-frame-from-webm-vp9-opus-vfr-webm-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/media/test/corpus.test.ts",
+        "bytes": 4660,
+        "sha256": "25079be5ff36e3d81d78c298c252509c27d448bbd2b67fe070ad7977d67dc49e"
+      },
+      {
+        "path": "packages/media/test/decode.browser.test.ts",
+        "bytes": 3067,
+        "sha256": "63f262b69a7c688c520d2983e282f0171adb3d432f8ea2a7660e86c87913c967"
+      },
+      {
+        "path": "packages/media/test/media.test.ts",
+        "bytes": 4809,
+        "sha256": "6a86c78ce131861006bbb346570d69e60f3923e6b93ab3ae5fe62b6123a7606c"
+      },
+      {
+        "path": "packages/media/tsconfig.json",
+        "bytes": 230,
+        "sha256": "03d4942a90e259c2f072fda8bf222ec19917c57c1b1a8712ba38c451d5c7da9b"
+      },
+      {
+        "path": "packages/project-schema/package.json",
+        "bytes": 1082,
+        "sha256": "1afc496527f8565bea518b398ae5c4995f90e682ada4dbbc3d8b818d15f3c067"
+      },
+      {
+        "path": "packages/project-schema/src/canonical.ts",
+        "bytes": 2792,
+        "sha256": "9f1e500f1bcc749449560576680bd34a3536cc63c62848732910087f182c4556"
+      },
+      {
+        "path": "packages/project-schema/src/index.ts",
+        "bytes": 91,
+        "sha256": "cdb50f2d92bc260c48fcbe6f9c17ec78c70ea591b5cec3c962e998f1b7db8464"
+      },
+      {
+        "path": "packages/project-schema/src/types.ts",
+        "bytes": 2748,
+        "sha256": "3ef6ea5c7d81f1a440a5ab35a289f4baf3b18d352da228b88f99764b33dca710"
+      },
+      {
+        "path": "packages/project-schema/src/validate.ts",
+        "bytes": 13504,
+        "sha256": "4c901edce839590d911956bdd35b312e8b683c285a38611e317d20035fcfae3a"
+      },
+      {
+        "path": "packages/project-schema/test/project.test.ts",
+        "bytes": 8266,
+        "sha256": "061917f43ca4424463811e8b156ce242e24e2df5d06c096e75c8ddd4cff2f7e7"
+      },
+      {
+        "path": "packages/project-schema/tsconfig.json",
+        "bytes": 230,
+        "sha256": "03d4942a90e259c2f072fda8bf222ec19917c57c1b1a8712ba38c451d5c7da9b"
+      },
+      {
+        "path": "packages/render-ir/package.json",
+        "bytes": 1118,
+        "sha256": "fc0e772e7e06046a43dc54462b1d37a2344113872b51408d2486a5edc7a48d42"
+      },
+      {
+        "path": "packages/render-ir/src/compiler.ts",
+        "bytes": 12770,
+        "sha256": "a6a6297de5ddc8f636cb32e54f7aa6df36a228f7fa313e440a739f676152c976"
+      },
+      {
+        "path": "packages/render-ir/src/evaluate.ts",
+        "bytes": 7091,
+        "sha256": "7d94d2d66fe2fd8daff9281fd8088146f6719121e63d56b412fcb841e76d36d0"
+      },
+      {
+        "path": "packages/render-ir/src/index.ts",
+        "bytes": 90,
+        "sha256": "8a0372c0bf7112c62fe9fcd8e9bdbb3acca30a79df3d2fca427f68d413ca6799"
+      },
+      {
+        "path": "packages/render-ir/src/types.ts",
+        "bytes": 5225,
+        "sha256": "5176ddc3bbc360344cdab12c9859d731ad9082075fbce79108e74985df89923d"
+      },
+      {
+        "path": "packages/render-ir/test/compiler.test.ts",
+        "bytes": 7963,
+        "sha256": "4689a783bab997b655a7d45b1f79c7f590217be4c837a27caf0fe749221cc04b"
+      },
+      {
+        "path": "packages/render-ir/tsconfig.json",
+        "bytes": 315,
+        "sha256": "401ba7cf85adcd4af7d13d4414f71d180ac47d0b404d82de4f867d5c9431cdde"
+      },
+      {
+        "path": "packages/renderer-worker/package.json",
+        "bytes": 1108,
+        "sha256": "19fb2b115d3ee6b7039d1481e18caaed20640b4fa7e863b5b2a930cc16f8b79d"
+      },
+      {
+        "path": "packages/renderer-worker/src/client.ts",
+        "bytes": 5925,
+        "sha256": "f9249d801153d0897f6915604657e414876a6ea5ac9c6c14a8db73acbd47a8f3"
+      },
+      {
+        "path": "packages/renderer-worker/src/index.ts",
+        "bytes": 94,
+        "sha256": "7676df304f6a822581d13e757a484c7a4e9ed8a7e1d66a56e79c06fe346784f2"
+      },
+      {
+        "path": "packages/renderer-worker/src/ir-renderer.ts",
+        "bytes": 13216,
+        "sha256": "1b84f52428e494d8f8a33d575e697172fe9d9b5a25c9282be9c5db983a3cd513"
+      },
+      {
+        "path": "packages/renderer-worker/src/protocol.ts",
+        "bytes": 2387,
+        "sha256": "db237871b963d45aea0f257d7c52b17d40cb7a2d68b3d1ca75774574e90ee669"
+      },
+      {
+        "path": "packages/renderer-worker/src/webgl2-worker.ts",
+        "bytes": 22312,
+        "sha256": "15807ece1f3348d297e3b97b5edefc9b4a5c777f18d9b8cc12d098c38175cf6b"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-executes-a-single-input-filter-compiled-from-the-same-Material-Graph-protocol-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-matches-cross-dissolve-golden-at-progress-0-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-matches-cross-dissolve-golden-at-progress-0-25-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-matches-cross-dissolve-golden-at-progress-0-5-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-matches-cross-dissolve-golden-at-progress-0-75-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-matches-cross-dissolve-golden-at-progress-1-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/compose.browser.test.ts/Worker-WebGL2-compositor-uses-the-Worker-WebGPU-primary-path-when-the-browser-exposes-it-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/ir-renderer.browser.test.ts/Project---Render-IR---Material-Graph---Worker-renderer-applies-base-visual-opacity-from-Render-IR-before-Material-execution-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__screenshots__/ir-renderer.browser.test.ts/Project---Render-IR---Material-Graph---Worker-renderer-uses-the-same-frozen-IR-frame-evaluator-for-preview-and-export-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/renderer-worker/test/__snapshots__/material.golden.test.ts.snap",
+        "bytes": 1992,
+        "sha256": "4a82c5217179b282941c58e628c5ef18f551ca743fed9e389958fa35cdb7222e"
+      },
+      {
+        "path": "packages/renderer-worker/test/compose.browser.test.ts",
+        "bytes": 14747,
+        "sha256": "0d8b330da703a8be849eae0031c41815308b3ceb9563ff282ccb36684f9a434b"
+      },
+      {
+        "path": "packages/renderer-worker/test/ir-renderer.browser.test.ts",
+        "bytes": 12986,
+        "sha256": "767cd9a82037f1752227b9cbdb1079fcaac6e85b899be8a2b8e867e8aa9ed588"
+      },
+      {
+        "path": "packages/renderer-worker/test/material.golden.test.ts",
+        "bytes": 1469,
+        "sha256": "b736bbd48ab5260ae29cfb9aa3d64db1655c30bb8c282fc16b37ab5b1d57cb18"
+      },
+      {
+        "path": "packages/renderer-worker/test/vertical-slice.browser.test.ts",
+        "bytes": 5385,
+        "sha256": "74336da0ba85b37cb43929f705c4a9a4935018ecf389cae224308f14de93abfc"
+      },
+      {
+        "path": "packages/renderer-worker/tsconfig.json",
+        "bytes": 310,
+        "sha256": "80688682cf145627e2dcc88a5723d5e1d40a55949b61936cf8dad832061a017d"
+      },
+      {
+        "path": "packages/sdk/api-snapshot.md",
+        "bytes": 2073,
+        "sha256": "4256ac11c5690e2f81f3652ac6fee046128af38ed65df32adba8e6b22cc6c0be"
+      },
+      {
+        "path": "packages/sdk/check-api-snapshot.mjs",
+        "bytes": 3908,
+        "sha256": "0fc2047577bfa8fc8f08bf31faaa4fa04f98f0c0073cc723040bcf02d5ec0023"
+      },
+      {
+        "path": "packages/sdk/package.json",
+        "bytes": 1714,
+        "sha256": "94f87bc068905f9c65e0c643d38777610faa3482df6fdb2c32e14246b40bdd6f"
+      },
+      {
+        "path": "packages/sdk/src/default-schemas.ts",
+        "bytes": 18613,
+        "sha256": "5866700c3d82c6593c8ea42dab144191cc6b96bb654b1263bb8b0220a62e5b1d"
+      },
+      {
+        "path": "packages/sdk/src/export-job.ts",
+        "bytes": 5461,
+        "sha256": "9a6937470d8916b41150be684595ea88443e0d8e5a9e5ae90d28941c067f7add"
+      },
+      {
+        "path": "packages/sdk/src/index.ts",
+        "bytes": 385,
+        "sha256": "24accdfb7bd12b8b6b180383d7b9414df554a57b3e3e844d2f6691819c1dc642"
+      },
+      {
+        "path": "packages/sdk/src/media-provider.ts",
+        "bytes": 7937,
+        "sha256": "c22f41730b701b2ba18ce80edbf394e9082d2cc6cc587ebb78a570a8e953eb17"
+      },
+      {
+        "path": "packages/sdk/src/player.ts",
+        "bytes": 14569,
+        "sha256": "c85c4fda5ea5a2c8e778ac2422f2e24f675c4c0b78cc86f7c680c647e4bfe5cb"
+      },
+      {
+        "path": "packages/sdk/src/runtime-material-registry.ts",
+        "bytes": 1446,
+        "sha256": "9f858d962b8c8a1b69235b5505f8aee40c63d0bdee19f93160a705ddf770a49a"
+      },
+      {
+        "path": "packages/sdk/src/session.ts",
+        "bytes": 18475,
+        "sha256": "349236dd7173fa4568ee16273764072abfb477d810d3fd6ce24f5a76498eb9e8"
+      },
+      {
+        "path": "packages/sdk/src/types.ts",
+        "bytes": 7815,
+        "sha256": "cc44c9b7c909c0197b65ed356f3abccd66c55311387e1e0f09bd1178839ca52f"
+      },
+      {
+        "path": "packages/sdk/test/__screenshots__/player-race.browser.test.ts/AelionPlayer-asynchronous-generations-aborts-and-drains-an-in-flight-PCM-fill-before-Session-disposal-completes-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/sdk/test/__screenshots__/player-race.browser.test.ts/AelionPlayer-asynchronous-generations-does-not-enqueue-or-publish-a-stale-PCM-generation-after-a-newer-seek-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/sdk/test/__screenshots__/session.browser.test.ts/-aelion-sdk-public-browser-facade-loads--edits--previews-and-exports-one-frozen-Project-through-public-APIs-1.png",
+        "bytes": 2082,
+        "sha256": "0a157c250dcc942cb0f7ff7b76b82b83ead2517b136b5e9ec2ca4f08242cf3dd"
+      },
+      {
+        "path": "packages/sdk/test/media-provider.test.ts",
+        "bytes": 6076,
+        "sha256": "3fd8991c326e21b08267d4a8a7e5c34eed5d56ccc5cf258d3de434807306dd63"
+      },
+      {
+        "path": "packages/sdk/test/player-race.browser.test.ts",
+        "bytes": 6301,
+        "sha256": "130089ca6f5a318c394c244b357fe389fa5c78ee64da0594741ba559048a9fe0"
+      },
+      {
+        "path": "packages/sdk/test/session.browser.test.ts",
+        "bytes": 7815,
+        "sha256": "fcd938a88714b844c022a0e222b9a46296aadb72f0f0036b681f10fdfe6a6bba"
+      },
+      {
+        "path": "packages/sdk/test/session.test.ts",
+        "bytes": 12799,
+        "sha256": "824841f13ea0a06831cc8d086c8fc253b6bb8eea4caa323649b87dd50f511091"
+      },
+      {
+        "path": "packages/sdk/tsconfig.json",
+        "bytes": 537,
+        "sha256": "4b55f05d764f885b221db5026d6dd69a75a3c83f295d01f450d751d47ecc5d67"
+      },
+      {
+        "path": "packages/transaction/package.json",
+        "bytes": 1073,
+        "sha256": "beedbd72ecaa76b2b5ae4645a10df4d6bfb66f10c381dd8358c892e406a5c3f4"
+      },
+      {
+        "path": "packages/transaction/src/affected-ranges.ts",
+        "bytes": 6273,
+        "sha256": "efa3d9767e8ee140d0bc0188872d90f1b3f3f9ffacad29c5e3e758cf5c589597"
+      },
+      {
+        "path": "packages/transaction/src/commands.ts",
+        "bytes": 24934,
+        "sha256": "c7a48eff7f05a05583900e78bea39c9f89087c722e92394b71a8e715e415a5a8"
+      },
+      {
+        "path": "packages/transaction/src/history.ts",
+        "bytes": 5374,
+        "sha256": "1969292659cfbd7d6516a84d92995120587145104214f072b4f3161f935ccf3b"
+      },
+      {
+        "path": "packages/transaction/src/index.ts",
+        "bytes": 194,
+        "sha256": "beab6d63def562507f58794f1c91900cc9706bf8063f8e606539c517a1403df6"
+      },
+      {
+        "path": "packages/transaction/src/operations.ts",
+        "bytes": 8173,
+        "sha256": "0bd1d1e99b97db771a92101fe57ee6cfc05f2c51de73c25ed5e2587fbc4b80a6"
+      },
+      {
+        "path": "packages/transaction/src/transaction.ts",
+        "bytes": 6912,
+        "sha256": "02328384402881d15c6782141112e71a2c22d80dad071b227a8e72f866b455d0"
+      },
+      {
+        "path": "packages/transaction/src/types.ts",
+        "bytes": 2427,
+        "sha256": "f316074afffeda899777bc929d2daac954ec253dcfd6f95e6bedeb638d543e52"
+      },
+      {
+        "path": "packages/transaction/test/commands.test.ts",
+        "bytes": 13039,
+        "sha256": "6fb03f62a27cbec45ffd8ff4be2d7b05c8a676e4afcdd433cda87147e16bd2b0"
+      },
+      {
+        "path": "packages/transaction/test/transaction.test.ts",
+        "bytes": 4770,
+        "sha256": "777b21e728b373ef8bcb5ba8dca4d87cc0cba65af5b45615c2bcdd1e86fa345d"
+      },
+      {
+        "path": "packages/transaction/test/vertical-slice.test.ts",
+        "bytes": 2760,
+        "sha256": "2228c723dc05d6e3ca77c7b7855f38c84b694a275d836a23b53cfe99bf04f876"
+      },
+      {
+        "path": "packages/transaction/tsconfig.json",
+        "bytes": 263,
+        "sha256": "6a00f00f5e48584af92c3d4a9c4e22e951061d0a899e8a9371160824bb41850c"
+      },
+      {
+        "path": "packages/vite-plugin/README.md",
+        "bytes": 1324,
+        "sha256": "8d85178c24da63ba20b2024b50f9af736cf5e08e79311079efa4d10bbc392887"
+      },
+      {
+        "path": "packages/vite-plugin/package.json",
+        "bytes": 1361,
+        "sha256": "7e7208d4b2ac1cdfcb36dbc281152f4fa224114e1e110d8a047f9d46269a0275"
+      },
+      {
+        "path": "packages/vite-plugin/src/index.ts",
+        "bytes": 5982,
+        "sha256": "880f7e183e3006c92c862c082142958cf4c4f63175e79f0a5db1af88561b727a"
+      },
+      {
+        "path": "packages/vite-plugin/test/fixtures/app/index.html",
+        "bytes": 111,
+        "sha256": "d476e5bd0f16ea0ba798dd4424e8c8e091dacfcd261f84ffe5295cc33e2e7ee1"
+      },
+      {
+        "path": "packages/vite-plugin/test/fixtures/app/main.js",
+        "bytes": 266,
+        "sha256": "b00ebf76e5442343de7860accdd66233e2b5816b0cc096ad318fa52b4ee3dde2"
+      },
+      {
+        "path": "packages/vite-plugin/test/vite-plugin.test-runner.mjs",
+        "bytes": 3276,
+        "sha256": "c5f4a7af8bbd6a8dfdeb51fedfa79c70167f6a6109a6b9dac1fdf1fe1c5af95e"
+      },
+      {
+        "path": "packages/vite-plugin/tsconfig.json",
+        "bytes": 288,
+        "sha256": "54ef886f5f4faf4e8152b6e8cbf01405b9242761d89e73cc2ace0236f2d6c107"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "bytes": 79137,
+        "sha256": "132f7db49053cfee27c5328ddd14e8e3b74d8ec158e4d22d02b023efc3d7c0c4"
+      },
+      {
+        "path": "pnpm-workspace.yaml",
+        "bytes": 160,
+        "sha256": "a0e26187cf5d1f29880bd1a20bd6fab4ba9c7ba5adfb7c5d835102a70f4b3831"
+      },
+      {
+        "path": "schemas/material/v1/definition.schema.json",
+        "bytes": 11085,
+        "sha256": "7dd9e409d44966295262e363cd8fd42c4a4812fa18d57dd7a47b025eddbe0475"
+      },
+      {
+        "path": "schemas/material/v1/graph.schema.json",
+        "bytes": 4439,
+        "sha256": "d89b8eaad10137d6bc5872b65220f59d663f999df12776c2ccae2070fe898522"
+      },
+      {
+        "path": "schemas/material/v1/instance.schema.json",
+        "bytes": 1973,
+        "sha256": "6ae89c540b1b9a7eb65e74569c3ed8b9bc46c746a276656da965539752d72cc0"
+      },
+      {
+        "path": "schemas/material/v1/package.schema.json",
+        "bytes": 3857,
+        "sha256": "e38e69254a1c483b4de1a3d814362b953f2180ac1db4a1b0580a02973715f632"
+      },
+      {
+        "path": "schemas/project/v1/project.schema.json",
+        "bytes": 25979,
+        "sha256": "ba9ee6773e1b67a8d8061b439d5487787b04a3b618cb7258a6ead2edace275f3"
+      },
+      {
+        "path": "scripts/capture-alpha-evidence.mjs",
+        "bytes": 3753,
+        "sha256": "ef987b9564bfbd92edf7692f5102ff72190ad7e1a608405232d3e710f83a5264"
+      },
+      {
+        "path": "scripts/capture-capability-matrix.mjs",
+        "bytes": 2342,
+        "sha256": "3ce93c3c54d057c0d4b72f7eb9b3d4db08a61161637bdcf226f2fbfa4ecc6610"
+      },
+      {
+        "path": "scripts/capture-capability-report.mjs",
+        "bytes": 1318,
+        "sha256": "4f38655a0638c7e8b0114f33a1628e8a41258df94d25d39ed6a6c4b3dfc20ecf"
+      },
+      {
+        "path": "scripts/capture-export-evidence.mjs",
+        "bytes": 6200,
+        "sha256": "d2db5de7c68358ecbc54a98cab1abb7c0322a604fadf7663d1b750a23d695281"
+      },
+      {
+        "path": "scripts/capture-performance-evidence.mjs",
+        "bytes": 1932,
+        "sha256": "6719d96fe86abfdf3787ca64a88fe558520571f55ff2c6a4ed3b6a6d6b35da99"
+      },
+      {
+        "path": "scripts/capture-phase-1-final-gates.mjs",
+        "bytes": 19659,
+        "sha256": "2041b05a4d0c2357ae167171075eb03da9dd0a41683a7a37bedefb61619d4cba"
+      },
+      {
+        "path": "scripts/capture-seek-evidence.mjs",
+        "bytes": 1598,
+        "sha256": "4a30b9f34bb556936914d4843bce8e0f33cdc5422bcb2328640a5422d7633246"
+      },
+      {
+        "path": "scripts/capture-vertical-slice-evidence.mjs",
+        "bytes": 3731,
+        "sha256": "755069ae7aca465c8f34b2ba9b674e3b35b456d05056a7287904c916a6771ffe"
+      },
+      {
+        "path": "scripts/check-default-schemas.mjs",
+        "bytes": 2037,
+        "sha256": "9737974c448e326244ebb0866823f39c174e992a03a6fd579012d17e31146f03"
+      },
+      {
+        "path": "scripts/fixtures/package-consumer/index.html",
+        "bytes": 384,
+        "sha256": "6420166f911e28198267c27c098dd513a88710285c02346c613c03a9dcc1c59d"
+      },
+      {
+        "path": "scripts/fixtures/package-consumer/main.mjs",
+        "bytes": 10769,
+        "sha256": "b8f54e7599f9195d6c3fa8f9de5c140844c13b6b6b25a173d03d5102a8d921bb"
+      },
+      {
+        "path": "scripts/generate-media-fixtures.mjs",
+        "bytes": 6346,
+        "sha256": "3d1abef1be37bd2abae34ea7eea9cb5e909020d95dfcaafe8146885cfa550512"
+      },
+      {
+        "path": "scripts/package-artifacts.mjs",
+        "bytes": 2242,
+        "sha256": "1e01a46624300046bc05aeb6a87b7e1f82f2ee1b6858ef9e77ae1f2247253fd7"
+      },
+      {
+        "path": "scripts/release-dry-run.mjs",
+        "bytes": 2355,
+        "sha256": "1c29f89b0411b5db93fdf1637be07454aaff5fc5659457162f22560c290ab7c0"
+      },
+      {
+        "path": "scripts/run-phase-1-final-gates.mjs",
+        "bytes": 6157,
+        "sha256": "4a3414f9d01cf17e66d93c45b3db9284f16b62368585c7d96bf537b0f19a87cf"
+      },
+      {
+        "path": "scripts/test-package-consumer.mjs",
+        "bytes": 24065,
+        "sha256": "9344655449e5da54f48fc7e30b31116726d1e24417687d4079f5fbd9aa17b151"
+      },
+      {
+        "path": "scripts/validate-material-examples.mjs",
+        "bytes": 14306,
+        "sha256": "b11575d5914e6019a7b42ccf02b143fd4a899441b5cc353d948f26f499fc65e9"
+      },
+      {
+        "path": "scripts/verify-clean-environment.mjs",
+        "bytes": 1146,
+        "sha256": "568aa5bcd42964e88072f205a0ac9bd51cdef3ed47cee8821a93cab9fb19ea33"
+      },
+      {
+        "path": "tsconfig.base.json",
+        "bytes": 1703,
+        "sha256": "e6e82b0e01ba7b95dc11715a10e4bce42a0c9beca31ea043fbaf468fb2f24cd3"
+      },
+      {
+        "path": "tsconfig.json",
+        "bytes": 648,
+        "sha256": "72a9f4cff7724feaaa5b49ac7ca0505817658147ec73ebd3b19daa4994296470"
+      },
+      {
+        "path": "tsconfig.test.json",
+        "bytes": 520,
+        "sha256": "528daa4ee7fc9766c7717c5a742c2cd17ae0695ae014f59ee8a54c66cb6b9a86"
+      },
+      {
+        "path": "vitest.browser.config.ts",
+        "bytes": 1942,
+        "sha256": "1053377842d0f9457afdd882bab8aff28f678a57cdc35d3bde3f183fb9381fcc"
+      },
+      {
+        "path": "vitest.config.ts",
+        "bytes": 1852,
+        "sha256": "dc892796013ac4ecab521d9a745f47922c7e5fa128584036c3bb90052d0cbff4"
+      },
+      {
+        "path": "vitest.firefox.config.ts",
+        "bytes": 2457,
+        "sha256": "7aa6da93e4a5e67ddb0241d00e4e0cfb805744856212fbee2627832274447364"
+      },
+      {
+        "path": "vitest.golden.config.ts",
+        "bytes": 538,
+        "sha256": "a05647093dcf29ba837d85b2200b32e6eb65afc820ae8d1252eb3fa3ed5a9e4c"
+      }
+    ]
+  },
+  "gatePolicy": {
+    "requiredCommands": [
+      "corepack pnpm run ci",
+      "corepack pnpm test:browser",
+      "corepack pnpm test:browser:firefox",
+      "corepack pnpm test:golden",
+      "corepack pnpm bench",
+      "corepack pnpm test:pack",
+      "corepack pnpm test:consumer",
+      "corepack pnpm release:dry-run",
+      "corepack pnpm format:check"
+    ],
+    "evidenceRefreshCommands": [
+      "corepack pnpm report:browser:chromium",
+      "corepack pnpm report:browser:firefox",
+      "corepack pnpm report:alpha"
+    ],
+    "recordContract": [
+      "command",
+      "startedAt",
+      "endedAt",
+      "exitCode",
+      "summary"
+    ]
+  },
+  "commands": [
+    {
+      "command": "corepack pnpm run ci",
+      "startedAt": "2026-07-13T10:51:23.511Z",
+      "endedAt": "2026-07-13T10:52:10.907Z",
+      "durationMs": 47396,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 ci /Users/zhongyu/Documents/AelionSDK\n> corepack pnpm run format:check && corepack pnpm run schemas:check && corepack pnpm run lint && corepack pnpm run typecheck && corepack pnpm run test && corepack pnpm run test:schema && corepack pnpm run build && corepack pnpm run api:snapshot\n\n\n> aelion-sdk@0.1.0-alpha.0 format:check /Users/zhongyu/Documents/AelionSDK\n> prettier --check .\n\nChecking formatting...\nAll matched files use Prettier code style!\n\n> aelion-sdk@0.1.0-alpha.0 schemas:check /Users/zhongyu/Documents/AelionSDK\n> node scripts/check-default-schemas.mjs\n\nBundled SDK schemas match canonical Project and Material Instance v1 JSON\n\n> aelion-sdk@0.1.0-alpha.0 lint /Users/zhongyu/Documents/AelionSDK\n> eslint .\n\n\n> aelion-sdk@0.1.0-alpha.0 typecheck /Users/zhongyu/Documents/AelionSDK\n> tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false\n\n\n> aelion-sdk@0.1.0-alpha.0 test /Users/zhongyu/Documents/AelionSDK\n> vitest run && corepack pnpm --filter @aelion/vite-plugin run test\n\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/core/test/resource.test.ts (2 tests) 18ms\n ✓ packages/media/test/corpus.test.ts (9 tests) 258ms\n ✓ packages/project-schema/test/project.test.ts (17 tests) 629ms\n ✓ packages/material-sdk/test/material-sdk.test.ts (7 tests) 69ms\n ✓ packages/render-ir/test/compiler.test.ts (9 tests) 861ms\n ✓ packages/transaction/test/vertical-slice.test.ts (1 test) 805ms\n ✓ packages/transaction/test/transaction.test.ts (5 tests) 1038ms\n   ✓ TransactionEngine > rolls back the entire transaction when an operation fails  315ms\n   ✓ TransactionEngine > rejects a semantically invalid draft without exposing it  315ms\n   ✓ TransactionEngine > restores the canonical hash by applying generated inverse operations  315ms\n ✓ packages/transaction/test/commands.test.ts (8 tests) 1126ms\n   ✓ EditingCommands > inserts, moves across Tracks and removes an Item atomically  379ms\n   ✓ EditingCommands > leaves revision and snapshot unchanged when a semantic command is rejected  383ms\n ✓ packages/media/test/media.test.ts (7 tests) 203ms\n ✓ packages/material-compiler/test/compiler.test.ts (10 tests) 120ms\n ✓ packages/audio/test/video-scheduler.test.ts (4 tests) 63ms\n ✓ packages/audio/test/transferable-pcm-queue.test.ts (2 tests) 18ms\n ✓ packages/audio/test/ir-mixer.test.ts (11 tests) 27ms\n ✓ packages/sdk/test/media-provider.test.ts (6 tests) 119ms\n ✓ packages/audio/test/pcm-ring.test.ts (5 tests) 2880ms\n   ✓ SharedPcmRingBuffer > wraps interleaved writes into planar reads without allocation growth  2878ms\n   ✓ SharedPcmRingBuffer > records underrun frames and zero-fills output  2878ms\n   ✓ SharedPcmRingBuffer > runs a ten-minute equivalent bounded producer/consumer simulation without underrun  2878ms\n   ✓ SharedPcmRingBuffer > does not accept writes after end or close  2878ms\n   ✓ SharedPcmRingBuffer > flushes queued PCM for a seek without reallocating the bounded ring  2878ms\n ✓ packages/sdk/test/session.test.ts (10 tests) 2377ms\n   ✓ @aelion/sdk session facade > bundles the canonical v1 schemas as deeply frozen runtime data  1364ms\n   ✓ @aelion/sdk session facade > loads a Project and keeps edit, undo and redo atomic through the public API  2217ms\n   ✓ @aelion/sdk session facade > rejects public rendering without an explicit media provider  1992ms\n   ✓ @aelion/sdk session facade > bundles default v1 schemas so a Project loads without consumer schema assets  2083ms\n   ✓ @aelion/sdk session facade > publishes stable validation diagnostics through snapshot and typed subscription  817ms\n   ✓ @aelion/sdk session facade > keeps diagnostic history bounded and reports evictions  507ms\n   ✓ @aelion/sdk session facade > does not expose mutable Render IR or compile ranges through snapshots  880ms\n   ✓ @aelion/sdk session facade > rejects a concurrent export with a stable diagnostic  905ms\n   ✓ @aelion/sdk session facade > records export failures in Session diagnostics before the job rejects  382ms\n ✓ packages/core/test/time.test.ts (16 tests) 5485ms\n   ✓ rational time > normalizes rational values  3936ms\n   ✓ rational time > keeps frame boundaries monotonic for 24/1  3936ms\n   ✓ rational time > keeps frame boundaries monotonic for 25/1  3936ms\n   ✓ rational time > keeps frame boundaries monotonic for 30/1  3936ms\n   ✓ rational time > keeps frame boundaries monotonic for 50/1  3936ms\n   ✓ rational time > keeps frame boundaries monotonic for 60/1  1519ms\n   ✓ rational time > keeps frame boundaries monotonic for 24000/1001  1519ms\n   ✓ rational time > keeps frame boundaries monotonic for 30000/1001  1519ms\n   ✓ rational time > keeps frame boundaries monotonic for 60000/1001  1519ms\n   ✓ rational time > does not accumulate rounded frame durations  1519ms\n\n Test Files  17 passed (17)\n      Tests  129 passed (129)\n   Start at  18:51:52\n   Duration  7.19s (transform 2.24s, setup 0ms, collect 9.89s, tests 16.10s, environment 6ms, prepare 7.68s)\n\n\n> @aelion/vite-plugin@0.1.0-alpha.0 test /Users/zhongyu/Documents/AelionSDK/packages/vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelion/vite-plugin@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK/packages/vite-plugin\n> tsc -b\n\n@aelion/vite-plugin tests passed: production build, development server\n\n> aelion-sdk@0.1.0-alpha.0 test:schema /Users/zhongyu/Documents/AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/project-schema/test/project.test.ts (17 tests) 225ms\n\n Test Files  1 passed (1)\n      Tests  17 passed (17)\n   Start at  18:52:04\n   Duration  1.43s (transform 140ms, setup 0ms, collect 245ms, tests 225ms, environment 0ms, prepare 217ms)\n\n\n> aelion-sdk@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK\n> tsc -b\n\n\n> aelion-sdk@0.1.0-alpha.0 api:snapshot /Users/zhongyu/Documents/AelionSDK\n> corepack pnpm --filter @aelion/sdk run api:snapshot\n\n\n> @aelion/sdk@0.1.0-alpha.0 api:snapshot /Users/zhongyu/Documents/AelionSDK/packages/sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelion/sdk@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK/packages/sdk\n> tsc -b",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm test:browser",
+      "startedAt": "2026-07-13T10:52:10.910Z",
+      "endedAt": "2026-07-13T10:52:25.241Z",
+      "durationMs": 14331,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 test:browser /Users/zhongyu/Documents/AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n ✓ |chromium| packages/media/test/decode.browser.test.ts (9 tests) 349ms\n ✓ |chromium| packages/capability/test/capability.browser.test.ts (2 tests) 694ms\n   ✓ browser capability report > probes real browser configurations and returns a serializable report  509ms\n ✓ |chromium| packages/renderer-worker/test/vertical-slice.browser.test.ts (1 test) 820ms\n   ✓ fixed 30-second Project vertical slice > loads real MP4/WebM frames and executes Filter + Transition through one Render IR  818ms\n ✓ |chromium| packages/sdk/test/player-race.browser.test.ts (3 tests) 1865ms\n   ✓ AelionPlayer asynchronous generations > closes an owned frame and enters error state when its subscriber throws  1203ms\n   ✓ AelionPlayer asynchronous generations > does not enqueue or publish a stale PCM generation after a newer seek  394ms\n ✓ |chromium| packages/audio/test/worklet.browser.test.ts (4 tests) 1923ms\n   ✓ AudioWorklet master clock > requests a configured sequence sample rate for owned contexts  613ms\n   ✓ AudioWorklet master clock > consumes a bounded PCM ring and advances the hardware clock without underrun  925ms\n   ✓ non-isolated AudioWorklet fallback > uses a bounded acknowledged Transferable queue without SAB  382ms\n ✓ |chromium| packages/export/test/export.browser.test.ts (7 tests) 2225ms\n   ✓ offline WebCodecs + streaming WebM export > exports deterministic CFR video and sample-aligned audio with bounded writes  939ms\n   ✓ offline WebCodecs + streaming WebM export > streams seekable output to OPFS without assembling a full in-memory Blob  1094ms\n ✓ |chromium| packages/renderer-worker/test/ir-renderer.browser.test.ts (4 tests) 2437ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > uses the same frozen IR frame evaluator for preview and export  641ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > alpha-composites every enabled visual track in Project order  943ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > keeps a transition result in the layer stack before compositing later visual tracks  748ms\n ✓ |chromium| packages/sdk/test/session.browser.test.ts (1 test) 2690ms\n   ✓ @aelion/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  2689ms\n ✓ |chromium| packages/renderer-worker/test/compose.browser.test.ts (15 tests) 3169ms\n   ✓ Worker WebGL2 compositor > matches cross-dissolve golden at progress 0  548ms\n   ✓ Worker WebGL2 compositor > matches cross-dissolve golden at progress 1  870ms\n   ✓ Worker WebGL2 compositor > executes a single-input filter compiled from the same Material Graph protocol  447ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  510ms\n\n Test Files  9 passed (9)\n      Tests  46 passed (46)\n   Start at  18:52:12\n   Duration  12.35s (transform 0ms, setup 0ms, collect 4.79s, tests 16.17s, environment 0ms, prepare 57.66s)",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm test:browser:firefox",
+      "startedAt": "2026-07-13T10:52:25.243Z",
+      "endedAt": "2026-07-13T10:52:43.473Z",
+      "durationMs": 18230,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 test:browser:firefox /Users/zhongyu/Documents/AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n ✓ |firefox| packages/capability/test/capability.browser.test.ts (2 tests) 205ms\n ✓ |firefox| packages/export/test/export.browser.test.ts (7 tests) 690ms\n   ✓ offline WebCodecs + streaming WebM export > exports deterministic CFR video and sample-aligned audio with bounded writes  368ms\n ✓ |firefox| packages/audio/test/worklet.browser.test.ts (4 tests) 433ms\n ✓ |firefox| packages/media/test/decode.browser.test.ts (9 tests) 1236ms\n ✓ |firefox| packages/sdk/test/player-race.browser.test.ts (3 tests) 1224ms\n   ✓ AelionPlayer asynchronous generations > closes an owned frame and enters error state when its subscriber throws  610ms\n   ✓ AelionPlayer asynchronous generations > does not enqueue or publish a stale PCM generation after a newer seek  367ms\n ✓ |firefox| packages/renderer-worker/test/ir-renderer.browser.test.ts (4 tests) 2672ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > uses the same frozen IR frame evaluator for preview and export  903ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > alpha-composites every enabled visual track in Project order  301ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > keeps a transition result in the layer stack before compositing later visual tracks  1289ms\n ✓ |firefox| packages/renderer-worker/test/compose.browser.test.ts (15 tests) 4994ms\n   ✓ Worker WebGL2 compositor > matches cross-dissolve golden at progress 0  329ms\n   ✓ Worker WebGL2 compositor > executes Soft Glow as four real WebGL2 passes with bounded intermediates  603ms\n   ✓ Worker WebGL2 compositor > applies explicit backpressure instead of growing the Worker queue without bound  757ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  2005ms\n ✓ |firefox| packages/sdk/test/session.browser.test.ts (1 test) 6987ms\n   ✓ @aelion/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  6985ms\n\n Test Files  8 passed (8)\n      Tests  45 passed (45)\n   Start at  18:52:26\n   Duration  15.61s (transform 0ms, setup 0ms, collect 7.67s, tests 18.44s, environment 0ms, prepare 55.69s)",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm test:golden",
+      "startedAt": "2026-07-13T10:52:43.475Z",
+      "endedAt": "2026-07-13T10:52:46.297Z",
+      "durationMs": 2822,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 test:golden /Users/zhongyu/Documents/AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/renderer-worker/test/material.golden.test.ts (1 test) 10ms\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  18:52:44\n   Duration  1.18s (transform 172ms, setup 0ms, collect 188ms, tests 10ms, environment 1ms, prepare 234ms)",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm bench",
+      "startedAt": "2026-07-13T10:52:46.300Z",
+      "endedAt": "2026-07-13T10:52:54.807Z",
+      "durationMs": 8507,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 bench /Users/zhongyu/Documents/AelionSDK\n> vitest bench --run\n\nBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\n\n RUN  v3.2.4 /Users/zhongyu/Documents/AelionSDK\n\n\n ✓ benchmarks/render-ir.bench.ts > Render IR compilation 5485ms\n     name                                               hz      min     max    mean     p75     p99    p995    p999     rme  samples\n   · cold compile 1,000 clips                       9.8409  98.4442  107.18  101.62  102.87  107.18  107.18  107.18  ±1.78%       10\n   · incremental no-op compile 1,000 clips          146.42   5.9055  8.1864  6.8297  7.0598  8.1864  8.1864  8.1864  ±1.48%       74\n   · session initialization 1,000 clips             9.5585   100.23  112.35  104.62  105.38  112.35  112.35  112.35  ±2.26%       10\n   · single-field transaction commit 1,000 clips  2,009.49   0.4054  1.2152  0.4976  0.5115  0.8221  0.8527  0.9173  ±1.16%     1005\n   · schema-validated field commit 1,000 clips      134.74   6.8827  8.2291  7.4219  7.5777  8.2291  8.2291  8.2291  ±0.93%       68\n\n BENCH  Summary\n\n  single-field transaction commit 1,000 clips - benchmarks/render-ir.bench.ts > Render IR compilation\n    13.72x faster than incremental no-op compile 1,000 clips\n    14.91x faster than schema-validated field commit 1,000 clips\n    204.20x faster than cold compile 1,000 clips\n    210.23x faster than session initialization 1,000 clips",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm test:pack",
+      "startedAt": "2026-07-13T10:52:54.809Z",
+      "endedAt": "2026-07-13T10:53:57.587Z",
+      "durationMs": 62778,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 test:pack /Users/zhongyu/Documents/AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs\n\n\n> aelion-sdk@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelion/audio, @aelion/capability, @aelion/core, @aelion/export, @aelion/material-compiler, @aelion/material-sdk, @aelion/media, @aelion/project-schema, @aelion/render-ir, @aelion/renderer-worker, @aelion/sdk, @aelion/transaction, @aelion/vite-plugin",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm test:consumer",
+      "startedAt": "2026-07-13T10:53:57.588Z",
+      "endedAt": "2026-07-13T10:55:15.097Z",
+      "durationMs": 77509,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 test:consumer /Users/zhongyu/Documents/AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelion/audio, @aelion/capability, @aelion/core, @aelion/export, @aelion/material-compiler, @aelion/material-sdk, @aelion/media, @aelion/project-schema, @aelion/render-ir, @aelion/renderer-worker, @aelion/sdk, @aelion/transaction, @aelion/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 17955\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"playedFrames\": 512,\n        \"underrunFrames\": 0,\n        \"timeUs\": 10667\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 52580\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"playedFrames\": 512,\n        \"underrunFrames\": 0,\n        \"timeUs\": 21333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm release:dry-run",
+      "startedAt": "2026-07-13T10:55:15.099Z",
+      "endedAt": "2026-07-13T10:56:04.940Z",
+      "durationMs": 49841,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 release:dry-run /Users/zhongyu/Documents/AelionSDK\n> corepack pnpm run build && node scripts/release-dry-run.mjs\n\n\n> aelion-sdk@0.1.0-alpha.0 build /Users/zhongyu/Documents/AelionSDK\n> tsc -b\n\nRelease dry-run passed: @aelion/audio@0.1.0-alpha.0, @aelion/capability@0.1.0-alpha.0, @aelion/core@0.1.0-alpha.0, @aelion/export@0.1.0-alpha.0, @aelion/material-compiler@0.1.0-alpha.0, @aelion/material-sdk@0.1.0-alpha.0, @aelion/media@0.1.0-alpha.0, @aelion/project-schema@0.1.0-alpha.0, @aelion/render-ir@0.1.0-alpha.0, @aelion/renderer-worker@0.1.0-alpha.0, @aelion/sdk@0.1.0-alpha.0, @aelion/transaction@0.1.0-alpha.0, @aelion/vite-plugin@0.1.0-alpha.0",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm format:check",
+      "startedAt": "2026-07-13T10:56:04.943Z",
+      "endedAt": "2026-07-13T10:56:09.809Z",
+      "durationMs": 4866,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 format:check /Users/zhongyu/Documents/AelionSDK\n> prettier --check .\n\nChecking formatting...\nAll matched files use Prettier code style!",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm report:browser:chromium",
+      "startedAt": "2026-07-13T10:56:09.811Z",
+      "endedAt": "2026-07-13T10:56:25.199Z",
+      "durationMs": 15388,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 report:browser:chromium /Users/zhongyu/Documents/AelionSDK\n> vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json\n\nJSON report written to /Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-chromium.json",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm report:browser:firefox",
+      "startedAt": "2026-07-13T10:56:25.201Z",
+      "endedAt": "2026-07-13T10:56:43.505Z",
+      "durationMs": 18304,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 report:browser:firefox /Users/zhongyu/Documents/AelionSDK\n> vitest run --config vitest.firefox.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-firefox.json\n\nJSON report written to /Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-firefox.json",
+        "outputTailTruncated": false
+      }
+    },
+    {
+      "command": "corepack pnpm report:alpha",
+      "startedAt": "2026-07-13T10:56:43.507Z",
+      "endedAt": "2026-07-13T10:58:16.587Z",
+      "durationMs": 93080,
+      "exitCode": 0,
+      "summary": {
+        "status": "passed",
+        "outputTail": "> aelion-sdk@0.1.0-alpha.0 report:alpha /Users/zhongyu/Documents/AelionSDK\n> node scripts/capture-alpha-evidence.mjs\n\nWrote /Users/zhongyu/Documents/AelionSDK/reports/baseline/alpha-60s.webm and /Users/zhongyu/Documents/AelionSDK/reports/baseline/alpha-60s.json",
+        "outputTailTruncated": false
+      }
+    }
+  ],
+  "artifacts": {
+    "apiSnapshot": {
+      "status": "present",
+      "file": "packages/sdk/api-snapshot.md",
+      "bytes": 2073,
+      "sha256": "4256ac11c5690e2f81f3652ac6fee046128af38ed65df32adba8e6b22cc6c0be",
+      "package": "@aelion/sdk",
+      "version": "0.1.0-alpha.0",
+      "declarationFileCount": 7,
+      "exportedSymbolCount": 31,
+      "contractSha256": "6932bcecc0ff33c96c8bb9ffb1d2202998dacb23c51fe9094a72925bd9f30a59"
+    },
+    "browserSuites": {
+      "chromium": {
+        "status": "present",
+        "file": "reports/baseline/browser-smoke-chromium.json",
+        "bytes": 17047,
+        "sha256": "dff1122d3584d646f852aa20fa78dd611bfb714e1a6755a32e1e85654b90290d",
+        "browser": "chromium",
+        "success": true,
+        "suites": {
+          "total": 19,
+          "passed": 19,
+          "failed": 0,
+          "pending": 0
+        },
+        "tests": {
+          "total": 46,
+          "passed": 46,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      },
+      "firefox": {
+        "status": "present",
+        "file": "reports/baseline/browser-smoke-firefox.json",
+        "bytes": 16430,
+        "sha256": "24c242bb8b641ba99e46ec249cb8b490783cc7b1ea8b5d8d19fbd0b64118fdcb",
+        "browser": "firefox",
+        "success": true,
+        "suites": {
+          "total": 17,
+          "passed": 17,
+          "failed": 0,
+          "pending": 0
+        },
+        "tests": {
+          "total": 45,
+          "passed": 45,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      }
+    },
+    "tarballConsumer": {
+      "status": "present",
+      "file": "reports/baseline/tarball-consumer.json",
+      "bytes": 8320,
+      "sha256": "e3e2609597d66618b84ee76e1c18437cbb29a40746ee2f96bf3bacb49a350157",
+      "sdkVersion": "0.1.0-alpha.0",
+      "packageCount": 13,
+      "packages": [
+        {
+          "name": "@aelion/audio",
+          "version": "0.1.0-alpha.0",
+          "sha256": "fd9e7ccc48bbd437cc016b86ea64fdeb8aec6ee7e976de11b86c148722b9fbf5"
+        },
+        {
+          "name": "@aelion/capability",
+          "version": "0.1.0-alpha.0",
+          "sha256": "5168a3f94f71a5f3b2cf56648906da6987874c81981ab796cae2b5935e24918f"
+        },
+        {
+          "name": "@aelion/core",
+          "version": "0.1.0-alpha.0",
+          "sha256": "71035a091540d1130f91cfa7d47249e5b249d137be921fd431a6d41bc56feb89"
+        },
+        {
+          "name": "@aelion/export",
+          "version": "0.1.0-alpha.0",
+          "sha256": "25c8e5ef4d8954e36ec0d68ca50f23fbb37a816cce47fec10cfb2b4731d53839"
+        },
+        {
+          "name": "@aelion/material-compiler",
+          "version": "0.1.0-alpha.0",
+          "sha256": "1b47248980443ad95fd7531a164cff2d7dccf0110c7bbe4cb52bbcffbb5616dc"
+        },
+        {
+          "name": "@aelion/material-sdk",
+          "version": "0.1.0-alpha.0",
+          "sha256": "33a23a51eaafa7248955057dd224a42f835a5cb6fbc66161d66e7e0f953fe18c"
+        },
+        {
+          "name": "@aelion/media",
+          "version": "0.1.0-alpha.0",
+          "sha256": "3242a18392681cb73b90ec877693735a39aafd32900ec1bf85cb05c762133fbd"
+        },
+        {
+          "name": "@aelion/project-schema",
+          "version": "0.1.0-alpha.0",
+          "sha256": "fbcb9783eb7d3253c141f87bbdd5f9dcb4d0f6f35c39259e3302a87e5412d07a"
+        },
+        {
+          "name": "@aelion/render-ir",
+          "version": "0.1.0-alpha.0",
+          "sha256": "5d96ca1e30f1e99c77b8f0873f8ccb19b46ca1b0db55f148168401fedcb5eb6a"
+        },
+        {
+          "name": "@aelion/renderer-worker",
+          "version": "0.1.0-alpha.0",
+          "sha256": "2b2d326ae67c605bf1027207aaf9469547ace7f88b6419a968cb623dea68b96a"
+        },
+        {
+          "name": "@aelion/sdk",
+          "version": "0.1.0-alpha.0",
+          "sha256": "5c6ed91e781b94f49b5a24c9cfe97a08ad46e7ac471c295fc02398a35e35f2bc"
+        },
+        {
+          "name": "@aelion/transaction",
+          "version": "0.1.0-alpha.0",
+          "sha256": "9f3915f4e483410b55e1150515230d0704183d4dbb04a145a3989d0312ac8a45"
+        },
+        {
+          "name": "@aelion/vite-plugin",
+          "version": "0.1.0-alpha.0",
+          "sha256": "593c3ab6400af4dcddae2bdf4cc19a2552131e4d6f5084652b2fdfa1c4287204"
+        }
+      ],
+      "browsers": [
+        {
+          "browser": "chromium",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36"
+        },
+        {
+          "browser": "firefox",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0"
+        }
+      ],
+      "bundlerAdapter": {
+        "id": "@aelion/vite-plugin",
+        "package": "@aelion/vite-plugin",
+        "version": "0.1.0-alpha.0",
+        "packageSha256": "593c3ab6400af4dcddae2bdf4cc19a2552131e4d6f5084652b2fdfa1c4287204",
+        "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
+        "public": true,
+        "zeroConfigVite": false,
+        "configuration": "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
+        "viteConfigSha256": "385ca60213b3f1bbd910a1aefc27b5921f6280dc48eb33c95750131eea5d8c29",
+        "note": "The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. No repository path aliases or private test transforms are used."
+      },
+      "runtimeAssetCount": 3
+    },
+    "alpha60s": {
+      "report": {
+        "status": "present",
+        "file": "reports/baseline/alpha-60s.json",
+        "bytes": 109960,
+        "sha256": "1d5c09ecc172cd981fc7207a0cb8935ed11ad546e0e3025ed79588e9c6078dcf",
+        "generatedAt": "2026-07-13T10:58:16.218Z",
+        "command": "corepack pnpm report:alpha",
+        "durationUs": 60000000,
+        "artifactSha256Declared": "10b9ee05eacb7d91a956d42ca239a5725d7eff8100e6261c9f271ba6c5806068",
+        "videoFrames": 1800,
+        "audioFrames": 2880000,
+        "videoSamples": 1800,
+        "audioSamples": 3001,
+        "avEndDriftUs": 333,
+        "longTasksOver50Ms": 0,
+        "sinkMaxInFlightWrites": 1,
+        "sessionStateAfterDispose": "disposed",
+        "opfsOutputRemoved": true,
+        "externalReadback": {
+          "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+          "videoDecode": "passed",
+          "audioDecode": "passed",
+          "videoFrameMd5DocumentSha256": "e06f37453a06188007dd2088b86cf55b46520b20cd5afa30862b298a58c8a6eb",
+          "audioPcmMd5": "MD5=371ec886039f227eef24418f05a4b6dc"
+        }
+      },
+      "media": {
+        "status": "present",
+        "file": "reports/baseline/alpha-60s.webm",
+        "bytes": 4748720,
+        "sha256": "10b9ee05eacb7d91a956d42ca239a5725d7eff8100e6261c9f271ba6c5806068"
+      },
+      "fixture": {
+        "status": "present",
+        "file": "examples/aelion-alpha-60s.project.json",
+        "bytes": 7309,
+        "sha256": "2089d101a7ca2c77b6a153a145f57f76853113aca73643448b9433bb44942880"
+      }
+    },
+    "testCounts": {
+      "browsers": {
+        "chromium": {
+          "total": 46,
+          "passed": 46,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        },
+        "firefox": {
+          "total": 45,
+          "passed": 45,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0
+        }
+      },
+      "browserTotal": 91
+    }
+  },
+  "artifactChecks": [
+    {
+      "id": "api-snapshot-present",
+      "passed": true,
+      "actual": "present",
+      "expected": "present"
+    },
+    {
+      "id": "chromium-browser-suite-passed",
+      "passed": true,
+      "actual": {
+        "total": 46,
+        "passed": 46,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "expected": "success with zero failed tests"
+    },
+    {
+      "id": "firefox-browser-suite-passed",
+      "passed": true,
+      "actual": {
+        "total": 45,
+        "passed": 45,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      },
+      "expected": "success with zero failed tests"
+    },
+    {
+      "id": "public-package-count",
+      "passed": true,
+      "actual": 13,
+      "expected": 13
+    },
+    {
+      "id": "tarball-browser-count",
+      "passed": true,
+      "actual": [
+        "chromium",
+        "firefox"
+      ],
+      "expected": [
+        "chromium",
+        "firefox"
+      ]
+    },
+    {
+      "id": "public-vite-adapter",
+      "passed": true,
+      "actual": {
+        "id": "@aelion/vite-plugin",
+        "package": "@aelion/vite-plugin",
+        "version": "0.1.0-alpha.0",
+        "packageSha256": "593c3ab6400af4dcddae2bdf4cc19a2552131e4d6f5084652b2fdfa1c4287204",
+        "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
+        "public": true,
+        "zeroConfigVite": false,
+        "configuration": "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
+        "viteConfigSha256": "385ca60213b3f1bbd910a1aefc27b5921f6280dc48eb33c95750131eea5d8c29",
+        "note": "The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. No repository path aliases or private test transforms are used."
+      },
+      "expected": {
+        "public": true
+      }
+    },
+    {
+      "id": "runtime-asset-count",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "id": "alpha-report-present",
+      "passed": true,
+      "actual": "present",
+      "expected": "present"
+    },
+    {
+      "id": "alpha-media-present",
+      "passed": true,
+      "actual": "present",
+      "expected": "present"
+    },
+    {
+      "id": "alpha-media-hash-matches-report",
+      "passed": true,
+      "actual": {
+        "media": "10b9ee05eacb7d91a956d42ca239a5725d7eff8100e6261c9f271ba6c5806068",
+        "declared": "10b9ee05eacb7d91a956d42ca239a5725d7eff8100e6261c9f271ba6c5806068"
+      },
+      "expected": "equal"
+    },
+    {
+      "id": "alpha-duration",
+      "passed": true,
+      "actual": 60000000,
+      "expected": 60000000
+    },
+    {
+      "id": "alpha-video-frames",
+      "passed": true,
+      "actual": 1800,
+      "expected": 1800
+    },
+    {
+      "id": "alpha-audio-frames",
+      "passed": true,
+      "actual": 2880000,
+      "expected": 2880000
+    },
+    {
+      "id": "alpha-readback",
+      "passed": true,
+      "actual": {
+        "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+        "videoDecode": "passed",
+        "audioDecode": "passed",
+        "videoFrameMd5DocumentSha256": "e06f37453a06188007dd2088b86cf55b46520b20cd5afa30862b298a58c8a6eb",
+        "audioPcmMd5": "MD5=371ec886039f227eef24418f05a4b6dc"
+      },
+      "expected": {
+        "videoDecode": "passed",
+        "audioDecode": "passed"
+      }
+    },
+    {
+      "id": "alpha-av-tail-drift",
+      "passed": true,
+      "actual": 333,
+      "expected": "absolute drift <= 1,000 us"
+    },
+    {
+      "id": "alpha-bounded-sink",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "id": "alpha-long-tasks",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "alpha-dispose-cleanup",
+      "passed": true,
+      "actual": {
+        "sessionStateAfterDispose": "disposed",
+        "opfsOutputRemoved": true
+      },
+      "expected": {
+        "sessionStateAfterDispose": "disposed",
+        "opfsOutputRemoved": true
+      }
+    }
+  ],
+  "result": {
+    "status": "passed",
+    "complete": true,
+    "passed": true,
+    "recordedCommandCount": 12,
+    "requiredGateCount": 9,
+    "evidenceRefreshCount": 3,
+    "missingRequiredCommands": [],
+    "failedRequiredCommands": [],
+    "missingEvidenceRefreshCommands": [],
+    "failedEvidenceRefreshCommands": [],
+    "failedArtifactChecks": []
+  }
+}

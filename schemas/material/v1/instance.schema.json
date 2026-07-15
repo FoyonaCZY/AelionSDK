@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aelion.dev/material/instance/v1.json",
+  "title": "Aelion Project Material Instance v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "definition", "enabled", "parameters"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packageId", "packageVersion", "packageIntegrity", "materialId"],
+      "properties": {
+        "packageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"
+        },
+        "packageVersion": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+        },
+        "packageIntegrity": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "materialId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        }
+      }
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "previewPolicy": {
+      "enum": ["required", "skippable-when-degraded"]
+    },
+    "parameters": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": true
+    },
+    "resourceBindings": {
+      "type": "object",
+      "maxProperties": 16,
+      "additionalProperties": true
+    },
+    "inputBindings": {
+      "type": "object",
+      "maxProperties": 16,
+      "additionalProperties": true
+    },
+    "randomSeed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

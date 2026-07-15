@@ -1,0 +1,347 @@
+{
+  "evidenceVersion": "1.0.0",
+  "fixture": "Aelion 1080p30 SDR reference",
+  "material": {
+    "warmFilmWebGpu": {
+      "label": "Warm Film single-pass WebGPU",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "frames": 30,
+      "passCount": 1,
+      "intermediateTextureCount": 0,
+      "wall": {
+        "p50Ms": 38.24000000953674,
+        "p95Ms": 60.064999997615814
+      },
+      "worker": {
+        "p50Us": 36855,
+        "p95Us": 59445
+      },
+      "gpuCompletion": {
+        "p50Us": 13675,
+        "p95Us": 34505
+      },
+      "throughputFps": 26.150627608541008,
+      "resourcesBeforeDispose": {
+        "disposed": false,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "resourcesAfterDispose": {
+        "disposed": true,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "memory": {
+        "before": {
+          "usedJsHeapBytes": 5795100,
+          "totalJsHeapBytes": 7414216
+        },
+        "after": {
+          "usedJsHeapBytes": 5871561,
+          "totalJsHeapBytes": 7958293
+        }
+      }
+    },
+    "warmFilmWebGl2": {
+      "label": "Warm Film single-pass WebGL2",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "frames": 30,
+      "passCount": 1,
+      "intermediateTextureCount": 0,
+      "wall": {
+        "p50Ms": 19.9549999833107,
+        "p95Ms": 28.93499994277954
+      },
+      "worker": {
+        "p50Us": 19080,
+        "p95Us": 28320
+      },
+      "gpuCompletion": {
+        "p50Us": 30,
+        "p95Us": 75
+      },
+      "throughputFps": 50.112753737727225,
+      "resourcesBeforeDispose": {
+        "disposed": false,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "resourcesAfterDispose": {
+        "disposed": true,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "memory": {
+        "before": {
+          "usedJsHeapBytes": 5924836,
+          "totalJsHeapBytes": 8220528
+        },
+        "after": {
+          "usedJsHeapBytes": 5887078,
+          "totalJsHeapBytes": 8744738
+        }
+      }
+    },
+    "softGlow": {
+      "label": "Soft Glow four-pass WebGL2",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "frames": 12,
+      "passCount": 4,
+      "intermediateTextureCount": 3,
+      "wall": {
+        "p50Ms": 75.73499995470047,
+        "p95Ms": 81.55500000715256
+      },
+      "worker": {
+        "p50Us": 74785,
+        "p95Us": 80675
+      },
+      "gpuCompletion": {
+        "p50Us": 135,
+        "p95Us": 190
+      },
+      "throughputFps": 13.20393478045992,
+      "resourcesBeforeDispose": {
+        "disposed": false,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "resourcesAfterDispose": {
+        "disposed": true,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "memory": {
+        "before": {
+          "usedJsHeapBytes": 5918173,
+          "totalJsHeapBytes": 9269117
+        },
+        "after": {
+          "usedJsHeapBytes": 5883858,
+          "totalJsHeapBytes": 7434018
+        }
+      }
+    },
+    "resourceOwnership": {
+      "policy": "each benchmark compositor is disposed and reports zero pending requests"
+    }
+  },
+  "export": {
+    "resolution": {
+      "width": 1920,
+      "height": 1080
+    },
+    "durationUs": 5000000,
+    "videoFrames": 150,
+    "audioFrames": 240000,
+    "elapsedMs": 2045.8849999904633,
+    "realtimeMultiple": 2.443930132936752,
+    "bytes": 811422,
+    "sink": {
+      "writes": 20,
+      "bytesWritten": 811535,
+      "finalSize": 811422,
+      "maxInFlightWrites": 1,
+      "closed": true,
+      "aborted": false
+    },
+    "mainThread": {
+      "contract": "codec-initialization-disclosed; steady-state begins at the second video frame",
+      "initialization": {
+        "supported": true,
+        "startedAtMs": 3875.2800000309944,
+        "completedAtMs": 4129.205000042915,
+        "elapsedMs": 253.92500001192093,
+        "tasks": [
+          {
+            "startTimeMs": 3875.225000023842,
+            "durationMs": 100,
+            "endTimeMs": 3975.225000023842,
+            "overlapMs": 99.94499999284744
+          }
+        ],
+        "longTasksOver50Ms": 1,
+        "maxLongTaskMs": 100
+      },
+      "steady": {
+        "supported": true,
+        "startedAtMs": 4129.205000042915,
+        "completedAtMs": 5921.165000021458,
+        "elapsedMs": 1791.9599999785423,
+        "tasks": [],
+        "longTasksOver50Ms": 0,
+        "maxLongTaskMs": 0
+      },
+      "overall": {
+        "supported": true,
+        "startedAtMs": 3875.2800000309944,
+        "completedAtMs": 5921.165000021458,
+        "elapsedMs": 2045.8849999904633,
+        "tasks": [
+          {
+            "startTimeMs": 3875.225000023842,
+            "durationMs": 100,
+            "endTimeMs": 3975.225000023842,
+            "overlapMs": 99.94499999284744
+          }
+        ],
+        "longTasksOver50Ms": 1,
+        "maxLongTaskMs": 100
+      }
+    },
+    "phases": [
+      {
+        "name": "export-call",
+        "atMs": 3875.439999997616
+      },
+      {
+        "name": "first-video-render-start",
+        "atMs": 3881.7800000309944
+      },
+      {
+        "name": "first-video-render-end",
+        "atMs": 3882.1700000166893
+      },
+      {
+        "name": "second-video-render-start",
+        "atMs": 4129.205000042915
+      },
+      {
+        "name": "video-complete",
+        "atMs": 5836.814999997616
+      },
+      {
+        "name": "first-audio-render-start",
+        "atMs": 5837.165000021458
+      },
+      {
+        "name": "first-audio-render-end",
+        "atMs": 5837.200000047684
+      },
+      {
+        "name": "export-complete",
+        "atMs": 5921.165000021458
+      }
+    ],
+    "memory": {
+      "before": {
+        "usedJsHeapBytes": 5892030,
+        "totalJsHeapBytes": 7696162
+      },
+      "after": {
+        "usedJsHeapBytes": 10124750,
+        "totalJsHeapBytes": 13701834
+      }
+    }
+  },
+  "longTimeline": {
+    "simulatedDurationUs": 600000000,
+    "elapsedMs": 790.8299999833107,
+    "pcm": {
+      "capacityFrames": 4096,
+      "availableReadFrames": 0,
+      "availableWriteFrames": 4096,
+      "playedFrames": 28800000,
+      "underrunFrames": 0,
+      "state": "open"
+    },
+    "boundedBytes": 32800,
+    "heapSamples": [
+      {
+        "equivalentMinute": 1,
+        "usedJsHeapBytes": 11689626
+      },
+      {
+        "equivalentMinute": 2,
+        "usedJsHeapBytes": 10450598
+      },
+      {
+        "equivalentMinute": 3,
+        "usedJsHeapBytes": 11209466
+      },
+      {
+        "equivalentMinute": 4,
+        "usedJsHeapBytes": 8790979
+      },
+      {
+        "equivalentMinute": 5,
+        "usedJsHeapBytes": 9511031
+      },
+      {
+        "equivalentMinute": 6,
+        "usedJsHeapBytes": 10231111
+      },
+      {
+        "equivalentMinute": 7,
+        "usedJsHeapBytes": 8855759
+      },
+      {
+        "equivalentMinute": 8,
+        "usedJsHeapBytes": 9575843
+      },
+      {
+        "equivalentMinute": 9,
+        "usedJsHeapBytes": 10295907
+      },
+      {
+        "equivalentMinute": 10,
+        "usedJsHeapBytes": 8919083
+      }
+    ],
+    "memory": {
+      "before": {
+        "usedJsHeapBytes": 10377526,
+        "totalJsHeapBytes": 13703882
+      },
+      "after": {
+        "usedJsHeapBytes": 9083227,
+        "totalJsHeapBytes": 14715235
+      }
+    }
+  },
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+  "command": "corepack pnpm report:performance",
+  "generatedAt": "2026-07-15T03:44:14.284Z",
+  "referenceDevice": {
+    "model": "MacBookPro16,1",
+    "cpu": "6-Core Intel Core i7 2.6 GHz, 12 logical CPUs",
+    "memoryGiB": 16,
+    "os": "macOS 15.6.1 (24G90)",
+    "platform": "darwin",
+    "architecture": "x64",
+    "logicalCpuCount": 12,
+    "physicalCoreCount": 6,
+    "memoryBytes": 17179869184,
+    "osVersion": "15.6.1",
+    "osBuild": "24G90",
+    "probe": {
+      "source": "node:os+system_profiler+sw_vers",
+      "limitations": []
+    },
+    "browser": "Google Chrome 150.0.7871.115",
+    "browserVersion": "150.0.7871.115",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36"
+  },
+  "browserVersion": "150.0.7871.115"
+}

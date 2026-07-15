@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "3.0.0",
+  "evidenceKind": "aelion-phase-1-blocker-review",
+  "generatedAt": "2026-07-14T07:36:54.667Z",
+  "decision": "not-approved",
+  "reviewedAt": null,
+  "reviewers": [],
+  "sourceIdentity": {
+    "policyVersion": "3.1.0",
+    "manifestSha256": "05c258c030ff2660829d7eb19d04db020be1cb5170cd10933ec7de9a25c3581c",
+    "vcsCommit": null
+  },
+  "gateRun": {
+    "resultsSha256": "7791e7e9717b50a807f54074a3d7b644d9aa2892a6fca3b70947c0090959d16e",
+    "startedAt": "2026-07-14T07:11:27.936Z",
+    "endedAt": "2026-07-14T07:25:06.912Z",
+    "sourceManifestSha256": "05c258c030ff2660829d7eb19d04db020be1cb5170cd10933ec7de9a25c3581c",
+    "artifacts": {
+      "files": [
+        {
+          "file": "reports/baseline/browser-smoke-chromium.json",
+          "command": "corepack pnpm report:browser:chromium",
+          "bytes": 21760,
+          "sha256": "af469c2ccc2d09b110176cf460eb21cc05834851bdb8ecd49bd6010023e0d82d",
+          "mtime": "2026-07-14T07:17:49.365Z"
+        },
+        {
+          "file": "reports/baseline/browser-smoke-firefox.json",
+          "command": "corepack pnpm report:browser:firefox",
+          "bytes": 19617,
+          "sha256": "5bb4f328b9dea35f425e2b83efe6240990dbf98c593997474c7f82478a99388b",
+          "mtime": "2026-07-14T07:23:13.822Z"
+        },
+        {
+          "file": "reports/baseline/media-seek-chromium.json",
+          "command": "corepack pnpm report:seek",
+          "bytes": 21575,
+          "sha256": "891039e5d9c43e778672f19544b77d57fa15b70fa7e933d5f6109ccd3dc027de",
+          "mtime": "2026-07-14T07:23:19.854Z"
+        },
+        {
+          "file": "reports/baseline/performance-1080p30-chromium.json",
+          "command": "corepack pnpm report:performance",
+          "bytes": 8751,
+          "sha256": "3947db73961a81d86878d24752099f87e1836c4d14547796f5353f1699278d16",
+          "mtime": "2026-07-14T07:23:29.773Z"
+        },
+        {
+          "file": "reports/baseline/tarball-consumer.json",
+          "command": "corepack pnpm test:consumer",
+          "bytes": 8600,
+          "sha256": "6bfd06fe76e30032619bd4b726faa007e0fcf5d3b4cc1b1334aebe7ea7e308e3",
+          "mtime": "2026-07-14T07:16:23.615Z"
+        },
+        {
+          "file": "reports/baseline/alpha-60s.json",
+          "command": "corepack pnpm report:alpha",
+          "bytes": 113700,
+          "sha256": "f5d927b7524260a38bdb758893a101b15ac21a7f9a6e974f8a16d4f17f247c29",
+          "mtime": "2026-07-14T07:25:06.228Z"
+        },
+        {
+          "file": "reports/baseline/alpha-60s.webm",
+          "command": "corepack pnpm report:alpha",
+          "bytes": 4743101,
+          "sha256": "b516854fceaade43e9c8cf46f8fe76531a40a395772b5ffda0d43f09f66e75c3",
+          "mtime": "2026-07-14T07:25:05.147Z"
+        },
+        {
+          "file": "README.md",
+          "freshness": "post-run",
+          "bytes": 9376,
+          "sha256": "96ff3c158a388d742a1a53bdb20c3808d055de63414a1108aa5229bd8ecd711e",
+          "mtime": "2026-07-14T07:36:21.177Z"
+        },
+        {
+          "file": "docs/GOAL-PHASE-1.md",
+          "freshness": "post-run",
+          "bytes": 8010,
+          "sha256": "9e2a2f172de75aba1f46139e58143d54da1cd8c759bd13b05c6440b93fff8ae6",
+          "mtime": "2026-07-14T07:36:21.875Z"
+        },
+        {
+          "file": "docs/evidence/phase-1-index.md",
+          "freshness": "post-run",
+          "bytes": 8119,
+          "sha256": "415003989b0f93c948f00c3c11c8fdf98031ffe3d2ba0543dd4bff81f5f82c76",
+          "mtime": "2026-07-14T07:36:22.646Z"
+        },
+        {
+          "file": "docs/evidence/phase-1-completion-audit.md",
+          "freshness": "post-run",
+          "bytes": 5999,
+          "sha256": "916d1125fee68618cdc9fd8597b9ab4ee132a0614680a41e690bb6cb061a3962",
+          "mtime": "2026-07-14T07:36:23.429Z"
+        },
+        {
+          "file": "docs/decisions/phase-1-exit.md",
+          "freshness": "post-run",
+          "bytes": 6842,
+          "sha256": "bc60b926467dfda3070360b5e6527131c175ccee3a187308a3653bac0346d885",
+          "mtime": "2026-07-14T07:36:24.240Z"
+        }
+      ],
+      "setSha256": "48cc9f8990f0d5e5ddf64efd168d50a545fbbb84a06ce25f3f0488ce7caaed03"
+    }
+  },
+  "checks": {
+    "resourceBounds": false,
+    "cancellationAndCleanup": false,
+    "materialTransportIntegrity": false,
+    "publicApiAndDistribution": false,
+    "evidenceIntegrity": false
+  },
+  "blockers": [
+    {
+      "id": "FINAL-GATES-NOT-REVIEWED",
+      "severity": "release-blocker",
+      "status": "open",
+      "summary": "The bound final serial Phase 1 gate run has not completed independent review.",
+      "evidence": []
+    }
+  ],
+  "notes": [
+    "This file is intentionally not approved.",
+    "Approval must follow a completed independent blocker audit and remain bound to this exact source, gate result and artifact set."
+  ]
+}

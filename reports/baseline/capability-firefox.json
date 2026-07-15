@@ -1,0 +1,237 @@
+{
+  "evidenceVersion": "1.0.0",
+  "command": "pnpm report:capability:matrix",
+  "engine": "firefox",
+  "report": {
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-07-13T02:38:20.413Z",
+    "tier": "b",
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0",
+      "platform": "unknown",
+      "language": "en-US",
+      "hardwareConcurrency": 6,
+      "deviceMemoryGiB": null,
+      "crossOriginIsolated": true,
+      "secureContext": true,
+      "origin": "http://127.0.0.1:4174"
+    },
+    "codecs": [
+      {
+        "id": "decode-h264-1080p",
+        "kind": "video-decoder",
+        "codec": "avc1.42001e",
+        "supported": true,
+        "config": {
+          "codec": "avc1.42001e",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "hardwareAcceleration": "no-preference"
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-vp9-1080p",
+        "kind": "video-decoder",
+        "codec": "vp09.00.10.08",
+        "supported": true,
+        "config": {
+          "codec": "vp09.00.10.08",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "hardwareAcceleration": "no-preference"
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-h264-1080p30",
+        "kind": "video-encoder",
+        "codec": "avc1.42001e",
+        "supported": true,
+        "config": {
+          "alpha": "discard",
+          "avc": {
+            "format": "avc"
+          },
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "avc1.42001e",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-vp9-1080p30",
+        "kind": "video-encoder",
+        "codec": "vp09.00.10.08",
+        "supported": true,
+        "config": {
+          "alpha": "discard",
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "vp09.00.10.08",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-aac-stereo",
+        "kind": "audio-decoder",
+        "codec": "mp4a.40.2",
+        "supported": true,
+        "config": {
+          "codec": "mp4a.40.2",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-opus-stereo",
+        "kind": "audio-decoder",
+        "codec": "opus",
+        "supported": true,
+        "config": {
+          "codec": "opus",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-aac-stereo",
+        "kind": "audio-encoder",
+        "codec": "mp4a.40.2",
+        "supported": false,
+        "config": {
+          "bitrate": 192000,
+          "bitrateMode": "variable",
+          "codec": "mp4a.40.2",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_CONFIG_UNSUPPORTED",
+            "severity": "warning",
+            "message": "AudioEncoder does not support mp4a.40.2",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-opus-stereo",
+        "kind": "audio-encoder",
+        "codec": "opus",
+        "supported": true,
+        "config": {
+          "bitrate": 192000,
+          "bitrateMode": "variable",
+          "codec": "opus",
+          "numberOfChannels": 2,
+          "sampleRate": 48000
+        },
+        "diagnostics": []
+      }
+    ],
+    "gpu": {
+      "worker": {
+        "status": "supported",
+        "available": true
+      },
+      "offscreenCanvas": {
+        "status": "supported",
+        "available": true
+      },
+      "webgl2": {
+        "status": "supported",
+        "available": true,
+        "details": {
+          "renderer": "Radeon R9 200 Series, or similar"
+        }
+      },
+      "webgpu": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_WEBGPU_UNAVAILABLE",
+            "severity": "warning",
+            "message": "WebGPU is unavailable",
+            "recoverable": true
+          }
+        ]
+      }
+    },
+    "audio": {
+      "audioContext": {
+        "status": "supported",
+        "available": true
+      },
+      "audioWorklet": {
+        "status": "supported",
+        "available": true
+      },
+      "sharedArrayBuffer": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "storage": {
+      "opfs": {
+        "status": "supported",
+        "available": true
+      },
+      "fileSystemAccess": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_FILE_SYSTEM_ACCESS_UNAVAILABLE",
+            "severity": "warning",
+            "message": "File System Access save picker is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "transferableStreams": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "wasm": {
+      "available": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "diagnostics": [
+      {
+        "code": "CAPABILITY_CODEC_CONFIG_UNSUPPORTED",
+        "severity": "warning",
+        "message": "AudioEncoder does not support mp4a.40.2",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_WEBGPU_UNAVAILABLE",
+        "severity": "warning",
+        "message": "WebGPU is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_FILE_SYSTEM_ACCESS_UNAVAILABLE",
+        "severity": "warning",
+        "message": "File System Access save picker is unavailable",
+        "recoverable": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "evidenceVersion": "1.0.0",
+  "command": "pnpm report:export",
+  "generatedAt": "2026-07-10T07:27:01.175Z",
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+  "artifact": {
+    "file": "reports/baseline/export-webm-vp9-opus.webm",
+    "bytes": 33836,
+    "sha256": "9225f87a4cc0ad38da17eaf9e2072998b4d0027e1ee5710d26512658753233ee"
+  },
+  "export": {
+    "mimeType": "video/webm; codecs=\"vp09.00.10.08, opus\"",
+    "videoFrames": 30,
+    "audioFrames": 48000,
+    "durationUs": 1000000
+  },
+  "sink": {
+    "writes": 1,
+    "bytesWritten": 33836,
+    "finalSize": 33836,
+    "maxInFlightWrites": 1
+  },
+  "readback": {
+    "container": "webm",
+    "durationUs": 1000000,
+    "videoCodec": "vp9",
+    "audioCodec": "opus",
+    "videoSamples": 30,
+    "audioSamples": 51,
+    "decodedTimestampUs": 500000,
+    "decodedWidth": 320,
+    "decodedHeight": 180
+  },
+  "externalReadback": {
+    "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+    "videoDecode": "passed",
+    "audioDecode": "passed",
+    "videoFrameMd5DocumentSha256": "ae36f226e7e4ae365ee4bd7058a8675546c3ed2e08d4b282daeac0f0a7d48da3",
+    "audioPcmMd5": "MD5=0f21842a2454e62e9b6672545c5d7fdb"
+  }
+}
