@@ -6,9 +6,6 @@ fixtures/media
 benchmarks/reports
 reports
 
-# Protocol and design artifacts predate the executable workspace. Their
-# formatting is reviewed separately to avoid semantic-noise rewrites.
-docs
 examples
 schemas/material
 scripts/validate-material-examples.mjs

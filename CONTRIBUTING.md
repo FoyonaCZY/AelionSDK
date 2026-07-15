@@ -27,7 +27,7 @@ corepack pnpm test:consumer
 corepack pnpm release:dry-run
 ```
 
-涉及 Project/Player/Preview/Export 集成语义时，按需重新生成 `corepack pnpm report:alpha`，并审查 60 秒独立音视频回读、队列和 dispose 证据。完整流程见 [AelionSDK Development Workflow](docs/AelionSDK-Development-Workflow.md)。
+涉及 Project/Player/Preview/Export 集成语义时，按需重新生成 `corepack pnpm report:alpha`，并审查 60 秒独立音视频回读、队列和 dispose 证据。完整流程见[开发与发布](docs/development.md)。
 
 浏览器能力不能根据桌面 Chromium 的结果推断到 Safari、iOS 或 Android。涉及兼容性的变更必须附带真实环境和版本信息。
 
@@ -36,7 +36,7 @@ corepack pnpm release:dry-run
 - 保持改动聚焦，并为行为变化添加测试。
 - 不提交生成的 `dist`、本地报告、凭据或受限制媒体。
 - Project/Material 协议变化需提供迁移策略，破坏性决策需新增 ADR。
-- 公开 API 变化需更新 declaration snapshot、CHANGELOG 和 [Breaking Change Policy](docs/versioning-and-breaking-changes.md)。
+- 公开 API 变化需更新 declaration snapshot、CHANGELOG 和[版本与迁移规则](docs/development.md#版本与迁移)。
 - 依赖或测试素材变化需同步许可证与来源声明。
 - PR 描述应包含动机、实现边界、验证命令和兼容性影响。
 

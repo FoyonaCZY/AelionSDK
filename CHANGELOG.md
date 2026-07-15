@@ -1,11 +1,12 @@
 # Changelog
 
-本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion Breaking Change Policy](docs/versioning-and-breaking-changes.md)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
+本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](docs/development.md#版本与迁移)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
 
 ## [Unreleased]
 
 ### Changed
 
+- Reorganized product documentation around getting started, capabilities, architecture, Material, compatibility, development and current status; retired duplicated phase goals, backlogs, exit reviews and ADR files from the active documentation set.
 - Bound untrusted Project v1 input to 16,384 array entries and 4,096 properties per object before schema and semantic validation. The bundled Project schema now exposes the same Alpha safety budgets instead of advertising larger collections that the SDK cannot admit.
 - Relicensed AelionSDK-owned code and all 13 public packages from Apache-2.0 to MIT and replaced placeholder repository metadata with `FoyonaCZY/AelionSDK`.
 - Browser conformance now selects WebGPU only after a real adapter probe; transparent output assertions validate observable alpha-over results across headless platforms.
@@ -18,9 +19,9 @@
 - Export profiles now cover WebM, MP4, PNG/JPEG/WebP, GIF and WAV/RF64, with a WebM Export Worker, AAC runtime canary, checkpoint protocol and canonical provider-backed Remote Export exposed through `session.export.startRemote()`.
 - Long-media infrastructure now includes segmented indexes, content-addressed CacheStore/OPFS LRU, proxy consistency, still/animated image adapters and a page-level decoder/GPU/cache resource governor.
 - Material production tooling now includes Ed25519/ECDSA publisher trust and revocation, deterministic migrations, composition/fusion/adaptive quality, immutable catalog metadata and a headless Material Lab with Golden/package export.
-- Production Core guide, compatibility matrix, Core Node math specification, ADR-016 and reproducible evidence index.
+- Product-facing Production Core documentation, compatibility boundaries, Core Node math specification and reproducible evidence mapping.
 - Audio Track solo is now an explicit Project v1 mixer state with a validated `setTrackSolo` transaction command; shared Render IR audio evaluation applies identical solo/mute semantics to preview and export.
-- Phase 1 最终 tarball browser consumer、API snapshot compare、全量门禁与 Exit Review 正在收口；60 秒 Chromium evidence 已生成并通过独立音视频回读。
+- Phase 1 tarball browser consumer、API snapshot compare 和全量门禁已完成；60 秒 Chromium evidence 已通过独立音视频回读。
 - Material package paths now reject ill-formed Unicode before UTF-8 encoding, preventing archive-name collisions; invalid transport Map keys are rejected without invoking caller coercion hooks.
 
 ### Fixed

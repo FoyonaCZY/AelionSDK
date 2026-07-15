@@ -4,16 +4,16 @@
 
 ## 数学与时间节点
 
-| Node | 结果 |
-|---|---|
-| `math.add` | `a + b` |
-| `math.subtract` | `a - b` |
-| `math.multiply` | `a × b` |
-| `math.divide` | `a / b`；调用方不得提供零分母 |
-| `math.clamp` | `min(max(value, min), max)` |
-| `math.smoothstep` | 令 `t=clamp((x-edge0)/(edge1-edge0),0,1)`，结果 `t²(3-2t)`；两 edge 不得相等 |
-| `time.transition-curve(linear)` | `clamp(progress,0,1)` |
-| `time.transition-curve(smooth)` | `smoothstep(0,1,clamp(progress,0,1))` |
+| Node                            | 结果                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| `math.add`                      | `a + b`                                                                      |
+| `math.subtract`                 | `a - b`                                                                      |
+| `math.multiply`                 | `a × b`                                                                      |
+| `math.divide`                   | `a / b`；调用方不得提供零分母                                                |
+| `math.clamp`                    | `min(max(value, min), max)`                                                  |
+| `math.smoothstep`               | 令 `t=clamp((x-edge0)/(edge1-edge0),0,1)`，结果 `t²(3-2t)`；两 edge 不得相等 |
+| `time.transition-curve(linear)` | `clamp(progress,0,1)`                                                        |
+| `time.transition-curve(smooth)` | `smoothstep(0,1,clamp(progress,0,1))`                                        |
 
 非有限 uniform、非法 specialization 和未知 node/typeVersion 必须在 compiler/runtime 边界拒绝。
 
@@ -21,19 +21,19 @@
 
 令输入颜色为 `c=(rgb,a)`：
 
-| Node | 结果 |
-|---|---|
-| `composite.mix` | `mix(a,b,clamp(amount,0,1))` |
-| `color.temperature` | `max(rgb × (1+t, 1+0.15t, 1-0.55t),0)`，alpha 不变 |
-| `color.lift-black` | `mix(rgb,1,clamp(amount,0,1))`，alpha 不变 |
-| `color.scale-rgb` | `max(rgb × scale,0)`，alpha 不变 |
-| `color.exposure` | `color.scale-rgb(c, 2^stops)` |
-| `color.contrast` | `(rgb-0.5)×amount+0.5`，alpha 不变 |
-| `color.saturation` | `mix(luma,rgb,amount)`，`luma=dot(rgb,(0.2126,0.7152,0.0722))` |
-| `color.invert` | `(a-rgb,a)`，保持 premultiplied 范围 |
-| `composite.screen` | `1-(1-base.rgb)(1-overlay.rgb)`；alpha `ab+ao-ab×ao` |
-| `composite.multiply` | `(base.rgb×overlay.rgb, base.a×overlay.a)` |
-| `composite.add` | `min(base+overlay,1)` |
+| Node                 | 结果                                                           |
+| -------------------- | -------------------------------------------------------------- |
+| `composite.mix`      | `mix(a,b,clamp(amount,0,1))`                                   |
+| `color.temperature`  | `max(rgb × (1+t, 1+0.15t, 1-0.55t),0)`，alpha 不变             |
+| `color.lift-black`   | `mix(rgb,1,clamp(amount,0,1))`，alpha 不变                     |
+| `color.scale-rgb`    | `max(rgb × scale,0)`，alpha 不变                               |
+| `color.exposure`     | `color.scale-rgb(c, 2^stops)`                                  |
+| `color.contrast`     | `(rgb-0.5)×amount+0.5`，alpha 不变                             |
+| `color.saturation`   | `mix(luma,rgb,amount)`，`luma=dot(rgb,(0.2126,0.7152,0.0722))` |
+| `color.invert`       | `(a-rgb,a)`，保持 premultiplied 范围                           |
+| `composite.screen`   | `1-(1-base.rgb)(1-overlay.rgb)`；alpha `ab+ao-ab×ao`           |
+| `composite.multiply` | `(base.rgb×overlay.rgb, base.a×overlay.a)`                     |
+| `composite.add`      | `min(base+overlay,1)`                                          |
 
 `color.extract-highlights → blur.gaussian → color.scale-rgb → composite.screen` 是受支持的四 pass Soft Glow pattern。Highlight 使用 `max(rgb-threshold,0)`；Gaussian radius clamp 到 `[0,64]`，横/纵 pass 使用相同离散 kernel 与边缘 clamp。
 

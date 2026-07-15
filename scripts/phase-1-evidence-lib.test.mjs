@@ -127,8 +127,8 @@ test('workspace identity excludes only the exact post-gate projections plus gene
   for (const path of PHASE_1_POST_GATE_DOCUMENTS) {
     assert.equal(excludedWorkspacePath(root, `/workspace/${path}`), true);
   }
-  assert.equal(excludedWorkspacePath(root, '/workspace/docs/GOAL.md'), false);
-  assert.equal(excludedWorkspacePath(root, '/workspace/docs/evidence/other.md'), false);
+  assert.equal(excludedWorkspacePath(root, '/workspace/docs/architecture.md'), false);
+  assert.equal(excludedWorkspacePath(root, '/workspace/docs/reference/other.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/packages/sdk/src/index.ts'), false);
 });
 
@@ -137,11 +137,11 @@ test('post-gate projections do not churn source identity but every other documen
   try {
     await mkdir(join(workspace, 'docs'), { recursive: true });
     await writeFile(join(workspace, 'README.md'), 'candidate\n');
-    await writeFile(join(workspace, 'docs', 'GOAL-PHASE-1.md'), 'active\n');
+    await writeFile(join(workspace, 'docs', 'status.md'), 'active\n');
     await writeFile(join(workspace, 'docs', 'design.md'), 'design-v1\n');
     const before = await sourceIdentity(workspace);
     await writeFile(join(workspace, 'README.md'), 'complete\n');
-    await writeFile(join(workspace, 'docs', 'GOAL-PHASE-1.md'), 'complete\n');
+    await writeFile(join(workspace, 'docs', 'status.md'), 'complete\n');
     const postGateUpdate = await sourceIdentity(workspace);
     assert.equal(postGateUpdate.manifestSha256, before.manifestSha256);
     await writeFile(join(workspace, 'docs', 'design.md'), 'design-v2\n');

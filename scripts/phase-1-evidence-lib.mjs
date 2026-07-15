@@ -103,13 +103,7 @@ export const PHASE_1_RUN_ARTIFACTS = Object.freeze([
  * then content-bound by the post-run blocker review above. No other document is
  * permitted to bypass source identity.
  */
-export const PHASE_1_POST_GATE_DOCUMENTS = Object.freeze([
-  'README.md',
-  'docs/GOAL-PHASE-1.md',
-  'docs/evidence/phase-1-index.md',
-  'docs/evidence/phase-1-completion-audit.md',
-  'docs/decisions/phase-1-exit.md',
-]);
+export const PHASE_1_POST_GATE_DOCUMENTS = Object.freeze(['README.md', 'docs/status.md']);
 
 /**
  * Exact files an independent review binds. The runner-produced prefix must
@@ -132,7 +126,7 @@ export const WORKSPACE_IDENTITY_POLICY = Object.freeze({
     'browser snapshot output directories named __screenshots__',
     'generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}',
     'OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo',
-    'five post-gate Phase 1 status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound',
+    'post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound',
   ]),
 });
 
@@ -471,7 +465,7 @@ function embeddedArtifactTimestamp(expected, artifact) {
 
 /**
  * Builds the fail-closed, self-contained runner postflight. It intentionally
- * does not read blocker review state or the five post-gate status documents.
+ * does not read blocker review state or the post-gate status documents.
  */
 export function buildPhase1Postflight(commands, artifacts, expectedVersion, generatedAt) {
   const checks = [];

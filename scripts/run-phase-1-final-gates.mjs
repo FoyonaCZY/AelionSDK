@@ -227,7 +227,7 @@ try {
     process.exitCode = 1;
   } else {
     process.stdout.write(
-      `Next: update the five post-gate status documents, run corepack pnpm report:phase1:blocker-template, complete the independent review bound to ${document.sourceIdentityAfter.manifestSha256}, then run corepack pnpm report:phase1:gates.\n`,
+      `Next: update the post-gate status documents, run corepack pnpm report:phase1:blocker-template, complete the independent review bound to ${document.sourceIdentityAfter.manifestSha256}, then run corepack pnpm report:phase1:gates.\n`,
     );
   }
 } finally {
