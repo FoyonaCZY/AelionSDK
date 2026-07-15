@@ -25,6 +25,9 @@ export default defineConfig({
         new URL('./packages/renderer-worker/src/index.ts', import.meta.url),
       ),
       '@aelion/sdk': fileURLToPath(new URL('./packages/sdk/src/index.ts', import.meta.url)),
+      '@aelion/transaction': fileURLToPath(
+        new URL('./packages/transaction/src/index.ts', import.meta.url),
+      ),
     },
   },
   server: {

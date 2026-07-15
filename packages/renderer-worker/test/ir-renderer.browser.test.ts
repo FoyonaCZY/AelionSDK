@@ -220,6 +220,16 @@ function pixel(bitmap: ImageBitmap): readonly number[] {
   return [...context.getImageData(4, 4, 1, 1).data];
 }
 
+function pixelOver(bitmap: ImageBitmap, fillStyle: string): readonly number[] {
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const context = canvas.getContext('2d', { alpha: false });
+  if (context === null) throw new Error('2D context unavailable');
+  context.fillStyle = fillStyle;
+  context.fillRect(0, 0, bitmap.width, bitmap.height);
+  context.drawImage(bitmap, 0, 0);
+  return [...context.getImageData(4, 4, 1, 1).data];
+}
+
 function expectFrameClosed(frame: VideoFrame): void {
   expect(frame.format).toBeNull();
   expect(frame.codedWidth).toBe(0);
@@ -477,11 +487,23 @@ describe('Project → Render IR → Material Graph → Worker renderer', () => {
       preferredBackend: 'webgl2',
     });
     try {
-      const actual = pixel(result.bitmap);
-      expect(actual[0]).toBeGreaterThanOrEqual(198);
-      expect(actual[0]).toBeLessThanOrEqual(201);
-      expect(actual[3]).toBeGreaterThanOrEqual(126);
-      expect(actual[3]).toBeLessThanOrEqual(129);
+      // Browsers may expose transparent-pixel RGB as straight or premultiplied
+      // values on readback. Verify the observable alpha-over result instead.
+      const overBlack = pixelOver(result.bitmap, 'black');
+      expect(overBlack[0]).toBeGreaterThanOrEqual(99);
+      expect(overBlack[0]).toBeLessThanOrEqual(101);
+      expect(overBlack[1]).toBeLessThanOrEqual(1);
+      expect(overBlack[2]).toBeLessThanOrEqual(1);
+      expect(overBlack[3]).toBe(255);
+
+      const overWhite = pixelOver(result.bitmap, 'white');
+      expect(overWhite[0]).toBeGreaterThanOrEqual(226);
+      expect(overWhite[0]).toBeLessThanOrEqual(228);
+      expect(overWhite[1]).toBeGreaterThanOrEqual(126);
+      expect(overWhite[1]).toBeLessThanOrEqual(128);
+      expect(overWhite[2]).toBeGreaterThanOrEqual(126);
+      expect(overWhite[2]).toBeLessThanOrEqual(128);
+      expect(overWhite[3]).toBe(255);
     } finally {
       result.bitmap.close();
       await renderer.dispose();

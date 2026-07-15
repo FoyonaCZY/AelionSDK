@@ -82,7 +82,7 @@ consumer 在临时工程安装真实 tgz 和 Vite tgz，独立运行 `tsc --noEm
 | `browser-smoke-firefox.json` | 19,613 | `be29ff4005d10e7cff29de7e5f63da30ece251a3b4a5152e025795a4129b18ea` |
 | `media-seek-chromium.json` | 21,541 | `71a44689d7bcb063938180db3ee2f2cf599d618de11a3a91ad90f8b7cff460b9` |
 | `performance-1080p30-chromium.json` | 8,758 | `bb06ce76470d978748fd40df0c72ba7c471976c430747cf207f12d3c73ccbe19` |
-| `tarball-consumer.json` | 8,599 | `c013e074d63028409e1b376f8d82169f51e8bd671726ecdab12d31a25417faae` |
+| `tarball-consumer.json` | 8,601 | `8fd6e37fc1485fd968a949539915bc71f8ba8931e9185bff8eb97809725942cd` |
 | `alpha-60s.json` | 113,769 | `c74b428f36c997423d6736cabef025a98d7db98e34e7448cc5fe418d333a5a83` |
 | `alpha-60s.webm` | 4,743,101 | `b516854fceaade43e9c8cf46f8fe76531a40a395772b5ffda0d43f09f66e75c3` |
 

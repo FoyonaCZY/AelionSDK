@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-15T03:41:51.280Z",
+  "generatedAt": "2026-07-15T06:17:04.364Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
     "package": "@aelion/vite-plugin",
     "version": "0.1.0-alpha.0",
-    "packageSha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a",
+    "packageSha256": "021fec08b850c7c4b32b06feeaaa03b28a0b6420f7987f975d2c56e59ee6e26d",
     "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
     "public": true,
     "zeroConfigVite": false,
@@ -59,7 +59,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "042738a6740cd5c4c27d39b24ab611c85580fd4f32ae7feb7b0cd273856a2722",
+    "packageJsonSha256": "67669f27c8109cf28475469c96d1e923606e26e1672796ef6805e88cd3a27cc3",
     "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -67,7 +67,7 @@
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "9aafa85ebf931da1034ce6c07f3680a3b0fd5a42fdf9d788abc87e90aae1f95c"
+      "sha256": "d85fad278aeda0b3863e322fd3ed121cac175f1ea899ee0997ada25694caf787"
     },
     {
       "name": "@aelion/capability",
@@ -117,17 +117,17 @@
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "97cc80eaec4638b4c0e35c18514a6f497d7175ab0e830eb41a8bb44d9b1a0948"
+      "sha256": "0a00afd0c5c1b89a698dfbb4d14eb2769eeffd43e2c5041c29854effc0ac8c65"
     },
     {
       "name": "@aelion/transaction",
       "version": "0.1.0-alpha.0",
-      "sha256": "2abb0566ffcaf88cddb7b8d09969eea03ebd558e45e20f354da45c49bfbfd172"
+      "sha256": "2ac0b30285aa72fd987002ad4a996ad9f3f6c5bae3aa398e44006fefc73876df"
     },
     {
       "name": "@aelion/vite-plugin",
       "version": "0.1.0-alpha.0",
-      "sha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a"
+      "sha256": "021fec08b850c7c4b32b06feeaaa03b28a0b6420f7987f975d2c56e59ee6e26d"
     }
   ],
   "runtimeAssets": [
@@ -168,7 +168,7 @@
             225,
             255
           ],
-          "workerTimingUs": 60785
+          "workerTimingUs": 47805
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -176,10 +176,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23744,
-          "playedFrames": 256,
+          "availableReadFrames": 23232,
+          "playedFrames": 768,
           "underrunFrames": 0,
-          "timeUs": 5333
+          "timeUs": 16000
         },
         "sessionFacade": {
           "revision": "3",
@@ -204,7 +204,7 @@
             225,
             255
           ],
-          "workerTimingUs": 65700
+          "workerTimingUs": 63600
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -212,10 +212,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23488,
-          "playedFrames": 512,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 10667
+          "timeUs": 32000
         },
         "sessionFacade": {
           "revision": "3",

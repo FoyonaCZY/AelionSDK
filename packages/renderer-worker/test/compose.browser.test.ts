@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
 import { WorkerCompositor } from '../src/index.js';
 import type { RendererWorkerRequest, RendererWorkerRequestSetSnapshot } from '../src/protocol.js';
+import { hasUsableWebGpu } from './browser-capabilities.js';
 
 const crossDissolveGraph: MaterialGraph = {
   $schema: 'https://schemas.aelion.dev/material/graph/v1.json',
@@ -388,8 +389,8 @@ describe('Worker WebGL2 compositor', () => {
     compositor.dispose();
   });
 
-  it('uses the Worker WebGPU primary path when the browser exposes it', async () => {
-    if (Reflect.get(navigator, 'gpu') === undefined) return;
+  it('uses the Worker WebGPU primary path when an adapter is usable', async () => {
+    if (!(await hasUsableWebGpu())) return;
     const compositor = new WorkerCompositor();
     const result = await compositor.compose({
       inputs: { from: solidFrame(255, 0, 0), to: solidFrame(0, 0, 255) },
@@ -415,7 +416,7 @@ describe('Worker WebGL2 compositor', () => {
   });
 
   it('executes the same single-input Filter graph through WebGPU', async () => {
-    if (Reflect.get(navigator, 'gpu') === undefined) return;
+    if (!(await hasUsableWebGpu())) return;
     const compositor = new WorkerCompositor();
     const result = await compositor.compose({
       inputs: { source: solidFrame(100, 100, 100) },
@@ -438,7 +439,7 @@ describe('Worker WebGL2 compositor', () => {
   });
 
   it('recovers a lost WebGPU device through the explicit WebGL2 fallback', async () => {
-    if (Reflect.get(navigator, 'gpu') === undefined) return;
+    if (!(await hasUsableWebGpu())) return;
     const compositor = new WorkerCompositor();
     const result = await compositor.compose({
       inputs: { from: solidFrame(255, 0, 0), to: solidFrame(0, 0, 255) },
@@ -494,7 +495,7 @@ describe('Worker WebGL2 compositor', () => {
     expect(webgl.snapshot().pendingRequests).toBe(0);
     webgl.dispose();
 
-    if (Reflect.get(navigator, 'gpu') === undefined) return;
+    if (!(await hasUsableWebGpu())) return;
     const webgpu = new WorkerCompositor();
     await expect(
       webgpu.compose({

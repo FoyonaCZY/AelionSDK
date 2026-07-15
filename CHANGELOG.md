@@ -8,11 +8,17 @@
 
 - Bound untrusted Project v1 input to 16,384 array entries and 4,096 properties per object before schema and semantic validation. The bundled Project schema now exposes the same Alpha safety budgets instead of advertising larger collections that the SDK cannot admit.
 - Relicensed AelionSDK-owned code and all 13 public packages from Apache-2.0 to MIT and replaced placeholder repository metadata with `FoyonaCZY/AelionSDK`.
+- Browser conformance now selects WebGPU only after a real adapter probe; transparent output assertions validate observable alpha-over results across headless platforms.
 
 ### Added
 
 - Phase 1 最终 tarball browser consumer、API snapshot compare、全量门禁与 Exit Review 正在收口；60 秒 Chromium evidence 已生成并通过独立音视频回读。
 - Material package paths now reject ill-formed Unicode before UTF-8 encoding, preventing archive-name collisions; invalid transport Map keys are rejected without invoking caller coercion hooks.
+
+### Fixed
+
+- Clean GitHub Actions browser jobs now build workspace exports before testing and resolve every `@aelion/*` test import through source aliases.
+- Hermetic tarball consumers inherit the repository's exact `pnpm@10.13.1` package-manager pin, preventing Corepack from selecting an incompatible pnpm release under Node.js 20.
 
 ## [0.1.0-alpha.0] - 2026-07-13
 

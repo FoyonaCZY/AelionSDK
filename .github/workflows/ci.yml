@@ -49,6 +49,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm exec playwright install --with-deps firefox
       - run: pnpm test:browser
@@ -70,6 +71,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm test:browser
       - run: pnpm test:browser:firefox

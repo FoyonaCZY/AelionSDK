@@ -11,6 +11,7 @@ import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelion/re
 import { describe, expect, it } from 'vitest';
 
 import { RenderIrFrameRenderer, type IrFrameSource } from '../src/index.js';
+import { hasUsableWebGpu } from './browser-capabilities.js';
 
 async function fixtureJson(path: string): Promise<JsonObject> {
   const response = await fetch(`/${path}`);
@@ -37,6 +38,7 @@ function parameterTypes(materialId: string) {
 
 describe('fixed 30-second Project vertical slice', () => {
   it('loads real MP4/WebM frames and executes Filter + Transition through one Render IR', async () => {
+    const preferredBackend = (await hasUsableWebGpu()) ? 'webgpu' : 'webgl2';
     const [project, warmGraph, transitionGraph, opening, closing] = await Promise.all([
       fixtureJson('examples/aelion-vertical-slice-30s.project.json'),
       fixtureJson('examples/materials/warm-film/graphs/warm-film.graph.json'),
@@ -90,21 +92,21 @@ describe('fixed 30-second Project vertical slice', () => {
           timeUs: 1_000_000,
           source,
           mode: 'preview',
-          preferredBackend: 'webgpu',
+          preferredBackend,
         }),
         renderer.render({
           ir,
           timeUs: 15_000_000,
           source,
           mode: 'preview',
-          preferredBackend: 'webgpu',
+          preferredBackend,
         }),
         renderer.render({
           ir,
           timeUs: 29_000_000,
           source,
           mode: 'export',
-          preferredBackend: 'webgpu',
+          preferredBackend,
         }),
       ]);
       const audio = await renderIrAudio({
@@ -129,7 +131,7 @@ describe('fixed 30-second Project vertical slice', () => {
         expect(openingFrame.materialIds).toEqual(['mat_warm']);
         expect(transitionFrame.materialIds).toEqual(['mat_warm', 'mat_dissolve']);
         expect(closingFrame.materialIds).toEqual([]);
-        expect(transitionFrame.backend).toBe('webgpu');
+        expect(transitionFrame.backend).toBe(preferredBackend);
         expect(openingFrame.bitmap.width).toBe(320);
         expect(closingFrame.bitmap.height).toBe(180);
         expect(audio).toHaveLength(9_600);

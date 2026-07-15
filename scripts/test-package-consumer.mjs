@@ -33,6 +33,11 @@ const consumerDirectory = join(temporaryDirectory, 'consumer');
 const browserMode = process.argv.includes('--browser');
 const evidencePath = join(root, 'reports', 'baseline', 'tarball-consumer.json');
 const keepTemporaryDirectory = process.env.AELION_KEEP_CONSUMER_TEMP === '1';
+const rootManifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+const packageManager = rootManifest.packageManager;
+if (typeof packageManager !== 'string' || !/^pnpm@\d+\.\d+\.\d+$/u.test(packageManager)) {
+  throw new Error('Root package.json must pin an exact pnpm packageManager version');
+}
 
 async function run(command, args, cwd) {
   return execFileAsync(command, args, {
@@ -514,6 +519,7 @@ try {
         name: 'aelion-package-consumer-smoke',
         private: true,
         type: 'module',
+        packageManager,
         dependencies: consumerDependencies,
         pnpm: { overrides: { ...dependencies, ...thirdPartyTarballs } },
       },
