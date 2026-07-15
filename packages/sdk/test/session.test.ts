@@ -1,7 +1,12 @@
 import { readFile } from 'node:fs/promises';
 
 import type { JsonObject } from '@aelion/core';
-import type { WebMExportOptions } from '@aelion/export';
+import type {
+  RemoteExportEvent,
+  RemoteExportRequest,
+  RemoteExportSession,
+  WebMExportOptions,
+} from '@aelion/export';
 import { canonicalHash } from '@aelion/project-schema';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -527,6 +532,88 @@ describe('@aelion/sdk session facade', () => {
       diagnostics: [expect.objectContaining({ code: 'EXPORT_JOB_ACTIVE' })],
     });
     await first.cancel();
+    await session.dispose();
+  });
+
+  it('runs a remote provider from a canonical frozen Project manifest', async () => {
+    const project = await json('examples/aelion-vertical-slice-30s.project.json');
+    const session = await Aelion.createSession();
+    await session.loadProject(project);
+    let submitted: RemoteExportRequest | undefined;
+    async function* events(request: RemoteExportRequest): AsyncIterable<RemoteExportEvent> {
+      await Promise.resolve();
+      yield { type: 'progress', progress: 0.4, stage: 'upload' };
+      yield {
+        type: 'completed',
+        result: {
+          providerJobId: 'provider-job',
+          contentId: request.contentId,
+          profileId: request.profileId,
+          mimeType: 'video/mp4',
+          byteLength: 42,
+          outputToken: 'opaque-token',
+        },
+      };
+    }
+    const progress: string[] = [];
+    const job = session.export.startRemote({
+      profile: 'mp4-h264-aac',
+      authorizer: {
+        authorize: () => Promise.resolve({ scheme: 'Bearer', token: 'secret' }),
+      },
+      provider: {
+        id: 'test-provider',
+        start: request => {
+          submitted = request;
+          const remoteSession: RemoteExportSession = {
+            providerJobId: 'provider-job',
+            events: events(request),
+            cancel: () => Promise.resolve(),
+            cleanup: () => Promise.resolve(),
+          };
+          return Promise.resolve(remoteSession);
+        },
+      },
+      onProgress: (value, stage) => progress.push(`${value.toString()}:${stage ?? ''}`),
+    });
+
+    await expect(job).resolves.toMatchObject({
+      providerJobId: 'provider-job',
+      profileId: 'mp4-h264-aac',
+      byteLength: 42,
+    });
+    expect(submitted).toMatchObject({
+      idempotencyKey: submitted?.contentId,
+      profileId: 'mp4-h264-aac',
+      projectId: project.projectId,
+      revision: '0',
+      manifest: {
+        protocol: 'aelion.remote-export/1',
+        project: { projectId: project.projectId },
+      },
+    });
+    expect(progress).toEqual(['0.4:upload', '1:completed']);
+    expect(session.getStats().export.jobsCompleted).toBe(1);
+    await session.dispose();
+  });
+
+  it('preflights every local export profile before acquiring its sink', async () => {
+    const project = await json('examples/aelion-vertical-slice-30s.project.json');
+    const session = await Aelion.createSession();
+    await session.loadProject(project);
+    const wav = await session.export.preflightProfile({
+      profile: 'audio-wav',
+      sink: new WritableStream(),
+    });
+    expect(wav).toMatchObject({ ok: true, revision: 0n, issues: [] });
+
+    const still = await session.export.preflightProfile({
+      profile: 'still-png',
+      timeUs: 0,
+      sink: new WritableStream(),
+    });
+    expect(still.ok).toBe(false);
+    expect(still.issues.map(issue => issue.code)).toContain('EXPORT_IMAGE_CANVAS_UNAVAILABLE');
     await session.dispose();
   });
 

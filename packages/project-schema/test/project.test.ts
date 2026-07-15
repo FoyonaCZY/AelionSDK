@@ -130,6 +130,21 @@ describe('Aelion Project v1', () => {
     expect(result.ok, JSON.stringify(result.diagnostics, null, 2)).toBe(true);
   });
 
+  it('accepts optional audio Track solo state and rejects non-boolean values', () => {
+    const candidate = canonicalClone(project);
+    const track = (candidate.tracks as JsonObject).track_music as JsonObject;
+    const audio = track.audio as JsonObject;
+    audio.solo = true;
+    expect(validator.validate(candidate).ok).toBe(true);
+
+    audio.solo = 'yes';
+    const invalid = validator.validate(candidate);
+    expect(invalid.ok).toBe(false);
+    expect(invalid.diagnostics).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: 'PROJECT_SCHEMA_INVALID' })]),
+    );
+  });
+
   it('validates the fixed 30-second vertical-slice Project', async () => {
     const verticalSlice = await readJson('examples/aelion-vertical-slice-30s.project.json');
     const result = validator.validate(verticalSlice);
@@ -182,12 +197,29 @@ describe('Aelion Project v1', () => {
     );
   });
 
+  it('requires LinkGroup membership and Item back-references to agree', () => {
+    const broken = canonicalClone(project);
+    const group = (broken.linkGroups as JsonObject).link_av_a as JsonObject;
+    group.itemIds = ['item_video_a'];
+    group.syncOffsetsUs = { item_video_a: 0, item_audio_a: 0 };
+
+    const result = validator.validate(broken);
+    expect(result.ok).toBe(false);
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_LINK_GROUP_TOO_SMALL' }),
+        expect.objectContaining({ code: 'PROJECT_LINK_GROUP_BACKREF_MISSING' }),
+        expect.objectContaining({ code: 'PROJECT_LINK_GROUP_OFFSET_ORPHAN' }),
+      ]),
+    );
+  });
+
   it.each([
     { rate: { numerator: 2, denominator: 1 }, reverse: false },
     { rate: { numerator: 1, denominator: 1 }, reverse: true },
-  ])('rejects unsupported Alpha audio time mapping before runtime', value => {
-    const broken = canonicalClone(project);
-    const items = broken.items as JsonObject;
+  ])('accepts production audio linear time mapping', value => {
+    const candidate = canonicalClone(project);
+    const items = candidate.items as JsonObject;
     const item = items.item_audio_a as ItemEntity | undefined;
     if (item === undefined || item.type !== 'audio') throw new Error('Fixture audio is missing');
     const source = item.source as JsonObject;
@@ -195,14 +227,55 @@ describe('Aelion Project v1', () => {
     mapping.rate = value.rate;
     mapping.reverse = value.reverse;
 
+    expect(validator.validate(candidate).ok).toBe(true);
+  });
+
+  it('rejects audio fades longer than the Item', () => {
+    const broken = canonicalClone(project);
+    const item = (broken.items as JsonObject).item_audio_a as JsonObject;
+    const audio = item.audio as JsonObject;
+    audio.fadeInUs = 5_200_001;
+
     const result = validator.validate(broken);
-    expect(result.ok).toBe(false);
     expect(result.diagnostics).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          code: 'PROJECT_AUDIO_TIME_MAPPING_UNSUPPORTED',
+          code: 'PROJECT_AUDIO_FADE_OUT_OF_RANGE',
           entityId: 'item_audio_a',
         }),
+      ]),
+    );
+  });
+
+  it('validates curve TimeMap endpoints and strictly increasing Item-local time', () => {
+    const candidate = canonicalClone(project);
+    const item = (candidate.items as JsonObject).item_video_a as JsonObject;
+    const source = item.source as JsonObject;
+    source.timeMapping = {
+      type: 'curve',
+      boundary: 'error',
+      points: [
+        { itemTimeUs: 0, sourceTimeUs: 1_000_000, interpolation: 'linear' },
+        { itemTimeUs: 2_000_000, sourceTimeUs: 3_000_000, interpolation: 'hold' },
+        { itemTimeUs: 5_200_000, sourceTimeUs: 2_000_000, interpolation: 'linear' },
+      ],
+    };
+    expect(validator.validate(candidate).ok).toBe(true);
+
+    const points = (source.timeMapping as JsonObject).points as JsonObject[];
+    const last = points.at(-1);
+    if (last === undefined) throw new Error('Curve fixture is incomplete');
+    last.itemTimeUs = 5_199_999;
+    expect(validator.validate(candidate).diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_TIME_MAPPING_ENDPOINT_INVALID' }),
+      ]),
+    );
+
+    last.itemTimeUs = 2_000_000;
+    expect(validator.validate(candidate).diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_TIME_MAPPING_ORDER_INVALID' }),
       ]),
     );
   });
@@ -460,6 +533,60 @@ describe('Aelion Project v1', () => {
     expect(result.ok).toBe(false);
     expect(result.diagnostics).toHaveLength(1);
     expect(result.diagnostics[0]?.code).toBe('PROJECT_SCHEMA_INVALID');
+  });
+
+  it('validates nested Sequence references and diagnoses recursive graphs', () => {
+    const changed = canonicalClone(project);
+    const sequences = changed.sequences as JsonObject;
+    const tracks = changed.tracks as JsonObject;
+    const items = changed.items as JsonObject;
+    const main = sequences.seq_main as JsonObject;
+    const titleTrack = tracks.track_title as JsonObject;
+    const title = items.item_title as JsonObject;
+    sequences.seq_child = {
+      ...canonicalClone(main),
+      id: 'seq_child',
+      trackIds: ['track_child'],
+      transitionIds: [],
+      materialInstanceIds: [],
+      markerIds: [],
+    };
+    tracks.track_child = {
+      ...canonicalClone(titleTrack),
+      id: 'track_child',
+      sequenceId: 'seq_child',
+      itemIds: [],
+      materialInstanceIds: [],
+    };
+    const nested = (id: string, trackId: string, sequenceId: string): JsonObject => ({
+      id,
+      trackId,
+      type: 'nested-sequence',
+      enabled: true,
+      range: { startUs: 0, durationUs: 1_000_000 },
+      materialInstanceIds: [],
+      source: {
+        sequenceId,
+        sourceRange: { startUs: 0, durationUs: 1_000_000 },
+        timeMapping: {
+          type: 'linear',
+          rate: { numerator: 1, denominator: 1 },
+          reverse: false,
+          boundary: 'error',
+        },
+      },
+      visual: canonicalClone(title.visual as JsonObject),
+    });
+    items.nested_to_child = nested('nested_to_child', 'track_title', 'seq_child');
+    titleTrack.itemIds = [...(titleTrack.itemIds as string[]), 'nested_to_child'];
+    expect(validator.validate(changed).ok).toBe(true);
+
+    items.nested_to_main = nested('nested_to_main', 'track_child', 'seq_main');
+    (tracks.track_child as JsonObject).itemIds = ['nested_to_main'];
+    expect(validator.validate(changed)).toMatchObject({
+      ok: false,
+      diagnostics: [expect.objectContaining({ code: 'PROJECT_NESTED_SEQUENCE_CYCLE' })],
+    });
   });
 });
 

@@ -2,11 +2,18 @@ import { renderIrAudio } from '@aelion/audio';
 import { probeCapabilities } from '@aelion/capability';
 import { AelionError, type Diagnostic } from '@aelion/core';
 import {
+  createRemoteExportContentId,
+  exportFrozenRenderIrMp4,
   exportFrozenRenderIrWebM,
+  exportGif,
+  exportStillImage,
+  exportWav,
+  preflightProfileExport,
   preflightWebMExport,
+  runRemoteExport,
   type FrozenWebMExportOptions,
 } from '@aelion/export';
-import { ProjectValidator, type AelionProject } from '@aelion/project-schema';
+import { canonicalStringify, ProjectValidator, type AelionProject } from '@aelion/project-schema';
 import { IncrementalRenderCompiler, type CompileStats, type RenderIr } from '@aelion/render-ir';
 import { RenderIrFrameRenderer, type RenderIrFrameRendererSnapshot } from '@aelion/renderer-worker';
 import {
@@ -25,6 +32,11 @@ import type {
   AelionExportJob,
   AelionExportJobSnapshot,
   AelionExportOptions,
+  AelionProfileExportJob,
+  AelionProfileExportOptions,
+  AelionProfileExportResult,
+  AelionRemoteExportJob,
+  AelionRemoteExportOptions,
   AelionPreviewApi,
   AelionSessionApi,
   AelionSessionEvent,
@@ -39,6 +51,13 @@ import type {
 
 function unloaded(): Error {
   return new Error('Load an Aelion Project before using this session');
+}
+
+function channelCountForLayout(layout: string): number {
+  if (layout === 'mono') return 1;
+  if (layout === 'stereo') return 2;
+  if (layout === '5.1') return 6;
+  throw new RangeError(`Unsupported channel layout ${layout}`);
 }
 
 const DEFAULT_MAX_DIAGNOSTICS = 256;
@@ -78,7 +97,7 @@ export class AelionSession implements AelionSessionApi {
   #exportJobsCompleted = 0;
   #exportJobsFailed = 0;
   #exportJobsCancelled = 0;
-  #activeExportJob: AelionExportJob | undefined;
+  #activeExportJob: AelionExportJob | AelionProfileExportJob | AelionRemoteExportJob | undefined;
   #nextExportJobId = 1;
   #loadGeneration = 0;
   #loadInProgress = 0;
@@ -124,10 +143,13 @@ export class AelionSession implements AelionSessionApi {
         return canRedo();
       },
     };
-    const activeExportJob = (): AelionExportJob | null => this.#activeExportJob ?? null;
+    const activeExportJob = () => this.#activeExportJob ?? null;
     this.export = {
       preflight: options => this.#preflight(options),
+      preflightProfile: options => this.#preflightProfile(options),
       start: options => this.#startExport(options),
+      startProfile: options => this.#startProfileExport(options),
+      startRemote: options => this.#startRemoteExport(options),
       cancel: reason => this.#cancelExport(reason),
       get activeJob() {
         return activeExportJob();
@@ -586,6 +608,20 @@ export class AelionSession implements AelionSessionApi {
     return report;
   }
 
+  async #preflightProfile(options: AelionProfileExportOptions) {
+    const ir = this.requireIr();
+    const report = await preflightProfileExport({
+      ir,
+      projectRevision: ir.revision,
+      profile: options.profile,
+      sink: options.sink,
+      ...('videoBitrate' in options ? { videoBitrate: options.videoBitrate } : {}),
+      ...('audioBitrate' in options ? { audioBitrate: options.audioBitrate } : {}),
+    });
+    for (const diagnostic of report.issues) this.#recordDiagnostic(diagnostic);
+    return report;
+  }
+
   #startExport(options: AelionExportOptions): AelionExportJob {
     this.#assertActive();
     if (this.#activeExportJob?.state === 'running') {
@@ -617,6 +653,223 @@ export class AelionSession implements AelionSessionApi {
         } catch (error) {
           // Publish structured export diagnostics before the await-compatible
           // job rejects so callers observe one deterministic Session state.
+          this.#recordErrorDiagnostics(error);
+          throw error;
+        }
+      },
+      onSnapshot: snapshot => this.#acceptExportSnapshot(snapshot),
+      onSettled: settled => {
+        if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
+        this.#emitStats();
+      },
+    });
+    this.#activeExportJob = job;
+    this.#emitStats();
+    return job;
+  }
+
+  #startProfileExport(options: AelionProfileExportOptions): AelionProfileExportJob {
+    this.#assertActive();
+    if (this.#activeExportJob?.state === 'running') {
+      const diagnostic: Diagnostic = {
+        code: 'EXPORT_JOB_ACTIVE',
+        severity: 'error',
+        message: 'AelionSession supports one active export; cancel it before starting another',
+        recoverable: true,
+      };
+      this.#recordDiagnostic(diagnostic);
+      throw new AelionError([diagnostic]);
+    }
+    const ir = this.requireIr();
+    const media = this.requireMedia();
+    const id = `export-${this.#nextExportJobId.toString()}`;
+    this.#nextExportJobId += 1;
+    this.#exportJobsStarted += 1;
+    const job = new ExportJob<AelionProfileExportResult>({
+      id,
+      ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
+      run: async (signal, updateProgress) => {
+        const onProgress = (progress: number): void => {
+          updateProgress(progress);
+          options.onProgress?.(progress);
+        };
+        const cleanup = options.cleanupSink;
+        const renderFrame = async (request: {
+          readonly timestampUs: number;
+          readonly durationUs: number;
+        }): Promise<VideoFrame> => {
+          const rendered = await this.#requireRenderer().render({
+            ir,
+            timeUs: request.timestampUs,
+            source: media,
+            mode: 'export',
+            preferredBackend: this.#options.preferredBackend ?? 'webgl2',
+            allowFallback: this.#options.allowBackendFallback ?? true,
+            signal,
+          });
+          try {
+            return new VideoFrame(rendered.bitmap, {
+              timestamp: request.timestampUs,
+              duration: request.durationUs,
+            });
+          } finally {
+            rendered.bitmap.close();
+          }
+        };
+        const renderAudio = (request: {
+          readonly startFrame: number;
+          readonly frameCount: number;
+          readonly channelCount: number;
+        }) =>
+          renderIrAudio({
+            ir,
+            startFrame: request.startFrame,
+            frameCount: request.frameCount,
+            channelCount: request.channelCount,
+            source: media,
+            signal,
+          });
+        try {
+          if (options.profile === 'webm-vp9-opus' || options.profile === 'mp4-h264-aac') {
+            const frozen = this.#frozenExportOptions(
+              {
+                sink: options.sink,
+                ...(options.videoBitrate === undefined
+                  ? {}
+                  : { videoBitrate: options.videoBitrate }),
+                ...(options.audioBitrate === undefined
+                  ? {}
+                  : { audioBitrate: options.audioBitrate }),
+                ...(cleanup === undefined ? {} : { cleanupSink: cleanup }),
+              },
+              signal,
+              onProgress,
+            );
+            return options.profile === 'mp4-h264-aac'
+              ? await exportFrozenRenderIrMp4(frozen)
+              : await exportFrozenRenderIrWebM(frozen);
+          }
+          if (options.profile === 'audio-wav') {
+            return await exportWav({
+              durationUs: ir.durationUs,
+              sampleRate: ir.sampleRate,
+              channelCount: channelCountForLayout(ir.channelLayout),
+              sink: options.sink,
+              renderAudio,
+              signal,
+              onProgress,
+              ...(options.sampleFormat === undefined ? {} : { sampleFormat: options.sampleFormat }),
+              ...(cleanup === undefined ? {} : { cleanupSink: cleanup }),
+            });
+          }
+          if (options.profile === 'animated-gif') {
+            return await exportGif({
+              durationUs: ir.durationUs,
+              width: ir.width,
+              height: ir.height,
+              frameRate: ir.frameRate,
+              sink: options.sink,
+              renderFrame,
+              signal,
+              onProgress,
+              ...(options.loopCount === undefined ? {} : { loopCount: options.loopCount }),
+              ...(cleanup === undefined ? {} : { cleanupSink: cleanup }),
+            });
+          }
+          const format =
+            options.profile === 'still-png'
+              ? 'png'
+              : options.profile === 'still-jpeg'
+                ? 'jpeg'
+                : 'webp';
+          if (!('timeUs' in options)) throw new TypeError('Unsupported export profile');
+          return await exportStillImage({
+            timeUs: options.timeUs,
+            width: ir.width,
+            height: ir.height,
+            format,
+            sink: options.sink,
+            renderFrame,
+            signal,
+            ...(options.quality === undefined ? {} : { quality: options.quality }),
+            ...(cleanup === undefined ? {} : { cleanupSink: cleanup }),
+          });
+        } catch (error) {
+          this.#recordErrorDiagnostics(error);
+          throw error;
+        }
+      },
+      onSnapshot: snapshot => this.#acceptExportSnapshot(snapshot),
+      onSettled: settled => {
+        if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
+        this.#emitStats();
+      },
+    });
+    this.#activeExportJob = job;
+    this.#emitStats();
+    return job;
+  }
+
+  #startRemoteExport(options: AelionRemoteExportOptions): AelionRemoteExportJob {
+    this.#assertActive();
+    if (this.#activeExportJob?.state === 'running') {
+      const diagnostic: Diagnostic = {
+        code: 'EXPORT_JOB_ACTIVE',
+        severity: 'error',
+        message: 'AelionSession supports one active export; cancel it before starting another',
+        recoverable: true,
+      };
+      this.#recordDiagnostic(diagnostic);
+      throw new AelionError([diagnostic]);
+    }
+    const engine = this.#engine;
+    const ir = this.requireIr();
+    const sequenceId = this.#sequenceId;
+    if (engine === undefined || sequenceId === undefined) throw unloaded();
+    const project = engine.getSnapshot();
+    const revision = ir.revision.toString();
+    const manifest =
+      options.manifest ??
+      ({
+        protocol: 'aelion.remote-export/1',
+        profileId: options.profile,
+        sequenceId,
+        revision,
+        project,
+      } as const);
+    const canonicalManifestBytes = new TextEncoder().encode(canonicalStringify(manifest));
+    const id = `export-${this.#nextExportJobId.toString()}`;
+    this.#nextExportJobId += 1;
+    this.#exportJobsStarted += 1;
+    const job = new ExportJob({
+      id,
+      ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
+      run: async (signal, updateProgress) => {
+        try {
+          const contentId = await createRemoteExportContentId(
+            canonicalManifestBytes,
+            options.profile,
+            revision,
+          );
+          return await runRemoteExport({
+            provider: options.provider,
+            authorizer: options.authorizer,
+            request: {
+              contentId,
+              idempotencyKey: options.idempotencyKey ?? contentId,
+              profileId: options.profile,
+              projectId: project.projectId,
+              sequenceId,
+              revision,
+              manifest,
+            },
+            signal,
+            onProgress: (progress, stage) => {
+              updateProgress(progress);
+              options.onProgress?.(progress, stage);
+            },
+          });
+        } catch (error) {
           this.#recordErrorDiagnostics(error);
           throw error;
         }

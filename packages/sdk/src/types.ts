@@ -1,7 +1,18 @@
 import type { PcmSourceBlock } from '@aelion/audio';
 import type { CapabilityReport } from '@aelion/capability';
 import type { Diagnostic, JsonObject, JsonValue } from '@aelion/core';
-import type { ExportPreflightReport, WebMExportResult, WebMExportOptions } from '@aelion/export';
+import type {
+  ExportProfileId,
+  ExportPreflightReport,
+  GifExportResult,
+  RemoteExportAuthorizer,
+  RemoteExportProvider,
+  RemoteExportResult,
+  StillImageExportResult,
+  WavExportResult,
+  WebMExportOptions,
+  WebMExportResult,
+} from '@aelion/export';
 import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
 import type { AelionProject } from '@aelion/project-schema';
 import type { CompileStats, IrMaterialDefinition, RenderIr } from '@aelion/render-ir';
@@ -159,11 +170,16 @@ export interface AelionExportOptions {
 
 export interface AelionExportApi {
   preflight(options: AelionExportOptions): Promise<ExportPreflightReport>;
+  preflightProfile(options: AelionProfileExportOptions): Promise<ExportPreflightReport>;
   /** Starts one frozen-revision export. The returned job remains await-compatible. */
   start(options: AelionExportOptions): AelionExportJob;
+  /** Starts a non-default production export profile from the same frozen Render IR. */
+  startProfile(options: AelionProfileExportOptions): AelionProfileExportJob;
+  /** Starts a provider-backed export from one canonical, frozen Project manifest. */
+  startRemote(options: AelionRemoteExportOptions): AelionRemoteExportJob;
   /** Cancels the active job, if one exists, and waits for pipeline cleanup. */
   cancel(reason?: unknown): Promise<void>;
-  readonly activeJob: AelionExportJob | null;
+  readonly activeJob: AelionExportJob | AelionProfileExportJob | AelionRemoteExportJob | null;
 }
 
 export type AelionExportJobState = 'running' | 'completed' | 'failed' | 'cancelled';
@@ -174,18 +190,69 @@ export interface AelionExportJobSnapshot {
   readonly progress: number;
 }
 
-/**
- * A cancellable export handle. It implements Promise so existing
- * `await session.export.start(options)` consumers remain source-compatible.
- */
-export interface AelionExportJob extends Promise<WebMExportResult> {
+interface AelionProfileExportBaseOptions {
+  readonly sink: WebMExportOptions['sink'];
+  readonly signal?: AbortSignal;
+  readonly cleanupSink?: (reason: unknown) => void | Promise<void>;
+  readonly onProgress?: (progress: number) => void;
+}
+
+export type AelionProfileExportOptions =
+  | (AelionProfileExportBaseOptions & {
+      readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac';
+      readonly videoBitrate?: number;
+      readonly audioBitrate?: number;
+    })
+  | (AelionProfileExportBaseOptions & {
+      readonly profile: 'audio-wav';
+      readonly sampleFormat?: 's16' | 'f32';
+    })
+  | (AelionProfileExportBaseOptions & {
+      readonly profile: 'still-png' | 'still-jpeg' | 'still-webp';
+      readonly timeUs: number;
+      readonly quality?: number;
+    })
+  | (AelionProfileExportBaseOptions & {
+      readonly profile: 'animated-gif';
+      readonly loopCount?: number;
+    });
+
+export type AelionProfileExportResult =
+  | WebMExportResult
+  | WavExportResult
+  | StillImageExportResult
+  | GifExportResult;
+
+export interface AelionTypedExportJob<TResult> extends Promise<TResult> {
   readonly id: string;
   readonly state: AelionExportJobState;
-  readonly result: Promise<WebMExportResult>;
+  readonly result: Promise<TResult>;
   cancel(reason?: unknown): Promise<void>;
   getSnapshot(): AelionExportJobSnapshot;
   subscribe(listener: (snapshot: AelionExportJobSnapshot) => void): () => void;
 }
+
+/**
+ * A cancellable export handle. It implements Promise so existing
+ * `await session.export.start(options)` consumers remain source-compatible.
+ */
+export type AelionExportJob = AelionTypedExportJob<WebMExportResult>;
+
+export type AelionProfileExportJob = AelionTypedExportJob<AelionProfileExportResult>;
+
+export interface AelionRemoteExportOptions {
+  readonly profile: ExportProfileId;
+  readonly provider: RemoteExportProvider;
+  readonly authorizer: RemoteExportAuthorizer;
+  /** Replaces the default canonical Project manifest when a provider needs extra bindings. */
+  readonly manifest?: JsonObject;
+  /** Overrides the content-derived idempotency key for an existing provider workflow. */
+  readonly idempotencyKey?: string;
+  readonly signal?: AbortSignal;
+  readonly onProgress?: (progress: number, stage?: string) => void;
+}
+
+export type AelionRemoteExportJob = AelionTypedExportJob<RemoteExportResult>;
 
 export interface AelionPreviewApi {
   renderFrame(options: AelionPreviewOptions): Promise<RenderIrFrameResult>;

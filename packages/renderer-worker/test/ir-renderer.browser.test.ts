@@ -487,8 +487,8 @@ describe('Project → Render IR → Material Graph → Worker renderer', () => {
       preferredBackend: 'webgl2',
     });
     try {
-      // Browsers may expose transparent-pixel RGB as straight or premultiplied
-      // values on readback. Verify the observable alpha-over result instead.
+      // Project backgroundColor is now an explicit base layer. The half-opacity
+      // red clip is therefore flattened over the authored opaque black canvas.
       const overBlack = pixelOver(result.bitmap, 'black');
       expect(overBlack[0]).toBeGreaterThanOrEqual(99);
       expect(overBlack[0]).toBeLessThanOrEqual(101);
@@ -497,12 +497,10 @@ describe('Project → Render IR → Material Graph → Worker renderer', () => {
       expect(overBlack[3]).toBe(255);
 
       const overWhite = pixelOver(result.bitmap, 'white');
-      expect(overWhite[0]).toBeGreaterThanOrEqual(226);
-      expect(overWhite[0]).toBeLessThanOrEqual(228);
-      expect(overWhite[1]).toBeGreaterThanOrEqual(126);
-      expect(overWhite[1]).toBeLessThanOrEqual(128);
-      expect(overWhite[2]).toBeGreaterThanOrEqual(126);
-      expect(overWhite[2]).toBeLessThanOrEqual(128);
+      expect(overWhite[0]).toBeGreaterThanOrEqual(99);
+      expect(overWhite[0]).toBeLessThanOrEqual(101);
+      expect(overWhite[1]).toBeLessThanOrEqual(1);
+      expect(overWhite[2]).toBeLessThanOrEqual(1);
       expect(overWhite[3]).toBe(255);
     } finally {
       result.bitmap.close();
@@ -616,6 +614,174 @@ describe('Project → Render IR → Material Graph → Worker renderer', () => {
       } finally {
         preview.bitmap.close();
         exported.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
+  it('applies alpha masks with invert, feather and consumed matte semantics', async () => {
+    const renderMasked = async (invert: boolean): Promise<readonly number[]> => {
+      const value = project();
+      const sequence = value.sequences.sequence;
+      const track = value.tracks.visual;
+      const from = value.items.from;
+      const to = value.items.to;
+      if (sequence === undefined || track === undefined || from === undefined || to === undefined) {
+        throw new Error('Fixture is incomplete');
+      }
+      sequence.transitionIds = [];
+      track.itemIds = ['to', 'from'];
+      to.range = { ...to.range, startUs: 0 };
+      from.materialInstanceIds = [];
+      const visual = from.visual as JsonObject;
+      visual.mask = {
+        sourceItemId: 'to',
+        channel: 'alpha',
+        invert,
+        featherPx: 2,
+        space: 'canvas',
+        consumeSource: true,
+      };
+      const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+      const renderer = new RenderIrFrameRenderer();
+      const result = await renderer.render({
+        ir,
+        timeUs: 1_000_000,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+      });
+      try {
+        return pixel(result.bitmap);
+      } finally {
+        result.bitmap.close();
+        await renderer.dispose();
+      }
+    };
+    expect(await renderMasked(false)).toEqual([200, 0, 0, 255]);
+    expect(await renderMasked(true)).toEqual([0, 0, 0, 255]);
+  });
+
+  it('renders a gradient Generator without invoking the media provider', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const track = value.tracks.visual;
+    const from = value.items.from;
+    if (sequence === undefined || track === undefined || from === undefined) {
+      throw new Error('Fixture is incomplete');
+    }
+    sequence.transitionIds = [];
+    track.itemIds = ['generator'];
+    value.items.generator = {
+      id: 'generator',
+      trackId: 'visual',
+      type: 'generator',
+      enabled: true,
+      range: { startUs: 0, durationUs: 2_000_000 },
+      generator: {
+        kind: 'linear-gradient',
+        colors: [
+          { space: 'srgb-linear', rgba: [0, 1, 0, 1] },
+          { space: 'srgb-linear', rgba: [0, 0, 1, 1] },
+        ],
+        angleDeg: 0,
+      },
+      visual: structuredClone(from.visual),
+      materialInstanceIds: [],
+    } as ItemEntity;
+    let mediaCalls = 0;
+    const renderer = new RenderIrFrameRenderer();
+    const result = await renderer.render({
+      ir: new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir,
+      timeUs: 1_000_000,
+      source: {
+        frameAt: () => {
+          mediaCalls++;
+          return Promise.reject(new Error('Generator must not decode media'));
+        },
+      },
+      mode: 'preview',
+      preferredBackend: 'webgl2',
+    });
+    try {
+      expect(mediaCalls).toBe(0);
+      const center = pixel(result.bitmap);
+      expect(center[1]).toBeGreaterThan(100);
+      expect(center[2]).toBeGreaterThan(100);
+    } finally {
+      result.bitmap.close();
+      await renderer.dispose();
+    }
+  });
+
+  it('executes every Project blend mode consistently across WebGL2 and WebGPU', async () => {
+    const modes = [
+      'normal',
+      'multiply',
+      'screen',
+      'overlay',
+      'darken',
+      'lighten',
+      'color-dodge',
+      'color-burn',
+      'hard-light',
+      'soft-light',
+      'difference',
+      'exclusion',
+    ] as const;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      for (const mode of modes) {
+        const value = project();
+        const sequence = value.sequences.sequence;
+        const track = value.tracks.visual;
+        const from = value.items.from;
+        const to = value.items.to;
+        if (
+          sequence === undefined ||
+          track === undefined ||
+          from === undefined ||
+          to === undefined
+        ) {
+          throw new Error('Fixture is incomplete');
+        }
+        sequence.transitionIds = [];
+        track.itemIds = ['from', 'to'];
+        to.range = { ...to.range, startUs: 0 };
+        from.materialInstanceIds = [];
+        (to.visual as JsonObject).blendMode = mode;
+        const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+        const webgl = await renderer.render({
+          ir,
+          timeUs: 1_000_000,
+          source,
+          mode: 'preview',
+          preferredBackend: 'webgl2',
+          allowFallback: false,
+        });
+        const gpu = await renderer.render({
+          ir,
+          timeUs: 1_000_000,
+          source,
+          mode: 'preview',
+          preferredBackend: 'webgpu',
+          allowFallback: true,
+        });
+        try {
+          const left = pixel(webgl.bitmap);
+          const right = pixel(gpu.bitmap);
+          if (gpu.backend === 'webgpu') {
+            expect(
+              Math.max(...left.map((value, index) => Math.abs(value - (right[index] ?? 0)))),
+              mode,
+            ).toBeLessThanOrEqual(2);
+          }
+          expect(left[3], mode).toBe(255);
+        } finally {
+          webgl.bitmap.close();
+          gpu.bitmap.close();
+        }
       }
     } finally {
       await renderer.dispose();

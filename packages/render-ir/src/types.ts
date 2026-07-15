@@ -29,15 +29,40 @@ export interface RenderCompileOptions {
   readonly affectedRanges?: RenderIrCompilation['stats']['affectedRanges'];
   readonly affectedEntityIds?: readonly string[];
   readonly resolveMaterialProgram?: MaterialProgramResolver;
+  /** @internal Recursive compiler stack used to diagnose nested Sequence cycles. */
+  readonly nestedSequenceStack?: readonly string[];
 }
+
+export interface IrLinearTimeMapping {
+  readonly type: 'linear';
+  readonly rate: Rational;
+  readonly reverse: boolean;
+}
+
+export interface IrCurveTimeMapPoint {
+  readonly itemTimeUs: number;
+  /** Absolute normalized source presentation time. */
+  readonly sourceTimeUs: number;
+  readonly interpolation: 'linear' | 'hold' | 'cubic';
+}
+
+export interface IrCurveTimeMapping {
+  readonly type: 'curve';
+  readonly points: readonly IrCurveTimeMapPoint[];
+}
+
+export type IrTimeMapping = IrLinearTimeMapping | IrCurveTimeMapping;
 
 export interface IrMediaSource {
   readonly assetId: string;
   readonly streamType: 'video' | 'audio';
   readonly streamIndex: number;
   readonly sourceRange: TimeRange;
-  readonly rate: Rational;
-  readonly reverse: boolean;
+  readonly timeMapping?: IrTimeMapping;
+  /** @deprecated Compatibility projection for legacy hand-authored linear IR. */
+  readonly rate?: Rational;
+  /** @deprecated Compatibility projection for legacy hand-authored linear IR. */
+  readonly reverse?: boolean;
   readonly boundary: 'error' | 'hold' | 'loop' | 'transparent';
 }
 
@@ -54,6 +79,46 @@ export interface IrBaseClip {
 export interface IrVisualClip extends IrBaseClip {
   readonly kind: 'visual-clip';
   readonly source: IrMediaSource;
+  readonly visual: IrVisualProperties;
+}
+
+export interface IrTextBox {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface IrTextRun {
+  readonly text: string;
+  readonly style: JsonObject;
+}
+
+export interface IrTextParagraph {
+  readonly style: JsonObject;
+  readonly runs: readonly IrTextRun[];
+}
+
+export interface IrTextClip extends IrBaseClip {
+  readonly kind: 'text-clip';
+  readonly role: 'text' | 'caption';
+  readonly box: IrTextBox;
+  readonly overflow: 'clip' | 'ellipsis' | 'visible' | 'auto-fit';
+  readonly writingMode: 'horizontal-tb' | 'vertical-rl' | 'vertical-lr';
+  readonly paragraphs: readonly IrTextParagraph[];
+  readonly visual: IrVisualProperties;
+}
+
+export interface IrNestedSequenceSource {
+  readonly sequenceId: string;
+  readonly sourceRange: TimeRange;
+  readonly timeMapping: IrTimeMapping;
+  readonly boundary: 'error' | 'hold' | 'loop' | 'transparent';
+}
+
+export interface IrNestedSequenceClip extends IrBaseClip {
+  readonly kind: 'nested-sequence-clip';
+  readonly source: IrNestedSequenceSource;
   readonly visual: IrVisualProperties;
 }
 
@@ -74,6 +139,25 @@ export interface IrVisualProperties {
   readonly crop: JsonObject;
   readonly opacity: number | JsonObject;
   readonly blendMode: string;
+  readonly mask?: {
+    readonly sourceItemId: string;
+    readonly channel: 'alpha' | 'luma';
+    readonly invert: boolean;
+    readonly featherPx: number;
+    readonly space: 'source' | 'canvas';
+    readonly consumeSource: boolean;
+  };
+}
+
+export interface IrGeneratorClip extends IrBaseClip {
+  readonly kind: 'generator-clip';
+  readonly generator: JsonObject;
+  readonly visual: IrVisualProperties;
+}
+
+export interface IrAdjustmentClip extends IrBaseClip {
+  readonly kind: 'adjustment-clip';
+  readonly visual: IrVisualProperties;
 }
 
 export interface IrAudioClip extends IrBaseClip {
@@ -82,7 +166,13 @@ export interface IrAudioClip extends IrBaseClip {
   readonly audio: JsonObject;
 }
 
-export type IrClip = IrVisualClip | IrAudioClip;
+export type IrClip =
+  | IrVisualClip
+  | IrTextClip
+  | IrNestedSequenceClip
+  | IrGeneratorClip
+  | IrAdjustmentClip
+  | IrAudioClip;
 
 export interface IrTrack {
   readonly id: string;
@@ -117,10 +207,15 @@ export interface RenderIr {
   readonly sampleRate: number;
   readonly channelLayout: string;
   readonly workingColorSpace: string;
+  readonly transferFunction?: 'srgb' | 'gamma22' | 'pq' | 'hlg';
+  readonly bitDepth?: 8 | 10;
+  readonly backgroundColor?: JsonObject;
   readonly durationUs: number;
   readonly tracks: readonly IrTrack[];
   readonly transitions: readonly IrTransition[];
   readonly materials: Readonly<Record<string, IrMaterialInstance>>;
+  /** Compiled nested Sequence graphs; absent only in legacy hand-authored IR. */
+  readonly subgraphs?: Readonly<Record<string, RenderIr>>;
 }
 
 export interface CompileStats {
@@ -143,7 +238,12 @@ export interface RenderIrCompilation {
 export interface ActiveVisualState {
   readonly timeUs: number;
   readonly clips: readonly {
-    readonly clip: IrVisualClip;
+    readonly clip:
+      | IrVisualClip
+      | IrTextClip
+      | IrNestedSequenceClip
+      | IrGeneratorClip
+      | IrAdjustmentClip;
     readonly sourceTimeUs: number | null;
     readonly materials: readonly IrMaterialInstance[];
   }[];
@@ -171,5 +271,6 @@ export interface ActiveAudioState {
     readonly durationUs: number;
     readonly gain: number;
     readonly pan: number;
+    readonly trackAudio: JsonObject;
   }[];
 }

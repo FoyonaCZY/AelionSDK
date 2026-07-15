@@ -38,6 +38,10 @@ export default defineConfig({
     },
   },
   test: {
+    // Browser GPU/context budgets are shared across tabs. Serial files keep the
+    // certification matrix deterministic; same-page concurrency has dedicated
+    // admission, cancellation and multi-instance resource tests.
+    fileParallelism: false,
     browser: {
       enabled: true,
       provider: 'playwright',

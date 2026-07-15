@@ -12,18 +12,18 @@
       "passCount": 1,
       "intermediateTextureCount": 0,
       "wall": {
-        "p50Ms": 38.24000000953674,
-        "p95Ms": 60.064999997615814
+        "p50Ms": 33.17999994754791,
+        "p95Ms": 57.924999952316284
       },
       "worker": {
-        "p50Us": 36855,
-        "p95Us": 59445
+        "p50Us": 32290,
+        "p95Us": 55675
       },
       "gpuCompletion": {
-        "p50Us": 13675,
-        "p95Us": 34505
+        "p50Us": 17785,
+        "p95Us": 24320
       },
-      "throughputFps": 26.150627608541008,
+      "throughputFps": 30.13863778121864,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -40,12 +40,12 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 5795100,
-          "totalJsHeapBytes": 7414216
+          "usedJsHeapBytes": 6585642,
+          "totalJsHeapBytes": 8091518
         },
         "after": {
-          "usedJsHeapBytes": 5871561,
-          "totalJsHeapBytes": 7958293
+          "usedJsHeapBytes": 6653987,
+          "totalJsHeapBytes": 8897739
         }
       }
     },
@@ -59,18 +59,18 @@
       "passCount": 1,
       "intermediateTextureCount": 0,
       "wall": {
-        "p50Ms": 19.9549999833107,
-        "p95Ms": 28.93499994277954
+        "p50Ms": 2.324999988079071,
+        "p95Ms": 4.240000009536743
       },
       "worker": {
-        "p50Us": 19080,
-        "p95Us": 28320
+        "p50Us": 460,
+        "p95Us": 1530
       },
       "gpuCompletion": {
-        "p50Us": 30,
-        "p95Us": 75
+        "p50Us": 25,
+        "p95Us": 65
       },
-      "throughputFps": 50.112753737727225,
+      "throughputFps": 430.1075290870027,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -87,12 +87,12 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 5924836,
-          "totalJsHeapBytes": 8220528
+          "usedJsHeapBytes": 6707754,
+          "totalJsHeapBytes": 8897830
         },
         "after": {
-          "usedJsHeapBytes": 5887078,
-          "totalJsHeapBytes": 8744738
+          "usedJsHeapBytes": 6668836,
+          "totalJsHeapBytes": 9159896
         }
       }
     },
@@ -106,18 +106,18 @@
       "passCount": 4,
       "intermediateTextureCount": 3,
       "wall": {
-        "p50Ms": 75.73499995470047,
-        "p95Ms": 81.55500000715256
+        "p50Ms": 2.4699999690055847,
+        "p95Ms": 176.22999995946884
       },
       "worker": {
-        "p50Us": 74785,
-        "p95Us": 80675
+        "p50Us": 840,
+        "p95Us": 158095
       },
       "gpuCompletion": {
-        "p50Us": 135,
-        "p95Us": 190
+        "p50Us": 75,
+        "p95Us": 220
       },
-      "throughputFps": 13.20393478045992,
+      "throughputFps": 404.8583046754439,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -134,12 +134,59 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 5918173,
-          "totalJsHeapBytes": 9269117
+          "usedJsHeapBytes": 6700059,
+          "totalJsHeapBytes": 9684275
         },
         "after": {
-          "usedJsHeapBytes": 5883858,
-          "totalJsHeapBytes": 7434018
+          "usedJsHeapBytes": 6666088,
+          "totalJsHeapBytes": 9159896
+        }
+      }
+    },
+    "fourKWebGl2": {
+      "label": "Warm Film 4K WebGL2",
+      "resolution": {
+        "width": 3840,
+        "height": 2160
+      },
+      "frames": 3,
+      "passCount": 1,
+      "intermediateTextureCount": 0,
+      "wall": {
+        "p50Ms": 4.325000047683716,
+        "p95Ms": 202.20999997854233
+      },
+      "worker": {
+        "p50Us": 785,
+        "p95Us": 187090
+      },
+      "gpuCompletion": {
+        "p50Us": 35,
+        "p95Us": 115
+      },
+      "throughputFps": 231.21387028320544,
+      "resourcesBeforeDispose": {
+        "disposed": false,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "resourcesAfterDispose": {
+        "disposed": true,
+        "pendingRequests": 0,
+        "activeRequests": 0,
+        "cancelledRequests": 0,
+        "maxPendingRequests": 8
+      },
+      "memory": {
+        "before": {
+          "usedJsHeapBytes": 6982391,
+          "totalJsHeapBytes": 10994995
+        },
+        "after": {
+          "usedJsHeapBytes": 6684356,
+          "totalJsHeapBytes": 9159896
         }
       }
     },
@@ -155,8 +202,8 @@
     "durationUs": 5000000,
     "videoFrames": 150,
     "audioFrames": 240000,
-    "elapsedMs": 2045.8849999904633,
-    "realtimeMultiple": 2.443930132936752,
+    "elapsedMs": 2133.0300000309944,
+    "realtimeMultiple": 2.344083299310064,
     "bytes": 811422,
     "sink": {
       "writes": 20,
@@ -167,97 +214,83 @@
       "aborted": false
     },
     "mainThread": {
-      "contract": "codec-initialization-disclosed; steady-state begins at the second video frame",
+      "contract": "worker encoder/mux orchestration; host frame production disclosed; steady-state begins at the second video frame",
       "initialization": {
         "supported": true,
-        "startedAtMs": 3875.2800000309944,
-        "completedAtMs": 4129.205000042915,
-        "elapsedMs": 253.92500001192093,
-        "tasks": [
-          {
-            "startTimeMs": 3875.225000023842,
-            "durationMs": 100,
-            "endTimeMs": 3975.225000023842,
-            "overlapMs": 99.94499999284744
-          }
-        ],
-        "longTasksOver50Ms": 1,
-        "maxLongTaskMs": 100
+        "startedAtMs": 2420,
+        "completedAtMs": 2817.4950000047684,
+        "elapsedMs": 397.4950000047684,
+        "tasks": [],
+        "longTasksOver50Ms": 0,
+        "maxLongTaskMs": 0
       },
       "steady": {
         "supported": true,
-        "startedAtMs": 4129.205000042915,
-        "completedAtMs": 5921.165000021458,
-        "elapsedMs": 1791.9599999785423,
+        "startedAtMs": 2817.4950000047684,
+        "completedAtMs": 4553.030000030994,
+        "elapsedMs": 1735.535000026226,
         "tasks": [],
         "longTasksOver50Ms": 0,
         "maxLongTaskMs": 0
       },
       "overall": {
         "supported": true,
-        "startedAtMs": 3875.2800000309944,
-        "completedAtMs": 5921.165000021458,
-        "elapsedMs": 2045.8849999904633,
-        "tasks": [
-          {
-            "startTimeMs": 3875.225000023842,
-            "durationMs": 100,
-            "endTimeMs": 3975.225000023842,
-            "overlapMs": 99.94499999284744
-          }
-        ],
-        "longTasksOver50Ms": 1,
-        "maxLongTaskMs": 100
+        "startedAtMs": 2420,
+        "completedAtMs": 4553.030000030994,
+        "elapsedMs": 2133.0300000309944,
+        "tasks": [],
+        "longTasksOver50Ms": 0,
+        "maxLongTaskMs": 0
       }
     },
     "phases": [
       {
         "name": "export-call",
-        "atMs": 3875.439999997616
+        "atMs": 2420.1299999952316
       },
       {
         "name": "first-video-render-start",
-        "atMs": 3881.7800000309944
+        "atMs": 2524.75
       },
       {
         "name": "first-video-render-end",
-        "atMs": 3882.1700000166893
+        "atMs": 2525.110000014305
       },
       {
         "name": "second-video-render-start",
-        "atMs": 4129.205000042915
+        "atMs": 2817.4950000047684
       },
       {
         "name": "video-complete",
-        "atMs": 5836.814999997616
+        "atMs": 4446.285000026226
       },
       {
         "name": "first-audio-render-start",
-        "atMs": 5837.165000021458
+        "atMs": 4446.704999983311
       },
       {
         "name": "first-audio-render-end",
-        "atMs": 5837.200000047684
+        "atMs": 4446.774999976158
       },
       {
         "name": "export-complete",
-        "atMs": 5921.165000021458
+        "atMs": 4553.024999976158
       }
     ],
     "memory": {
       "before": {
-        "usedJsHeapBytes": 5892030,
-        "totalJsHeapBytes": 7696162
+        "usedJsHeapBytes": 6692948,
+        "totalJsHeapBytes": 9422040
       },
       "after": {
-        "usedJsHeapBytes": 10124750,
-        "totalJsHeapBytes": 13701834
+        "usedJsHeapBytes": 11871983,
+        "totalJsHeapBytes": 14013647
       }
     }
   },
   "longTimeline": {
     "simulatedDurationUs": 600000000,
-    "elapsedMs": 790.8299999833107,
+    "elapsedMs": 874.0600000023842,
     "pcm": {
       "capacityFrames": 4096,
       "availableReadFrames": 0,
@@ -270,59 +303,59 @@
     "heapSamples": [
       {
         "equivalentMinute": 1,
-        "usedJsHeapBytes": 11689626
+        "usedJsHeapBytes": 9589885
       },
       {
         "equivalentMinute": 2,
-        "usedJsHeapBytes": 10450598
+        "usedJsHeapBytes": 9328609
       },
       {
         "equivalentMinute": 3,
-        "usedJsHeapBytes": 11209466
+        "usedJsHeapBytes": 10087689
       },
       {
         "equivalentMinute": 4,
-        "usedJsHeapBytes": 8790979
+        "usedJsHeapBytes": 9793593
       },
       {
         "equivalentMinute": 5,
-        "usedJsHeapBytes": 9511031
+        "usedJsHeapBytes": 9466869
       },
       {
         "equivalentMinute": 6,
-        "usedJsHeapBytes": 10231111
+        "usedJsHeapBytes": 9138477
       },
       {
         "equivalentMinute": 7,
-        "usedJsHeapBytes": 8855759
+        "usedJsHeapBytes": 9858553
       },
       {
         "equivalentMinute": 8,
-        "usedJsHeapBytes": 9575843
+        "usedJsHeapBytes": 9530173
       },
       {
         "equivalentMinute": 9,
-        "usedJsHeapBytes": 10295907
+        "usedJsHeapBytes": 9201801
       },
       {
         "equivalentMinute": 10,
-        "usedJsHeapBytes": 8919083
+        "usedJsHeapBytes": 9921893
       }
     ],
     "memory": {
       "before": {
-        "usedJsHeapBytes": 10377526,
-        "totalJsHeapBytes": 13703882
+        "usedJsHeapBytes": 12132047,
+        "totalJsHeapBytes": 14015695
       },
       "after": {
-        "usedJsHeapBytes": 9083227,
-        "totalJsHeapBytes": 14715235
+        "usedJsHeapBytes": 9899281,
+        "totalJsHeapBytes": 12611377
       }
     }
   },
   "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:performance",
-  "generatedAt": "2026-07-15T03:44:14.284Z",
+  "generatedAt": "2026-07-15T09:46:11.034Z",
   "referenceDevice": {
     "model": "MacBookPro16,1",
     "cpu": "6-Core Intel Core i7 2.6 GHz, 12 logical CPUs",

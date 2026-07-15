@@ -9,6 +9,7 @@ import {
   AudioSample,
   AudioSampleSource,
   Output,
+  Mp4OutputFormat,
   StreamTarget,
   VideoSample,
   VideoSampleSource,
@@ -60,6 +61,17 @@ export interface WebMExportResult {
   readonly videoFrames: number;
   readonly audioFrames: number;
   readonly durationUs: number;
+}
+
+export type Mp4ExportOptions = WebMExportOptions;
+export type Mp4ExportResult = WebMExportResult;
+
+interface MuxedExportProfile {
+  readonly operationName: string;
+  readonly format: WebMOutputFormat | Mp4OutputFormat;
+  readonly videoCodec: 'vp9' | 'avc';
+  readonly fullVideoCodecString: string;
+  readonly audioCodec: 'opus' | 'aac';
 }
 
 type ExportStage =
@@ -119,33 +131,36 @@ function assertPositiveInteger(value: number, name: string): void {
   }
 }
 
-export async function exportWebM(options: WebMExportOptions): Promise<WebMExportResult> {
+async function exportMuxed(
+  options: WebMExportOptions,
+  profile: MuxedExportProfile,
+): Promise<WebMExportResult> {
   assertPositiveInteger(options.durationUs, 'durationUs');
   assertPositiveInteger(options.width, 'width');
   assertPositiveInteger(options.height, 'height');
   assertPositiveInteger(options.sampleRate, 'sampleRate');
   assertPositiveInteger(options.channelCount, 'channelCount');
-  throwIfAborted(options.signal, 'WebM export');
+  throwIfAborted(options.signal, profile.operationName);
 
   const target = new StreamTarget(options.sink, {
     chunked: true,
     chunkSize: 64 * 1_024,
   });
   const output = new Output({
-    format: new WebMOutputFormat(),
+    format: profile.format,
     target,
   });
   const videoSource = new VideoSampleSource({
-    codec: 'vp9',
+    codec: profile.videoCodec,
+    fullCodecString: profile.fullVideoCodecString,
     bitrate: options.videoBitrate,
     bitrateMode: 'variable',
     keyFrameInterval: 1,
     latencyMode: 'quality',
     alpha: 'discard',
-    fullCodecString: 'vp09.00.10.08',
   });
   const audioSource = new AudioSampleSource({
-    codec: 'opus',
+    codec: profile.audioCodec,
     bitrate: options.audioBitrate,
     bitrateMode: 'variable',
   });
@@ -264,4 +279,24 @@ export async function exportWebM(options: WebMExportOptions): Promise<WebMExport
     if (error instanceof AelionError) throw error;
     throw exportFailure(stage, error);
   }
+}
+
+export function exportWebM(options: WebMExportOptions): Promise<WebMExportResult> {
+  return exportMuxed(options, {
+    operationName: 'WebM export',
+    format: new WebMOutputFormat(),
+    videoCodec: 'vp9',
+    fullVideoCodecString: 'vp09.00.10.08',
+    audioCodec: 'opus',
+  });
+}
+
+export function exportMp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
+  return exportMuxed(options, {
+    operationName: 'MP4 export',
+    format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+    videoCodec: 'avc',
+    fullVideoCodecString: 'avc1.640028',
+    audioCodec: 'aac',
+  });
 }

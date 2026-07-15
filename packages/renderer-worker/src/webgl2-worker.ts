@@ -31,6 +31,10 @@ interface GpuQueue {
   onSubmittedWorkDone(): Promise<void>;
 }
 
+interface GpuPipeline {
+  getBindGroupLayout(index: number): unknown;
+}
+
 interface GpuDevice {
   readonly queue: GpuQueue;
   readonly lost: Promise<{ readonly reason: string; readonly message: string }>;
@@ -46,9 +50,7 @@ interface GpuDevice {
     copyTextureToBuffer(source: object, destination: object, size: object): void;
     finish(): unknown;
   };
-  createRenderPipeline(descriptor: object): {
-    getBindGroupLayout(index: number): unknown;
-  };
+  createRenderPipeline(descriptor: object): GpuPipeline;
   createSampler(descriptor: object): unknown;
   createShaderModule(descriptor: object): unknown;
   createTexture(descriptor: object): GpuTexture;
@@ -114,6 +116,99 @@ const GPU_TEXTURE_USAGE = {
   TEXTURE_BINDING: 0x0004,
 };
 
+let persistentGpuDevice: GpuDevice | undefined;
+let persistentGpuDeviceTask: Promise<GpuDevice> | undefined;
+const persistentGpuPipelines = new Map<string, GpuPipeline>();
+const persistentGpuTextures = new Map<string, GpuTexture[]>();
+const MAX_POOLED_GPU_TEXTURE_BYTES = 256 * 1_024 * 1_024;
+let pooledGpuTextureBytes = 0;
+
+interface AcquiredGpuTexture {
+  readonly texture: GpuTexture;
+  readonly key: string;
+  readonly bytes: number;
+}
+
+function gpuTextureKey(width: number, height: number, usage: number): string {
+  return `${width.toString()}x${height.toString()}:rgba8unorm:${usage.toString()}`;
+}
+
+function acquireGpuTexture(
+  device: GpuDevice,
+  width: number,
+  height: number,
+  usage: number,
+): AcquiredGpuTexture {
+  const key = gpuTextureKey(width, height, usage);
+  const bytes = width * height * 4;
+  const bucket = persistentGpuTextures.get(key);
+  const texture = bucket?.pop();
+  if (texture !== undefined) {
+    pooledGpuTextureBytes -= bytes;
+    if (bucket?.length === 0) persistentGpuTextures.delete(key);
+    return { texture, key, bytes };
+  }
+  return {
+    texture: device.createTexture({
+      size: { width, height },
+      format: 'rgba8unorm',
+      usage,
+    }),
+    key,
+    bytes,
+  };
+}
+
+function releaseGpuTexture(acquired: AcquiredGpuTexture): void {
+  if (pooledGpuTextureBytes + acquired.bytes > MAX_POOLED_GPU_TEXTURE_BYTES) {
+    acquired.texture.destroy();
+    return;
+  }
+  const bucket = persistentGpuTextures.get(acquired.key) ?? [];
+  bucket.push(acquired.texture);
+  persistentGpuTextures.set(acquired.key, bucket);
+  pooledGpuTextureBytes += acquired.bytes;
+}
+
+function clearGpuTexturePool(): void {
+  persistentGpuTextures.forEach(bucket => bucket.forEach(texture => texture.destroy()));
+  persistentGpuTextures.clear();
+  pooledGpuTextureBytes = 0;
+}
+
+async function gpuDevice(): Promise<GpuDevice> {
+  if (persistentGpuDevice !== undefined) return persistentGpuDevice;
+  persistentGpuDeviceTask ??= (async () => {
+    const gpu = (navigator as GpuNavigator).gpu;
+    if (gpu === undefined) throw new Error('WebGPU is unavailable');
+    const adapter = await gpu.requestAdapter();
+    if (adapter === null) throw new Error('WebGPU adapter is unavailable');
+    const device = await adapter.requestDevice();
+    persistentGpuDevice = device;
+    void device.lost.then(() => {
+      if (persistentGpuDevice === device) {
+        persistentGpuDevice = undefined;
+        persistentGpuDeviceTask = undefined;
+        persistentGpuPipelines.clear();
+        clearGpuTexturePool();
+      }
+    });
+    return device;
+  })().catch((error: unknown) => {
+    persistentGpuDeviceTask = undefined;
+    throw error;
+  });
+  return persistentGpuDeviceTask;
+}
+
+function disposeGpuRuntime(): void {
+  clearGpuTexturePool();
+  persistentGpuDevice?.destroy();
+  persistentGpuDevice = undefined;
+  persistentGpuDeviceTask = undefined;
+  persistentGpuPipelines.clear();
+}
+
 async function composeWebGpu(
   request: ComposeRequest,
   resources: RendererWorkerResourceSnapshot,
@@ -126,34 +221,26 @@ async function composeWebGpu(
     if (frame === undefined) throw new Error(`WebGPU Material input ${port} is missing`);
     return frame;
   });
-  const gpu = (navigator as GpuNavigator).gpu;
-  if (gpu === undefined) throw new Error('WebGPU is unavailable');
-  const adapter = await gpu.requestAdapter();
-  if (adapter === null) throw new Error('WebGPU adapter is unavailable');
-  const device = await adapter.requestDevice();
+  const device = await gpuDevice();
   (resources as { webgpuDevices: number }).webgpuDevices += 1;
   device.pushErrorScope('validation');
-  const textures: GpuTexture[] = [];
+  const textures: AcquiredGpuTexture[] = [];
   let uniformBuffer: GpuBuffer | undefined;
   let readback: GpuBuffer | undefined;
   try {
-    const textureDescriptor = {
-      size: { width: request.width, height: request.height },
-      format: 'rgba8unorm',
-      usage:
-        GPU_TEXTURE_USAGE.TEXTURE_BINDING |
-        GPU_TEXTURE_USAGE.COPY_DST |
-        GPU_TEXTURE_USAGE.RENDER_ATTACHMENT,
-    };
-    const inputTextures = frames.map(() => device.createTexture(textureDescriptor));
-    const outputTexture = device.createTexture({
-      ...textureDescriptor,
-      usage: GPU_TEXTURE_USAGE.RENDER_ATTACHMENT | GPU_TEXTURE_USAGE.COPY_SRC,
-    });
+    const inputUsage =
+      GPU_TEXTURE_USAGE.TEXTURE_BINDING |
+      GPU_TEXTURE_USAGE.COPY_DST |
+      GPU_TEXTURE_USAGE.RENDER_ATTACHMENT;
+    const outputUsage = GPU_TEXTURE_USAGE.RENDER_ATTACHMENT | GPU_TEXTURE_USAGE.COPY_SRC;
+    const inputTextures = frames.map(() =>
+      acquireGpuTexture(device, request.width, request.height, inputUsage),
+    );
+    const outputTexture = acquireGpuTexture(device, request.width, request.height, outputUsage);
     textures.push(...inputTextures, outputTexture);
     (resources as { webgpuTextures: number }).webgpuTextures += textures.length;
     if (request.debugSimulateLoss === 'webgpu-device') {
-      device.destroy();
+      disposeGpuRuntime();
       throw new RendererBackendError(
         'RENDERER_WEBGPU_DEVICE_LOST',
         'WebGPU device was lost during composition',
@@ -162,7 +249,7 @@ async function composeWebGpu(
     inputTextures.forEach((texture, index) => {
       const frame = frames[index];
       if (frame === undefined) throw new Error('WebGPU input frame is missing');
-      device.queue.copyExternalImageToTexture({ source: frame }, { texture }, [
+      device.queue.copyExternalImageToTexture({ source: frame }, { texture: texture.texture }, [
         request.width,
         request.height,
       ]);
@@ -184,13 +271,18 @@ async function composeWebGpu(
     });
     (resources as { webgpuBuffers: number }).webgpuBuffers += 1;
     device.queue.writeBuffer(uniformBuffer, 0, uniformData);
-    const module = device.createShaderModule({ code: webgpu.shader });
-    const pipeline = device.createRenderPipeline({
-      layout: 'auto',
-      vertex: { module, entryPoint: 'vs' },
-      fragment: { module, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] },
-      primitive: { topology: 'triangle-list' },
-    });
+    const pipelineKey = `${request.program.graphHash}:${webgpu.shader}`;
+    let pipeline = persistentGpuPipelines.get(pipelineKey);
+    if (pipeline === undefined) {
+      const module = device.createShaderModule({ code: webgpu.shader });
+      pipeline = device.createRenderPipeline({
+        layout: 'auto',
+        vertex: { module, entryPoint: 'vs' },
+        fragment: { module, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] },
+        primitive: { topology: 'triangle-list' },
+      });
+      persistentGpuPipelines.set(pipelineKey, pipeline);
+    }
     (resources as { webgpuPipelines: number }).webgpuPipelines += 1;
     const bindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
@@ -201,7 +293,7 @@ async function composeWebGpu(
         },
         ...inputTextures.map((texture, index) => ({
           binding: index + 1,
-          resource: texture.createView(),
+          resource: texture.texture.createView(),
         })),
         { binding: inputTextures.length + 1, resource: { buffer: uniformBuffer } },
       ],
@@ -216,7 +308,7 @@ async function composeWebGpu(
     const pass = encoder.beginRenderPass({
       colorAttachments: [
         {
-          view: outputTexture.createView(),
+          view: outputTexture.texture.createView(),
           clearValue: { r: 0, g: 0, b: 0, a: 0 },
           loadOp: 'clear',
           storeOp: 'store',
@@ -228,7 +320,7 @@ async function composeWebGpu(
     pass.draw(3);
     pass.end();
     encoder.copyTextureToBuffer(
-      { texture: outputTexture },
+      { texture: outputTexture.texture },
       { buffer: readback, bytesPerRow, rowsPerImage: request.height },
       { width: request.width, height: request.height },
     );
@@ -264,8 +356,10 @@ async function composeWebGpu(
   } finally {
     uniformBuffer?.destroy();
     readback?.destroy();
-    textures.forEach(texture => texture.destroy());
-    device.destroy();
+    textures.forEach(texture => {
+      if (persistentGpuDevice === device) releaseGpuTexture(texture);
+      else texture.texture.destroy();
+    });
     (resources as { webgpuDevices: number }).webgpuDevices = 0;
     (resources as { webgpuPipelines: number }).webgpuPipelines = 0;
     (resources as { webgpuBuffers: number }).webgpuBuffers = 0;
@@ -281,6 +375,143 @@ void main() {
   gl_Position = vec4(a_position, 0.0, 1.0);
   v_uv = a_uv;
 }`;
+
+class WebGl2Runtime {
+  readonly canvas: OffscreenCanvas;
+  readonly gl: WebGL2RenderingContext;
+  readonly #programs = new Map<string, WebGLProgram>();
+  readonly #textures: WebGLTexture[] = [];
+  readonly #positionBuffer: WebGLBuffer;
+  readonly #uvBuffer: WebGLBuffer;
+  lastAccess = 0;
+
+  public constructor(
+    public readonly width: number,
+    public readonly height: number,
+  ) {
+    this.canvas = new OffscreenCanvas(width, height);
+    const gl = this.canvas.getContext('webgl2', {
+      alpha: true,
+      antialias: false,
+      depth: false,
+      desynchronized: true,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      stencil: false,
+    });
+    if (gl === null) throw new Error('Worker WebGL2 context is unavailable');
+    this.gl = gl;
+    this.#positionBuffer = this.#createBuffer([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+    this.#uvBuffer = this.#createBuffer([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
+  }
+
+  public program(fragmentShader: string): WebGLProgram {
+    const cached = this.#programs.get(fragmentShader);
+    if (cached !== undefined) return cached;
+    const program = createProgram(this.gl, fragmentShader);
+    this.#programs.set(fragmentShader, program);
+    return program;
+  }
+
+  public bindAttributes(program: WebGLProgram): void {
+    this.#bindAttribute(program, 'a_position', this.#positionBuffer);
+    this.#bindAttribute(program, 'a_uv', this.#uvBuffer);
+  }
+
+  public uploadTexture(index: number, source: VideoFrame | ImageBitmap): WebGLTexture {
+    const gl = this.gl;
+    let texture = this.#textures[index];
+    if (texture === undefined) {
+      texture = gl.createTexture();
+      this.#textures[index] = texture;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      source as unknown as TexImageSource,
+    );
+    return texture;
+  }
+
+  public snapshot(): {
+    readonly programs: number;
+    readonly textures: number;
+    readonly buffers: number;
+  } {
+    return { programs: this.#programs.size, textures: this.#textures.length, buffers: 2 };
+  }
+
+  public dispose(): void {
+    const gl = this.gl;
+    this.#programs.forEach(program => gl.deleteProgram(program));
+    this.#programs.clear();
+    this.#textures.forEach(texture => gl.deleteTexture(texture));
+    this.#textures.length = 0;
+    gl.deleteBuffer(this.#positionBuffer);
+    gl.deleteBuffer(this.#uvBuffer);
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+  }
+
+  #createBuffer(values: readonly number[]): WebGLBuffer {
+    const buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(values), this.gl.STATIC_DRAW);
+    return buffer;
+  }
+
+  #bindAttribute(program: WebGLProgram, name: string, buffer: WebGLBuffer): void {
+    const location = this.gl.getAttribLocation(program, name);
+    if (location < 0) throw new Error(`Missing WebGL attribute ${name}`);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.enableVertexAttribArray(location);
+    this.gl.vertexAttribPointer(location, 2, this.gl.FLOAT, false, 0, 0);
+  }
+}
+
+const MAX_WEBGL2_RUNTIMES = 2;
+const webGl2Runtimes = new Map<string, WebGl2Runtime>();
+let webGl2RuntimeClock = 0;
+
+function webGl2Runtime(width: number, height: number): WebGl2Runtime {
+  const key = `${width.toString()}x${height.toString()}`;
+  let runtime = webGl2Runtimes.get(key);
+  if (runtime?.gl.isContextLost() === true) {
+    runtime.dispose();
+    webGl2Runtimes.delete(key);
+    runtime = undefined;
+  }
+  if (runtime === undefined) {
+    runtime = new WebGl2Runtime(width, height);
+    webGl2Runtimes.set(key, runtime);
+  }
+  runtime.lastAccess = ++webGl2RuntimeClock;
+  while (webGl2Runtimes.size > MAX_WEBGL2_RUNTIMES) {
+    const oldest = [...webGl2Runtimes.entries()].sort(
+      (left, right) => left[1].lastAccess - right[1].lastAccess,
+    )[0];
+    if (oldest === undefined) break;
+    oldest[1].dispose();
+    webGl2Runtimes.delete(oldest[0]);
+  }
+  return runtime;
+}
+
+function disposeWebGl2Runtimes(): void {
+  webGl2Runtimes.forEach(runtime => runtime.dispose());
+  webGl2Runtimes.clear();
+}
 
 function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
   const shader = gl.createShader(type);
@@ -312,26 +543,6 @@ function createProgram(gl: WebGL2RenderingContext, fragmentShaderSource: string)
   return program;
 }
 
-function createTexture(gl: WebGL2RenderingContext, frame: VideoFrame | ImageBitmap): WebGLTexture {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    frame as unknown as TexImageSource,
-  );
-  return texture;
-}
-
 function uniformValue(
   uniform: ComposeRequest['program']['uniforms'][number],
   request: ComposeRequest,
@@ -356,51 +567,46 @@ function renderWebGl2Pass(
   uniforms: ComposeRequest['program']['uniforms'],
   timing: MutableWorkerTiming,
 ): ImageBitmap {
-  const canvas = new OffscreenCanvas(request.width, request.height);
-  const gl = canvas.getContext('webgl2', {
-    alpha: true,
-    antialias: false,
-    depth: false,
-    desynchronized: true,
-    premultipliedAlpha: true,
-    preserveDrawingBuffer: false,
-    stencil: false,
+  const runtime = webGl2Runtime(request.width, request.height);
+  const gl = runtime.gl;
+  const program = runtime.program(fragmentShader);
+  gl.useProgram(program);
+  runtime.bindAttributes(program);
+  passInputs.forEach((input, index) => {
+    gl.activeTexture(gl.TEXTURE0 + index);
+    runtime.uploadTexture(index, input.source);
+    gl.uniform1i(gl.getUniformLocation(program, `u_input_${input.sampler}`), index);
   });
-  if (gl === null) throw new Error('Worker WebGL2 context is unavailable');
-  const program = createProgram(gl, fragmentShader);
-  const buffers: WebGLBuffer[] = [];
-  const textures: WebGLTexture[] = [];
-  try {
-    gl.useProgram(program);
-    buffers.push(
-      bindAttribute(gl, program, 'a_position', [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      bindAttribute(gl, program, 'a_uv', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]),
-    );
-    passInputs.forEach((input, index) => {
-      gl.activeTexture(gl.TEXTURE0 + index);
-      textures.push(createTexture(gl, input.source));
-      gl.uniform1i(gl.getUniformLocation(program, `u_input_${input.sampler}`), index);
-    });
-    for (const uniform of uniforms) {
-      gl.uniform1f(gl.getUniformLocation(program, uniform.name), uniformValue(uniform, request));
-    }
-    gl.viewport(0, 0, request.width, request.height);
-    const gpuStartedAt = performance.now();
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    gl.finish();
-    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
-    if (gl.isContextLost()) {
-      throw new RendererBackendError(
-        'RENDERER_WEBGL_CONTEXT_LOST',
-        'WebGL2 context was lost during composition',
-      );
-    }
-    return canvas.transferToImageBitmap();
-  } finally {
-    buffers.forEach(buffer => gl.deleteBuffer(buffer));
-    textures.forEach(texture => gl.deleteTexture(texture));
-    gl.deleteProgram(program);
+  for (const uniform of uniforms) {
+    gl.uniform1f(gl.getUniformLocation(program, uniform.name), uniformValue(uniform, request));
   }
+  gl.viewport(0, 0, request.width, request.height);
+  const gpuStartedAt = performance.now();
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.finish();
+  timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
+  if (gl.isContextLost()) {
+    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
+    runtime.dispose();
+    throw new RendererBackendError(
+      'RENDERER_WEBGL_CONTEXT_LOST',
+      'WebGL2 context was lost during composition',
+    );
+  }
+  const bitmap = runtime.canvas.transferToImageBitmap();
+  // Chromium may evict a context between GPU completion and bitmap transfer
+  // when several tabs/workers contend for the page context budget. Never return
+  // the resulting transparent/stale bitmap as a successful composition.
+  if (gl.isContextLost()) {
+    bitmap.close();
+    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
+    runtime.dispose();
+    throw new RendererBackendError(
+      'RENDERER_WEBGL_CONTEXT_LOST',
+      'WebGL2 context was lost while transferring the composed frame',
+    );
+  }
+  return bitmap;
 }
 
 function composeWebGl2MultiPass(
@@ -445,22 +651,6 @@ function composeWebGl2MultiPass(
   }
 }
 
-function bindAttribute(
-  gl: WebGL2RenderingContext,
-  program: WebGLProgram,
-  name: string,
-  values: readonly number[],
-): WebGLBuffer {
-  const location = gl.getAttribLocation(program, name);
-  if (location < 0) throw new Error(`Missing WebGL attribute ${name}`);
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(location);
-  gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
-  return buffer;
-}
-
 function composeWebGl2(
   request: ComposeRequest,
   resources: RendererWorkerResourceSnapshot,
@@ -482,73 +672,59 @@ function composeWebGl2(
   if (request.program.passes !== undefined) {
     return composeWebGl2MultiPass(request, resources, timing);
   }
-
-  const canvas = new OffscreenCanvas(request.width, request.height);
-  const gl = canvas.getContext('webgl2', {
-    alpha: true,
-    antialias: false,
-    depth: false,
-    desynchronized: true,
-    premultipliedAlpha: true,
-    preserveDrawingBuffer: false,
-    stencil: false,
+  const inputs = request.program.inputPorts.map(port => {
+    const source = request.inputs[port];
+    if (source === undefined) throw new RangeError(`Material input ${port} is missing`);
+    return { sampler: port.replaceAll(/[^a-zA-Z0-9_]/gu, '_'), source };
   });
-  if (gl === null) throw new Error('Worker WebGL2 context is unavailable');
-  (resources as { webgl2Contexts: number }).webgl2Contexts += 1;
-  const program = createProgram(gl, request.program.fragmentShader);
-  (resources as { webgl2Programs: number }).webgl2Programs += 1;
-  const buffers: WebGLBuffer[] = [];
-  const textures: WebGLTexture[] = [];
-  try {
-    gl.useProgram(program);
-    buffers.push(
-      bindAttribute(gl, program, 'a_position', [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      bindAttribute(gl, program, 'a_uv', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]),
+  if (request.debugSimulateLoss === 'webgl2-context') {
+    const runtime = webGl2Runtime(request.width, request.height);
+    runtime.gl.getExtension('WEBGL_lose_context')?.loseContext();
+    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
+    runtime.dispose();
+    throw new RendererBackendError(
+      'RENDERER_WEBGL_CONTEXT_LOST',
+      'WebGL2 context was lost during composition',
     );
-    (resources as { webgl2Buffers: number }).webgl2Buffers += buffers.length;
-
-    request.program.inputPorts.forEach((port, index) => {
-      const frame = request.inputs[port];
-      if (frame === undefined) throw new RangeError(`Material input ${port} is missing`);
-      gl.activeTexture(gl.TEXTURE0 + index);
-      textures.push(createTexture(gl, frame));
-      gl.uniform1i(
-        gl.getUniformLocation(program, `u_input_${port.replaceAll(/[^a-zA-Z0-9_]/gu, '_')}`),
-        index,
-      );
-    });
-    (resources as { webgl2Textures: number }).webgl2Textures += textures.length;
-    if (request.debugSimulateLoss === 'webgl2-context') {
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-      throw new RendererBackendError(
-        'RENDERER_WEBGL_CONTEXT_LOST',
-        'WebGL2 context was lost during composition',
-      );
-    }
-    for (const uniform of request.program.uniforms) {
-      gl.uniform1f(gl.getUniformLocation(program, uniform.name), uniformValue(uniform, request));
-    }
-    gl.viewport(0, 0, request.width, request.height);
-    const gpuStartedAt = performance.now();
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    gl.finish();
-    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
-    if (gl.isContextLost()) {
-      throw new RendererBackendError(
-        'RENDERER_WEBGL_CONTEXT_LOST',
-        'WebGL2 context was lost during composition',
-      );
-    }
-    return canvas.transferToImageBitmap();
-  } finally {
-    buffers.forEach(buffer => gl.deleteBuffer(buffer));
-    textures.forEach(texture => gl.deleteTexture(texture));
-    gl.deleteProgram(program);
-    (resources as { webgl2Contexts: number }).webgl2Contexts = 0;
-    (resources as { webgl2Programs: number }).webgl2Programs = 0;
-    (resources as { webgl2Buffers: number }).webgl2Buffers = 0;
-    (resources as { webgl2Textures: number }).webgl2Textures = 0;
   }
+  return renderWebGl2Pass(
+    request,
+    request.program.fragmentShader,
+    inputs,
+    request.program.uniforms,
+    timing,
+  );
+}
+
+async function composeWebGl2WithAdmissionRetry(
+  request: ComposeRequest,
+  resources: RendererWorkerResourceSnapshot,
+  timing: MutableWorkerTiming,
+): Promise<ImageBitmap> {
+  const maxAttempts = 80;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return composeWebGl2(request, resources, timing);
+    } catch (error) {
+      const unavailable =
+        error instanceof Error && error.message === 'Worker WebGL2 context is unavailable';
+      if (!unavailable) throw error;
+      if (cancelledRequestIds.has(request.id)) {
+        throw new DOMException('Renderer request cancelled', 'AbortError');
+      }
+      if (attempt === maxAttempts - 1) {
+        throw new RendererBackendError(
+          'RENDERER_WEBGL_ADMISSION_TIMEOUT',
+          'Timed out waiting for a page WebGL2 context budget',
+        );
+      }
+      await new Promise(resolve => globalThis.setTimeout(resolve, 50));
+    }
+  }
+  throw new RendererBackendError(
+    'RENDERER_WEBGL_ADMISSION_TIMEOUT',
+    'Timed out waiting for a page WebGL2 context budget',
+  );
 }
 
 const worker = globalThis as unknown as DedicatedWorkerGlobalScope;
@@ -570,6 +746,8 @@ function acknowledgeCancellation(id: number): void {
 worker.addEventListener('message', (event: MessageEvent<RendererWorkerRequest>) => {
   const request = event.data;
   if (request.type === 'dispose') {
+    disposeGpuRuntime();
+    disposeWebGl2Runtimes();
     worker.close();
     return;
   }
@@ -622,11 +800,11 @@ worker.addEventListener('message', (event: MessageEvent<RendererWorkerRequest>) 
           const failure = backendError(error, 'RENDERER_WEBGPU_FAILED');
           if (!request.allowFallback) throw failure;
           diagnostics.push({ code: failure.code, message: failure.message });
-          bitmap = composeWebGl2(request, resources, timing);
+          bitmap = await composeWebGl2WithAdmissionRetry(request, resources, timing);
           backend = 'webgl2';
         }
       } else {
-        bitmap = composeWebGl2(request, resources, timing);
+        bitmap = await composeWebGl2WithAdmissionRetry(request, resources, timing);
         backend = 'webgl2';
       }
       closeInputs();

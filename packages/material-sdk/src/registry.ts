@@ -8,6 +8,7 @@ import {
 } from './package-limits.js';
 import { assertMaterialDefinitionShape, assertMaterialGraphShape } from './package-shape.js';
 import { snapshotMaterialPackage } from './package-snapshot.js';
+import type { MaterialTrustStore, SignedMaterialPackage } from './security.js';
 import type {
   MaterialDefinition,
   MaterialPackageByteLimitOptions,
@@ -168,6 +169,22 @@ export class MaterialRegistry implements MaterialPackageResolver {
       packageKey(manifest.package.id, manifest.package.version, snapshot.integrity),
       snapshot,
     );
+  }
+
+  async installSigned(
+    signed: SignedMaterialPackage,
+    trustStore: MaterialTrustStore,
+    options: InstallMaterialPackageOptions & {
+      readonly signal?: AbortSignal;
+      readonly nowMs?: number;
+    } = {},
+  ): Promise<void> {
+    await trustStore.verify(signed, {
+      ...(options.signal === undefined ? {} : { signal: options.signal }),
+      ...(options.nowMs === undefined ? {} : { nowMs: options.nowMs }),
+    });
+    throwIfAborted(options.signal, 'Signed Material package install');
+    await this.install(signed.package, options);
   }
 
   resolve(

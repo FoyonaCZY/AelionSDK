@@ -38,6 +38,7 @@ export default defineConfig({
     },
   },
   test: {
+    fileParallelism: false,
     browser: {
       enabled: true,
       provider: 'playwright',

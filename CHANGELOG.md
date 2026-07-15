@@ -12,11 +12,22 @@
 
 ### Added
 
+- Production editing commands now include ripple insert/remove, roll, slip, slide, linked groups, marker/range/selection metadata and nested Sequence subgraphs with atomic inverse/affected-range semantics.
+- Render IR now has canonical curve/hold/reverse TimeMap evaluation and inversion, recursive automation, deterministic Text/Caption layout, SRT/WebVTT, Image/Generator/Adjustment clips, masks/mattes, 12 blend modes and explicit color/bit-depth contracts.
+- Audio now supports sample-accurate gain/pan/fades, generic TimeMap varispeed, 1–8 channel matrices, ducking/sidechain, waveform peaks, LUFS/true-peak analysis, limiting and device/interruption recovery state.
+- Export profiles now cover WebM, MP4, PNG/JPEG/WebP, GIF and WAV/RF64, with a WebM Export Worker, AAC runtime canary, checkpoint protocol and canonical provider-backed Remote Export exposed through `session.export.startRemote()`.
+- Long-media infrastructure now includes segmented indexes, content-addressed CacheStore/OPFS LRU, proxy consistency, still/animated image adapters and a page-level decoder/GPU/cache resource governor.
+- Material production tooling now includes Ed25519/ECDSA publisher trust and revocation, deterministic migrations, composition/fusion/adaptive quality, immutable catalog metadata and a headless Material Lab with Golden/package export.
+- Production Core guide, compatibility matrix, Core Node math specification, ADR-016 and reproducible evidence index.
+- Audio Track solo is now an explicit Project v1 mixer state with a validated `setTrackSolo` transaction command; shared Render IR audio evaluation applies identical solo/mute semantics to preview and export.
 - Phase 1 最终 tarball browser consumer、API snapshot compare、全量门禁与 Exit Review 正在收口；60 秒 Chromium evidence 已生成并通过独立音视频回读。
 - Material package paths now reject ill-formed Unicode before UTF-8 encoding, preventing archive-name collisions; invalid transport Map keys are rejected without invoking caller coercion hooks.
 
 ### Fixed
 
+- Export preflight no longer trusts Chromium's AAC declaration alone; a real encode/flush canary converts runtime false positives into `EXPORT_AUDIO_CONFIG_UNSUPPORTED`.
+- Browser certification files now run serially because GPU/context budgets are browser-global across tabs; same-page concurrency remains covered by explicit admission and release tests.
+- WebGL2 composition checks context loss both before and after bitmap transfer and retries bounded context admission with a stable timeout diagnostic.
 - Clean GitHub Actions browser jobs now build workspace exports before testing and resolve every `@aelion/*` test import through source aliases.
 - Hermetic tarball consumers inherit the repository's exact `pnpm@10.13.1` package-manager pin, preventing Corepack from selecting an incompatible pnpm release under Node.js 20.
 - Render IR presentation normalizes the public `ImageBitmap` to straight alpha, avoiding double premultiplication on Linux headless Chromium/ANGLE paths.

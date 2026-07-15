@@ -26,10 +26,11 @@
 | `setTrackLocked` | 设置编辑锁 | lock 不改变渲染结果 |
 | `setTrackEnabled` | 设置 Track 渲染开关 | 正常进入 ChangeSet/affected ranges |
 | `setTrackMuted` | 设置 audio Track 的 `audio.muted` | 非 audio Track 拒绝 |
+| `setTrackSolo` | 设置 audio Track 的 `audio.solo` | 非 audio Track 拒绝；旧 Project 缺省为 `false` |
 
 所有时间均为非负 safe integer 微秒，区间保持半开语义。命令接受可选 `baseRevision`；陈旧 revision 仍由 `TransactionEngine` 以 `REVISION_CONFLICT` 拒绝。
 
-`setTrackEnabled` 是本 Alpha 的 visual visibility/audio participation 开关；`setTrackMuted` 只控制 audio mixer。Track solo 尚未实现，也没有隐式由 enabled/muted 推导；上层不能把通用 `setField` 包装成已认证 solo 命令。
+`setTrackEnabled` 是 visual visibility/audio participation 开关；`setTrackMuted` 与 `setTrackSolo` 只控制 audio mixer。同一 Sequence 只要存在 enabled 的 solo audio Track，Render IR 音频求值便只混入 enabled、solo 且未 muted 的 audio Track。mute 仍是独立硬开关：若所有 solo Track 同时 muted，结果为静音，而不是恢复非 solo Track。
 
 ## 3. Source mapping
 
@@ -71,7 +72,7 @@ ChangeSet 同时收集编辑前与编辑后的 owner range，因此 move/trim/sp
 - move 到不兼容 kind 的 Track；
 - replace 改变 ownership 或拓扑。
 
-Ripple/roll/slip/slide、Track solo、group/link/unlink 和 linked group split 尚无语义命令，属于后续 Alpha 路线，而不是本契约的隐式能力。
+Ripple/roll/slip/slide、group/link/unlink 和 linked group split 尚无语义命令，属于后续 Alpha 路线，而不是本契约的隐式能力。
 
 这些边界对应下一批 linked editing、keyframe split/trim policy 与 Material `splitPolicy`，不会污染 Project v1 数据结构。
 

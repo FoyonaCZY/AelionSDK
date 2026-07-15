@@ -1115,7 +1115,11 @@ export function validateSeekEvidence(report) {
 }
 
 function validateCompositorBenchmark(value, options, reasons) {
-  if (value?.resolution?.width !== 1_920 || value?.resolution?.height !== 1_080) {
+  const resolution = options.resolution ?? { width: 1_920, height: 1_080 };
+  if (
+    value?.resolution?.width !== resolution.width ||
+    value?.resolution?.height !== resolution.height
+  ) {
     reasons.push(`${options.name} resolution differs`);
   }
   if (value?.frames !== options.frames || value?.passCount !== options.passes) {
@@ -1316,6 +1320,16 @@ export function validatePerformanceEvidence(report) {
     { name: 'Soft Glow WebGL2', frames: 12, passes: 4 },
     reasons,
   );
+  validateCompositorBenchmark(
+    report?.material?.fourKWebGl2,
+    {
+      name: 'Warm Film 4K WebGL2',
+      frames: 3,
+      passes: 1,
+      resolution: { width: 3_840, height: 2_160 },
+    },
+    reasons,
+  );
   const exported = report?.export;
   const expectedRealtimeMultiple = exported?.durationUs / 1_000 / exported?.elapsedMs;
   if (
@@ -1348,7 +1362,7 @@ export function validatePerformanceEvidence(report) {
   }
   if (
     exported?.mainThread?.contract !==
-    'codec-initialization-disclosed; steady-state begins at the second video frame'
+    'worker encoder/mux orchestration; host frame production disclosed; steady-state begins at the second video frame'
   ) {
     reasons.push('performance export Long Task attribution contract differs');
   }

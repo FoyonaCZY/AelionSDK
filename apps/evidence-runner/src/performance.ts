@@ -1,5 +1,5 @@
 import { renderIrAudio, SharedPcmRingBuffer } from '@aelion/audio';
-import { exportWebM, SeekableMemorySink } from '@aelion/export';
+import { exportMuxedInWorker, SeekableMemorySink } from '@aelion/export';
 import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
 import { IncrementalRenderCompiler } from '@aelion/render-ir';
 import { WorkerCompositor } from '@aelion/renderer-worker';
@@ -45,6 +45,10 @@ async function materialBenchmark(
   parameters: Readonly<Record<string, number>>,
   iterations: number,
   preferredBackend: 'webgpu' | 'webgl2',
+  resolution: { readonly width: number; readonly height: number } = {
+    width: 1_920,
+    height: 1_080,
+  },
 ): Promise<Record<string, unknown>> {
   const program = compileMaterialGraphToWebGl2(graph, {
     parameters: Object.fromEntries(Object.keys(parameters).map(id => [id, 'float' as const])),
@@ -59,12 +63,12 @@ async function materialBenchmark(
     for (let iteration = 0; iteration < iterations; iteration += 1) {
       const startedAt = performance.now();
       const result = await compositor.compose({
-        inputs: { source: solidFrame(1920, 1080, 32) },
+        inputs: { source: solidFrame(resolution.width, resolution.height, 32) },
         program,
         parameters,
         preferredBackend,
-        width: 1920,
-        height: 1080,
+        width: resolution.width,
+        height: resolution.height,
       });
       wallMs.push(performance.now() - startedAt);
       workerUs.push(result.timing.totalWorkerUs);
@@ -75,7 +79,7 @@ async function materialBenchmark(
     compositor.dispose();
     return {
       label,
-      resolution: { width: 1920, height: 1080 },
+      resolution,
       frames: wallMs.length,
       passCount: program.executionPlan.passes.length,
       intermediateTextureCount: program.executionPlan.intermediateTextureCount,
@@ -103,7 +107,8 @@ async function exportBenchmark(): Promise<Record<string, unknown>> {
   let renderedAudioBlocks = 0;
   const measured = await measureLongTasksDuring(async () => {
     mark('export-call');
-    const result = await exportWebM({
+    const result = await exportMuxedInWorker({
+      profile: 'webm',
       durationUs: 5_000_000,
       width: 1920,
       height: 1080,
@@ -154,7 +159,8 @@ async function exportBenchmark(): Promise<Record<string, unknown>> {
     throw new Error('Performance export did not reach the steady-state frame boundary');
   }
   const mainThread = {
-    contract: 'codec-initialization-disclosed; steady-state begins at the second video frame',
+    contract:
+      'worker encoder/mux orchestration; host frame production disclosed; steady-state begins at the second video frame',
     initialization: sliceLongTaskWindow(
       measured.window,
       measured.window.startedAtMs,
@@ -255,6 +261,14 @@ async function run(): Promise<Record<string, unknown>> {
     12,
     'webgl2',
   );
+  const fourKWebGl2 = await materialBenchmark(
+    'Warm Film 4K WebGL2',
+    warmFilm,
+    { intensity: 0.65 },
+    3,
+    'webgl2',
+    { width: 3_840, height: 2_160 },
+  );
   const exportResult = await exportBenchmark();
   const longTimeline = await longTimelineSimulation(project);
   return {
@@ -264,6 +278,7 @@ async function run(): Promise<Record<string, unknown>> {
       warmFilmWebGpu,
       warmFilmWebGl2,
       softGlow: softGlowResult,
+      fourKWebGl2,
       resourceOwnership: {
         policy: 'each benchmark compositor is disposed and reports zero pending requests',
       },

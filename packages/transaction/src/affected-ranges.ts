@@ -104,24 +104,10 @@ function ownerRanges(
       const owner = marker.owner;
       const startUs = marker.timeUs;
       const durationUs = marker.durationUs;
-      if (
-        owner === null ||
-        Array.isArray(owner) ||
-        typeof owner !== 'object' ||
-        typeof owner.type !== 'string' ||
-        typeof owner.id !== 'string' ||
-        typeof startUs !== 'number' ||
-        typeof durationUs !== 'number'
-      ) {
-        return [];
-      }
       if (owner.type === 'sequence') return [{ sequenceId: owner.id, startUs, durationUs }];
-      if (owner.type === 'item') {
-        const item = project.items[owner.id];
-        const base = item === undefined ? undefined : itemRange(project, item);
-        return base === undefined ? [] : [{ ...base, startUs: base.startUs + startUs, durationUs }];
-      }
-      return [];
+      const item = project.items[owner.id];
+      const base = item === undefined ? undefined : itemRange(project, item);
+      return base === undefined ? [] : [{ ...base, startUs: base.startUs + startUs, durationUs }];
     }
   }
 }

@@ -61,7 +61,12 @@ interface Diagnostic {
 | `PROJECT_MATERIAL_MULTIPLE_OWNERS` | 同一 MaterialInstance 被多个 host 拥有 |
 | `PROJECT_MATERIAL_ORPHAN` | MaterialInstance 没有合法 owner |
 | `PROJECT_VISUAL_TRANSITION_OVERLAP` | 同一 Sequence 的 visual Transition 时间区间重叠；拆分或调整区间，避免运行时选择歧义 |
-| `PROJECT_AUDIO_TIME_MAPPING_UNSUPPORTED` | 本 Alpha 的音频仅支持 forward 1x linear；变速/倒放须在导入阶段烘焙或等待后续版本 |
+| `PROJECT_TIME_MAPPING_ENDPOINT_INVALID` | curve TimeMap 未覆盖 Item/source 端点或端点越界 |
+| `PROJECT_TIME_MAPPING_ORDER_INVALID` | curve point 时间顺序无效，无法形成确定单调段 |
+| `PROJECT_NESTED_SEQUENCE_CYCLE` | Nested Sequence 引用形成循环 |
+| `PROJECT_MASK_SOURCE_INVALID` | Mask/Matte source 不存在、跨 Sequence 或自引用 |
+| `PROJECT_AUDIO_FADE_OUT_OF_RANGE` | fade 长于 Item duration |
+| `PROJECT_HDR_FORMAT_INVALID` | PQ/HLG 未同时使用 Rec.2020 linear 与 10-bit contract |
 
 ## 4. Transaction、History 与编辑命令
 
@@ -101,7 +106,7 @@ interface Diagnostic {
 | `COMMAND_ITEM_ANCHOR_INVALID` | Item 不能移动到自己之前 |
 | `COMMAND_TRACK_ANCHOR_MISSING` | Track 排序 anchor 不属于目标 Sequence |
 | `COMMAND_TRACK_SEQUENCE_MISMATCH` | Track 不属于指定 Sequence |
-| `COMMAND_TRACK_AUDIO_REQUIRED` | mute 命令目标不是带 mixer 属性的 Audio Track |
+| `COMMAND_TRACK_AUDIO_REQUIRED` | mute/solo 命令目标不是带 mixer 属性的 Audio Track |
 | `COMMAND_NO_CHANGE` | 命令没有产生语义变化 |
 | `COMMAND_TIME_MAPPING_UNSUPPORTED` | 当前命令无法安全修改该非线性/未知 time mapping |
 | `COMMAND_SOURCE_RANGE_EMPTY` | trim 后 source range 将为空 |
@@ -118,7 +123,7 @@ interface Diagnostic {
 | `COMMAND_REPLACE_OWNERSHIP_CHANGED` | replace 改变 Material/Marker/Link ownership |
 | `COMMAND_TRANSITION_TRACK_CONFLICT` | 跨 Track move 会使已有 Transition 非法；先移除/重建 Transition |
 
-当前 Alpha 没有 ripple/roll/slip/slide、group split 和 solo 命令；没有 code 不表示这些能力被通用 `setField` 支持。
+Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_ROLL_*`、`COMMAND_SLIDE_*`、`COMMAND_LINK_GROUP_*` 和 `COMMAND_SOURCE_HANDLE_UNAVAILABLE` 等细分 code。Linked split 仅在 group mapping 可确定时执行；否则 fail closed，不使用通用 `setField` 绕过所有权和 Transition 校验。
 
 ## 5. Media
 
@@ -130,6 +135,9 @@ interface Diagnostic {
 | `MEDIA_RANGE_REQUEST_FAILED` | Range 返回非预期 HTTP status/content range |
 | `MEDIA_RAW_DTS_UNAVAILABLE` | 当前 container adapter 不提供原始 DTS；不要用 normalized decode time 冒充 |
 | `MEDIA_SAMPLE_OFFSET_UNAVAILABLE` | 当前 adapter 不提供稳定 physical byte offset |
+| `MEDIA_PROXY_DURATION_MISMATCH` | Proxy 与 original 时长不一致；回退 original 并重新生成 proxy |
+| `MEDIA_RESOURCE_REQUEST_EXCEEDS_PAGE_BUDGET` | 单次 decoder/GPU/cache 请求超过页面预算 |
+| `MEDIA_RESOURCE_QUEUE_FULL` | 页面资源 admission 队列达到硬上限 |
 
 ## 6. Capability
 
@@ -170,6 +178,7 @@ The Player enters `error` state and can be rebuilt by loading the Project again.
 | `RENDERER_WEBGPU_DEVICE_LOST` | WebGPU device lost；若允许则回退/重建，否则停止 |
 | `RENDERER_WEBGPU_FAILED` | WebGPU 组合失败且可按配置尝试 WebGL2 |
 | `RENDERER_WEBGL_CONTEXT_LOST` | WebGL2 context lost；释放并重建 Session/renderer |
+| `RENDERER_WEBGL_ADMISSION_TIMEOUT` | 浏览器全局 WebGL 配额在有界等待期内仍不可用 |
 | `RENDERER_WORKER_COMPOSE_FAILED` | Worker 内未归类的合成失败 |
 
 Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `RENDERER_*` 故障码。
@@ -203,6 +212,13 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 | `MATERIAL_PARAMETER_OUT_OF_RANGE` | 数值参数超 Definition hard range |
 | `MATERIAL_TRUST_REQUIRED` | Shader/WASM 未同时满足 trusted package、显式授权和 publisher allowlist |
 | `MATERIAL_BACKEND_UNAVAILABLE` | 没有指定 backend 的可执行 implementation |
+| `MATERIAL_SIGNATURE_INVALID` | publisher signature 或 payload identity 校验失败 |
+| `MATERIAL_PUBLISHER_UNTRUSTED` | publisher key 不在 TrustStore 或已吊销 |
+| `MATERIAL_NETWORK_PERMISSION_DENIED` | execution policy 未授权 Material 网络访问 |
+| `MATERIAL_SHADER_PERMISSION_DENIED` | execution policy 未授权 trusted Shader |
+| `MATERIAL_WASM_PERMISSION_DENIED` | execution policy 未授权 trusted WASM |
+| `MATERIAL_MIGRATION_INVALID` | migration 非确定、版本链不连续或输出协议无效 |
+| `MATERIAL_EXECUTION_BUDGET_DENIED` | Composition/Lab 的 pass/texture/quality 预算不允许执行 |
 
 协议还保留 `MATERIAL_COMPILE_FAILED`、`MATERIAL_EXECUTION_FAILED` 等面向未来的目录项；当前源码不会稳定发出这些 code，因此本 Alpha runtime 表不把它们列为已实现事件。
 
@@ -214,9 +230,9 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 | `EXPORT_CHANNEL_LAYOUT_UNSUPPORTED` | 输出 channel layout 不在 exporter 支持范围 |
 | `EXPORT_SINK_LOCKED` | WritableStream 已被其他 writer lock；创建新 Sink |
 | `EXPORT_VIDEO_ENCODER_UNAVAILABLE` | VideoEncoder 不可用 |
-| `EXPORT_VIDEO_CONFIG_UNSUPPORTED` | VP9 config probe 失败 |
+| `EXPORT_VIDEO_CONFIG_UNSUPPORTED` | VP9/H.264 config probe 失败 |
 | `EXPORT_AUDIO_ENCODER_UNAVAILABLE` | AudioEncoder 不可用 |
-| `EXPORT_AUDIO_CONFIG_UNSUPPORTED` | Opus config probe 失败 |
+| `EXPORT_AUDIO_CONFIG_UNSUPPORTED` | Opus/AAC config 或真实 runtime canary 失败 |
 | `EXPORT_MATERIAL_BACKEND_UNAVAILABLE` | 启用的 Material 没有 offline backend |
 | `EXPORT_JOB_ACTIVE` | 同一 Session 已有运行中的导出；等待完成或先调用 `cancel()` |
 | `EXPORT_ENCODER_INIT_FAILED` | encoder/muxer 初始化失败 |
@@ -226,6 +242,16 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 | `EXPORT_AUDIO_ENCODER_FAILED` | AudioEncoder 拒绝 PCM block |
 | `EXPORT_STORAGE_WRITE_FAILED` | 配额、磁盘或 Sink write 失败；清除 partial output 后重试 |
 | `EXPORT_MUX_OR_SINK_FAILED` | finalize/mux/未分类 Sink 失败 |
+| `EXPORT_IMAGE_CANVAS_UNAVAILABLE` | still/GIF 所需 OffscreenCanvas/Image 能力不可用 |
+| `EXPORT_IMAGE_WRITE_FAILED` | still/GIF sink 写入或 finalize 失败 |
+| `EXPORT_AUDIO_WRITE_FAILED` | WAV/RF64 sink 写入失败 |
+| `REMOTE_EXPORT_AUTH_INVALID` | provider authorization scheme/token 为空 |
+| `REMOTE_EXPORT_AUTH_EXPIRED` | provider authorization 已过期 |
+| `REMOTE_EXPORT_FAILED` | Remote provider 启动、identity、progress stream 或 cleanup 失败 |
+| `COLOR_WORKING_SPACE_UNSUPPORTED` | 当前 renderer/export backend 不支持 IR working space |
+| `COLOR_TRANSFER_FUNCTION_UNSUPPORTED` | 当前 backend 不执行所需 transfer function |
+| `COLOR_BIT_DEPTH_UNSUPPORTED` | 当前输出路径不具备所需 8/10-bit contract |
+| `COLOR_HDR_PRESENTATION_UNSUPPORTED` | 当前 surface 不能真实呈现 HDR，禁止静默降为 SDR |
 
 同一 Session 并发启动第二个 export 会抛出 `AelionError`，其 `diagnostics` 包含稳定的 `EXPORT_JOB_ACTIVE`；上层仍可先检查 `session.export.activeJob`，或等待/取消当前 job。英文 `message` 只用于展示，业务分支必须使用 diagnostic code。
 

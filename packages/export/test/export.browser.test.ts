@@ -4,9 +4,13 @@ import { createSampleIndex, decodeVideoFrameAt } from '@aelion/media';
 import type { RenderIr } from '@aelion/render-ir';
 
 import {
+  exportGif,
+  exportFrozenRenderIrMp4,
   exportFrozenRenderIrWebM,
+  exportStillImage,
   exportWebM,
   OpfsSeekableSink,
+  preflightMp4Export,
   preflightWebMExport,
   SeekableMemorySink,
 } from '../src/index.js';
@@ -31,6 +35,96 @@ function frozenIr(revision = 7n): RenderIr {
 }
 
 describe('offline WebCodecs + streaming WebM export', () => {
+  it('exports still PNG and bounded-frame animated GIF profiles', async () => {
+    const renderFrame = (request: {
+      readonly timestampUs: number;
+      readonly durationUs: number;
+      readonly width: number;
+      readonly height: number;
+    }) => {
+      const canvas = new OffscreenCanvas(request.width, request.height);
+      const context = canvas.getContext('2d');
+      if (context === null) throw new Error('2D context unavailable');
+      context.fillStyle = request.timestampUs === 0 ? 'red' : 'blue';
+      context.fillRect(0, 0, request.width, request.height);
+      return Promise.resolve(
+        new VideoFrame(canvas, {
+          timestamp: request.timestampUs,
+          duration: request.durationUs,
+        }),
+      );
+    };
+    const stillSink = new SeekableMemorySink();
+    const still = await exportStillImage({
+      timeUs: 0,
+      width: 16,
+      height: 8,
+      format: 'png',
+      sink: stillSink.writable,
+      renderFrame,
+    });
+    const png = stillSink.finalize();
+    expect(still.mimeType).toBe('image/png');
+    expect([...png.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+
+    const gifSink = new SeekableMemorySink();
+    const gif = await exportGif({
+      durationUs: 200_000,
+      width: 16,
+      height: 8,
+      frameRate: { numerator: 10, denominator: 1 },
+      sink: gifSink.writable,
+      renderFrame,
+    });
+    const bytes = gifSink.finalize();
+    expect(gif).toMatchObject({ mimeType: 'image/gif', videoFrames: 2 });
+    expect(new TextDecoder().decode(bytes.subarray(0, 6))).toBe('GIF89a');
+    expect(bytes.at(-1)).toBe(0x3b);
+    expect(gifSink.snapshot().maxInFlightWrites).toBe(1);
+  });
+
+  it('capability-selects and exports MP4/H.264/AAC or reports the unsupported codec', async () => {
+    const sink = new SeekableMemorySink();
+    const common = {
+      ir: frozenIr(),
+      projectRevision: 7n,
+      videoBitrate: 500_000,
+      audioBitrate: 64_000,
+      sink: sink.writable,
+      cleanupSink: () => sink.cleanup(),
+      renderFrame: (request: { readonly timestampUs: number; readonly durationUs: number }) => {
+        const canvas = new OffscreenCanvas(160, 90);
+        canvas.getContext('2d')?.fillRect(0, 0, 160, 90);
+        return Promise.resolve(
+          new VideoFrame(canvas, {
+            timestamp: request.timestampUs,
+            duration: request.durationUs,
+          }),
+        );
+      },
+      renderAudio: (request: { readonly frameCount: number; readonly channelCount: number }) =>
+        Promise.resolve(new Float32Array(request.frameCount * request.channelCount)),
+    } as const;
+    const preflight = await preflightMp4Export(common);
+    if (!preflight.ok) {
+      expect(
+        preflight.issues.some(issue =>
+          /^EXPORT_(VIDEO|AUDIO)_CONFIG_UNSUPPORTED$/u.test(issue.code),
+        ),
+      ).toBe(true);
+      return;
+    }
+
+    const result = await exportFrozenRenderIrMp4(common);
+    const bytes = sink.finalize();
+    expect(result.mimeType).toContain('video/mp4');
+    expect(bytes.byteLength).toBeGreaterThan(1_000);
+    const index = await createSampleIndex(bytes);
+    expect(index.container).toBe('mp4');
+    expect(index.tracks.find(track => track.kind === 'video')?.codecFamily).toBe('avc');
+    expect(index.tracks.find(track => track.kind === 'audio')?.codecFamily).toBe('aac');
+  });
+
   it('exports deterministic CFR video and sample-aligned audio with bounded writes', async () => {
     const sink = new SeekableMemorySink();
     const progress: number[] = [];

@@ -1,6 +1,12 @@
 import type { JsonObject, JsonValue } from '@aelion/core';
 import { AelionError } from '@aelion/core';
-import type { AelionProject, EntityId, ItemEntity, TrackEntity } from '@aelion/project-schema';
+import type {
+  AelionProject,
+  EntityId,
+  ItemEntity,
+  MarkerEntity,
+  TrackEntity,
+} from '@aelion/project-schema';
 
 import type { TransactionHost } from './history.js';
 import type { EditOptions, TransactionCommit } from './types.js';
@@ -64,6 +70,100 @@ export interface SetTrackFlagOptions extends CommandOptions {
   readonly value: boolean;
 }
 
+export interface LinkItemsOptions extends CommandOptions {
+  readonly groupId: EntityId;
+  readonly itemIds: readonly EntityId[];
+  readonly kind?: 'av-sync' | 'edit-group';
+}
+
+export interface UnlinkItemsOptions extends CommandOptions {
+  readonly groupId: EntityId;
+  /** Omit to unlink every member and delete the group. */
+  readonly itemIds?: readonly EntityId[];
+}
+
+export interface MoveLinkedGroupOptions extends CommandOptions {
+  readonly groupId: EntityId;
+  readonly deltaUs: number;
+}
+
+export interface SlipItemOptions extends CommandOptions {
+  readonly itemId: EntityId;
+  /** Signed source presentation-time offset. Timeline range is unchanged. */
+  readonly deltaSourceUs: number;
+}
+
+export interface RollEditOptions extends CommandOptions {
+  readonly leftItemId: EntityId;
+  readonly rightItemId: EntityId;
+  /** New shared boundary in Sequence time. */
+  readonly toUs: number;
+}
+
+export interface SlideItemOptions extends CommandOptions {
+  readonly itemId: EntityId;
+  readonly deltaUs: number;
+}
+
+export interface RippleInsertItemOptions extends InsertItemOptions {
+  /** Defaults to every Track in the target Sequence. */
+  readonly trackIds?: readonly EntityId[];
+}
+
+export interface RippleRemoveItemOptions extends RemoveItemOptions {
+  /** Defaults to every Track in the source Sequence. */
+  readonly trackIds?: readonly EntityId[];
+}
+
+export interface AddMarkerOptions extends CommandOptions {
+  readonly marker: MarkerEntity;
+}
+
+export interface UpdateMarkerOptions extends CommandOptions {
+  readonly markerId: EntityId;
+  readonly timeUs?: number;
+  readonly durationUs?: number;
+  readonly markerLabel?: string | null;
+  readonly markerColor?: string | null;
+  readonly payload?: JsonValue;
+}
+
+export interface RemoveMarkerOptions extends CommandOptions {
+  readonly markerId: EntityId;
+}
+
+export interface SetSelectionMetadataOptions extends CommandOptions {
+  readonly sequenceId: EntityId;
+  readonly itemIds: readonly EntityId[];
+  readonly range?: { readonly startUs: number; readonly durationUs: number };
+}
+
+export interface TrimLinkedGroupOptions extends CommandOptions {
+  readonly groupId: EntityId;
+  readonly edge: 'start' | 'end';
+  /** Signed trim amount applied to every member; must be positive. */
+  readonly amountUs: number;
+}
+
+export interface RemoveLinkedGroupOptions extends CommandOptions {
+  readonly groupId: EntityId;
+}
+
+export interface SplitLinkedGroupOptions extends CommandOptions {
+  readonly groupId: EntityId;
+  readonly rightGroupId: EntityId;
+  /** Sequence time; every member must contain this point. */
+  readonly atUs: number;
+  readonly rightItemIds: Readonly<Record<EntityId, EntityId>>;
+}
+
+export interface SplitLinkedGroupResult {
+  readonly commit: TransactionCommit;
+  readonly leftGroupId: EntityId;
+  readonly rightGroupId: EntityId;
+  readonly rightItemIds: Readonly<Record<EntityId, EntityId>>;
+}
+
 interface MediaSourceView {
   readonly sourceRange: { readonly startUs: number; readonly durationUs: number };
   readonly timeMapping: {
@@ -88,6 +188,12 @@ function commandError(code: string, message: string, entityId?: string): AelionE
 function assertTime(value: number, name: string): void {
   if (!Number.isSafeInteger(value) || value < 0) {
     throw commandError('COMMAND_TIME_INVALID', `${name} must be a non-negative safe integer`);
+  }
+}
+
+function assertTimeDelta(value: number, name: string): void {
+  if (!Number.isSafeInteger(value)) {
+    throw commandError('COMMAND_TIME_INVALID', `${name} must be a safe integer`);
   }
 }
 
@@ -184,6 +290,113 @@ function scaledDuration(
   return Math.floor((durationUs * rate.numerator) / rate.denominator);
 }
 
+function signedScaledDuration(
+  durationUs: number,
+  rate: { readonly numerator: number; readonly denominator: number },
+): number {
+  return Math.sign(durationUs) * scaledDuration(Math.abs(durationUs), rate);
+}
+
+function sourceAssetDuration(
+  project: Readonly<AelionProject>,
+  item: ItemEntity,
+): number | undefined {
+  const source = asObject(item.source);
+  const assetId = source?.assetId;
+  if (typeof assetId !== 'string') return undefined;
+  const asset = project.assets[assetId];
+  const probeHint = asObject(asset?.probeHint);
+  const durationUs = probeHint?.durationUs;
+  return typeof durationUs === 'number' && Number.isSafeInteger(durationUs)
+    ? durationUs
+    : undefined;
+}
+
+function assertSourceRange(
+  project: Readonly<AelionProject>,
+  item: ItemEntity,
+  range: { readonly startUs: number; readonly durationUs: number },
+): void {
+  const assetDurationUs = sourceAssetDuration(project, item);
+  if (
+    !Number.isSafeInteger(range.startUs) ||
+    !Number.isSafeInteger(range.durationUs) ||
+    range.startUs < 0 ||
+    range.durationUs < 1 ||
+    (assetDurationUs !== undefined && range.startUs + range.durationUs > assetDurationUs)
+  ) {
+    throw commandError(
+      'COMMAND_SOURCE_HANDLE_UNAVAILABLE',
+      `Item ${item.id} does not have enough source media for this edit`,
+      item.id,
+    );
+  }
+}
+
+function adjustedLinearSourceRange(
+  project: Readonly<AelionProject>,
+  item: ItemEntity,
+  edge: 'start' | 'end',
+  deltaUs: number,
+): { readonly startUs: number; readonly durationUs: number } | undefined {
+  const source = mediaSource(item);
+  if (source === undefined) return undefined;
+  const mappedDeltaUs = signedScaledDuration(deltaUs, source.timeMapping.rate);
+  const startUs =
+    edge === 'start'
+      ? source.sourceRange.startUs + (source.timeMapping.reverse ? 0 : mappedDeltaUs)
+      : source.sourceRange.startUs - (source.timeMapping.reverse ? mappedDeltaUs : 0);
+  const durationUs =
+    source.sourceRange.durationUs + (edge === 'start' ? -mappedDeltaUs : mappedDeltaUs);
+  const range = { startUs, durationUs };
+  assertSourceRange(project, item, range);
+  return range;
+}
+
+function assertProfessionalEditItems(
+  project: Readonly<AelionProject>,
+  items: readonly ItemEntity[],
+): void {
+  const ids = new Set(items.map(item => item.id));
+  for (const item of items) {
+    assertUnlocked(trackIn(project, item.trackId));
+    if (item.linkGroupId !== undefined) {
+      throw commandError(
+        'COMMAND_LINKED_EDIT_REQUIRES_GROUP',
+        `Item ${item.id} is linked; use a LinkGroup edit or unlink it first`,
+        item.id,
+      );
+    }
+    if (containsAnimation(item)) {
+      throw commandError(
+        'COMMAND_EDIT_ANIMATION_UNSUPPORTED',
+        `Item ${item.id} contains automation that requires an explicit retiming policy`,
+        item.id,
+      );
+    }
+  }
+  const transition = Object.values(project.transitions).find(
+    value => ids.has(value.fromItemId) || ids.has(value.toItemId),
+  );
+  if (transition !== undefined) {
+    throw commandError(
+      'COMMAND_EDIT_TRANSITION_CONFLICT',
+      `Edit conflicts with Transition ${transition.id}`,
+      transition.id,
+    );
+  }
+}
+
+function setSourceRange(
+  transaction: import('./transaction.js').TransactionBuilder,
+  item: ItemEntity,
+  range: { readonly startUs: number; readonly durationUs: number } | undefined,
+): void {
+  if (range === undefined) return;
+  transaction.setField('items', item.id, ['source', 'sourceRange', 'startUs'], range.startUs);
+  transaction.setField('items', item.id, ['source', 'sourceRange', 'durationUs'], range.durationUs);
+}
+
 function trimmedSourceRange(
   item: ItemEntity,
   edge: 'start' | 'end',
@@ -207,6 +420,153 @@ function trimmedSourceRange(
     startUs: source.sourceRange.startUs + (advancesLowEdge ? removedSourceUs : 0),
     durationUs,
   };
+}
+
+function rippleTracks(
+  project: Readonly<AelionProject>,
+  sequenceId: string,
+  requested: readonly string[] | undefined,
+): readonly TrackEntity[] {
+  const sequence = project.sequences[sequenceId];
+  if (sequence === undefined) {
+    throw commandError('COMMAND_SEQUENCE_MISSING', `Sequence ${sequenceId} does not exist`);
+  }
+  const ids = requested === undefined ? [...sequence.trackIds] : [...new Set(requested)];
+  if (ids.length === 0 || ids.some(id => !sequence.trackIds.includes(id))) {
+    throw commandError(
+      'COMMAND_RIPPLE_TRACK_MISMATCH',
+      `Every ripple Track must belong to Sequence ${sequenceId}`,
+      sequenceId,
+    );
+  }
+  return ids.map(id => trackIn(project, id));
+}
+
+function assertRippleClosure(
+  project: Readonly<AelionProject>,
+  shiftedItemIds: ReadonlySet<string>,
+  ignoredItemIds: ReadonlySet<string> = new Set(),
+): readonly import('@aelion/project-schema').TransitionEntity[] {
+  for (const id of shiftedItemIds) {
+    const groupId = project.items[id]?.linkGroupId;
+    if (groupId === undefined) continue;
+    const group = project.linkGroups[groupId];
+    if (group?.itemIds.some(memberId => !shiftedItemIds.has(memberId)) === true) {
+      throw commandError(
+        'COMMAND_RIPPLE_LINK_GROUP_CONFLICT',
+        `Ripple would move only part of LinkGroup ${group.id}`,
+        group.id,
+      );
+    }
+  }
+  const shiftedTransitions: import('@aelion/project-schema').TransitionEntity[] = [];
+  for (const transition of Object.values(project.transitions)) {
+    if (ignoredItemIds.has(transition.fromItemId) || ignoredItemIds.has(transition.toItemId)) {
+      continue;
+    }
+    const fromShifted = shiftedItemIds.has(transition.fromItemId);
+    const toShifted = shiftedItemIds.has(transition.toItemId);
+    if (fromShifted !== toShifted) {
+      throw commandError(
+        'COMMAND_RIPPLE_TRANSITION_CONFLICT',
+        `Ripple would move only one side of Transition ${transition.id}`,
+        transition.id,
+      );
+    }
+    if (fromShifted) shiftedTransitions.push(transition);
+  }
+  return shiftedTransitions;
+}
+
+function appendRippleShift(
+  project: Readonly<AelionProject>,
+  transaction: import('./transaction.js').TransactionBuilder,
+  items: readonly ItemEntity[],
+  transitions: readonly import('@aelion/project-schema').TransitionEntity[],
+  sequenceId: string,
+  markerPivotUs: number,
+  deltaUs: number,
+): void {
+  for (const item of items) {
+    transaction.setField('items', item.id, ['range', 'startUs'], item.range.startUs + deltaUs);
+  }
+  for (const transition of transitions) {
+    transaction.setField(
+      'transitions',
+      transition.id,
+      ['range', 'startUs'],
+      transition.range.startUs + deltaUs,
+    );
+  }
+  for (const marker of Object.values(project.markers)) {
+    const owner = asObject(marker.owner);
+    if (
+      owner?.type !== 'sequence' ||
+      owner.id !== sequenceId ||
+      typeof marker.timeUs !== 'number' ||
+      marker.timeUs < markerPivotUs
+    ) {
+      continue;
+    }
+    transaction.setField('markers', marker.id, ['timeUs'], Math.max(0, marker.timeUs + deltaUs));
+  }
+}
+
+function appendRemoveItem(
+  project: Readonly<AelionProject>,
+  item: ItemEntity,
+  transaction: import('./transaction.js').TransactionBuilder,
+  skipLinkGroup = false,
+): void {
+  const track = trackIn(project, item.trackId);
+  for (const transition of Object.values(project.transitions)) {
+    if (transition.fromItemId !== item.id && transition.toItemId !== item.id) continue;
+    transaction.listRemove('sequences', transition.sequenceId, ['transitionIds'], transition.id);
+    transaction.deleteEntity('transitions', transition.id);
+    transaction.deleteEntity('materialInstances', transition.materialInstanceId);
+  }
+
+  const ownedMarkerIds = Object.values(project.markers)
+    .filter(marker => {
+      const owner = asObject(marker.owner);
+      return owner?.type === 'item' && owner.id === item.id;
+    })
+    .map(marker => marker.id);
+  const markerIds = new Set([...(item.markerIds ?? []), ...ownedMarkerIds]);
+  for (const markerId of markerIds) {
+    for (const sequence of Object.values(project.sequences)) {
+      if (sequence.markerIds.includes(markerId)) {
+        transaction.listRemove('sequences', sequence.id, ['markerIds'], markerId);
+      }
+    }
+    if (project.markers[markerId] !== undefined) transaction.deleteEntity('markers', markerId);
+  }
+
+  if (!skipLinkGroup && item.linkGroupId !== undefined) {
+    const group = project.linkGroups[item.linkGroupId];
+    if (group !== undefined) {
+      const remaining = group.itemIds.filter(id => id !== item.id);
+      if (remaining.length < 2) {
+        for (const remainingId of remaining) {
+          if (project.items[remainingId]?.linkGroupId === group.id) {
+            transaction.removeField('items', remainingId, ['linkGroupId']);
+          }
+        }
+        transaction.deleteEntity('linkGroups', group.id);
+      } else {
+        transaction.listRemove('linkGroups', group.id, ['itemIds'], item.id);
+        if (group.syncOffsetsUs !== undefined && Object.hasOwn(group.syncOffsetsUs, item.id)) {
+          transaction.removeField('linkGroups', group.id, ['syncOffsetsUs', item.id]);
+        }
+      }
+    }
+  }
+
+  transaction.listRemove('tracks', track.id, ['itemIds'], item.id);
+  transaction.deleteEntity('items', item.id);
+  for (const materialId of item.materialInstanceIds) {
+    transaction.deleteEntity('materialInstances', materialId);
+  }
 }
 
 function splitSourceRanges(
@@ -323,61 +683,113 @@ export class EditingCommands {
     const track = trackIn(project, item.trackId);
     assertUnlocked(track);
     return this.#host.edit(commandEditOptions(options, 'Remove item'), transaction => {
-      for (const transition of Object.values(project.transitions)) {
-        if (transition.fromItemId !== item.id && transition.toItemId !== item.id) continue;
-        transaction.listRemove(
-          'sequences',
-          transition.sequenceId,
-          ['transitionIds'],
-          transition.id,
-        );
-        transaction.deleteEntity('transitions', transition.id);
-        transaction.deleteEntity('materialInstances', transition.materialInstanceId);
-      }
+      appendRemoveItem(project, item, transaction);
+    });
+  }
 
-      const ownedMarkerIds = Object.values(project.markers)
-        .filter(marker => {
-          const owner = asObject(marker.owner);
-          return owner?.type === 'item' && owner.id === item.id;
-        })
-        .map(marker => marker.id);
-      const markerIds = new Set([...(item.markerIds ?? []), ...ownedMarkerIds]);
-      for (const markerId of markerIds) {
-        for (const sequence of Object.values(project.sequences)) {
-          if (sequence.markerIds.includes(markerId)) {
-            transaction.listRemove('sequences', sequence.id, ['markerIds'], markerId);
-          }
-        }
-        if (project.markers[markerId] !== undefined) transaction.deleteEntity('markers', markerId);
-      }
+  public rippleInsertItem(options: RippleInsertItemOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const targetTrack = trackIn(project, options.item.trackId);
+    assertUnlocked(targetTrack);
+    assertItemTrackCompatible(options.item, targetTrack);
+    assertAnchor(targetTrack, options.beforeItemId);
+    if (options.item.linkGroupId !== undefined) {
+      throw commandError(
+        'COMMAND_RIPPLE_NEW_ITEM_LINKED',
+        'A ripple-inserted Item cannot reference a LinkGroup that is not created atomically',
+        options.item.id,
+      );
+    }
+    if (project.items[options.item.id] !== undefined) {
+      throw commandError('COMMAND_ITEM_EXISTS', `Item ${options.item.id} already exists`);
+    }
+    const tracks = rippleTracks(project, targetTrack.sequenceId, options.trackIds);
+    if (!tracks.some(track => track.id === targetTrack.id)) {
+      throw commandError(
+        'COMMAND_RIPPLE_TRACK_MISMATCH',
+        'Ripple Tracks must include the inserted Item Track',
+        targetTrack.id,
+      );
+    }
+    const shiftedItems = tracks.flatMap(track =>
+      track.itemIds.flatMap(id => {
+        const item = project.items[id];
+        return item !== undefined && item.range.startUs >= options.item.range.startUs ? [item] : [];
+      }),
+    );
+    for (const track of tracks) {
+      if (shiftedItems.some(item => item.trackId === track.id)) assertUnlocked(track);
+    }
+    const shiftedIds = new Set(shiftedItems.map(item => item.id));
+    const transitions = assertRippleClosure(project, shiftedIds);
+    return this.#host.edit(commandEditOptions(options, 'Ripple insert item'), transaction => {
+      appendRippleShift(
+        project,
+        transaction,
+        shiftedItems,
+        transitions,
+        targetTrack.sequenceId,
+        options.item.range.startUs,
+        options.item.range.durationUs,
+      );
+      transaction.createEntity('items', options.item.id, options.item);
+      transaction.listInsert(
+        'tracks',
+        targetTrack.id,
+        ['itemIds'],
+        options.item.id,
+        options.beforeItemId,
+      );
+    });
+  }
 
-      if (item.linkGroupId !== undefined) {
-        const group = project.linkGroups[item.linkGroupId];
-        const ids = group?.itemIds;
-        if (group !== undefined && Array.isArray(ids) && ids.every(id => typeof id === 'string')) {
-          const remaining = ids.filter(id => id !== item.id);
-          if (remaining.length < 2) {
-            for (const remainingId of remaining) {
-              if (project.items[remainingId]?.linkGroupId === group.id) {
-                transaction.removeField('items', remainingId, ['linkGroupId']);
-              }
-            }
-            transaction.deleteEntity('linkGroups', group.id);
-          } else {
-            transaction.listRemove('linkGroups', group.id, ['itemIds'], item.id);
-            const offsets = asObject(group.syncOffsetsUs);
-            if (offsets !== undefined && Object.hasOwn(offsets, item.id)) {
-              transaction.removeField('linkGroups', group.id, ['syncOffsetsUs', item.id]);
-            }
-          }
-        }
-      }
-
-      transaction.listRemove('tracks', track.id, ['itemIds'], item.id);
-      transaction.deleteEntity('items', item.id);
-      for (const materialId of item.materialInstanceIds) {
-        transaction.deleteEntity('materialInstances', materialId);
-      }
+  public rippleRemoveItem(options: RippleRemoveItemOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const item = itemIn(project, options.itemId);
+    const sourceTrack = trackIn(project, item.trackId);
+    assertUnlocked(sourceTrack);
+    if (item.linkGroupId !== undefined) {
+      throw commandError(
+        'COMMAND_RIPPLE_LINK_GROUP_DELETE_UNSUPPORTED',
+        `Unlink Item ${item.id} before ripple deletion`,
+        item.id,
+      );
+    }
+    const tracks = rippleTracks(project, sourceTrack.sequenceId, options.trackIds);
+    if (!tracks.some(track => track.id === sourceTrack.id)) {
+      throw commandError(
+        'COMMAND_RIPPLE_TRACK_MISMATCH',
+        'Ripple Tracks must include the removed Item Track',
+        sourceTrack.id,
+      );
+    }
+    const endUs = item.range.startUs + item.range.durationUs;
+    const shiftedItems = tracks.flatMap(track =>
+      track.itemIds.flatMap(id => {
+        const candidate = project.items[id];
+        return candidate !== undefined &&
+          candidate.id !== item.id &&
+          candidate.range.startUs >= endUs
+          ? [candidate]
+          : [];
+      }),
+    );
+    for (const track of tracks) {
+      if (shiftedItems.some(candidate => candidate.trackId === track.id)) assertUnlocked(track);
+    }
+    const shiftedIds = new Set(shiftedItems.map(candidate => candidate.id));
+    const shiftedTransitions = assertRippleClosure(project, shiftedIds, new Set([item.id]));
+    return this.#host.edit(commandEditOptions(options, 'Ripple remove item'), transaction => {
+      appendRemoveItem(project, item, transaction);
+      appendRippleShift(
+        project,
+        transaction,
+        shiftedItems,
+        shiftedTransitions,
+        sourceTrack.sequenceId,
+        endUs,
+        -item.range.durationUs,
+      );
     });
   }
 
@@ -622,6 +1034,826 @@ export class EditingCommands {
     });
   }
 
+  public linkItems(options: LinkItemsOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    if (project.linkGroups[options.groupId] !== undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_EXISTS',
+        `LinkGroup ${options.groupId} already exists`,
+        options.groupId,
+      );
+    }
+    const itemIds = [...new Set(options.itemIds)];
+    if (itemIds.length !== options.itemIds.length || itemIds.length < 2) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_INVALID',
+        'A LinkGroup requires at least two unique Items',
+        options.groupId,
+      );
+    }
+    const items = itemIds.map(id => itemIn(project, id));
+    let sequenceId: string | undefined;
+    for (const item of items) {
+      const track = trackIn(project, item.trackId);
+      assertUnlocked(track);
+      if (item.linkGroupId !== undefined) {
+        throw commandError(
+          'COMMAND_ITEM_ALREADY_LINKED',
+          `Item ${item.id} already belongs to LinkGroup ${item.linkGroupId}`,
+          item.id,
+        );
+      }
+      sequenceId ??= track.sequenceId;
+      if (track.sequenceId !== sequenceId) {
+        throw commandError(
+          'COMMAND_LINK_GROUP_SEQUENCE_MISMATCH',
+          'A LinkGroup cannot span Sequences',
+          options.groupId,
+        );
+      }
+    }
+    const anchorStartUs = items[0]?.range.startUs ?? 0;
+    const group: JsonObject = {
+      id: options.groupId,
+      kind: options.kind ?? 'edit-group',
+      itemIds,
+      ...((options.kind ?? 'edit-group') === 'av-sync'
+        ? {
+            syncOffsetsUs: Object.fromEntries(
+              items.map(item => [item.id, item.range.startUs - anchorStartUs]),
+            ),
+          }
+        : {}),
+    };
+    return this.#host.edit(commandEditOptions(options, 'Link items'), transaction => {
+      transaction.createEntity('linkGroups', options.groupId, group);
+      for (const item of items) {
+        transaction.setField('items', item.id, ['linkGroupId'], options.groupId);
+      }
+    });
+  }
+
+  public unlinkItems(options: UnlinkItemsOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const group = project.linkGroups[options.groupId];
+    if (group === undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MISSING',
+        `LinkGroup ${options.groupId} does not exist`,
+        options.groupId,
+      );
+    }
+    const selected =
+      options.itemIds === undefined ? [...group.itemIds] : [...new Set(options.itemIds)];
+    if (selected.length === 0 || selected.some(id => !group.itemIds.includes(id))) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MEMBER_MISSING',
+        `Every unlinked Item must belong to LinkGroup ${group.id}`,
+        group.id,
+      );
+    }
+    const remaining = group.itemIds.filter(id => !selected.includes(id));
+    const removed = remaining.length < 2 ? [...group.itemIds] : selected;
+    for (const id of removed) {
+      const item = itemIn(project, id);
+      assertUnlocked(trackIn(project, item.trackId));
+    }
+    return this.#host.edit(commandEditOptions(options, 'Unlink items'), transaction => {
+      for (const id of removed) transaction.removeField('items', id, ['linkGroupId']);
+      if (remaining.length < 2) {
+        transaction.deleteEntity('linkGroups', group.id);
+      } else {
+        for (const id of selected) {
+          transaction.listRemove('linkGroups', group.id, ['itemIds'], id);
+          if (group.syncOffsetsUs !== undefined && Object.hasOwn(group.syncOffsetsUs, id)) {
+            transaction.removeField('linkGroups', group.id, ['syncOffsetsUs', id]);
+          }
+        }
+      }
+    });
+  }
+
+  public moveLinkedGroup(options: MoveLinkedGroupOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const group = project.linkGroups[options.groupId];
+    if (group === undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MISSING',
+        `LinkGroup ${options.groupId} does not exist`,
+        options.groupId,
+      );
+    }
+    assertTimeDelta(options.deltaUs, 'deltaUs');
+    if (options.deltaUs === 0) {
+      throw commandError('COMMAND_NO_CHANGE', 'Linked move deltaUs cannot be zero', group.id);
+    }
+    const items = group.itemIds.map(id => itemIn(project, id));
+    for (const item of items) {
+      assertUnlocked(trackIn(project, item.trackId));
+      if (item.range.startUs + options.deltaUs < 0) {
+        throw commandError(
+          'COMMAND_MOVE_OUT_OF_RANGE',
+          `Linked move would place Item ${item.id} before Sequence time zero`,
+          item.id,
+        );
+      }
+    }
+    const ids = new Set(group.itemIds);
+    const transitions = Object.values(project.transitions).filter(
+      value => ids.has(value.fromItemId) || ids.has(value.toItemId),
+    );
+    for (const transition of transitions) {
+      if (!ids.has(transition.fromItemId) || !ids.has(transition.toItemId)) {
+        throw commandError(
+          'COMMAND_TRANSITION_LINK_GROUP_CONFLICT',
+          `Transition ${transition.id} crosses the LinkGroup boundary`,
+          transition.id,
+        );
+      }
+      if (transition.range.startUs + options.deltaUs < 0) {
+        throw commandError(
+          'COMMAND_MOVE_OUT_OF_RANGE',
+          `Linked move would place Transition ${transition.id} before Sequence time zero`,
+          transition.id,
+        );
+      }
+    }
+    return this.#host.edit(commandEditOptions(options, 'Move linked group'), transaction => {
+      for (const item of items) {
+        transaction.setField(
+          'items',
+          item.id,
+          ['range', 'startUs'],
+          item.range.startUs + options.deltaUs,
+        );
+      }
+      for (const transition of transitions) {
+        transaction.setField(
+          'transitions',
+          transition.id,
+          ['range', 'startUs'],
+          transition.range.startUs + options.deltaUs,
+        );
+      }
+    });
+  }
+
+  public trimLinkedGroup(options: TrimLinkedGroupOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const group = project.linkGroups[options.groupId];
+    if (group === undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MISSING',
+        `LinkGroup ${options.groupId} does not exist`,
+        options.groupId,
+      );
+    }
+    if (!Number.isSafeInteger(options.amountUs) || options.amountUs <= 0) {
+      throw commandError('COMMAND_TIME_INVALID', 'amountUs must be a positive safe integer');
+    }
+    const items = group.itemIds.map(id => itemIn(project, id));
+    const updates = items.map(item => {
+      assertUnlocked(trackIn(project, item.trackId));
+      if (containsAnimation(item)) {
+        throw commandError(
+          'COMMAND_TRIM_ANIMATION_UNSUPPORTED',
+          `Item ${item.id} contains animation; an explicit keyframe trim policy is required`,
+          item.id,
+        );
+      }
+      if (options.amountUs >= item.range.durationUs) {
+        throw commandError(
+          'COMMAND_TRIM_OUT_OF_RANGE',
+          `Linked trim would empty Item ${item.id}`,
+          item.id,
+        );
+      }
+      return {
+        item,
+        range: trimmedSourceRange(item, options.edge, options.amountUs),
+      };
+    });
+    const ids = new Set(group.itemIds);
+    for (const transition of Object.values(project.transitions)) {
+      if (!ids.has(transition.fromItemId) && !ids.has(transition.toItemId)) continue;
+      if (!ids.has(transition.fromItemId) || !ids.has(transition.toItemId)) {
+        throw commandError(
+          'COMMAND_TRANSITION_LINK_GROUP_CONFLICT',
+          `Transition ${transition.id} crosses the LinkGroup boundary`,
+          transition.id,
+        );
+      }
+      const transitionEnd = transition.range.startUs + transition.range.durationUs;
+      for (const { item } of updates) {
+        if (transition.fromItemId !== item.id && transition.toItemId !== item.id) continue;
+        const itemStart = item.range.startUs + (options.edge === 'start' ? options.amountUs : 0);
+        const itemEnd =
+          item.range.startUs +
+          item.range.durationUs -
+          (options.edge === 'end' ? options.amountUs : 0);
+        if (transition.range.startUs < itemStart || transitionEnd > itemEnd) {
+          throw commandError(
+            'COMMAND_TRIM_TRANSITION_CONFLICT',
+            `Linked trim would remove part of Transition ${transition.id}`,
+            transition.id,
+          );
+        }
+      }
+    }
+    return this.#host.edit(commandEditOptions(options, 'Trim linked group'), transaction => {
+      for (const { item, range } of updates) {
+        if (options.edge === 'start') {
+          transaction.setField(
+            'items',
+            item.id,
+            ['range', 'startUs'],
+            item.range.startUs + options.amountUs,
+          );
+        }
+        transaction.setField(
+          'items',
+          item.id,
+          ['range', 'durationUs'],
+          item.range.durationUs - options.amountUs,
+        );
+        setSourceRange(transaction, item, range);
+      }
+    });
+  }
+
+  public removeLinkedGroup(options: RemoveLinkedGroupOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const group = project.linkGroups[options.groupId];
+    if (group === undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MISSING',
+        `LinkGroup ${options.groupId} does not exist`,
+        options.groupId,
+      );
+    }
+    const items = group.itemIds.map(id => itemIn(project, id));
+    for (const item of items) assertUnlocked(trackIn(project, item.trackId));
+    return this.#host.edit(commandEditOptions(options, 'Remove linked group'), transaction => {
+      const removedTransitions = new Set<string>();
+      for (const item of items) {
+        // appendRemoveItem owns all Item resources. Avoid duplicate Transition
+        // deletes when both endpoints are members by filtering the immutable snapshot.
+        for (const transition of Object.values(project.transitions)) {
+          if (
+            removedTransitions.has(transition.id) ||
+            (transition.fromItemId !== item.id && transition.toItemId !== item.id)
+          ) {
+            continue;
+          }
+          removedTransitions.add(transition.id);
+        }
+      }
+      for (const transitionId of removedTransitions) {
+        const transition = project.transitions[transitionId];
+        if (transition === undefined) continue;
+        transaction.listRemove(
+          'sequences',
+          transition.sequenceId,
+          ['transitionIds'],
+          transition.id,
+        );
+        transaction.deleteEntity('transitions', transition.id);
+        transaction.deleteEntity('materialInstances', transition.materialInstanceId);
+      }
+      const projectWithoutTransitions = {
+        ...project,
+        transitions: Object.fromEntries(
+          Object.entries(project.transitions).filter(([id]) => !removedTransitions.has(id)),
+        ),
+      } as Readonly<AelionProject>;
+      for (const item of items)
+        appendRemoveItem(projectWithoutTransitions, item, transaction, true);
+      transaction.deleteEntity('linkGroups', group.id);
+    });
+  }
+
+  public splitLinkedGroup(options: SplitLinkedGroupOptions): SplitLinkedGroupResult {
+    const project = this.#host.getSnapshot();
+    const group = project.linkGroups[options.groupId];
+    if (group === undefined) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_MISSING',
+        `LinkGroup ${options.groupId} does not exist`,
+        options.groupId,
+      );
+    }
+    if (
+      project.linkGroups[options.rightGroupId] !== undefined ||
+      options.rightGroupId === group.id
+    ) {
+      throw commandError(
+        'COMMAND_LINK_GROUP_EXISTS',
+        `LinkGroup ${options.rightGroupId} already exists`,
+        options.rightGroupId,
+      );
+    }
+    assertTime(options.atUs, 'atUs');
+    const mappedIds = Object.keys(options.rightItemIds);
+    if (
+      mappedIds.length !== group.itemIds.length ||
+      group.itemIds.some(id => typeof options.rightItemIds[id] !== 'string')
+    ) {
+      throw commandError(
+        'COMMAND_SPLIT_GROUP_MAPPING_INVALID',
+        'rightItemIds must map every LinkGroup member exactly once',
+        group.id,
+      );
+    }
+    const rightIds = group.itemIds.map(id => {
+      const value = options.rightItemIds[id];
+      if (value === undefined) {
+        throw commandError(
+          'COMMAND_SPLIT_GROUP_MAPPING_INVALID',
+          `Missing right Item ID for ${id}`,
+        );
+      }
+      return value;
+    });
+    const rightIdAt = (index: number): string => {
+      const value = rightIds[index];
+      if (value === undefined) throw new RangeError('Right Item index is outside the group');
+      return value;
+    };
+    if (
+      new Set(rightIds).size !== rightIds.length ||
+      rightIds.some(id => project.items[id] !== undefined || group.itemIds.includes(id))
+    ) {
+      throw commandError(
+        'COMMAND_ITEM_EXISTS',
+        'Every right-side Item ID must be new and unique',
+        group.id,
+      );
+    }
+    const split = group.itemIds.map((id, index) => {
+      const item = itemIn(project, id);
+      const track = trackIn(project, item.trackId);
+      assertUnlocked(track);
+      const endUs = item.range.startUs + item.range.durationUs;
+      if (options.atUs <= item.range.startUs || options.atUs >= endUs) {
+        throw commandError(
+          'COMMAND_SPLIT_OUT_OF_RANGE',
+          `Split point must be inside every linked Item; ${item.id} does not contain it`,
+          item.id,
+        );
+      }
+      if (
+        item.materialInstanceIds.length > 0 ||
+        (item.markerIds?.length ?? 0) > 0 ||
+        containsAnimation(item)
+      ) {
+        throw commandError(
+          'COMMAND_SPLIT_OWNED_ENTITY_UNSUPPORTED',
+          `Linked Item ${item.id} requires an explicit owned-entity split policy`,
+          item.id,
+        );
+      }
+      const leftDurationUs = options.atUs - item.range.startUs;
+      const sourceRanges = splitSourceRanges(item, leftDurationUs);
+      const right = structuredClone(item);
+      right.id = rightIdAt(index);
+      right.linkGroupId = options.rightGroupId;
+      right.range = { startUs: options.atUs, durationUs: endUs - options.atUs };
+      const rightSource = sourceRanges?.right;
+      if (rightSource !== undefined) {
+        const range = asObject(asObject(right.source)?.sourceRange);
+        if (range !== undefined) {
+          range.startUs = rightSource.startUs;
+          range.durationUs = rightSource.durationUs;
+        }
+      }
+      return { item, track, leftDurationUs, sourceRanges, right };
+    });
+    for (const transition of Object.values(project.transitions)) {
+      const transitionEnd = transition.range.startUs + transition.range.durationUs;
+      if (
+        (group.itemIds.includes(transition.fromItemId) ||
+          group.itemIds.includes(transition.toItemId)) &&
+        options.atUs > transition.range.startUs &&
+        options.atUs < transitionEnd
+      ) {
+        throw commandError(
+          'COMMAND_SPLIT_TRANSITION_CONFLICT',
+          `Split point intersects Transition ${transition.id}`,
+          transition.id,
+        );
+      }
+    }
+    const rightGroup: JsonObject = {
+      id: options.rightGroupId,
+      kind: group.kind,
+      itemIds: rightIds,
+      ...(group.syncOffsetsUs === undefined
+        ? {}
+        : {
+            syncOffsetsUs: Object.fromEntries(
+              group.itemIds.map((_id, index) => [rightIdAt(index), 0]),
+            ),
+          }),
+    };
+    const commit = this.#host.edit(
+      commandEditOptions(options, 'Split linked group'),
+      transaction => {
+        for (const entry of split) {
+          transaction.setField(
+            'items',
+            entry.item.id,
+            ['range', 'durationUs'],
+            entry.leftDurationUs,
+          );
+          setSourceRange(transaction, entry.item, entry.sourceRanges?.left);
+          transaction.createEntity('items', entry.right.id, entry.right);
+          const itemIndex = entry.track.itemIds.indexOf(entry.item.id);
+          transaction.listInsert(
+            'tracks',
+            entry.track.id,
+            ['itemIds'],
+            entry.right.id,
+            entry.track.itemIds[itemIndex + 1],
+          );
+        }
+        transaction.createEntity('linkGroups', options.rightGroupId, rightGroup);
+        for (const transition of Object.values(project.transitions)) {
+          if (transition.range.startUs < options.atUs) continue;
+          const fromIndex = group.itemIds.indexOf(transition.fromItemId);
+          const toIndex = group.itemIds.indexOf(transition.toItemId);
+          if (fromIndex >= 0) {
+            transaction.setField(
+              'transitions',
+              transition.id,
+              ['fromItemId'],
+              rightIdAt(fromIndex),
+            );
+          }
+          if (toIndex >= 0) {
+            transaction.setField('transitions', transition.id, ['toItemId'], rightIdAt(toIndex));
+          }
+        }
+      },
+    );
+    return {
+      commit,
+      leftGroupId: group.id,
+      rightGroupId: options.rightGroupId,
+      rightItemIds: { ...options.rightItemIds },
+    };
+  }
+
+  public slipItem(options: SlipItemOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const item = itemIn(project, options.itemId);
+    assertUnlocked(trackIn(project, item.trackId));
+    if (item.linkGroupId !== undefined) {
+      throw commandError(
+        'COMMAND_LINKED_EDIT_REQUIRES_GROUP',
+        `Item ${item.id} is linked; use a LinkGroup edit or unlink it first`,
+        item.id,
+      );
+    }
+    assertTimeDelta(options.deltaSourceUs, 'deltaSourceUs');
+    if (options.deltaSourceUs === 0) {
+      throw commandError('COMMAND_NO_CHANGE', 'Slip deltaSourceUs cannot be zero', item.id);
+    }
+    const source = asObject(item.source);
+    const sourceRange = asObject(source?.sourceRange);
+    const mapping = asObject(source?.timeMapping);
+    if (
+      sourceRange === undefined ||
+      mapping === undefined ||
+      typeof sourceRange.startUs !== 'number' ||
+      typeof sourceRange.durationUs !== 'number'
+    ) {
+      throw commandError(
+        'COMMAND_TIME_MAPPING_UNSUPPORTED',
+        `Item ${item.id} does not have a media TimeMap`,
+        item.id,
+      );
+    }
+    const shiftedRange = {
+      startUs: sourceRange.startUs + options.deltaSourceUs,
+      durationUs: sourceRange.durationUs,
+    };
+    assertSourceRange(project, item, shiftedRange);
+    const curvePoints =
+      mapping.type === 'curve' && Array.isArray(mapping.points)
+        ? mapping.points.map(value => asObject(value))
+        : undefined;
+    if (mapping.type !== 'linear' && curvePoints === undefined) {
+      throw commandError(
+        'COMMAND_TIME_MAPPING_UNSUPPORTED',
+        `Item ${item.id} has an unsupported TimeMap`,
+        item.id,
+      );
+    }
+    if (
+      curvePoints?.some(point => point === undefined || typeof point.sourceTimeUs !== 'number') ===
+      true
+    ) {
+      throw commandError(
+        'COMMAND_TIME_MAPPING_UNSUPPORTED',
+        `Item ${item.id} has an invalid curve TimeMap`,
+        item.id,
+      );
+    }
+    return this.#host.edit(commandEditOptions(options, 'Slip item'), transaction => {
+      transaction.setField(
+        'items',
+        item.id,
+        ['source', 'sourceRange', 'startUs'],
+        shiftedRange.startUs,
+      );
+      if (curvePoints !== undefined) {
+        transaction.setField(
+          'items',
+          item.id,
+          ['source', 'timeMapping', 'points'],
+          curvePoints.map(point => ({
+            ...point,
+            sourceTimeUs: (point?.sourceTimeUs as number) + options.deltaSourceUs,
+          })) as JsonValue,
+        );
+      }
+    });
+  }
+
+  public rollEdit(options: RollEditOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const left = itemIn(project, options.leftItemId);
+    const right = itemIn(project, options.rightItemId);
+    if (left.trackId !== right.trackId) {
+      throw commandError('COMMAND_ROLL_TRACK_MISMATCH', 'Roll Items must share one Track');
+    }
+    assertProfessionalEditItems(project, [left, right]);
+    assertTime(options.toUs, 'toUs');
+    const boundaryUs = left.range.startUs + left.range.durationUs;
+    if (boundaryUs !== right.range.startUs) {
+      throw commandError(
+        'COMMAND_ROLL_ITEMS_NOT_ADJACENT',
+        'Roll Items must share an exact half-open boundary',
+      );
+    }
+    if (
+      options.toUs <= left.range.startUs ||
+      options.toUs >= right.range.startUs + right.range.durationUs
+    ) {
+      throw commandError('COMMAND_ROLL_OUT_OF_RANGE', 'Roll boundary would empty an Item');
+    }
+    const deltaUs = options.toUs - boundaryUs;
+    if (deltaUs === 0) throw commandError('COMMAND_NO_CHANGE', 'Roll boundary is unchanged');
+    const leftSource = adjustedLinearSourceRange(project, left, 'end', deltaUs);
+    const rightSource = adjustedLinearSourceRange(project, right, 'start', deltaUs);
+    return this.#host.edit(commandEditOptions(options, 'Roll edit'), transaction => {
+      transaction.setField(
+        'items',
+        left.id,
+        ['range', 'durationUs'],
+        left.range.durationUs + deltaUs,
+      );
+      transaction.setField('items', right.id, ['range', 'startUs'], options.toUs);
+      transaction.setField(
+        'items',
+        right.id,
+        ['range', 'durationUs'],
+        right.range.durationUs - deltaUs,
+      );
+      setSourceRange(transaction, left, leftSource);
+      setSourceRange(transaction, right, rightSource);
+    });
+  }
+
+  public slideItem(options: SlideItemOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const item = itemIn(project, options.itemId);
+    assertTimeDelta(options.deltaUs, 'deltaUs');
+    if (options.deltaUs === 0) throw commandError('COMMAND_NO_CHANGE', 'Slide deltaUs is zero');
+    const track = trackIn(project, item.trackId);
+    const left = track.itemIds
+      .map(id => project.items[id])
+      .find(
+        value =>
+          value !== undefined &&
+          value.range.startUs + value.range.durationUs === item.range.startUs,
+      );
+    const itemEndUs = item.range.startUs + item.range.durationUs;
+    const right = track.itemIds
+      .map(id => project.items[id])
+      .find(value => value !== undefined && value.range.startUs === itemEndUs);
+    if (left === undefined || right === undefined) {
+      throw commandError(
+        'COMMAND_SLIDE_NEIGHBOR_MISSING',
+        `Item ${item.id} requires adjacent left and right Items`,
+        item.id,
+      );
+    }
+    assertProfessionalEditItems(project, [left, item, right]);
+    if (
+      left.range.durationUs + options.deltaUs < 1 ||
+      right.range.durationUs - options.deltaUs < 1
+    ) {
+      throw commandError('COMMAND_SLIDE_OUT_OF_RANGE', 'Slide would empty an adjacent Item');
+    }
+    const leftSource = adjustedLinearSourceRange(project, left, 'end', options.deltaUs);
+    const rightSource = adjustedLinearSourceRange(project, right, 'start', options.deltaUs);
+    return this.#host.edit(commandEditOptions(options, 'Slide item'), transaction => {
+      transaction.setField(
+        'items',
+        left.id,
+        ['range', 'durationUs'],
+        left.range.durationUs + options.deltaUs,
+      );
+      transaction.setField(
+        'items',
+        item.id,
+        ['range', 'startUs'],
+        item.range.startUs + options.deltaUs,
+      );
+      transaction.setField(
+        'items',
+        right.id,
+        ['range', 'startUs'],
+        right.range.startUs + options.deltaUs,
+      );
+      transaction.setField(
+        'items',
+        right.id,
+        ['range', 'durationUs'],
+        right.range.durationUs - options.deltaUs,
+      );
+      setSourceRange(transaction, left, leftSource);
+      setSourceRange(transaction, right, rightSource);
+    });
+  }
+
+  public addMarker(options: AddMarkerOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const marker = options.marker;
+    if (project.markers[marker.id] !== undefined) {
+      throw commandError('COMMAND_MARKER_EXISTS', `Marker ${marker.id} already exists`, marker.id);
+    }
+    assertTime(marker.timeUs, 'marker.timeUs');
+    assertTime(marker.durationUs, 'marker.durationUs');
+    let sequenceId: string;
+    let item: ItemEntity | undefined;
+    if (marker.owner.type === 'sequence') {
+      if (project.sequences[marker.owner.id] === undefined) {
+        throw commandError(
+          'COMMAND_MARKER_OWNER_MISSING',
+          `Sequence ${marker.owner.id} does not exist`,
+          marker.id,
+        );
+      }
+      sequenceId = marker.owner.id;
+    } else {
+      item = itemIn(project, marker.owner.id);
+      const track = trackIn(project, item.trackId);
+      assertUnlocked(track);
+      sequenceId = track.sequenceId;
+      if (marker.timeUs + marker.durationUs > item.range.durationUs) {
+        throw commandError(
+          'COMMAND_MARKER_OUT_OF_RANGE',
+          `Marker ${marker.id} exceeds Item ${item.id}`,
+          marker.id,
+        );
+      }
+    }
+    const sequence = project.sequences[sequenceId];
+    if (sequence === undefined) throw commandError('COMMAND_SEQUENCE_MISSING', sequenceId);
+    return this.#host.edit(commandEditOptions(options, 'Add marker'), transaction => {
+      transaction.createEntity('markers', marker.id, marker);
+      transaction.listInsert('sequences', sequence.id, ['markerIds'], marker.id);
+      if (item !== undefined) {
+        if (item.markerIds === undefined) {
+          transaction.setField('items', item.id, ['markerIds'], [marker.id]);
+        } else {
+          transaction.listInsert('items', item.id, ['markerIds'], marker.id);
+        }
+      }
+    });
+  }
+
+  public updateMarker(options: UpdateMarkerOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const marker = project.markers[options.markerId];
+    if (marker === undefined) {
+      throw commandError(
+        'COMMAND_MARKER_MISSING',
+        `Marker ${options.markerId} does not exist`,
+        options.markerId,
+      );
+    }
+    const timeUs = options.timeUs ?? marker.timeUs;
+    const durationUs = options.durationUs ?? marker.durationUs;
+    assertTime(timeUs, 'timeUs');
+    assertTime(durationUs, 'durationUs');
+    if (marker.owner.type === 'item') {
+      const item = itemIn(project, marker.owner.id);
+      assertUnlocked(trackIn(project, item.trackId));
+      if (timeUs + durationUs > item.range.durationUs) {
+        throw commandError(
+          'COMMAND_MARKER_OUT_OF_RANGE',
+          `Marker ${marker.id} exceeds Item ${item.id}`,
+          marker.id,
+        );
+      }
+    }
+    return this.#host.edit(commandEditOptions(options, 'Update marker'), transaction => {
+      if (options.timeUs !== undefined) {
+        transaction.setField('markers', marker.id, ['timeUs'], options.timeUs);
+      }
+      if (options.durationUs !== undefined) {
+        transaction.setField('markers', marker.id, ['durationUs'], options.durationUs);
+      }
+      for (const [property, optionProperty] of [
+        ['label', 'markerLabel'],
+        ['color', 'markerColor'],
+      ] as const) {
+        const value = options[optionProperty];
+        if (value === undefined) continue;
+        if (value === null) {
+          if (marker[property] !== undefined)
+            transaction.removeField('markers', marker.id, [property]);
+        } else {
+          transaction.setField('markers', marker.id, [property], value);
+        }
+      }
+      if (Object.hasOwn(options, 'payload')) {
+        transaction.setField('markers', marker.id, ['payload'], options.payload ?? null);
+      }
+    });
+  }
+
+  public removeMarker(options: RemoveMarkerOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const marker = project.markers[options.markerId];
+    if (marker === undefined) {
+      throw commandError(
+        'COMMAND_MARKER_MISSING',
+        `Marker ${options.markerId} does not exist`,
+        options.markerId,
+      );
+    }
+    const sequenceId =
+      marker.owner.type === 'sequence'
+        ? marker.owner.id
+        : trackIn(project, itemIn(project, marker.owner.id).trackId).sequenceId;
+    const sequence = project.sequences[sequenceId];
+    return this.#host.edit(commandEditOptions(options, 'Remove marker'), transaction => {
+      if (sequence?.markerIds.includes(marker.id) === true) {
+        transaction.listRemove('sequences', sequence.id, ['markerIds'], marker.id);
+      }
+      if (marker.owner.type === 'item') {
+        const item = itemIn(project, marker.owner.id);
+        if (item.markerIds?.includes(marker.id) === true) {
+          transaction.listRemove('items', item.id, ['markerIds'], marker.id);
+        }
+      }
+      transaction.deleteEntity('markers', marker.id);
+    });
+  }
+
+  public setSelectionMetadata(options: SetSelectionMetadataOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const sequence = project.sequences[options.sequenceId];
+    if (sequence === undefined) {
+      throw commandError(
+        'COMMAND_SEQUENCE_MISSING',
+        `Sequence ${options.sequenceId} does not exist`,
+      );
+    }
+    const itemIds = [...new Set(options.itemIds)];
+    if (itemIds.length !== options.itemIds.length) {
+      throw commandError('COMMAND_SELECTION_INVALID', 'Selection Item IDs must be unique');
+    }
+    for (const id of itemIds) {
+      const item = itemIn(project, id);
+      if (trackIn(project, item.trackId).sequenceId !== sequence.id) {
+        throw commandError(
+          'COMMAND_SELECTION_SEQUENCE_MISMATCH',
+          `Item ${id} does not belong to Sequence ${sequence.id}`,
+          id,
+        );
+      }
+    }
+    if (options.range !== undefined) {
+      assertTime(options.range.startUs, 'range.startUs');
+      assertTime(options.range.durationUs, 'range.durationUs');
+    }
+    const extensions = asObject(sequence.extensions) ?? {};
+    return this.#host.edit(commandEditOptions(options, 'Set selection metadata'), transaction => {
+      transaction.setField('sequences', sequence.id, ['extensions'], {
+        ...extensions,
+        'aelion.selection': {
+          itemIds,
+          ...(options.range === undefined ? {} : { range: options.range }),
+        },
+      });
+    });
+  }
+
   public reorderTrack(options: ReorderTrackOptions): TransactionCommit {
     const project = this.#host.getSnapshot();
     const sequence = project.sequences[options.sequenceId];
@@ -675,6 +1907,20 @@ export class EditingCommands {
     }
     return this.#host.edit(commandEditOptions(options, 'Set track mute'), transaction => {
       transaction.setField('tracks', options.trackId, ['audio', 'muted'], options.value);
+    });
+  }
+
+  public setTrackSolo(options: SetTrackFlagOptions): TransactionCommit {
+    const track = trackIn(this.#host.getSnapshot(), options.trackId);
+    if (track.kind !== 'audio' || asObject(track.audio) === undefined) {
+      throw commandError(
+        'COMMAND_TRACK_AUDIO_REQUIRED',
+        `Track ${track.id} is not an audio Track with mixer properties`,
+        track.id,
+      );
+    }
+    return this.#host.edit(commandEditOptions(options, 'Set track solo'), transaction => {
+      transaction.setField('tracks', options.trackId, ['audio', 'solo'], options.value);
     });
   }
 }

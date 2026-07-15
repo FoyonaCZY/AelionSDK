@@ -284,14 +284,155 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
         diagnostics,
       ),
     );
-    if (item.linkGroupId !== undefined) {
-      requireReference(
-        project.linkGroups,
-        item.linkGroupId,
-        'linkGroups',
-        ['items', item.id, 'linkGroupId'],
-        diagnostics,
+    if (item.type === 'adjustment' && item.materialInstanceIds.length === 0) {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_ADJUSTMENT_EMPTY',
+          `Adjustment Item ${item.id} must own at least one Material`,
+          ['items', item.id, 'materialInstanceIds'],
+          item.id,
+        ),
       );
+    }
+    if (item.type === 'nested-sequence') {
+      const source = item.source as { readonly sequenceId?: unknown } | undefined;
+      if (typeof source?.sequenceId === 'string') {
+        requireReference(
+          project.sequences,
+          source.sequenceId,
+          'sequences',
+          ['items', item.id, 'source', 'sequenceId'],
+          diagnostics,
+        );
+      }
+    }
+    if (item.type === 'image') {
+      const source = item.source as { readonly stream?: { readonly type?: unknown } } | undefined;
+      if (source?.stream?.type !== 'video') {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_IMAGE_STREAM_INVALID',
+            `Image Item ${item.id} must use the visual stream adapter`,
+            ['items', item.id, 'source', 'stream', 'type'],
+            item.id,
+          ),
+        );
+      }
+    }
+    const visual = (item as { readonly visual?: unknown }).visual;
+    if (visual !== null && typeof visual === 'object' && !Array.isArray(visual)) {
+      const mask: unknown = Reflect.get(visual, 'mask');
+      if (mask !== null && typeof mask === 'object' && !Array.isArray(mask)) {
+        const sourceItemId: unknown = Reflect.get(mask, 'sourceItemId');
+        if (typeof sourceItemId === 'string') {
+          const exists = requireReference(
+            project.items,
+            sourceItemId,
+            'items',
+            ['items', item.id, 'visual', 'mask', 'sourceItemId'],
+            diagnostics,
+          );
+          const sourceTrackId = project.items[sourceItemId]?.trackId;
+          const ownerSequenceId = project.tracks[item.trackId]?.sequenceId;
+          const sourceSequenceId =
+            sourceTrackId === undefined ? undefined : project.tracks[sourceTrackId]?.sequenceId;
+          if (exists && (sourceItemId === item.id || sourceSequenceId !== ownerSequenceId)) {
+            diagnostics.push(
+              semanticDiagnostic(
+                'PROJECT_MASK_SOURCE_INVALID',
+                `Mask source ${sourceItemId} must be another Item in the same Sequence`,
+                ['items', item.id, 'visual', 'mask', 'sourceItemId'],
+                item.id,
+              ),
+            );
+          }
+        }
+      }
+    }
+    if (item.linkGroupId !== undefined) {
+      if (
+        requireReference(
+          project.linkGroups,
+          item.linkGroupId,
+          'linkGroups',
+          ['items', item.id, 'linkGroupId'],
+          diagnostics,
+        ) &&
+        !project.linkGroups[item.linkGroupId]?.itemIds.includes(item.id)
+      ) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_LINK_GROUP_BACKREF_MISSING',
+            `LinkGroup ${item.linkGroupId} does not contain Item ${item.id}`,
+            ['items', item.id, 'linkGroupId'],
+            item.id,
+          ),
+        );
+      }
+    }
+  }
+
+  for (const group of Object.values(project.linkGroups)) {
+    validateUniqueList(group.itemIds, ['linkGroups', group.id, 'itemIds'], diagnostics);
+    if (group.itemIds.length < 2) {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_LINK_GROUP_TOO_SMALL',
+          `LinkGroup ${group.id} must contain at least two Items`,
+          ['linkGroups', group.id, 'itemIds'],
+          group.id,
+        ),
+      );
+    }
+    let sequenceId: string | undefined;
+    group.itemIds.forEach((id, index) => {
+      if (
+        !requireReference(
+          project.items,
+          id,
+          'items',
+          ['linkGroups', group.id, 'itemIds', index],
+          diagnostics,
+        )
+      ) {
+        return;
+      }
+      const item = project.items[id];
+      if (item?.linkGroupId !== group.id) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_LINK_GROUP_BACKREF_MISSING',
+            `Item ${id} does not reference LinkGroup ${group.id}`,
+            ['linkGroups', group.id, 'itemIds', index],
+            id,
+          ),
+        );
+      }
+      const itemSequenceId =
+        item === undefined ? undefined : project.tracks[item.trackId]?.sequenceId;
+      if (sequenceId === undefined) sequenceId = itemSequenceId;
+      else if (itemSequenceId !== undefined && itemSequenceId !== sequenceId) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_LINK_GROUP_SEQUENCE_MISMATCH',
+            `LinkGroup ${group.id} cannot span Sequences`,
+            ['linkGroups', group.id, 'itemIds', index],
+            group.id,
+          ),
+        );
+      }
+    });
+    for (const id of Object.keys(group.syncOffsetsUs ?? {})) {
+      if (!group.itemIds.includes(id)) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_LINK_GROUP_OFFSET_ORPHAN',
+            `LinkGroup ${group.id} has an offset for non-member ${id}`,
+            ['linkGroups', group.id, 'syncOffsetsUs', id],
+            group.id,
+          ),
+        );
+      }
     }
   }
 
@@ -332,6 +473,47 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
       diagnostics,
     );
   }
+}
+
+function validateNestedSequenceCycles(project: AelionProject, diagnostics: DiagnosticSink): void {
+  const edges = new Map<string, { readonly itemId: string; readonly target: string }[]>();
+  for (const item of Object.values(project.items)) {
+    if (item.type !== 'nested-sequence') continue;
+    const owner = project.tracks[item.trackId]?.sequenceId;
+    const source = item.source as { readonly sequenceId?: unknown } | undefined;
+    if (owner === undefined || typeof source?.sequenceId !== 'string') continue;
+    const values = edges.get(owner);
+    const edge = { itemId: item.id, target: source.sequenceId };
+    if (values === undefined) edges.set(owner, [edge]);
+    else values.push(edge);
+  }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const stack: string[] = [];
+  const visit = (sequenceId: string): void => {
+    if (visited.has(sequenceId)) return;
+    visiting.add(sequenceId);
+    stack.push(sequenceId);
+    for (const edge of edges.get(sequenceId) ?? []) {
+      if (visiting.has(edge.target)) {
+        const cycleStart = stack.indexOf(edge.target);
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_NESTED_SEQUENCE_CYCLE',
+            `Nested Sequence cycle: ${[...stack.slice(cycleStart), edge.target].join(' -> ')}`,
+            ['items', edge.itemId, 'source', 'sequenceId'],
+            edge.itemId,
+          ),
+        );
+      } else {
+        visit(edge.target);
+      }
+    }
+    stack.pop();
+    visiting.delete(sequenceId);
+    visited.add(sequenceId);
+  };
+  for (const sequenceId of Object.keys(project.sequences)) visit(sequenceId);
 }
 
 function validateMaterialOwnership(project: AelionProject, diagnostics: DiagnosticSink): void {
@@ -452,29 +634,88 @@ function validateVisualTransitionOverlap(
   }
 }
 
-function validateAlphaAudioSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
+function validateTimeMappingSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
   for (const item of Object.values(project.items)) {
-    if (item.type !== 'audio') continue;
+    if (item.type !== 'video' && item.type !== 'audio' && item.type !== 'nested-sequence') continue;
     const source = item.source as {
       readonly timeMapping?: {
         readonly type?: unknown;
-        readonly rate?: { readonly numerator?: unknown; readonly denominator?: unknown };
-        readonly reverse?: unknown;
+        readonly points?: readonly {
+          readonly itemTimeUs?: unknown;
+        }[];
       };
     };
     const mapping = source.timeMapping;
-    const rate = mapping?.rate;
-    if (
-      mapping?.type !== 'linear' ||
-      mapping.reverse !== false ||
-      rate?.numerator !== rate?.denominator
-    ) {
+    if (mapping?.type !== 'curve' || !Array.isArray(mapping.points)) continue;
+    const points = mapping.points as readonly unknown[];
+    const pointTime = (value: unknown): unknown =>
+      value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? Reflect.get(value, 'itemTimeUs')
+        : undefined;
+    const firstTime = pointTime(points[0]);
+    const lastTime = pointTime(points.at(-1));
+    if (firstTime !== 0 || lastTime !== item.range.durationUs) {
       diagnostics.push(
         semanticDiagnostic(
-          'PROJECT_AUDIO_TIME_MAPPING_UNSUPPORTED',
-          `Audio item ${item.id} requires forward 1x linear time mapping in this Alpha`,
-          ['items', item.id, 'source', 'timeMapping'],
+          'PROJECT_TIME_MAPPING_ENDPOINT_INVALID',
+          `Curve TimeMap for ${item.id} must start at 0 and end at the Item duration`,
+          ['items', item.id, 'source', 'timeMapping', 'points'],
           item.id,
+        ),
+      );
+    }
+    for (let index = 1; index < points.length; index += 1) {
+      const previous = pointTime(points[index - 1]);
+      const current = pointTime(points[index]);
+      if (typeof previous === 'number' && typeof current === 'number' && current <= previous) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_TIME_MAPPING_ORDER_INVALID',
+            `Curve TimeMap Item times must strictly increase for ${item.id}`,
+            ['items', item.id, 'source', 'timeMapping', 'points', index, 'itemTimeUs'],
+            item.id,
+          ),
+        );
+        break;
+      }
+    }
+  }
+}
+
+function validateAudioSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
+  for (const item of Object.values(project.items)) {
+    if (item.type !== 'audio') continue;
+    const audio = (item as { readonly audio?: { fadeInUs?: unknown; fadeOutUs?: unknown } }).audio;
+    for (const property of ['fadeInUs', 'fadeOutUs'] as const) {
+      const durationUs = audio?.[property];
+      if (typeof durationUs !== 'number' || durationUs <= item.range.durationUs) continue;
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_AUDIO_FADE_OUT_OF_RANGE',
+          `${property} for audio item ${item.id} cannot exceed the Item duration`,
+          ['items', item.id, 'audio', property],
+          item.id,
+        ),
+      );
+    }
+  }
+}
+
+function validateColorSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
+  for (const sequence of Object.values(project.sequences)) {
+    const format = sequence.format as {
+      readonly workingColorSpace?: unknown;
+      readonly transferFunction?: unknown;
+      readonly bitDepth?: unknown;
+    };
+    if (format.transferFunction !== 'pq' && format.transferFunction !== 'hlg') continue;
+    if (format.workingColorSpace !== 'rec2020-linear' || format.bitDepth !== 10) {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_HDR_FORMAT_INVALID',
+          `HDR Sequence ${sequence.id} requires rec2020-linear working space and 10-bit output`,
+          ['sequences', sequence.id, 'format'],
+          sequence.id,
         ),
       );
     }
@@ -536,8 +777,11 @@ export class ProjectValidator {
     COLLECTION_NAMES.forEach(collection => validateEntityMap(project, collection, diagnostics));
     validateReferences(project, diagnostics);
     validateMaterialOwnership(project, diagnostics);
+    validateNestedSequenceCycles(project, diagnostics);
     validateVisualTransitionOverlap(project, diagnostics);
-    validateAlphaAudioSemantics(project, diagnostics);
+    validateTimeMappingSemantics(project, diagnostics);
+    validateAudioSemantics(project, diagnostics);
+    validateColorSemantics(project, diagnostics);
     return diagnostics.diagnostics.length === 0 ? ok({ project }) : err(...diagnostics.diagnostics);
   }
 }

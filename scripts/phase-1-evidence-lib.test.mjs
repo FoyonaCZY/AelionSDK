@@ -288,6 +288,11 @@ test('seek and performance validators fail closed on resource or SLO drift', () 
       warmFilmWebGl2: benchmark(30, 1),
       warmFilmWebGpu: benchmark(30, 1),
       softGlow: benchmark(12, 4),
+      fourKWebGl2: {
+        ...benchmark(3, 1),
+        label: 'Warm Film 4K WebGL2',
+        resolution: { width: 3840, height: 2160 },
+      },
     },
     export: {
       resolution: { width: 1_920, height: 1_080 },
@@ -306,7 +311,8 @@ test('seek and performance validators fail closed on resource or SLO drift', () 
         aborted: false,
       },
       mainThread: {
-        contract: 'codec-initialization-disclosed; steady-state begins at the second video frame',
+        contract:
+          'worker encoder/mux orchestration; host frame production disclosed; steady-state begins at the second video frame',
         initialization: {
           supported: true,
           startedAtMs: 10,

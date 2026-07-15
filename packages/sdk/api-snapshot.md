@@ -21,7 +21,7 @@ baseline in the same change.
     "dist/player.d.ts": "53bfc4a663ce7e3d02d5a1101c1c5bdd75a25a162a31adf85a01a7e4d8924d9f",
     "dist/runtime-material-registry.d.ts": "e74c432da12a8f5384fd133d6a30a8dd8953d38ec910ed0491e8c6018bca133b",
     "dist/session.d.ts": "0e8d6c2f2755a7efd8e3c8455d923e6c79e38725847afa3bd990e0e6b162a61f",
-    "dist/types.d.ts": "824dc1a9e1fcdb1eea633d28d3666b0ea9187735c63ff5b5d84d049fb4ad9924"
+    "dist/types.d.ts": "c02b5285b04382854236d2752f79d9c9021f51b0c4927c0b55c3827f19af7d7d"
   },
   "exports": [
     "Aelion",
@@ -40,7 +40,12 @@ baseline in the same change.
     "AelionPlayerStats",
     "AelionPreviewApi",
     "AelionPreviewOptions",
+    "AelionProfileExportJob",
+    "AelionProfileExportOptions",
+    "AelionProfileExportResult",
     "AelionProjectSchemas",
+    "AelionRemoteExportJob",
+    "AelionRemoteExportOptions",
     "AelionRuntimeMaterialRegistry",
     "AelionSession",
     "AelionSessionApi",
@@ -52,6 +57,7 @@ baseline in the same change.
     "AelionSessionState",
     "AelionSessionStats",
     "AelionTransactionApi",
+    "AelionTypedExportJob",
     "ByteMediaProvider",
     "ByteMediaProviderOptions",
     "RuntimeMaterialRegistry",

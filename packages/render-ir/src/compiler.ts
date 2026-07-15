@@ -1,4 +1,5 @@
 import { canonicalStringify, type AelionProject, type ItemEntity } from '@aelion/project-schema';
+import type { JsonObject } from '@aelion/core';
 
 import type {
   IrAudioClip,
@@ -6,6 +7,9 @@ import type {
   IrMaterialDefinition,
   IrMaterialInstance,
   IrMediaSource,
+  IrNestedSequenceSource,
+  IrTextClip,
+  IrTimeMapping,
   IrTrack,
   IrTransition,
   IrVisualProperties,
@@ -31,6 +35,10 @@ function object(value: unknown, context: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function jsonObject(value: unknown, context: string): JsonObject {
+  return object(value, context) as JsonObject;
+}
+
 function string(value: unknown, context: string): string {
   if (typeof value !== 'string') throw new TypeError(`${context} must be a string`);
   return value;
@@ -53,10 +61,6 @@ function mediaSource(item: ItemEntity): IrMediaSource {
   const stream = object(source.stream, `item ${item.id}.source.stream`);
   const sourceRange = object(source.sourceRange, `item ${item.id}.source.sourceRange`);
   const timeMapping = object(source.timeMapping, `item ${item.id}.source.timeMapping`);
-  if (timeMapping.type !== 'linear') {
-    throw new TypeError(`Phase 0 Render IR only supports linear time mapping for ${item.id}`);
-  }
-  const rate = object(timeMapping.rate, `item ${item.id}.source.timeMapping.rate`);
   const streamType = string(stream.type, 'stream.type');
   if (streamType !== 'video' && streamType !== 'audio') {
     throw new TypeError(`Unsupported stream type ${streamType}`);
@@ -64,6 +68,38 @@ function mediaSource(item: ItemEntity): IrMediaSource {
   const boundary = string(timeMapping.boundary, 'timeMapping.boundary');
   if (!['error', 'hold', 'loop', 'transparent'].includes(boundary)) {
     throw new TypeError(`Unsupported boundary ${boundary}`);
+  }
+  let compiledTimeMapping: IrTimeMapping;
+  if (timeMapping.type === 'linear') {
+    const rate = object(timeMapping.rate, `item ${item.id}.source.timeMapping.rate`);
+    compiledTimeMapping = {
+      type: 'linear',
+      rate: {
+        numerator: number(rate.numerator, 'rate.numerator'),
+        denominator: number(rate.denominator, 'rate.denominator'),
+      },
+      reverse: boolean(timeMapping.reverse, 'timeMapping.reverse'),
+    };
+  } else if (timeMapping.type === 'curve') {
+    if (!Array.isArray(timeMapping.points))
+      throw new TypeError('timeMapping.points must be an array');
+    compiledTimeMapping = {
+      type: 'curve',
+      points: timeMapping.points.map((value, index) => {
+        const point = object(value, `timeMapping.points[${index.toString()}]`);
+        const interpolation = string(point.interpolation, 'timeMapping point interpolation');
+        if (interpolation !== 'linear' && interpolation !== 'hold' && interpolation !== 'cubic') {
+          throw new TypeError(`Unsupported TimeMap interpolation ${interpolation}`);
+        }
+        return {
+          itemTimeUs: number(point.itemTimeUs, 'timeMapping point itemTimeUs'),
+          sourceTimeUs: number(point.sourceTimeUs, 'timeMapping point sourceTimeUs'),
+          interpolation,
+        };
+      }),
+    };
+  } else {
+    throw new TypeError(`Unsupported time mapping for ${item.id}`);
   }
   return {
     assetId: string(source.assetId, 'source.assetId'),
@@ -73,12 +109,62 @@ function mediaSource(item: ItemEntity): IrMediaSource {
       startUs: number(sourceRange.startUs, 'sourceRange.startUs'),
       durationUs: number(sourceRange.durationUs, 'sourceRange.durationUs'),
     },
-    rate: {
-      numerator: number(rate.numerator, 'rate.numerator'),
-      denominator: number(rate.denominator, 'rate.denominator'),
-    },
-    reverse: boolean(timeMapping.reverse, 'timeMapping.reverse'),
+    timeMapping: compiledTimeMapping,
+    ...(compiledTimeMapping.type === 'linear'
+      ? { rate: compiledTimeMapping.rate, reverse: compiledTimeMapping.reverse }
+      : {}),
     boundary: boundary as IrMediaSource['boundary'],
+  };
+}
+
+function nestedSequenceSource(item: ItemEntity): IrNestedSequenceSource {
+  const source = object(item.source, `item ${item.id}.source`);
+  const sourceRange = object(source.sourceRange, `item ${item.id}.source.sourceRange`);
+  const timeMapping = object(source.timeMapping, `item ${item.id}.source.timeMapping`);
+  const boundary = string(timeMapping.boundary, 'timeMapping.boundary');
+  if (!['error', 'hold', 'loop', 'transparent'].includes(boundary)) {
+    throw new TypeError(`Unsupported boundary ${boundary}`);
+  }
+  let compiledTimeMapping: IrTimeMapping;
+  if (timeMapping.type === 'linear') {
+    const rate = object(timeMapping.rate, `item ${item.id}.source.timeMapping.rate`);
+    compiledTimeMapping = {
+      type: 'linear',
+      rate: {
+        numerator: number(rate.numerator, 'rate.numerator'),
+        denominator: number(rate.denominator, 'rate.denominator'),
+      },
+      reverse: boolean(timeMapping.reverse, 'timeMapping.reverse'),
+    };
+  } else if (timeMapping.type === 'curve') {
+    if (!Array.isArray(timeMapping.points))
+      throw new TypeError('timeMapping.points must be an array');
+    compiledTimeMapping = {
+      type: 'curve',
+      points: timeMapping.points.map((value, index) => {
+        const point = object(value, `timeMapping.points[${index.toString()}]`);
+        const interpolation = string(point.interpolation, 'timeMapping point interpolation');
+        if (interpolation !== 'linear' && interpolation !== 'hold' && interpolation !== 'cubic') {
+          throw new TypeError(`Unsupported TimeMap interpolation ${interpolation}`);
+        }
+        return {
+          itemTimeUs: number(point.itemTimeUs, 'timeMapping point itemTimeUs'),
+          sourceTimeUs: number(point.sourceTimeUs, 'timeMapping point sourceTimeUs'),
+          interpolation,
+        };
+      }),
+    };
+  } else {
+    throw new TypeError(`Unsupported nested Sequence time mapping for ${item.id}`);
+  }
+  return {
+    sequenceId: string(source.sequenceId, `item ${item.id}.source.sequenceId`),
+    sourceRange: {
+      startUs: number(sourceRange.startUs, 'sourceRange.startUs'),
+      durationUs: number(sourceRange.durationUs, 'sourceRange.durationUs'),
+    },
+    timeMapping: compiledTimeMapping,
+    boundary: boundary as IrNestedSequenceSource['boundary'],
   };
 }
 
@@ -122,34 +208,134 @@ function compileClip(
   item: ItemEntity,
   materials: Readonly<Record<string, IrMaterialInstance>>,
 ): IrClip {
-  const source = mediaSource(item);
   const base = {
     id: item.id,
     trackId: item.trackId,
     range: { ...item.range },
     enabled: item.enabled,
     materialInstanceIds: [...item.materialInstanceIds],
-    dependencyEntityIds: [item.id, source.assetId, ...item.materialInstanceIds],
+    dependencyEntityIds: [item.id, ...item.materialInstanceIds],
     fingerprint: clipFingerprint(item, materials),
   };
-  if (item.type === 'video') {
+  if (item.type === 'video' || item.type === 'image') {
+    const source = mediaSource(item);
     const visual = object(item.visual, `item ${item.id}.visual`);
+    const mask = object(visual.mask ?? {}, `item ${item.id}.visual.mask`);
+    const maskSourceId =
+      typeof mask.sourceItemId === 'string' && mask.sourceItemId.length > 0
+        ? mask.sourceItemId
+        : undefined;
     return {
       ...base,
+      dependencyEntityIds: [
+        ...base.dependencyEntityIds,
+        source.assetId,
+        ...(maskSourceId === undefined ? [] : [maskSourceId]),
+      ],
       kind: 'visual-clip',
       source,
       visual: visual as unknown as IrVisualProperties,
     };
   }
   if (item.type === 'audio') {
+    const source = mediaSource(item);
     return {
       ...base,
+      dependencyEntityIds: [...base.dependencyEntityIds, source.assetId],
       kind: 'audio-clip',
       source,
       audio: object(item.audio, `item ${item.id}.audio`) as IrAudioClip['audio'],
     };
   }
-  throw new TypeError(`Phase 0 Render IR cannot compile item type ${item.type}`);
+  if (item.type === 'text') {
+    const box = object(item.box, `item ${item.id}.box`);
+    const paragraphs = item.paragraphs;
+    if (!Array.isArray(paragraphs))
+      throw new TypeError(`item ${item.id}.paragraphs must be an array`);
+    return {
+      ...base,
+      kind: 'text-clip',
+      role: 'text',
+      box: {
+        x: number(box.x, 'text box.x'),
+        y: number(box.y, 'text box.y'),
+        width: number(box.width, 'text box.width'),
+        height: number(box.height, 'text box.height'),
+      },
+      overflow: string(item.overflow, 'text overflow') as IrTextClip['overflow'],
+      writingMode: string(item.writingMode, 'text writingMode') as IrTextClip['writingMode'],
+      paragraphs: paragraphs.map((paragraphValue, paragraphIndex) => {
+        const paragraph = object(paragraphValue, `paragraphs[${paragraphIndex.toString()}]`);
+        if (!Array.isArray(paragraph.runs))
+          throw new TypeError('text paragraph.runs must be an array');
+        return {
+          style: jsonObject(paragraph.style, 'text paragraph.style'),
+          runs: paragraph.runs.map((runValue, runIndex) => {
+            const run = object(runValue, `text run[${runIndex.toString()}]`);
+            return {
+              text: string(run.text, 'text run.text'),
+              style: jsonObject(run.style, 'text run.style'),
+            };
+          }),
+        };
+      }),
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  if (item.type === 'caption') {
+    const box = object(item.box, `item ${item.id}.box`);
+    return {
+      ...base,
+      kind: 'text-clip',
+      role: 'caption',
+      box: {
+        x: number(box.x, 'caption box.x'),
+        y: number(box.y, 'caption box.y'),
+        width: number(box.width, 'caption box.width'),
+        height: number(box.height, 'caption box.height'),
+      },
+      overflow: item.overflow === 'clip' ? 'clip' : 'auto-fit',
+      writingMode: 'horizontal-tb',
+      paragraphs: [
+        {
+          style: jsonObject(item.style, `item ${item.id}.style`),
+          runs: [
+            {
+              text: string(item.text, `item ${item.id}.text`),
+              style: jsonObject(item.style, `item ${item.id}.style`),
+            },
+          ],
+        },
+      ],
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  if (item.type === 'nested-sequence') {
+    const source = nestedSequenceSource(item);
+    return {
+      ...base,
+      kind: 'nested-sequence-clip',
+      source,
+      dependencyEntityIds: [...base.dependencyEntityIds, source.sequenceId],
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  if (item.type === 'generator') {
+    return {
+      ...base,
+      kind: 'generator-clip',
+      generator: jsonObject(item.generator, `item ${item.id}.generator`),
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  if (item.type === 'adjustment') {
+    return {
+      ...base,
+      kind: 'adjustment-clip',
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  throw new TypeError(`Render IR cannot compile item type ${item.type}`);
 }
 
 function material(
@@ -241,6 +427,12 @@ export class IncrementalRenderCompiler {
       const options: RenderCompileOptions = Array.isArray(optionsOrAffectedRanges)
         ? { affectedRanges: optionsOrAffectedRanges }
         : (optionsOrAffectedRanges as RenderCompileOptions);
+      const nestedSequenceStack = options.nestedSequenceStack ?? [];
+      if (nestedSequenceStack.includes(sequenceId)) {
+        throw new TypeError(
+          `NESTED_SEQUENCE_CYCLE: ${[...nestedSequenceStack, sequenceId].join(' -> ')}`,
+        );
+      }
       const sequence = project.sequences[sequenceId];
       if (sequence === undefined) throw new RangeError(`Sequence ${sequenceId} does not exist`);
       const materials = Object.fromEntries(
@@ -271,7 +463,17 @@ export class IncrementalRenderCompiler {
         const clips = track.itemIds.flatMap(itemId => {
           const item = project.items[itemId];
           if (item === undefined) throw new RangeError(`Item ${itemId} does not exist`);
-          if (item.type !== 'video' && item.type !== 'audio') return [];
+          if (
+            item.type !== 'video' &&
+            item.type !== 'image' &&
+            item.type !== 'audio' &&
+            item.type !== 'text' &&
+            item.type !== 'caption' &&
+            item.type !== 'nested-sequence' &&
+            item.type !== 'generator' &&
+            item.type !== 'adjustment'
+          )
+            return [];
           const previous = previousClips.get(itemId);
           if (
             canReuseByEntity &&
@@ -342,6 +544,24 @@ export class IncrementalRenderCompiler {
       const format = object(sequence.format, 'sequence.format');
       const frameRate = object(format.frameRate, 'sequence.format.frameRate');
       const duration = object(sequence.duration, 'sequence.duration');
+      const nestedSequenceIds = new Set(
+        tracks.flatMap(track =>
+          track.clips.flatMap(clip =>
+            clip.kind === 'nested-sequence-clip' ? [clip.source.sequenceId] : [],
+          ),
+        ),
+      );
+      const subgraphs = Object.fromEntries(
+        [...nestedSequenceIds].map(nestedSequenceId => [
+          nestedSequenceId,
+          new IncrementalRenderCompiler().compile(project, nestedSequenceId, revision, {
+            ...(options.resolveMaterialProgram === undefined
+              ? {}
+              : { resolveMaterialProgram: options.resolveMaterialProgram }),
+            nestedSequenceStack: [...nestedSequenceStack, sequenceId],
+          }).ir,
+        ]),
+      );
       const ir: RenderIr = {
         irVersion: '1.0.0',
         projectId: project.projectId,
@@ -356,6 +576,14 @@ export class IncrementalRenderCompiler {
         sampleRate: number(format.sampleRate, 'format.sampleRate'),
         channelLayout: string(format.channelLayout, 'format.channelLayout'),
         workingColorSpace: string(format.workingColorSpace, 'format.workingColorSpace'),
+        transferFunction:
+          format.transferFunction === 'gamma22' ||
+          format.transferFunction === 'pq' ||
+          format.transferFunction === 'hlg'
+            ? format.transferFunction
+            : 'srgb',
+        bitDepth: format.bitDepth === 10 ? 10 : 8,
+        backgroundColor: jsonObject(format.backgroundColor, 'format.backgroundColor'),
         durationUs:
           duration.mode === 'fixed'
             ? number(duration.durationUs, 'duration.durationUs')
@@ -363,6 +591,7 @@ export class IncrementalRenderCompiler {
         tracks,
         transitions,
         materials,
+        subgraphs,
       };
       const frozenIr = deepFreezePlain(ir) as RenderIr;
       const stats = deepFreezePlain({

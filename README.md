@@ -2,22 +2,27 @@
 
 AelionSDK 是一个 Browser-first 的实时音视频剪辑、预览、合成与导出 SDK。上层用可版本化 Project JSON 保存工程，用原子 Transaction 做实时编辑，用同一 Render IR 驱动 Preview、AudioWorklet Player 和流式 Export；滤镜、转场、特效与生成器通过 Aelion Material Protocol 扩展。
 
-> 当前版本：`0.1.0-alpha.0`。Phase 1 的浏览器端实时剪辑闭环已经完成：Node/Vitest 208/208、Chromium 59/59、Firefox 54/54、Golden 1/1、13 个真实 tarball consumer 与 60 秒有声 WebM 导出/独立回读均已通过。桌面 Chromium Tier A 与 Firefox Tier B 是当前 Alpha 认证范围；Safari、iOS 和 Android **未认证**。本仓库已具备首个源码里程碑的开源发布条件，但尚未向 npm 发布任何包。
+> 当前版本：`0.1.0-alpha.0 + Unreleased`。Production Core 已在源码树完成：Node/Vitest 274/274、Chromium 64/64、Firefox 59/59、Golden 1/1，并生成 1080p30、4K probe、Export Worker 与 10 分钟等价资源证据。桌面 Chromium/Firefox 仍是当前既有测试范围；这不扩大到 Safari、移动端、其他 OS/GPU，也不表示任何包已经向 npm 发布。
 
 ## 已有能力
 
 - Project v1 Schema、normalized entities、整数微秒/有理帧率、canonical JSON；
 - 原子 Transaction、revision conflict、inverse、bounded undo/redo、最小 affected ranges；
-- insert/remove/move/trim/split/replace Item，Track reorder/lock/enabled/mute；
+- insert/remove/move/trim/split/replace、ripple insert/delete、roll/slip/slide、group/link/unlink、Marker/range/selection 与 nested Sequence；
+- linear/curve/hold/reverse TimeMap、正向/求逆、step/linear/cubic automation 与 cycle/ping-pong infinity；
 - MP4/H.264/AAC 与 WebM/VP9/Opus 的 SampleIndex、exact seek、VideoFrame 和 PCM decode；
-- Worker WebGL2/WebGPU Material 合成，多视觉轨道按 Project 顺序做 premultiplied alpha-over；
-- AudioWorklet 主时钟、视频追随、有界 SharedArrayBuffer/Transferable PCM；
-- frozen Render IR 的 WebM/VP9/Opus 流式导出、Writable/OPFS Sink、背压与清理；
-- Material Definition/Graph compiler、typed Authoring SDK、确定性 `.aelionmat`、SHA-256 integrity、精确 Registry 和 trusted-code 默认拒绝；
+- Worker WebGL2/WebGPU Material 合成、12 种 blend mode、alpha/luma mask/matte、Generator/Adjustment 与显式 background；
+- Text/Caption deterministic layout、字体资源管理、SRT/WebVTT 与文字 Material；
+- AudioWorklet 主时钟、sample-accurate automation、曲线/倒放 varispeed、声道矩阵、ducking、waveform、LUFS/true peak/limiter 与设备恢复状态机；
+- frozen Render IR 的 WebM/MP4/still/GIF/WAV/RF64、Export Worker、Writable/OPFS Sink、Remote provider、checkpoint、背压与清理；
+- 分段 SampleIndex、内容寻址 CacheStore/OPFS LRU、proxy/image/animated-image 与页面级 decoder/GPU/cache 仲裁；
+- Material Definition/Graph compiler、typed Authoring SDK、签名/信任/吊销、迁移、Composition、Catalog、Material Lab 和 trusted-code 默认拒绝；
 - `@aelion/sdk` Session facade：load/edit/undo/redo/player/preview/export/capability/diagnostic/state；
 - 13 个 MIT 许可的公开包；`@aelion/vite-plugin` 是公开、版本化的 Vite Worker/AudioWorklet 资源适配器。
 
-明确不在本 Alpha 认证范围：Safari/移动端、MP4 统一输出、非 `normal` blend mode、完整文字/字幕、mask/matte、ripple/roll/slip/slide、Track solo、长视频/4K/HDR，以及任意第三方 Shader/WASM 自动执行。
+当前本地 RGBA8 路径执行 SDR；PQ/HLG/10-bit/HDR contract 会 fail closed。4K 已有有界离线 probe，但没有 4K30 实时承诺。第三方 Shader/WASM 即使签名也不会自动执行，仍需要宿主 execution policy。
+
+明确排除：Safari/移动端/新增 OS-GPU-driver 认证、npm publish/provenance/Tag/Release、非 Vite bundler 与 1.0 API 稳定承诺。详见 [Production Core Guide](docs/guides/production-core.md) 和 [兼容矩阵](docs/compatibility/production-core-matrix.md)。
 
 `ByteMediaProvider` 是短媒体 convenience provider：它完整读取 bytes，以有界 LRU、默认 4 路 load/index/decode 全局并发、64 个底层等待操作和 68 个公开调用全生命周期硬上限执行，并对同 asset bytes/SampleIndex 做可引用计数、可取消的 single-flight；按媒体类型使用零基 `streamIndex` 精确选择视频/音频流，请求不存在的流会稳定拒绝。大文件/CDN 仍应实现 range-backed `AelionMediaProvider`。
 
@@ -114,21 +119,21 @@ corepack pnpm dev:lab
 
 推荐接入 `@aelion/sdk`。高级调用方可以按边界安装：
 
-| Package                     | 用途                                                    |
-| --------------------------- | ------------------------------------------------------- |
-| `@aelion/sdk`               | Session、Player、Preview/Export、MediaProvider 统一门面 |
-| `@aelion/core`              | 时间、诊断、生命周期基础类型                            |
-| `@aelion/project-schema`    | Project 类型、validator、canonical JSON                 |
-| `@aelion/transaction`       | operation、语义命令、history                            |
-| `@aelion/media`             | Range、SampleIndex、seek/decode                         |
-| `@aelion/render-ir`         | Project → 共享执行语义                                  |
-| `@aelion/renderer-worker`   | Worker GPU compositor/frame renderer                    |
-| `@aelion/audio`             | PCM mixer、AudioWorklet clock、video scheduler          |
-| `@aelion/export`            | WebM export、Memory/OPFS Sink                           |
-| `@aelion/capability`        | 配置级 capability report                                |
-| `@aelion/material-compiler` | Core Node Graph 校验/编译                               |
-| `@aelion/material-sdk`      | Material authoring、pack、integrity、Registry           |
-| `@aelion/vite-plugin`       | 官方 Vite Worker/AudioWorklet 资源集成                  |
+| Package                     | 用途                                                       |
+| --------------------------- | ---------------------------------------------------------- |
+| `@aelion/sdk`               | Session、Player、Preview/Export、MediaProvider 统一门面    |
+| `@aelion/core`              | 时间、诊断、生命周期基础类型                               |
+| `@aelion/project-schema`    | Project 类型、validator、canonical JSON                    |
+| `@aelion/transaction`       | operation、语义命令、history                               |
+| `@aelion/media`             | Range、分段 SampleIndex、seek/decode、Cache/Proxy/资源仲裁 |
+| `@aelion/render-ir`         | Project → 共享执行语义                                     |
+| `@aelion/renderer-worker`   | Worker GPU compositor/frame renderer                       |
+| `@aelion/audio`             | PCM mixer、AudioWorklet、专业处理/分析、device state       |
+| `@aelion/export`            | 多 Profile/Remote/Worker/checkpoint、Memory/OPFS Sink      |
+| `@aelion/capability`        | 配置级 capability report                                   |
+| `@aelion/material-compiler` | Core Node Graph 校验/编译                                  |
+| `@aelion/material-sdk`      | Authoring、签名/迁移/Composition/Catalog/Lab               |
+| `@aelion/vite-plugin`       | 官方 Vite Worker/AudioWorklet 资源集成                     |
 
 发布前 `test:pack` 会生成真实 `.tgz`、安装到干净 consumer，检查全部公开入口、LICENSE/README、依赖重写和 Worker/AudioWorklet `.js` 资源。`test:consumer` 还必须从这些 tarball 启动实际浏览器链路。
 
@@ -137,6 +142,8 @@ corepack pnpm dev:lab
 ## 兼容性与协议
 
 - [Alpha 兼容性矩阵](docs/compatibility/phase-1-alpha-matrix.md)
+- [Production Core 兼容性矩阵](docs/compatibility/production-core-matrix.md)
+- [Production Core Guide](docs/guides/production-core.md)
 - [Alpha Quick Start](docs/guides/alpha-quick-start.md)
 - [浏览器部署与 COOP/COEP](docs/guides/browser-deployment.md)
 - [MediaProvider 契约](docs/guides/media-provider.md)
@@ -148,10 +155,14 @@ corepack pnpm dev:lab
 - [Project 示例说明](examples/README.md)
 - [Aelion Material Protocol v1](docs/Aelion-Material-Protocol-v1.md)
 - [Material Authoring Guide](docs/guides/material-authoring.md)
+- [Core Node Math v1](docs/reference/core-node-math-v1.md)
 
 ## 项目状态与证据
 
 - [Phase 1 Goal（阶段成果）](docs/GOAL-PHASE-1.md)
+- [Audio Track Solo Goal（Complete）](docs/GOAL-TRACK-SOLO.md)
+- [Production Core Goal（Complete）](docs/GOAL-PRODUCTION-CORE.md)
+- [Production Core Evidence](docs/evidence/production-core-index.md)
 - [Phase 1 Evidence Index](docs/evidence/phase-1-index.md)
 - [Phase 1 Exit Review](docs/decisions/phase-1-exit.md)
 - [Phase 1 Backlog](docs/phase-1-backlog.md)

@@ -159,8 +159,8 @@
           "required": ["timeSpace", "preInfinity", "postInfinity", "keyframes"],
           "properties": {
             "timeSpace": { "enum": ["item", "sequence"] },
-            "preInfinity": { "enum": ["hold", "linear", "none"] },
-            "postInfinity": { "enum": ["hold", "linear", "none"] },
+            "preInfinity": { "enum": ["hold", "linear", "none", "cycle", "ping-pong"] },
+            "postInfinity": { "enum": ["hold", "linear", "none", "cycle", "ping-pong"] },
             "keyframes": {
               "type": "array",
               "minItems": 1,
@@ -366,6 +366,11 @@
             "workingColorSpace": {
               "enum": ["srgb-linear", "display-p3-linear", "rec2020-linear"]
             },
+            "transferFunction": {
+              "enum": ["srgb", "gamma22", "pq", "hlg"],
+              "default": "srgb"
+            },
+            "bitDepth": { "enum": [8, 10], "default": 8 },
             "backgroundColor": { "$ref": "#/$defs/color" }
           }
         },
@@ -436,7 +441,8 @@
           "properties": {
             "gainDb": { "$ref": "#/$defs/animatableNumber" },
             "pan": { "$ref": "#/$defs/animatableNumber" },
-            "muted": { "type": "boolean" }
+            "muted": { "type": "boolean" },
+            "solo": { "type": "boolean", "default": false }
           }
         },
         "extensions": { "$ref": "#/$defs/extensions" }
@@ -590,6 +596,19 @@
             "difference",
             "exclusion"
           ]
+        },
+        "mask": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceItemId", "channel", "invert", "featherPx", "space", "consumeSource"],
+          "properties": {
+            "sourceItemId": { "$ref": "#/$defs/entityId" },
+            "channel": { "enum": ["alpha", "luma"] },
+            "invert": { "type": "boolean" },
+            "featherPx": { "type": "number", "minimum": 0, "maximum": 4096 },
+            "space": { "enum": ["source", "canvas"] },
+            "consumeSource": { "type": "boolean" }
+          }
         }
       }
     },
@@ -602,6 +621,10 @@
         "pan": { "$ref": "#/$defs/animatableNumber" },
         "fadeInUs": { "$ref": "#/$defs/timeUs" },
         "fadeOutUs": { "$ref": "#/$defs/timeUs" },
+        "pitchPolicy": {
+          "const": "varispeed",
+          "description": "Playback rate and direction deterministically change pitch with source time."
+        },
         "channelMap": {
           "type": "array",
           "maxItems": 16384,
@@ -640,6 +663,22 @@
             "type": { "const": "audio" },
             "source": { "$ref": "#/$defs/mediaSource" },
             "audio": { "$ref": "#/$defs/audioProperties" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "imageItem": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/baseItem" },
+        {
+          "type": "object",
+          "required": ["source", "visual"],
+          "properties": {
+            "type": { "const": "image" },
+            "source": { "$ref": "#/$defs/mediaSource" },
+            "visual": { "$ref": "#/$defs/visual" }
           }
         }
       ],
@@ -702,6 +741,106 @@
       ],
       "unevaluatedProperties": false
     },
+    "captionItem": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/baseItem" },
+        {
+          "type": "object",
+          "required": ["text", "box", "style", "visual"],
+          "properties": {
+            "type": { "const": "caption" },
+            "text": { "type": "string", "maxLength": 1000000 },
+            "box": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["x", "y", "width", "height"],
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" },
+                "width": { "type": "number", "exclusiveMinimum": 0 },
+                "height": { "type": "number", "exclusiveMinimum": 0 }
+              }
+            },
+            "style": { "$ref": "#/$defs/jsonObject" },
+            "overflow": { "enum": ["clip", "auto-fit"] },
+            "cueSettings": { "$ref": "#/$defs/jsonObject" },
+            "visual": { "$ref": "#/$defs/visual" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "nestedSequenceItem": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/baseItem" },
+        {
+          "type": "object",
+          "required": ["source", "visual"],
+          "properties": {
+            "type": { "const": "nested-sequence" },
+            "source": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["sequenceId", "sourceRange", "timeMapping"],
+              "properties": {
+                "sequenceId": { "$ref": "#/$defs/entityId" },
+                "sourceRange": { "$ref": "#/$defs/range" },
+                "timeMapping": { "$ref": "#/$defs/mediaSource/properties/timeMapping" }
+              }
+            },
+            "visual": { "$ref": "#/$defs/visual" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "generatorItem": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/baseItem" },
+        {
+          "type": "object",
+          "required": ["generator", "visual"],
+          "properties": {
+            "type": { "const": "generator" },
+            "generator": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "colors"],
+              "properties": {
+                "kind": { "enum": ["solid", "linear-gradient"] },
+                "colors": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": { "$ref": "#/$defs/color" }
+                },
+                "angleDeg": { "type": "number" }
+              }
+            },
+            "visual": { "$ref": "#/$defs/visual" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "adjustmentItem": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/$defs/baseItem" },
+        {
+          "type": "object",
+          "required": ["visual"],
+          "properties": {
+            "type": { "const": "adjustment" },
+            "visual": { "$ref": "#/$defs/visual" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "genericItem": {
       "type": "object",
       "allOf": [
@@ -712,7 +851,7 @@
           "additionalProperties": true,
           "properties": {
             "type": {
-              "enum": ["image", "caption", "shape", "generator", "nested-sequence", "adjustment"]
+              "enum": ["shape"]
             }
           }
         }
@@ -737,7 +876,12 @@
       "oneOf": [
         { "$ref": "#/$defs/videoItem" },
         { "$ref": "#/$defs/audioItem" },
+        { "$ref": "#/$defs/imageItem" },
         { "$ref": "#/$defs/textItem" },
+        { "$ref": "#/$defs/captionItem" },
+        { "$ref": "#/$defs/nestedSequenceItem" },
+        { "$ref": "#/$defs/generatorItem" },
+        { "$ref": "#/$defs/adjustmentItem" },
         { "$ref": "#/$defs/materialContentItem" },
         { "$ref": "#/$defs/genericItem" }
       ]

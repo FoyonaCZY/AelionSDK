@@ -49,6 +49,33 @@ function videoItem(id: string, trackId = 'track_video_main'): ItemEntity {
   return item;
 }
 
+function installProfessionalEditTrack(engine: TransactionEngine): void {
+  const values = [
+    { id: 'edit_left', startUs: 0, sourceStartUs: 0 },
+    { id: 'edit_middle', startUs: 2_000_000, sourceStartUs: 2_000_000 },
+    { id: 'edit_right', startUs: 4_000_000, sourceStartUs: 4_000_000 },
+  ].map(value => {
+    const item = videoItem(value.id, 'track_edit');
+    item.range = { startUs: value.startUs, durationUs: 2_000_000 };
+    const source = item.source as JsonObject;
+    source.sourceRange = { startUs: value.sourceStartUs, durationUs: 2_000_000 };
+    return item;
+  });
+  engine.edit({ baseRevision: engine.revision }, transaction => {
+    transaction.createEntity('tracks', 'track_edit', {
+      id: 'track_edit',
+      sequenceId: 'seq_main',
+      kind: 'visual',
+      enabled: true,
+      locked: false,
+      itemIds: values.map(value => value.id),
+      materialInstanceIds: [],
+    });
+    transaction.listInsert('sequences', 'seq_main', ['trackIds'], 'track_edit');
+    for (const item of values) transaction.createEntity('items', item.id, item);
+  });
+}
+
 describe('EditingCommands', () => {
   it('inserts, moves across Tracks and removes an Item atomically', async () => {
     const { engine, commands } = create();
@@ -195,6 +222,124 @@ describe('EditingCommands', () => {
     expect(await canonicalHash(engine.getSnapshot())).toBe(beforeHash);
   });
 
+  it('edits marker ranges and selection metadata as invertible domain commands', async () => {
+    const { engine, commands } = create();
+    const before = await canonicalHash(engine.getSnapshot());
+    const added = commands.addMarker({
+      marker: {
+        id: 'marker_item_note',
+        owner: { type: 'item', id: 'item_video_a' },
+        timeUs: 100_000,
+        durationUs: 50_000,
+        label: 'Note',
+      },
+    });
+    expect(added.snapshot.items.item_video_a?.markerIds).toContain('marker_item_note');
+    expect(added.snapshot.sequences.seq_main?.markerIds).toContain('marker_item_note');
+
+    const updated = commands.updateMarker({
+      markerId: 'marker_item_note',
+      timeUs: 200_000,
+      durationUs: 75_000,
+      markerLabel: null,
+      markerColor: '#123456',
+    });
+    expect(updated.snapshot.markers.marker_item_note).toMatchObject({
+      timeUs: 200_000,
+      durationUs: 75_000,
+      color: '#123456',
+    });
+    expect(updated.snapshot.markers.marker_item_note?.label).toBeUndefined();
+
+    const selected = commands.setSelectionMetadata({
+      sequenceId: 'seq_main',
+      itemIds: ['item_video_a', 'item_audio_a'],
+      range: { startUs: 100_000, durationUs: 500_000 },
+    });
+    expect(selected.snapshot.sequences.seq_main?.extensions).toMatchObject({
+      'aelion.selection': {
+        itemIds: ['item_video_a', 'item_audio_a'],
+        range: { startUs: 100_000, durationUs: 500_000 },
+      },
+    });
+    const removed = commands.removeMarker({ markerId: 'marker_item_note' });
+    expect(removed.snapshot.markers.marker_item_note).toBeUndefined();
+
+    const restored = structuredClone(removed.snapshot);
+    const { applyOperations } = await import('../src/index.js');
+    applyOperations(restored, removed.inverse);
+    applyOperations(restored, selected.inverse);
+    applyOperations(restored, updated.inverse);
+    applyOperations(restored, added.inverse);
+    expect(await canonicalHash(restored)).toBe(before);
+  });
+
+  it('trims, splits and deletes LinkGroups without exposing partial membership', () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    const parallel = videoItem('edit_parallel', 'track_edit_parallel');
+    parallel.range = { startUs: 0, durationUs: 2_000_000 };
+    (parallel.source as JsonObject).sourceRange = { startUs: 0, durationUs: 2_000_000 };
+    engine.edit({ baseRevision: engine.revision }, transaction => {
+      transaction.createEntity('tracks', 'track_edit_parallel', {
+        id: 'track_edit_parallel',
+        sequenceId: 'seq_main',
+        kind: 'visual',
+        enabled: true,
+        locked: false,
+        itemIds: [parallel.id],
+        materialInstanceIds: [],
+      });
+      transaction.listInsert('sequences', 'seq_main', ['trackIds'], 'track_edit_parallel');
+      transaction.createEntity('items', parallel.id, parallel);
+    });
+    commands.linkItems({
+      groupId: 'group_edit',
+      kind: 'edit-group',
+      itemIds: ['edit_left', 'edit_parallel'],
+    });
+    const trimmed = commands.trimLinkedGroup({
+      groupId: 'group_edit',
+      edge: 'start',
+      amountUs: 100_000,
+    });
+    expect(trimmed.snapshot.items.edit_left).toMatchObject({
+      range: { startUs: 100_000, durationUs: 1_900_000 },
+      source: { sourceRange: { startUs: 100_000, durationUs: 1_900_000 } },
+    });
+    expect(trimmed.snapshot.items.edit_parallel).toMatchObject({
+      range: { startUs: 100_000, durationUs: 1_900_000 },
+    });
+
+    const split = commands.splitLinkedGroup({
+      groupId: 'group_edit',
+      rightGroupId: 'group_edit_right',
+      atUs: 1_000_000,
+      rightItemIds: {
+        edit_left: 'edit_left_right',
+        edit_parallel: 'edit_parallel_right',
+      },
+    });
+    expect(split.commit.snapshot.linkGroups.group_edit?.itemIds).toEqual([
+      'edit_left',
+      'edit_parallel',
+    ]);
+    expect(split.commit.snapshot.linkGroups.group_edit_right?.itemIds).toEqual([
+      'edit_left_right',
+      'edit_parallel_right',
+    ]);
+    expect(split.commit.snapshot.items.edit_left_right).toMatchObject({
+      linkGroupId: 'group_edit_right',
+      range: { startUs: 1_000_000, durationUs: 1_000_000 },
+      source: { sourceRange: { startUs: 1_000_000, durationUs: 1_000_000 } },
+    });
+
+    const removed = commands.removeLinkedGroup({ groupId: 'group_edit_right' });
+    expect(removed.snapshot.linkGroups.group_edit_right).toBeUndefined();
+    expect(removed.snapshot.items.edit_left_right).toBeUndefined();
+    expect(removed.snapshot.items.edit_parallel_right).toBeUndefined();
+  });
+
   it('removes owned Transition, Material, Marker and degenerate LinkGroup without dangling refs', () => {
     const { engine, commands } = create();
     engine.edit({ baseRevision: 0n }, transaction => {
@@ -232,22 +377,260 @@ describe('EditingCommands', () => {
     commands.setTrackLocked({ trackId: 'track_title', value: false, baseRevision: 2n });
     commands.setTrackEnabled({ trackId: 'track_title', value: false, baseRevision: 3n });
     commands.setTrackMuted({ trackId: 'track_music', value: true, baseRevision: 4n });
+    commands.setTrackSolo({ trackId: 'track_music', value: true, baseRevision: 5n });
     const reordered = commands.reorderTrack({
       sequenceId: 'seq_main',
       trackId: 'track_title',
       beforeTrackId: 'track_video_main',
-      baseRevision: 5n,
+      baseRevision: 6n,
     });
     expect(reordered.snapshot.tracks.track_title).toMatchObject({
       enabled: false,
       locked: false,
     });
-    expect(reordered.snapshot.tracks.track_music?.audio).toMatchObject({ muted: true });
+    expect(reordered.snapshot.tracks.track_music?.audio).toMatchObject({ muted: true, solo: true });
     expect(reordered.snapshot.sequences.seq_main?.trackIds[0]).toBe('track_title');
+  });
+
+  it('rejects audio mixer commands for non-audio Tracks without changing revision', () => {
+    const { engine, commands } = create();
+    expect(() => commands.setTrackSolo({ trackId: 'track_title', value: true })).toThrow(
+      /not an audio Track/u,
+    );
+    expect(() => commands.setTrackMuted({ trackId: 'track_title', value: true })).toThrow(
+      /not an audio Track/u,
+    );
+    expect(engine.revision).toBe(0n);
+  });
+
+  it('links, moves and unlinks a cross-Track edit group as atomic reversible commits', async () => {
+    const { engine, commands } = create();
+    const beforeHash = await canonicalHash(engine.getSnapshot());
+    const linked = commands.linkItems({
+      groupId: 'link_edit',
+      itemIds: ['item_title', 'item_music'],
+      kind: 'edit-group',
+    });
+    expect(linked.snapshot.linkGroups.link_edit).toEqual({
+      id: 'link_edit',
+      kind: 'edit-group',
+      itemIds: ['item_title', 'item_music'],
+    });
+    expect(linked.snapshot.items.item_title?.linkGroupId).toBe('link_edit');
+    expect(linked.snapshot.items.item_music?.linkGroupId).toBe('link_edit');
+
+    const moved = commands.moveLinkedGroup({ groupId: 'link_edit', deltaUs: 100_000 });
+    expect(moved.snapshot.items.item_title?.range.startUs).toBe(1_000_000);
+    expect(moved.snapshot.items.item_music?.range.startUs).toBe(100_000);
+    expect(moved.changeSet.affectedRanges).toEqual([
+      { sequenceId: 'seq_main', startUs: 0, durationUs: 10_100_000 },
+    ]);
+
+    const unlinked = commands.unlinkItems({ groupId: 'link_edit', itemIds: ['item_title'] });
+    expect(unlinked.snapshot.linkGroups.link_edit).toBeUndefined();
+    expect(unlinked.snapshot.items.item_title?.linkGroupId).toBeUndefined();
+    expect(unlinked.snapshot.items.item_music?.linkGroupId).toBeUndefined();
+
+    const restored = structuredClone(unlinked.snapshot);
+    const { applyOperations } = await import('../src/index.js');
+    applyOperations(restored, unlinked.inverse);
+    applyOperations(restored, moved.inverse);
+    applyOperations(restored, linked.inverse);
+    expect(await canonicalHash(restored)).toBe(beforeHash);
+    expect(engine.revision).toBe(3n);
+  });
+
+  it('rejects linked moves that would break a Transition or cross Sequence time zero', () => {
+    const { engine, commands } = create();
+    expect(() => commands.moveLinkedGroup({ groupId: 'link_av_a', deltaUs: 100_000 })).toThrow(
+      /crosses the LinkGroup boundary/u,
+    );
+    expect(() => commands.moveLinkedGroup({ groupId: 'link_av_a', deltaUs: -1 })).toThrow(
+      /before Sequence time zero/u,
+    );
+    expect(engine.revision).toBe(0n);
+  });
+
+  it('slips linear and curve media without moving their timeline ranges', () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    const linear = commands.slipItem({
+      itemId: 'edit_middle',
+      deltaSourceUs: 250_000,
+      baseRevision: 1n,
+    });
+    expect(linear.snapshot.items.edit_middle).toMatchObject({
+      range: { startUs: 2_000_000, durationUs: 2_000_000 },
+      source: { sourceRange: { startUs: 2_250_000, durationUs: 2_000_000 } },
+    });
+
+    engine.edit({ baseRevision: 2n }, transaction => {
+      transaction.setField('items', 'edit_middle', ['source', 'sourceRange'], {
+        startUs: 1_000_000,
+        durationUs: 4_000_000,
+      });
+      transaction.setField('items', 'edit_middle', ['source', 'timeMapping'], {
+        type: 'curve',
+        boundary: 'error',
+        points: [
+          { itemTimeUs: 0, sourceTimeUs: 1_000_000, interpolation: 'linear' },
+          { itemTimeUs: 1_000_000, sourceTimeUs: 3_000_000, interpolation: 'hold' },
+          { itemTimeUs: 2_000_000, sourceTimeUs: 3_000_000, interpolation: 'linear' },
+        ],
+      });
+    });
+    const curve = commands.slipItem({
+      itemId: 'edit_middle',
+      deltaSourceUs: 500_000,
+      baseRevision: 3n,
+    });
+    expect(curve.snapshot.items.edit_middle?.source).toMatchObject({
+      sourceRange: { startUs: 1_500_000, durationUs: 4_000_000 },
+      timeMapping: {
+        points: [
+          { sourceTimeUs: 1_500_000 },
+          { sourceTimeUs: 3_500_000 },
+          { sourceTimeUs: 3_500_000 },
+        ],
+      },
+    });
+  });
+
+  it('rolls an adjacent boundary while preserving the combined timeline extent', () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    const commit = commands.rollEdit({
+      leftItemId: 'edit_left',
+      rightItemId: 'edit_middle',
+      toUs: 2_250_000,
+      baseRevision: 1n,
+    });
+    expect(commit.snapshot.items.edit_left).toMatchObject({
+      range: { startUs: 0, durationUs: 2_250_000 },
+      source: { sourceRange: { startUs: 0, durationUs: 2_250_000 } },
+    });
+    expect(commit.snapshot.items.edit_middle).toMatchObject({
+      range: { startUs: 2_250_000, durationUs: 1_750_000 },
+      source: { sourceRange: { startUs: 2_250_000, durationUs: 1_750_000 } },
+    });
+    expect(commit.changeSet.affectedRanges).toEqual([
+      { sequenceId: 'seq_main', startUs: 0, durationUs: 4_000_000 },
+    ]);
+  });
+
+  it('slides an Item and compensates both adjacent edit boundaries atomically', async () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    const before = await canonicalHash(engine.getSnapshot());
+    const commit = commands.slideItem({
+      itemId: 'edit_middle',
+      deltaUs: 250_000,
+      baseRevision: 1n,
+    });
+    expect(commit.snapshot.items.edit_left).toMatchObject({
+      range: { durationUs: 2_250_000 },
+      source: { sourceRange: { durationUs: 2_250_000 } },
+    });
+    expect(commit.snapshot.items.edit_middle?.range).toEqual({
+      startUs: 2_250_000,
+      durationUs: 2_000_000,
+    });
+    expect(commit.snapshot.items.edit_right).toMatchObject({
+      range: { startUs: 4_250_000, durationUs: 1_750_000 },
+      source: { sourceRange: { startUs: 4_250_000, durationUs: 1_750_000 } },
+    });
+
+    const restored = structuredClone(commit.snapshot);
+    const { applyOperations } = await import('../src/index.js');
+    applyOperations(restored, commit.inverse);
+    expect(await canonicalHash(restored)).toBe(before);
+  });
+
+  it('ripple-inserts and removes an Item while shifting later Items and Sequence Markers', async () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    engine.edit({ baseRevision: 1n }, transaction => {
+      transaction.createEntity('markers', 'marker_ripple', {
+        id: 'marker_ripple',
+        owner: { type: 'sequence', id: 'seq_main' },
+        timeUs: 4_000_000,
+        durationUs: 0,
+      });
+      transaction.listInsert('sequences', 'seq_main', ['markerIds'], 'marker_ripple');
+    });
+    const before = await canonicalHash(engine.getSnapshot());
+    const insertedItem = videoItem('edit_inserted', 'track_edit');
+    insertedItem.range = { startUs: 2_000_000, durationUs: 500_000 };
+    const source = insertedItem.source as JsonObject;
+    source.sourceRange = { startUs: 6_000_000, durationUs: 500_000 };
+
+    const inserted = commands.rippleInsertItem({
+      item: insertedItem,
+      beforeItemId: 'edit_middle',
+      trackIds: ['track_edit'],
+      baseRevision: 2n,
+    });
+    expect(inserted.snapshot.tracks.track_edit?.itemIds).toEqual([
+      'edit_left',
+      'edit_inserted',
+      'edit_middle',
+      'edit_right',
+    ]);
+    expect(inserted.snapshot.items.edit_middle?.range.startUs).toBe(2_500_000);
+    expect(inserted.snapshot.items.edit_right?.range.startUs).toBe(4_500_000);
+    expect(inserted.snapshot.markers.marker_ripple?.timeUs).toBe(4_500_000);
+
+    const removed = commands.rippleRemoveItem({
+      itemId: 'edit_inserted',
+      trackIds: ['track_edit'],
+      baseRevision: 3n,
+    });
+    expect(removed.snapshot.items.edit_inserted).toBeUndefined();
+    expect(removed.snapshot.items.edit_middle?.range.startUs).toBe(2_000_000);
+    expect(removed.snapshot.items.edit_right?.range.startUs).toBe(4_000_000);
+    expect(removed.snapshot.markers.marker_ripple?.timeUs).toBe(4_000_000);
+    expect(await canonicalHash(removed.snapshot)).toBe(before);
+  });
+
+  it('rejects a partial ripple that would tear an AV LinkGroup', () => {
+    const { engine, commands } = create();
+    const item = videoItem('ripple_conflict');
+    item.range = { startUs: 0, durationUs: 100_000 };
+    expect(() =>
+      commands.rippleInsertItem({
+        item,
+        trackIds: ['track_video_main'],
+        beforeItemId: 'item_video_a',
+      }),
+    ).toThrow(/only part of LinkGroup/u);
+    expect(engine.revision).toBe(0n);
   });
 });
 
 describe('TransactionHistory', () => {
+  it('undoes and redoes an optional solo field without changing its legacy default', () => {
+    const engine = new TransactionEngine(project, validate);
+    const history = new TransactionHistory(engine);
+    const commands = new EditingCommands(history);
+    expect(engine.getSnapshot().tracks.track_music?.audio?.solo).toBeUndefined();
+
+    const solo = commands.setTrackSolo({
+      trackId: 'track_music',
+      value: true,
+      label: 'Solo music',
+    });
+    expect(solo.changeSet.affectedEntityIds).toEqual(['track_music']);
+    expect(solo.changeSet.affectedRanges).toEqual([
+      { sequenceId: 'seq_main', startUs: 0, durationUs: 10_000_000 },
+    ]);
+    expect(engine.getSnapshot().tracks.track_music?.audio?.solo).toBe(true);
+
+    history.undo();
+    expect(engine.getSnapshot().tracks.track_music?.audio?.solo).toBeUndefined();
+    history.redo();
+    expect(engine.getSnapshot().tracks.track_music?.audio?.solo).toBe(true);
+  });
+
   it('undoes/redoes semantic commits through new validated revisions', async () => {
     const engine = new TransactionEngine(project, validate);
     const history = new TransactionHistory(engine, { maxEntries: 2 });

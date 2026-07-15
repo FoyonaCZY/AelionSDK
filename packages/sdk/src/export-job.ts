@@ -1,16 +1,15 @@
-import type { WebMExportResult } from '@aelion/export';
+import type {
+  AelionExportJobSnapshot,
+  AelionExportJobState,
+  AelionTypedExportJob,
+} from './types.js';
 
-import type { AelionExportJob, AelionExportJobSnapshot, AelionExportJobState } from './types.js';
-
-export interface AelionExportJobOptions {
+export interface AelionExportJobOptions<TResult> {
   readonly id: string;
   readonly externalSignal?: AbortSignal;
-  readonly run: (
-    signal: AbortSignal,
-    onProgress: (progress: number) => void,
-  ) => Promise<WebMExportResult>;
+  readonly run: (signal: AbortSignal, onProgress: (progress: number) => void) => Promise<TResult>;
   readonly onSnapshot?: (snapshot: AelionExportJobSnapshot) => void;
-  readonly onSettled?: (job: AelionExportJob) => void;
+  readonly onSettled?: (job: AelionTypedExportJob<TResult>) => void;
 }
 
 function boundedProgress(value: number): number {
@@ -33,17 +32,17 @@ function isAbort(error: unknown, signal: AbortSignal): boolean {
   );
 }
 
-export class ExportJob extends Promise<WebMExportResult> implements AelionExportJob {
+export class ExportJob<TResult> extends Promise<TResult> implements AelionTypedExportJob<TResult> {
   readonly #id: string;
   readonly #controller = new AbortController();
   readonly #listeners = new Set<(snapshot: AelionExportJobSnapshot) => void>();
-  readonly #onSnapshot: AelionExportJobOptions['onSnapshot'];
+  readonly #onSnapshot: AelionExportJobOptions<TResult>['onSnapshot'];
   #state: AelionExportJobState = 'running';
   #progress = 0;
-  #result!: Promise<WebMExportResult>;
+  #result!: Promise<TResult>;
   #detachExternalSignal: (() => void) | undefined;
 
-  public constructor(options: AelionExportJobOptions) {
+  public constructor(options: AelionExportJobOptions<TResult>) {
     // The native Promise backing this subclass deliberately stays pending. All
     // Promise methods delegate to #result, which avoids a second rejection that
     // could otherwise become unhandled while preserving await compatibility.
@@ -92,24 +91,24 @@ export class ExportJob extends Promise<WebMExportResult> implements AelionExport
     return this.#state;
   }
 
-  public get result(): Promise<WebMExportResult> {
+  public get result(): Promise<TResult> {
     return this.#result;
   }
 
-  public override then<TResult1 = WebMExportResult, TResult2 = never>(
-    onfulfilled?: ((value: WebMExportResult) => TResult1 | PromiseLike<TResult1>) | null,
+  public override then<TResult1 = TResult, TResult2 = never>(
+    onfulfilled?: ((value: TResult) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
   ): Promise<TResult1 | TResult2> {
     return this.#result.then(onfulfilled, onrejected);
   }
 
-  public override catch<TResult = never>(
-    onrejected?: ((reason: unknown) => TResult | PromiseLike<TResult>) | null,
-  ): Promise<WebMExportResult | TResult> {
+  public override catch<TResult2 = never>(
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+  ): Promise<TResult | TResult2> {
     return this.#result.catch(onrejected);
   }
 
-  public override finally(onfinally?: (() => void) | null): Promise<WebMExportResult> {
+  public override finally(onfinally?: (() => void) | null): Promise<TResult> {
     return this.#result.finally(onfinally);
   }
 
@@ -157,7 +156,7 @@ export class ExportJob extends Promise<WebMExportResult> implements AelionExport
     if (this.#state !== 'running') this.#listeners.clear();
   }
 
-  #settled(options: AelionExportJobOptions): void {
+  #settled(options: AelionExportJobOptions<TResult>): void {
     this.#detachExternalSignal?.();
     this.#detachExternalSignal = undefined;
     options.onSettled?.(this);
