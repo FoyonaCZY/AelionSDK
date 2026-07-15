@@ -89,6 +89,23 @@ function takeBitmapFrame(bitmap: ImageBitmap, timestampUs: number): VideoFrame {
   }
 }
 
+async function presentationBitmap(
+  frame: VideoFrame,
+  signal: AbortSignal | undefined,
+): Promise<ImageBitmap> {
+  // A WebGL canvas exports premultiplied RGBA. Normalizing the public bitmap to
+  // straight alpha prevents some headless Chromium/ANGLE paths from applying
+  // alpha a second time when callers present it through Canvas 2D.
+  const bitmap = await createImageBitmap(frame, { premultiplyAlpha: 'none' });
+  try {
+    throwIfAborted(signal, 'Render IR presentation');
+    return bitmap;
+  } catch (error) {
+    bitmap.close();
+    throw error;
+  }
+}
+
 const BASE_VISUAL_PROGRAM: WebGl2MaterialProgram = {
   backend: 'webgl2',
   nodeSet: 'aelion.visual.builtin/1.0.0',
@@ -458,12 +475,8 @@ export class RenderIrFrameRenderer implements Disposable {
           composite = takeBitmapFrame(result.bitmap, options.timeUs);
         }
 
-        const canvas = new OffscreenCanvas(options.ir.width, options.ir.height);
-        const context = canvas.getContext('2d');
-        if (context === null) throw new Error('2D presentation context is unavailable');
-        context.drawImage(composite, 0, 0, options.ir.width, options.ir.height);
         return {
-          bitmap: canvas.transferToImageBitmap(),
+          bitmap: await presentationBitmap(composite, options.signal),
           backend: layers.length > 1 ? 'webgl2' : (transitionBackend ?? 'webgl2'),
           materialIds: appliedMaterialIds,
         };
