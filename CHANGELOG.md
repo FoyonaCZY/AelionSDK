@@ -20,6 +20,7 @@
 - Clean GitHub Actions browser jobs now build workspace exports before testing and resolve every `@aelion/*` test import through source aliases.
 - Hermetic tarball consumers inherit the repository's exact `pnpm@10.13.1` package-manager pin, preventing Corepack from selecting an incompatible pnpm release under Node.js 20.
 - Render IR presentation normalizes the public `ImageBitmap` to straight alpha, avoiding double premultiplication on Linux headless Chromium/ANGLE paths.
+- Browser CI follows the certified platform boundary: Chromium runs on Ubuntu, while Firefox 54/54 and the two-browser tarball consumer run on macOS Intel where Worker WebGL2, H.264/AAC and the null audio backend are available.
 
 ## [0.1.0-alpha.0] - 2026-07-13
 
