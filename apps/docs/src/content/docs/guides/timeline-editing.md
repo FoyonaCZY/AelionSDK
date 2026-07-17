@@ -111,4 +111,4 @@ Marker 使用 `addMarker`、`updateMarker`、`removeMarker`。`setSelectionMetad
 
 不要直接修改 `session.getSnapshot().project`；快照是只读、冻结且可能在下一 revision 被替换。
 
-全部命令选项见 [Editing Commands](../reference/editing-commands.md)。
+全部命令选项见 [Editing Commands](/AelionSDK/reference/editing-commands/)。

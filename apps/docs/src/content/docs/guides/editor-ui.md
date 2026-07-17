@@ -86,4 +86,4 @@ Undo/Redo 绑定 SDK history；视图操作如 zoom 不应进入工程历史。
 6. 保存 canonical Project snapshot；
 7. 离开时取消任务，释放 preview/session/provider。
 
-仓库中的[参考编辑器](../start/reference-editor.md)展示了这个最小架构。复杂产品还需要自行实现快捷键冲突、可访问性、自动保存、协作、账户和素材服务。
+仓库中的[参考编辑器](/AelionSDK/start/reference-editor/)展示了这个最小架构。复杂产品还需要自行实现快捷键冲突、可访问性、自动保存、协作、账户和素材服务。

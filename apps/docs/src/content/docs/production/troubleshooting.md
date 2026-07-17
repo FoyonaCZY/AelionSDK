@@ -83,4 +83,4 @@ media.dispose();
 - 是否在参考编辑器可复现；
 - 生产/开发构建差异。
 
-完整代码表见 [Diagnostic Codes](../reference/diagnostic-codes.md)。
+完整代码表见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。

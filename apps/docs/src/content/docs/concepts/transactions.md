@@ -95,4 +95,4 @@ const unsubscribe = session.subscribe('project-changed', event => {
 
 Change listener 是提交后的观察者。不要在 listener 中同步启动另一个事务；把后续动作排入微任务或业务状态机。
 
-命令的选项和约束见 [Editing Commands](../reference/editing-commands.md)。
+命令的选项和约束见 [Editing Commands](/AelionSDK/reference/editing-commands/)。

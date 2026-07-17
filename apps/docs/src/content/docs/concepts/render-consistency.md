@@ -60,4 +60,4 @@ const job = session.export.startProfile(options);
 
 对降分辨率预览不做逐像素等同要求，而是比较构图、时间和效果语义。需要精确审片时切换 `quality: 'full'`、`renderScale: 1`。
 
-完整执行模型见[架构与执行模型](./architecture.md)，导出行为见[导出概览](../export/overview.md)。
+完整执行模型见[架构与执行模型](/AelionSDK/concepts/architecture/)，导出行为见[导出概览](/AelionSDK/export/overview/)。

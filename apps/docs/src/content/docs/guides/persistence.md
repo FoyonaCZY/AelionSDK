@@ -81,4 +81,4 @@ function migrateProject(value: unknown): unknown {
 
 使用 `extensions` 下的命名空间 key，例如 `com.example.review`。扩展值必须是 JSON，不应改变内核渲染语义；需要参与渲染的内容应使用正式 Item、Marker 或 Material 协议。
 
-字段定义见 [Project Schema](../reference/project-schema.md)，安全输入预算见[安全与部署清单](../production/security-deployment.md)。
+字段定义见 [Project Schema](/AelionSDK/reference/project-schema/)，安全输入预算见[安全与部署清单](/AelionSDK/production/security-deployment/)。

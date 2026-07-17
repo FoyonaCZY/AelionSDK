@@ -90,4 +90,4 @@ const session = await Aelion.createSession();
 await session.loadProject(builder.build());
 ```
 
-`build()` 和 `loadProject()` 都会拒绝不符合 v1 约束的文档。字段级说明见 [Project Schema](../reference/project-schema.md)。
+`build()` 和 `loadProject()` 都会拒绝不符合 v1 约束的文档。字段级说明见 [Project Schema](/AelionSDK/reference/project-schema/)。

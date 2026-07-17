@@ -106,4 +106,4 @@ Marker owner 是 `{ type: 'sequence' | 'item', id }`，时间相对 owner 语义
 5. 时间、transition、mapping、mask 和 Material 语义；
 6. 编译 Render IR。
 
-任何一步失败都不会发布半加载 Session。错误码见 [Diagnostic Codes](./diagnostic-codes.md)。
+任何一步失败都不会发布半加载 Session。错误码见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。

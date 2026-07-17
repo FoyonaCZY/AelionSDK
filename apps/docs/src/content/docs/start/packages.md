@@ -56,4 +56,4 @@ import { OpfsSeekableSink } from '@aelion/export';
 - 升级前运行 Project fixture、导出 preflight 和关键浏览器回归。
 - alpha 阶段把 API Snapshot 变化视为需要人工审阅的变更。
 
-完整导出清单见[包与入口](../reference/packages.md)，精确签名见站点中的 API Reference。
+完整导出清单见[包与入口](/AelionSDK/reference/packages/)，精确签名见站点中的 API Reference。

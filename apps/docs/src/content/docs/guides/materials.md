@@ -16,7 +16,7 @@ Package → Definition → Graph → Instance
 - **Graph**：由 typed Core Node 组成的有向无环执行图。
 - **Instance**：Project 中的版本锁定引用、参数、资源绑定和启用状态。
 
-完整字段和执行语义见 [Material Protocol v1](../../reference/material-protocol-v1/)。
+完整字段和执行语义见 [Material Protocol v1](/AelionSDK/reference/material-protocol-v1/)。
 
 ## 创作一个声明式 Material
 

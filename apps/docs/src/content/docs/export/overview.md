@@ -72,4 +72,4 @@ const job = session.export.startProfile({
 });
 ```
 
-任务详情见[任务、进度与 Sink](./jobs-sinks.md)，浏览器差异见[能力探测与 Preflight](../production/capability-preflight.md)。
+任务详情见[任务、进度与 Sink](/AelionSDK/export/jobs-sinks/)，浏览器差异见[能力探测与 Preflight](/AelionSDK/production/capability-preflight/)。

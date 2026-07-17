@@ -98,4 +98,4 @@ await session.dispose();
 pnpm vite build
 ```
 
-如果出现 Worker、AudioWorklet、MIME、CORS 或跨源隔离问题，查看[故障排查](../production/troubleshooting.md)。
+如果出现 Worker、AudioWorklet、MIME、CORS 或跨源隔离问题，查看[故障排查](/AelionSDK/production/troubleshooting/)。

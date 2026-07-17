@@ -69,4 +69,4 @@ UI
 
 销毁时按外到内释放：Controller → Session → Provider。`ImageBitmap`、`VideoFrame`、AudioData 等可关闭对象在消费后立即关闭。切换 Project 不等于自动释放业务创建的 Provider。
 
-具体注册方式见[导入与管理媒体](../guides/media-import.md)，资源预算见[性能与资源预算](../production/performance.md)。
+具体注册方式见[导入与管理媒体](/AelionSDK/guides/media-import/)，资源预算见[性能与资源预算](/AelionSDK/production/performance/)。

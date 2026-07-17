@@ -92,4 +92,4 @@ const unsubs = [
 - Remote Export 按 idempotency key 恢复或查询；
 - Session dispose 在应用正常路由切换中完成。
 
-事件字段见[事件与统计](../reference/events-stats.md)，code 表见 [Diagnostic Codes](../reference/diagnostic-codes.md)。
+事件字段见[事件与统计](/AelionSDK/reference/events-stats/)，code 表见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。

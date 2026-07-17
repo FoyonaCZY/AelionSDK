@@ -24,8 +24,10 @@ export default defineConfig({
           sidebar: { label: 'API Reference', collapsed: true },
           typeDoc: {
             entryPointStrategy: 'packages',
+            entryFileName: 'overview',
             packageOptions: {
               entryPoints: ['src/index.ts'],
+              entryFileName: 'overview',
               validation: { notDocumented: false, notExported: false },
             },
             categorizeByGroup: true,

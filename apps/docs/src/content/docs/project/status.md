@@ -78,4 +78,4 @@ corepack pnpm release:dry-run
 
 ## 历史说明
 
-早期 Phase 0、Phase 1 和 Production Core 的 Goal、Backlog、Exit Review、ADR 与完成审计已经履行阶段性作用。它们的历史内容仍可从 Git 追溯；现行结论统一由本页、[能力全景](../../start/capabilities/)、[架构设计](../../concepts/architecture/)和[兼容性](../../production/compatibility/)维护。
+早期 Phase 0、Phase 1 和 Production Core 的 Goal、Backlog、Exit Review、ADR 与完成审计已经履行阶段性作用。它们的历史内容仍可从 Git 追溯；现行结论统一由本页、[能力全景](/AelionSDK/start/capabilities/)、[架构设计](/AelionSDK/concepts/architecture/)和[兼容性](/AelionSDK/production/compatibility/)维护。

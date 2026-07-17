@@ -139,7 +139,7 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 ## 文档规则
 
 - 新的用户任务优先补充 Guide，不为每个 Issue 新建 Goal 文档。
-- 长期架构约束更新[架构与执行模型](../../concepts/architecture/)，不再创建零散 ADR 文件。
-- 当前支持范围只更新[兼容性与部署](../../production/compatibility/)。
-- 阶段结果和可复现证据只更新[项目状态](../status/)与 reports 索引。
+- 长期架构约束更新[架构与执行模型](/AelionSDK/concepts/architecture/)，不再创建零散 ADR 文件。
+- 当前支持范围只更新[兼容性与部署](/AelionSDK/production/compatibility/)。
+- 阶段结果和可复现证据只更新[项目状态](/AelionSDK/project/status/)与 reports 索引。
 - 已过期计划依靠 Git 历史追溯，避免现行文档同时存在多套口径。

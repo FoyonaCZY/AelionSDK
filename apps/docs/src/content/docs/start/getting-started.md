@@ -3,7 +3,7 @@ title: 快速开始
 description: 用一个本地视频完成导入、Project 创建、实时预览、编辑和 H.264 导出。
 ---
 
-这条路径只使用聚合入口 `@aelion/sdk`，目标是在一个页面里走通最小可用链路。当前版本尚未发布到 npm，请先按[安装与工程配置](./installation.md)从仓库运行。
+这条路径只使用聚合入口 `@aelion/sdk`，目标是在一个页面里走通最小可用链路。当前版本尚未发布到 npm，请先按[安装与工程配置](/AelionSDK/start/installation/)从仓库运行。
 
 ## 1. 配置 Vite
 
@@ -18,7 +18,7 @@ export default defineConfig({
 });
 ```
 
-播放器使用 SharedArrayBuffer 音频通道时，页面还需要跨源隔离响应头。完整配置见[兼容性与部署](../production/compatibility.md)。
+播放器使用 SharedArrayBuffer 音频通道时，页面还需要跨源隔离响应头。完整配置见[兼容性与部署](/AelionSDK/production/compatibility/)。
 
 ## 2. 准备画布和文件输入
 
@@ -120,7 +120,7 @@ await session.transaction.undo();
 await session.transaction.redo();
 ```
 
-拖拽类高频手势应使用 `beginInteractive()` 合并为一条撤销记录，见[事务、历史与交互编辑](../concepts/transactions.md)。
+拖拽类高频手势应使用 `beginInteractive()` 合并为一条撤销记录，见[事务、历史与交互编辑](/AelionSDK/concepts/transactions/)。
 
 ## 6. 导出 H.264 MP4
 
@@ -163,7 +163,7 @@ try {
 }
 ```
 
-长视频不要使用内存 Sink，改用 OPFS。格式、取消和清理规则见[导出概览](../export/overview.md)和[任务、进度与 Sink](../export/jobs-sinks.md)。
+长视频不要使用内存 Sink，改用 OPFS。格式、取消和清理规则见[导出概览](/AelionSDK/export/overview/)和[任务、进度与 Sink](/AelionSDK/export/jobs-sinks/)。
 
 ## 7. 释放资源
 
@@ -176,7 +176,7 @@ try {
 });
 ```
 
-到这里，你已经走通 File → Project → Session → Preview/Player → Transaction → Export。接下来建议运行[参考编辑器](./reference-editor.md)，再按实际产品阅读[剪辑 UI 集成](../guides/editor-ui.md)。
+到这里，你已经走通 File → Project → Session → Preview/Player → Transaction → Export。接下来建议运行[参考编辑器](/AelionSDK/start/reference-editor/)，再按实际产品阅读[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)。
 
 :::tip[可编译的完整示例]
 仓库中的 `examples/typescript/sdk-integration.ts` 由 CI 执行 TypeScript 检查，覆盖同一条 File → Canvas → H.264 路径。

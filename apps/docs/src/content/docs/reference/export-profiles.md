@@ -43,4 +43,4 @@ Session 会从 Render IR 填充 duration、width、height、frameRate、sampleRa
 
 `probeExportProfiles()` 只检查通用 codec/canvas 能力。`session.export.preflightProfile()` 还检查当前 Project revision、尺寸、帧率、声道、色彩、Material 和 Sink，是启动前的最终依据。
 
-Profile 常量由 `EXPORT_PROFILES` 导出。完整 Job 用法见[任务、进度与 Sink](../export/jobs-sinks.md)。
+Profile 常量由 `EXPORT_PROFILES` 导出。完整 Job 用法见[任务、进度与 Sink](/AelionSDK/export/jobs-sinks/)。

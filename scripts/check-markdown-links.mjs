@@ -2,6 +2,8 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { basename, dirname, extname, resolve } from 'node:path';
 
 const root = process.cwd();
+const docsContentDirectory = resolve(root, 'apps/docs/src/content/docs');
+const docsSiteBase = '/AelionSDK/';
 const generatedDirectories = new Set([resolve(root, 'apps/docs/src/content/docs/api')]);
 const skippedDirectories = new Set([
   '.git',
@@ -46,6 +48,29 @@ async function exists(path) {
 }
 
 async function localTargetExists(file, target) {
+  if (
+    file.startsWith(`${docsContentDirectory}/`) &&
+    (target === docsSiteBase.slice(0, -1) || target.startsWith(docsSiteBase))
+  ) {
+    const route =
+      target === docsSiteBase.slice(0, -1)
+        ? ''
+        : target.slice(docsSiteBase.length).replace(/\/+$/u, '');
+    if (route.startsWith('api/')) return true;
+
+    const routePath = resolve(docsContentDirectory, route);
+    const routeCandidates = [
+      `${routePath}.md`,
+      `${routePath}.mdx`,
+      resolve(routePath, 'index.md'),
+      resolve(routePath, 'index.mdx'),
+    ];
+    for (const candidate of routeCandidates) {
+      if (await exists(candidate)) return true;
+    }
+    return false;
+  }
+
   const directPath = resolve(dirname(file), target);
   if (await exists(directPath)) return true;
 
@@ -72,11 +97,28 @@ const failures = [];
 
 for (const file of await collectMarkdownFiles()) {
   const source = await readFile(file, 'utf8');
-  for (const match of source.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/gu)) {
-    const target = localTarget(match[1]);
+  for (const match of source.matchAll(/(!?)\[[^\]]*\]\(([^)]+)\)/gu)) {
+    const target = localTarget(match[2]);
     if (target === null) continue;
+    if (file.startsWith(`${docsContentDirectory}/`) && /\.mdx?$/u.test(target)) {
+      failures.push(
+        `${file.slice(root.length + 1)} -> ${match[2]} (use the generated route without .md/.mdx)`,
+      );
+      continue;
+    }
+    if (
+      file.startsWith(`${docsContentDirectory}/`) &&
+      match[1] !== '!' &&
+      target !== docsSiteBase.slice(0, -1) &&
+      !target.startsWith(docsSiteBase)
+    ) {
+      failures.push(
+        `${file.slice(root.length + 1)} -> ${match[2]} (use an absolute ${docsSiteBase} route)`,
+      );
+      continue;
+    }
     if (!(await localTargetExists(file, target))) {
-      failures.push(`${file.slice(root.length + 1)} -> ${match[1]}`);
+      failures.push(`${file.slice(root.length + 1)} -> ${match[2]}`);
     }
   }
 }

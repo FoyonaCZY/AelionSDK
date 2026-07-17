@@ -48,6 +48,7 @@ jobs:
       - run: pnpm run docs:check
       - run: pnpm run docs:typecheck
       - run: pnpm run build:docs
+      - run: pnpm run docs:check:built
       - if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
       - if: github.event_name != 'pull_request'

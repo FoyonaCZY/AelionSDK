@@ -46,4 +46,4 @@ corepack pnpm run build:editor
 
 不应照搬：视觉样式、产品状态管理、权限模型、素材服务、快捷键体系和协作逻辑。这些属于上层产品，而不是 SDK 契约。
 
-读完后继续看[剪辑 UI 集成](../guides/editor-ui.md)，了解如何把这些能力放入专业编辑器架构。
+读完后继续看[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)，了解如何把这些能力放入专业编辑器架构。

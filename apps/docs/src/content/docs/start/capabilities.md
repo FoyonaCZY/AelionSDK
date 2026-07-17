@@ -105,7 +105,7 @@ Material 统一表达 Filter、Transition、Effect 和 Generator：
 - 支持 Ed25519/ECDSA publisher signature、TrustStore、revocation 和安装审计；
 - Shader、WASM、网络访问需要宿主 execution policy 显式授权，签名不会自动赋予执行权限。
 
-接入步骤见 [Material 创作](../../guides/materials/)，协议见 [Material Protocol v1](../../reference/material-protocol-v1/)。
+接入步骤见 [Material 创作](/AelionSDK/guides/materials/)，协议见 [Material Protocol v1](/AelionSDK/reference/material-protocol-v1/)。
 
 ## 运行边界
 

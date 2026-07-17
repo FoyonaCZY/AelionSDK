@@ -70,4 +70,4 @@ Mute/Solo 只适用于带 audio mixer properties 的音频轨。
 
 命令执行前检查实体、track kind、lock、时间、source handle、transition、ownership 和 no-op。失败时抛出带 Diagnostic 的 `AelionError`，Project 和 revision 不变。
 
-UI 应在可能时预检查并提供即时反馈，但不能绕过内核验证。完整拒绝 code 见 [Diagnostic Codes](./diagnostic-codes.md)，精确 TypeScript 类型见 API Reference 的 `@aelion/transaction`。
+UI 应在可能时预检查并提供即时反馈，但不能绕过内核验证。完整拒绝 code 见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)，精确 TypeScript 类型见 API Reference 的 `@aelion/transaction`。
