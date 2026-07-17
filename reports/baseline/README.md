@@ -21,7 +21,7 @@
 | `alpha-60s.json`                    | 60 秒公开 SDK edit/play/preview/export/readback、Long Task、queue 与 dispose 数据                    |
 | `alpha-60s.webm`                    | 60 秒 WebM/VP9/Opus 成片，SHA-256 `b516854fceaade43e9c8cf46f8fe76531a40a395772b5ffda0d43f09f66e75c3` |
 
-验证环境为 Node.js `v20.20.2`、pnpm `10.13.1`、macOS `15.6.1` x64。首次提交前仓库没有 Git HEAD，因此报告保存 workspace manifest，而不伪造 commit。当前产品结论和证据地图见[项目状态](../../docs/status.md)。
+验证环境为 Node.js `v20.20.2`、pnpm `10.13.1`、macOS `15.6.1` x64。首次提交前仓库没有 Git HEAD，因此报告保存 workspace manifest，而不伪造 commit。当前产品结论和证据地图见[项目状态](../../apps/docs/src/content/docs/project/status.md)。
 
 ## Phase 0 历史基线
 

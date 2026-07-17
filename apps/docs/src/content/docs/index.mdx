@@ -1,0 +1,71 @@
+---
+title: 浏览器视频编辑与渲染 SDK
+description: 在浏览器里构建真正的视频编辑产品。
+template: splash
+hero:
+  title: "在\u2060浏\u2060览\u2060器\u2060里\u2060构\u2060建 真\u2060正\u2060的\u2060视\u2060频\u2060编\u2060辑\u2060产\u2060品"
+  tagline: 从时间线编辑、实时预览到音视频导出，使用同一套工程模型和渲染语义。
+  actions:
+    - text: 开始接入
+      link: ./start/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: 查看能力
+      link: ./start/capabilities/
+      icon: open-book
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<div class="product-proof">
+  <span>Project JSON</span>
+  <i>→</i>
+  <span>Transaction</span>
+  <i>→</i>
+  <span>Render IR</span>
+  <i>→</i>
+  <strong>Preview · Player · Export</strong>
+</div>
+
+## 一套内核，覆盖完整剪辑链路
+
+AelionSDK 是一套 Browser-first 音视频剪辑与渲染 SDK。业务保存可版本化的 Project JSON，编辑通过原子 Transaction 提交，Preview、Player 和 Export 共同消费 Render IR。画面、声音和导出不会各自维护一套容易漂移的规则。
+
+<CardGrid>
+  <Card title="专业时间线">
+    插入、裁剪、切分、ripple、roll、slip、slide、link/group、Marker、关键帧与变速。
+  </Card>
+  <Card title="实时预览">
+    Worker GPU compositor、latest-wins scrub、自适应预览质量、DPR 与资源生命周期管理。
+  </Card>
+  <Card title="音视频导出">
+    WebM、H.264 MP4、图片、GIF、WAV/RF64，以及 Worker、Remote、checkpoint 与流式 Sink。
+  </Card>
+  <Card title="可扩展 Material">
+    Filter、Transition、Effect 和 Generator 共用声明式 Graph、类型参数与安全执行协议。
+  </Card>
+</CardGrid>
+
+## 先走通一条真实路径
+
+第一次接入时，不需要先理解所有底层包。建议从 `@aelion/sdk` 开始，依次完成：导入媒体、创建 Project、加载 Session、连接预览画布、提交一次编辑、执行一次导出。
+
+1. 阅读[快速开始](./start/getting-started/)，运行完整的 TypeScript 示例。
+2. 打开[能力全景](./start/capabilities/)，确认你的产品需求与当前边界。
+3. 在进入生产环境前阅读[兼容性与部署](./production/compatibility/)，按实际设备执行 capability probe 和 export preflight。
+
+:::note[当前版本]
+AelionSDK 当前为 `0.1.0-alpha.0` 源码里程碑，公开包尚未发布到 npm。文档中的安装命令描述发布后的接入方式；现在可以 clone 仓库运行源码、参考编辑器和测试。
+:::
+
+## 为上层产品而设计
+
+AelionSDK 提供剪辑引擎和公共集成 API，不限定你的 UI。你可以用它构建在线剪辑器、模板成片、营销素材生产、内容创作工具或自动化视频工作流，同时保留自己的产品交互、素材系统和业务数据模型。
+
+<div class="doc-cta">
+  <div>
+    <strong>准备开始？</strong>
+    <span>十分钟走通 Project、Preview、编辑与导出。</span>
+  </div>
+  <a href="./start/getting-started/">阅读快速开始 →</a>
+</div>

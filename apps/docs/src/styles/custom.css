@@ -1,0 +1,116 @@
+:root {
+  --sl-color-accent-low: #172554;
+  --sl-color-accent: #60a5fa;
+  --sl-color-accent-high: #dbeafe;
+  --sl-color-white: #f8fafc;
+  --sl-color-gray-1: #e2e8f0;
+  --sl-color-gray-2: #cbd5e1;
+  --sl-color-gray-3: #64748b;
+  --sl-color-gray-4: #334155;
+  --sl-color-gray-5: #1e293b;
+  --sl-color-gray-6: #0f172a;
+  --sl-color-black: #080c18;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #dbeafe;
+  --sl-color-accent: #2563eb;
+  --sl-color-accent-high: #1e3a8a;
+  --sl-color-white: #0f172a;
+  --sl-color-gray-1: #1e293b;
+  --sl-color-gray-2: #334155;
+  --sl-color-gray-3: #64748b;
+  --sl-color-gray-4: #cbd5e1;
+  --sl-color-gray-5: #e2e8f0;
+  --sl-color-gray-6: #f1f5f9;
+  --sl-color-gray-7: #f8fafc;
+  --sl-color-black: #ffffff;
+}
+
+.hero {
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: clamp(3rem, 8vw, 7rem);
+}
+
+.hero h1 {
+  max-width: 100%;
+  background: linear-gradient(115deg, #60a5fa 5%, #a78bfa 52%, #2dd4bf 95%);
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(2.35rem, 7vw, 5.2rem);
+  letter-spacing: -0.055em;
+}
+
+.hero .tagline {
+  max-width: 43rem;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.75;
+}
+
+.product-proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 3.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--sl-color-accent) 30%, transparent);
+  border-radius: 1rem;
+  background: linear-gradient(110deg, rgb(37 99 235 / 12%), rgb(45 212 191 / 7%));
+  font-family: var(--__sl-font-mono);
+  font-size: 0.85rem;
+}
+
+.product-proof i {
+  color: var(--sl-color-gray-3);
+  font-style: normal;
+}
+
+.product-proof strong {
+  color: var(--sl-color-accent-high);
+}
+
+.card-grid .card {
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgb(96 165 250 / 8%), transparent 65%);
+}
+
+.doc-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 1rem;
+}
+
+.doc-cta div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.doc-cta span {
+  color: var(--sl-color-gray-2);
+}
+
+.doc-cta a {
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  background: var(--sl-color-accent);
+  color: var(--sl-color-black);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 50rem) {
+  .hero h1 {
+    font-size: 2.35rem;
+  }
+
+  .product-proof i {
+    display: none;
+  }
+}

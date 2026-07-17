@@ -1,4 +1,7 @@
-# AelionSDK Diagnostic Codes
+---
+title: AelionSDK Diagnostic Codes
+description: 稳定错误码、严重级别、恢复建议和结构化诊断字段。
+---
 
 > 对应源码版本：`0.1.0-alpha.0`  
 > 规则：业务分支只依赖 `code` 和结构化字段，不解析英文 `message`

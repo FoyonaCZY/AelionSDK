@@ -1,4 +1,7 @@
-# Material 创作与接入
+---
+title: Material 创作与接入
+description: 创建和接入 Filter、Transition、Effect 与 Generator。
+---
 
 Material 是 AelionSDK 的视觉扩展单元。Filter、Transition、Effect 和 Generator 使用同一套包、参数、资源、Graph 和执行协议。
 
@@ -13,7 +16,7 @@ Package → Definition → Graph → Instance
 - **Graph**：由 typed Core Node 组成的有向无环执行图。
 - **Instance**：Project 中的版本锁定引用、参数、资源绑定和启用状态。
 
-完整字段和执行语义见 [Material Protocol v1](Aelion-Material-Protocol-v1.md)。
+完整字段和执行语义见 [Material Protocol v1](../../reference/material-protocol-v1/)。
 
 ## 创作一个声明式 Material
 
@@ -41,7 +44,7 @@ const result = authoring.build({
 });
 ```
 
-仓库中的可运行示例位于 [`examples/materials`](../examples/materials/README.md)。Authoring API 的精确类型以 `@aelion/material-sdk` 导出为准。
+仓库中的可运行示例位于 [`examples/materials`](https://github.com/FoyonaCZY/AelionSDK/tree/main/examples/materials)。Authoring API 的精确类型以 `@aelion/material-sdk` 导出为准。
 
 ## 推荐工作流
 

@@ -1,6 +1,9 @@
-# 开发与发布
+---
+title: 开发与发布
+description: 仓库环境、质量门禁、变更流程和发布检查。
+---
 
-本页面向仓库维护者。贡献者的行为与提交流程另见 [`CONTRIBUTING.md`](../CONTRIBUTING.md)。
+本页面向仓库维护者。贡献者的行为与提交流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/CONTRIBUTING.md)。
 
 ## 环境
 
@@ -33,7 +36,7 @@ corepack pnpm run ci
 | `corepack pnpm dev:lab`              | Capability / Material Lab                                  |
 | `corepack pnpm dev:editor`           | 只使用公开包 API 的参考剪辑器                              |
 
-证据生成命令和产物说明位于 [`reports/baseline/README.md`](../reports/baseline/README.md)。
+证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
 
 ## 变更流程
 
@@ -136,7 +139,7 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 ## 文档规则
 
 - 新的用户任务优先补充 Guide，不为每个 Issue 新建 Goal 文档。
-- 长期架构约束更新 [architecture.md](architecture.md)，不再创建零散 ADR 文件。
-- 当前支持范围只更新 [compatibility.md](compatibility.md)。
-- 阶段结果和可复现证据只更新 [status.md](status.md) 与 reports 索引。
+- 长期架构约束更新[架构与执行模型](../../concepts/architecture/)，不再创建零散 ADR 文件。
+- 当前支持范围只更新[兼容性与部署](../../production/compatibility/)。
+- 阶段结果和可复现证据只更新[项目状态](../status/)与 reports 索引。
 - 已过期计划依靠 Git 历史追溯，避免现行文档同时存在多套口径。

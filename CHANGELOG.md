@@ -1,6 +1,6 @@
 # Changelog
 
-本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](docs/development.md#版本与迁移)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
+本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/project/development.md#版本与迁移)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
 
 ## [Unreleased]
 

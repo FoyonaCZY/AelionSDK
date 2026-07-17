@@ -1,4 +1,7 @@
-# 项目状态与证据
+---
+title: 项目状态与证据
+description: 当前版本成熟度、自动化证据和已知边界。
+---
 
 > 当前版本：`0.1.0-alpha.0 + Unreleased`
 >
@@ -17,7 +20,7 @@ AelionSDK 已具备完整的浏览器剪辑核心：Project/Transaction、专业
 - Chromium source browser suite；
 - Firefox source browser suite 与真实 tarball browser consumer。
 
-Production Core 完成窗口还通过 Chromium、Firefox、Golden 和性能专项。精确、可重新生成的数据保存在 [`reports/baseline`](../reports/baseline/README.md)，不在本页复制容易过期的计数。
+Production Core 完成窗口还通过 Chromium、Firefox、Golden 和性能专项。精确、可重新生成的数据保存在 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)，不在本页复制容易过期的计数。
 
 ## 证据地图
 
@@ -75,4 +78,4 @@ corepack pnpm release:dry-run
 
 ## 历史说明
 
-早期 Phase 0、Phase 1 和 Production Core 的 Goal、Backlog、Exit Review、ADR 与完成审计已经履行阶段性作用。它们的历史内容仍可从 Git 追溯；现行结论统一由本页、[能力全景](capabilities.md)、[架构设计](architecture.md)和[兼容性](compatibility.md)维护。
+早期 Phase 0、Phase 1 和 Production Core 的 Goal、Backlog、Exit Review、ADR 与完成审计已经履行阶段性作用。它们的历史内容仍可从 Git 追溯；现行结论统一由本页、[能力全景](../../start/capabilities/)、[架构设计](../../concepts/architecture/)和[兼容性](../../production/compatibility/)维护。

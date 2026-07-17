@@ -1,6 +1,9 @@
-# 能力全景
+---
+title: 能力全景
+description: AelionSDK 当前已经实现的编辑、渲染、音频、媒体、导出和 Material 能力。
+---
 
-本页描述当前源码中的产品能力和明确边界。公开 API 的精确类型以 [`@aelion/sdk` declaration snapshot](../packages/sdk/api-snapshot.md) 为准。
+本页描述当前源码中的产品能力和明确边界。公开 API 的精确类型以 [`@aelion/sdk` declaration snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 为准。
 
 ## 工程与编辑模型
 
@@ -102,7 +105,7 @@ Material 统一表达 Filter、Transition、Effect 和 Generator：
 - 支持 Ed25519/ECDSA publisher signature、TrustStore、revocation 和安装审计；
 - Shader、WASM、网络访问需要宿主 execution policy 显式授权，签名不会自动赋予执行权限。
 
-接入步骤见 [Material 创作](materials.md)，协议见 [Material Protocol v1](Aelion-Material-Protocol-v1.md)。
+接入步骤见 [Material 创作](../../guides/materials/)，协议见 [Material Protocol v1](../../reference/material-protocol-v1/)。
 
 ## 运行边界
 

@@ -1,4 +1,7 @@
-# Aelion Material Protocol v1
+---
+title: Aelion Material Protocol v1
+description: Material Package、Definition、Graph、Instance、安全与兼容协议。
+---
 
 | 项目     | 内容                                     |
 | -------- | ---------------------------------------- |
@@ -1382,7 +1385,7 @@ AMP v1 当前由 `@aelion/material-compiler`、`@aelion/material-sdk`、Project 
 - 新增可选字段必须有稳定缺省行为，未知必需能力必须 fail closed；
 - 迁移是确定性纯数据变换，不执行网络或任意代码；
 - Graph backend 可以增加，但不能让 Preview 与 Export 产生两套语义；
-- Core Node 的精确公式和 Golden 容差由 [Core Node Math 1.0](reference/core-node-math-v1.md) 定义；
-- 当前实现范围、宿主注册和发布检查见 [Material 创作与接入](materials.md)。
+- Core Node 的精确公式和 Golden 容差由 [Core Node Math 1.0](../core-node-math-v1/) 定义；
+- 当前实现范围、宿主注册和发布检查见 [Material 创作与接入](../../guides/materials/)。
 
 AMP v1 的发布级兼容承诺只会随正式版本和 release notes 生效；源码中的 Alpha 实现不自动构成 1.0 稳定性承诺。

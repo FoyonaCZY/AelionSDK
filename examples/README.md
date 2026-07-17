@@ -23,7 +23,7 @@
 
 ## Runtime binding
 
-`runtime-binding` 只保存稳定 binding ID，不把 File、签名 URL、token 或 bytes 放入 Project。接入方必须在 MediaProvider 中把 Project `assetId` 解析到当前会话资源，遵守[媒体接入约束](../docs/getting-started.md#3-准备-project-与媒体)。
+`runtime-binding` 只保存稳定 binding ID，不把 File、签名 URL、token 或 bytes 放入 Project。接入方必须在 MediaProvider 中把 Project `assetId` 解析到当前会话资源，遵守[媒体接入约束](../apps/docs/src/content/docs/start/getting-started.md#3-从媒体创建-project)。
 
 修改 fixture 后必须：
 
