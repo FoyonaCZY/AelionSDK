@@ -2,146 +2,186 @@
 
 # AelionSDK
 
-**在浏览器里构建真正的视频编辑产品。**
-
-从时间线编辑、实时预览到音视频导出，使用同一套工程模型和渲染语义。
+用 TypeScript 在浏览器中完成时间线编辑、实时预览、播放和音视频导出。
 
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Node.js 20](https://img.shields.io/badge/node-20.19%2B-43853d.svg)](package.json)
 
-[文档中心](https://foyonaczy.github.io/AelionSDK/) · [快速开始](https://foyonaczy.github.io/AelionSDK/start/getting-started/) · [构建剪辑器](https://foyonaczy.github.io/AelionSDK/guides/editor-ui/) · [导出](https://foyonaczy.github.io/AelionSDK/export/overview/) · [API Reference](https://foyonaczy.github.io/AelionSDK/api/readme/)
+[文档](https://foyonaczy.github.io/AelionSDK/) · [快速开始](https://foyonaczy.github.io/AelionSDK/start/getting-started/) · [参考编辑器](https://foyonaczy.github.io/AelionSDK/start/reference-editor/) · [API](https://foyonaczy.github.io/AelionSDK/api/overview/)
 
 </div>
 
-## 一套内核，覆盖完整剪辑链路
+## AelionSDK 是什么
 
-AelionSDK 是一套 Browser-first 音视频剪辑与渲染 SDK。业务保存的是可版本化的 Project JSON；每次编辑通过原子 Transaction 提交；Preview、Player 和 Export 共同消费 Render IR。画面、声音和导出不会各自维护一套容易漂移的规则。
+AelionSDK 是一个运行在浏览器里的视频编辑与渲染引擎。它提供工程模型、编辑命令、媒体解码、画面合成、音频播放和导出能力，但不绑定 UI，也不要求使用特定前端框架。
+
+你可以用它开发在线剪辑器、模板成片工具、营销素材编辑器，或者任何需要在网页中读取、编辑和导出视频的产品。React、Vue、Svelte 和原生 DOM 都可以接入。
+
+SDK 中最重要的四个对象是：
+
+- `Project`：一份可保存、可迁移的 JSON，记录素材、轨道、片段、效果和输出规格；
+- `ProductionMediaProvider`：把 Project 中的素材 ID 绑定到 File、URL、OPFS 或自定义数据源；
+- `Session`：加载 Project，提供编辑、预览、播放、导出、事件和诊断接口；
+- `PreviewCanvasController`：把 Session 产生的画面绘制到 Canvas，并处理缩放、过期帧和资源释放。
 
 ```text
-Project JSON → Transaction → Render IR → Preview / Player / Export
-                       └────── Material Runtime ──────┘
+File / URL / OPFS ──→ Media Provider
+                           │
+Project JSON ──────────→ Session
+                           ├── Transaction + Undo / Redo
+                           ├── Preview + Player
+                           └── Local / Remote Export
 ```
 
-它适合需要把剪辑能力直接嵌入产品的团队：模板成片、在线编辑器、内容创作工具、营销素材生产和自动化视频工作流。
+Project 只描述“剪什么”，Media Provider 负责“去哪里读取素材”，Session 则执行编辑和渲染。预览与导出消费同一份 Project 和 Render IR，时间映射、Material 与音频规则不会各维护一套实现。
 
-## 为什么选择 AelionSDK
+## 先跑起来
 
-| 产品能力       | AelionSDK 的处理方式                                                  |
-| -------------- | --------------------------------------------------------------------- |
-| 可持续编辑     | normalized Project、稳定 ID、revision、原子提交、交互合并和有界历史   |
-| 预览与导出一致 | 同一 Render IR、时间映射、Material 和音频混音语义；预览可独立降采样   |
-| 浏览器原生执行 | WebCodecs、Worker、WebGL2/WebGPU、AudioWorklet、OPFS                  |
-| 专业时间线     | ripple、roll、slip、slide、link/group、nested sequence、关键帧与变速  |
-| 可扩展视觉系统 | Filter、Transition、Effect、Generator 共用 Material Protocol          |
-| 可控的生产资源 | 背压、取消、缓存预算、decoder/GPU 仲裁和确定性释放                    |
-| 可部署、可诊断 | capability probe、export preflight、稳定 diagnostic code 和 Vite 集成 |
-
-## 核心能力
-
-- **时间线编辑**：插入、移除、移动、裁剪、切分、替换、ripple、roll、slip、slide、链接、分组、Marker 和选择区间。
-- **时间与动画**：整数微秒、有理帧率、正放/倒放/定格/曲线 TimeMap，以及 step、linear、cubic、cycle、ping-pong automation。
-- **画面合成**：多轨合成、12 种 blend mode、mask/matte、可缩放 Draft/Full 预览、文字与字幕、Generator、Adjustment、嵌套 Sequence 和显式背景。
-- **音频引擎**：AudioWorklet 主时钟、sample-accurate automation、mute/solo、声道矩阵、ducking、waveform、LUFS、true peak 和 limiter。
-- **媒体管线**：MP4/WebM SampleIndex、exact seek、VideoFrame/PCM decode、代理选择、分段索引、内容寻址缓存和页面级资源仲裁。
-- **多格式导出**：WebM、MP4、PNG/JPEG/WebP、GIF、WAV/RF64，以及 Worker、Remote、checkpoint、Writable/OPFS Sink。
-- **Material 生态**：声明式 Graph、typed Authoring SDK、Composition、Catalog、迁移、签名/信任/吊销和 Material Lab。
-
-完整边界和高级功能见[能力全景](https://foyonaczy.github.io/AelionSDK/start/capabilities/)。
-
-## 快速体验
-
-> 当前版本为 `0.1.0-alpha.0`，公开包尚未发布到 npm。下面的包安装命令代表发布后的接入方式；现在请 clone 仓库运行源码。
+当前版本为 `0.1.0-alpha.0`，源码可以运行，但尚未发布到 npm。现阶段最直接的体验方式是启动仓库内的 Quickstart：
 
 ```bash
-pnpm add @aelion/sdk @aelion/export
-pnpm add -D @aelion/vite-plugin
+git clone https://github.com/FoyonaCZY/AelionSDK.git
+cd AelionSDK
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev:quickstart
 ```
+
+打开终端给出的本地地址，选择一个 MP4 或 WebM 文件。页面可以显示第一帧、拖动和播放素材、移动片段并撤销，以及在设备支持时导出 H.264/AAC MP4。
+
+如果想看一个更接近剪辑产品的例子，可以运行参考编辑器：
+
+```bash
+corepack pnpm dev:editor
+```
+
+它包含本地素材导入、时间线、播放头拖动、音视频联动编辑、撤销/重做，以及 WebM 和 H.264 MP4 导出。两个示例都只使用公开包入口，没有调用仓库内部实现。
+
+## 最小接入
+
+使用 Vite 时先启用官方插件，它会处理 Renderer Worker、Export Worker 和 AudioWorklet 资源：
 
 ```ts
 // vite.config.ts
 import { aelion } from '@aelion/vite-plugin';
 import { defineConfig } from 'vite';
 
-export default defineConfig({ plugins: [aelion()] });
+export default defineConfig({
+  plugins: [aelion()],
+});
 ```
+
+下面这段代码把用户选择的本地文件变成一个可预览的工程：
 
 ```ts
 import { Aelion, ProductionMediaProvider, attachPreviewCanvas, createProject } from '@aelion/sdk';
 
-const media = new ProductionMediaProvider();
-media.registerFile('asset_main', file);
+async function openVideo(file: File, canvas: HTMLCanvasElement) {
+  const media = new ProductionMediaProvider();
+  media.registerFile('asset_main', file);
 
-const project = createProject({ width: 1920, height: 1080 });
-await project.importMedia({ provider: media, assetId: 'asset_main' });
+  const probe = await media.probe('asset_main');
+  const video = probe.index.tracks.find(track => track.kind === 'video');
 
-const session = await Aelion.createSession({ media });
-await session.loadProject(project.build());
+  const builder = createProject({
+    width: video?.codedWidth ?? 1920,
+    height: video?.codedHeight ?? 1080,
+    frameRate: { numerator: 30, denominator: 1 },
+  });
 
-const canvas = document.querySelector<HTMLCanvasElement>('#preview');
-if (canvas === null) throw new Error('Preview canvas is missing');
-const preview = attachPreviewCanvas(session, canvas, { quality: 'adaptive' });
-await preview.render(0);
+  await builder.importMedia({
+    provider: media,
+    assetId: 'asset_main',
+    name: file.name,
+    ...(file.type.length === 0 ? {} : { mimeType: file.type }),
+  });
+
+  const session = await Aelion.createSession({ media });
+  await session.loadProject(builder.build());
+
+  const preview = attachPreviewCanvas(session, canvas, {
+    quality: 'adaptive',
+    fit: 'contain',
+  });
+  await preview.render(0);
+
+  return async () => {
+    preview.dispose();
+    await session.dispose();
+    media.dispose();
+  };
+}
 ```
 
-这条路径会按需读取 File range、自动建立并缓存 SampleIndex，并由 Canvas Controller 处理过期帧取消、bitmap 释放、DPR 和预览质量。完整可编译版本在 [`examples/typescript/sdk-integration.ts`](examples/typescript/sdk-integration.ts)。
+这里的时间单位是整数微秒。`preview.render(0)` 请求时间线起点的画面；快速连续请求时，Controller 会取消过期任务并释放旧帧。
 
-仓库里还包含一个只使用公开包 API 的参考编辑器，可导入本地视频、拖动预览、分割/移动联动片段、撤销/重做，并导出 WebM 或 H.264 MP4：
+完整可编译版本在 [`examples/typescript/sdk-integration.ts`](examples/typescript/sdk-integration.ts)。从素材导入一直走到 H.264 MP4 的教程见[快速开始](https://foyonaczy.github.io/AelionSDK/start/getting-started/)。
 
-```bash
-corepack pnpm run build
-corepack pnpm dev:editor
-```
+## 已有能力
 
-## 当前状态
+| 模块       | 目前可以做什么                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| 时间线     | 多轨编辑、插入、移动、裁剪、切分、替换、ripple、roll、slip、slide、音视频联动、Marker、关键帧和变速    |
+| 预览与播放 | Canvas 预览、play/pause/seek/scrub、AudioWorklet 音频时钟、自适应画质、WebGL2/WebGPU Worker 合成       |
+| 画面       | 多轨合成、12 种混合模式、mask/matte、文字与字幕、Generator、Adjustment、嵌套 Sequence 和 Material      |
+| 音频       | 多轨混音、gain/pan/fade、mute/solo、声道矩阵、ducking、waveform、响度、true peak 和 limiter            |
+| 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算              |
+| 导出       | H.264/AAC MP4、VP9/Opus WebM、PNG、JPEG、WebP、GIF、WAV/RF64，以及 Memory、OPFS 和自定义 Writable Sink |
+| 扩展       | 自定义 Material、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测                              |
 
-Production Core 已进入源码树，并由单元、契约、Schema、Chromium、Firefox、Golden、真实 tarball consumer 和性能证据持续验证。当前 GitHub CI 覆盖 `quality`、`browser-smoke` 与 `firefox-smoke`。
+编辑操作通过 Transaction 提交。每次成功提交都会产生新的 revision，并可以 Undo/Redo；拖拽或滑块等连续交互可以实时更新，同时只占用一条撤销记录。
 
-现阶段边界同样明确：
+更完整的功能与限制说明见[当前能力](https://foyonaczy.github.io/AelionSDK/start/capabilities/)。
 
-- 当前是 Alpha 源码里程碑，不代表 npm、Tag 或 GitHub Release 已发布；
-- 桌面 Chromium 和 Firefox 是现有自动化验证范围；Safari、iOS、Android 仍未认证；
-- 默认本地画面路径是 RGBA8 SDR；HDR、PQ/HLG 和 10-bit 会 fail closed；
-- 4K 有离线探测证据，但没有跨设备的 4K30 实时承诺；
-- 第三方 Shader/WASM 即使已签名，也必须经过宿主 execution policy 授权。
+## 当前边界
 
-查看[兼容性与部署边界](https://foyonaczy.github.io/AelionSDK/production/compatibility/)和[项目状态与证据](https://foyonaczy.github.io/AelionSDK/project/status/)。
+AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于 Alpha。使用前需要了解这些边界：
 
-## 包
+- 公开包还没有发布到 npm，API 在首个稳定版本前仍可能调整；
+- 自动化测试覆盖桌面 Chromium 和 Firefox，Safari、iOS、Android 尚未完成认证；
+- 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；
+- 4K 可以探测和离线导出，但没有跨设备的 4K30 实时预览承诺；
+- 音频变速目前会同时改变音高，还没有保音高的 time-stretch；
+- 官方构建集成目前是 Vite，其他 bundler 尚未提供适配和兼容性保证。
 
-大多数应用只需要从 `@aelion/sdk` 开始。高级集成可以按边界选择独立包。
+MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，取决于实际浏览器、操作系统和硬件。产品应在运行时做 capability probe 和 export preflight，而不是只按浏览器名称判断。
 
-| Package                     | 作用                                                            |
-| --------------------------- | --------------------------------------------------------------- |
-| `@aelion/sdk`               | Session、媒体导入、Project Builder、Preview、编辑与导出统一入口 |
-| `@aelion/project-schema`    | Project 类型、校验与 canonical JSON                             |
-| `@aelion/transaction`       | 原子 operation、剪辑命令和 history                              |
-| `@aelion/media`             | demux、seek、decode、cache、proxy 和资源治理                    |
-| `@aelion/render-ir`         | Project 到共享执行语义的编译与求值                              |
-| `@aelion/renderer-worker`   | Worker GPU compositor 和 frame renderer                         |
-| `@aelion/audio`             | PCM mixer、AudioWorklet、处理、分析和设备状态                   |
-| `@aelion/export`            | 多 Profile、Worker/Remote export、checkpoint 和 Sink            |
-| `@aelion/material-sdk`      | Material Authoring、信任、迁移、Catalog 和 Lab                  |
-| `@aelion/material-compiler` | Material Graph 校验与编译                                       |
-| `@aelion/capability`        | 运行环境与配置能力探测                                          |
-| `@aelion/core`              | 时间、诊断和生命周期基础类型                                    |
-| `@aelion/vite-plugin`       | Worker 与 AudioWorklet 的官方 Vite 集成                         |
+详见[兼容性与部署](https://foyonaczy.github.io/AelionSDK/production/compatibility/)和[当前版本状态](https://foyonaczy.github.io/AelionSDK/project/status/)。
+
+## 从哪里继续读
+
+- [从本地视频到 MP4](https://foyonaczy.github.io/AelionSDK/start/getting-started/)：第一次接入建议从这里开始；
+- [Project 和时间线](https://foyonaczy.github.io/AelionSDK/concepts/project-timeline/)：理解保存格式、轨道、片段和素材引用；
+- [把 SDK 接进剪辑器 UI](https://foyonaczy.github.io/AelionSDK/guides/editor-ui/)：连接状态管理、时间线、Inspector 和自动保存；
+- [导出 MP4 和 WebM](https://foyonaczy.github.io/AelionSDK/export/video/)：选择 Profile、Sink、码率并处理 preflight；
+- [包和公开入口](https://foyonaczy.github.io/AelionSDK/reference/packages/)：决定应用需要依赖哪些包；
+- [API Reference](https://foyonaczy.github.io/AelionSDK/api/overview/)：查看所有公开类型和方法。
+
+仓库内值得先看的目录：
+
+- [`apps/quickstart`](apps/quickstart)：不依赖 UI 框架的最短完整示例；
+- [`apps/editor-demo`](apps/editor-demo)：参考剪辑器；
+- [`examples/typescript`](examples/typescript)：文档中的可编译代码；
+- [`packages`](packages)：SDK 各模块源码；
+- [`apps/docs`](apps/docs)：文档站源码。
+
+大多数应用从 `@aelion/sdk` 开始，需要直接管理导出 Sink 时再使用 `@aelion/export`。底层媒体、渲染、音频和 Material 包可以按需单独接入。
 
 ## 本地开发
 
 需要 Node.js `>=20.19 <21` 和 Corepack：
 
 ```bash
-git clone https://github.com/FoyonaCZY/AelionSDK.git
-cd AelionSDK
 corepack pnpm install --frozen-lockfile
 corepack pnpm run ci
 corepack pnpm test:browser
 corepack pnpm test:browser:firefox
 ```
 
-更多命令和提交要求见[开发与发布](https://foyonaczy.github.io/AelionSDK/project/development/)和[贡献指南](CONTRIBUTING.md)。
+`pnpm run ci` 会检查格式、文档链接、Schema、类型、单元测试、应用构建和 API Snapshot；浏览器测试分别使用 Chromium 和 Firefox。
 
-## 开源
+贡献代码前请阅读[贡献指南](CONTRIBUTING.md)。开发命令、包验证和发布流程见[维护仓库与准备发布](https://foyonaczy.github.io/AelionSDK/project/development/)。
 
-AelionSDK 使用 [MIT License](LICENSE)。第三方组件和测试素材许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。问题和功能建议请提交到 [GitHub Issues](https://github.com/FoyonaCZY/AelionSDK/issues)；安全问题请按 [Security Policy](SECURITY.md) 私下报告。
+## License
+
+AelionSDK 使用 [MIT License](LICENSE)。第三方组件和测试素材许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。功能建议和问题可以提交到 [GitHub Issues](https://github.com/FoyonaCZY/AelionSDK/issues)；安全问题请按照 [Security Policy](SECURITY.md) 私下报告。
