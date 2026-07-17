@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { StreamTargetChunk } from 'mediabunny';
 
 import { createSampleIndex, decodeVideoFrameAt } from '@aelion/media';
 import type { RenderIr } from '@aelion/render-ir';
@@ -210,6 +211,62 @@ describe('offline WebCodecs + streaming WebM export', () => {
       result,
       sink: sink.snapshot(),
     });
+  });
+
+  it('does not resolve a muxed export before an asynchronous sink close completes', async () => {
+    let announceClose!: () => void;
+    let releaseClose!: () => void;
+    const closeStarted = new Promise<void>(resolve => {
+      announceClose = resolve;
+    });
+    const closeGate = new Promise<void>(resolve => {
+      releaseClose = resolve;
+    });
+    const sink = new WritableStream<StreamTargetChunk>({
+      write: () => undefined,
+      close: async () => {
+        announceClose();
+        await closeGate;
+      },
+    });
+    const result = exportWebM({
+      durationUs: 100_000,
+      width: 16,
+      height: 16,
+      frameRate: { numerator: 10, denominator: 1 },
+      sampleRate: 48_000,
+      channelCount: 2,
+      videoBitrate: 100_000,
+      audioBitrate: 32_000,
+      sink,
+      renderFrame: request => {
+        const canvas = new OffscreenCanvas(request.width, request.height);
+        canvas.getContext('2d')?.fillRect(0, 0, request.width, request.height);
+        return Promise.resolve(
+          new VideoFrame(canvas, {
+            timestamp: request.timestampUs,
+            duration: request.durationUs,
+          }),
+        );
+      },
+      renderAudio: request =>
+        Promise.resolve(new Float32Array(request.frameCount * request.channelCount)),
+    });
+
+    let settled = false;
+    void result.then(
+      () => {
+        settled = true;
+      },
+      () => undefined,
+    );
+    await closeStarted;
+    await Promise.resolve();
+    expect(settled).toBe(false);
+
+    releaseClose();
+    await result;
+    expect(settled).toBe(true);
   });
 
   it('cancels before creating encoders', async () => {

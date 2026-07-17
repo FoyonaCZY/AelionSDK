@@ -11,6 +11,7 @@ import {
   Output,
   Mp4OutputFormat,
   StreamTarget,
+  type StreamTargetChunk,
   VideoSample,
   VideoSampleSource,
   WebMOutputFormat,
@@ -157,6 +158,28 @@ function assertPositiveInteger(value: number, name: string): void {
   }
 }
 
+interface SinkCompletionBarrier {
+  readonly writable: WritableStream<StreamTargetChunk>;
+  readonly completion: Promise<void>;
+  abort(reason: unknown): void;
+}
+
+function createSinkCompletionBarrier(
+  sink: WritableStream<StreamTargetChunk>,
+): SinkCompletionBarrier {
+  const stream = new TransformStream<StreamTargetChunk, StreamTargetChunk>();
+  const controller = new AbortController();
+  const completion = stream.readable.pipeTo(sink, { signal: controller.signal });
+  // The muxer may report a sink failure through its own writer before the
+  // pipe promise is awaited. Keep that rejection observed in the meantime.
+  void completion.catch(() => undefined);
+  return {
+    writable: stream.writable,
+    completion,
+    abort: reason => controller.abort(reason),
+  };
+}
+
 async function exportMuxed(
   options: WebMExportOptions,
   profile: MuxedExportProfile,
@@ -168,33 +191,12 @@ async function exportMuxed(
   assertPositiveInteger(options.channelCount, 'channelCount');
   throwIfAborted(options.signal, profile.operationName);
 
-  const target = new StreamTarget(options.sink, {
-    chunked: true,
-    chunkSize: 64 * 1_024,
-  });
-  const output = new Output({
-    format: profile.format,
-    target,
-  });
-  const videoSource = new VideoSampleSource({
-    codec: profile.videoCodec,
-    fullCodecString: profile.fullVideoCodecString,
-    bitrate: options.videoBitrate,
-    bitrateMode: 'variable',
-    keyFrameInterval: 1,
-    latencyMode: 'quality',
-    alpha: 'discard',
-  });
-  const audioSource = new AudioSampleSource({
-    codec: profile.audioCodec,
-    bitrate: options.audioBitrate,
-    bitrateMode: 'variable',
-  });
-  output.addVideoTrack(videoSource, {
-    frameRate: options.frameRate.numerator / options.frameRate.denominator,
-  });
-  output.addAudioTrack(audioSource);
-
+  // StreamTarget closes its writer during Output.finalize(). Some Firefox
+  // builds have resolved that close before the consumer sink's close callback
+  // became observable. Pipe through a barrier and await the pipe separately so
+  // a completed export always means the caller's sink is fully closed.
+  const sinkBarrier = createSinkCompletionBarrier(options.sink);
+  let output: Output | undefined;
   let videoFrames = 0;
   let audioFrames = 0;
   let stage: ExportStage = 'initialize';
@@ -207,6 +209,33 @@ async function exportMuxed(
     throwIfAborted(options.signal, 'WebM export');
   };
   try {
+    const target = new StreamTarget(sinkBarrier.writable, {
+      chunked: true,
+      chunkSize: 64 * 1_024,
+    });
+    output = new Output({
+      format: profile.format,
+      target,
+    });
+    const videoSource = new VideoSampleSource({
+      codec: profile.videoCodec,
+      fullCodecString: profile.fullVideoCodecString,
+      bitrate: options.videoBitrate,
+      bitrateMode: 'variable',
+      keyFrameInterval: 1,
+      latencyMode: 'quality',
+      alpha: 'discard',
+    });
+    const audioSource = new AudioSampleSource({
+      codec: profile.audioCodec,
+      bitrate: options.audioBitrate,
+      bitrateMode: 'variable',
+    });
+    output.addVideoTrack(videoSource, {
+      frameRate: options.frameRate.numerator / options.frameRate.denominator,
+    });
+    output.addAudioTrack(audioSource);
+
     await output.start();
     await yieldMainThreadWhenDue();
     const frameCount = Math.ceil(
@@ -284,6 +313,7 @@ async function exportMuxed(
     audioSource.close();
     stage = 'finalize';
     await output.finalize();
+    await sinkBarrier.completion;
     options.onProgress?.(1);
     return {
       mimeType: await output.getMimeType(),
@@ -311,11 +341,15 @@ async function exportMuxed(
       },
     };
   } catch (error) {
-    try {
-      await output.cancel();
-    } catch {
-      // Preserve the first failure. Stream cancellation is best-effort cleanup.
+    if (output !== undefined && output.state !== 'finalized' && output.state !== 'canceled') {
+      try {
+        await output.cancel();
+      } catch {
+        // Preserve the first failure. Stream cancellation is best-effort cleanup.
+      }
     }
+    sinkBarrier.abort(error);
+    await sinkBarrier.completion.catch(() => undefined);
     try {
       await options.cleanupSink?.(error);
     } catch {
