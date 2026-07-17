@@ -59,11 +59,16 @@ export async function createEditorRuntime(
 /** Export the current frozen Project revision with browser H.264/AAC encoders. */
 export async function exportH264(session: AelionSessionApi): Promise<Uint8Array> {
   const sink = new SeekableMemorySink();
-  await session.export.startProfile({
+  const options = {
     profile: 'mp4-h264-aac',
     sink: sink.writable,
     videoBitrate: 8_000_000,
     audioBitrate: 192_000,
-  });
+  } as const;
+  const report = await session.export.preflightProfile(options);
+  if (!report.ok) {
+    throw new Error(`MP4 export is unavailable: ${report.issues.map(issue => issue.code).join(', ')}`);
+  }
+  await session.export.startProfile(options);
   return sink.finalize();
 }

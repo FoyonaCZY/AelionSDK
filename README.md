@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Node.js 20](https://img.shields.io/badge/node-20.19%2B-43853d.svg)](package.json)
 
-[快速开始](https://foyonaczy.github.io/AelionSDK/start/getting-started/) · [能力全景](https://foyonaczy.github.io/AelionSDK/start/capabilities/) · [架构设计](https://foyonaczy.github.io/AelionSDK/concepts/architecture/) · [文档中心](https://foyonaczy.github.io/AelionSDK/)
+[文档中心](https://foyonaczy.github.io/AelionSDK/) · [快速开始](https://foyonaczy.github.io/AelionSDK/start/getting-started/) · [构建剪辑器](https://foyonaczy.github.io/AelionSDK/guides/editor-ui/) · [导出](https://foyonaczy.github.io/AelionSDK/export/overview/) · [API Reference](https://foyonaczy.github.io/AelionSDK/api/readme/)
 
 </div>
 

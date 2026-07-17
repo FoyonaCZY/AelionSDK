@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { basename, dirname, extname, resolve } from 'node:path';
 
 const root = process.cwd();
+const generatedDirectories = new Set([resolve(root, 'apps/docs/src/content/docs/api')]);
 const skippedDirectories = new Set([
   '.git',
   '.pnpm-store',
@@ -19,6 +20,7 @@ async function collectMarkdownFiles(directory = root, files = []) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (entry.isDirectory() && skippedDirectories.has(entry.name)) continue;
     const path = resolve(directory, entry.name);
+    if (entry.isDirectory() && generatedDirectories.has(path)) continue;
     if (entry.isDirectory()) await collectMarkdownFiles(path, files);
     else if (entry.isFile() && /\.mdx?$/u.test(entry.name)) files.push(path);
   }

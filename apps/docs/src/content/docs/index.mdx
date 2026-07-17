@@ -10,8 +10,8 @@ hero:
       link: ./start/getting-started/
       icon: right-arrow
       variant: primary
-    - text: 查看能力
-      link: ./start/capabilities/
+    - text: 运行参考编辑器
+      link: ./start/reference-editor/
       icon: open-book
 ---
 
@@ -27,7 +27,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <strong>Preview · Player · Export</strong>
 </div>
 
-## 一套内核，覆盖完整剪辑链路
+## 从第一次导入到生产导出
 
 AelionSDK 是一套 Browser-first 音视频剪辑与渲染 SDK。业务保存可版本化的 Project JSON，编辑通过原子 Transaction 提交，Preview、Player 和 Export 共同消费 Render IR。画面、声音和导出不会各自维护一套容易漂移的规则。
 
@@ -46,13 +46,14 @@ AelionSDK 是一套 Browser-first 音视频剪辑与渲染 SDK。业务保存可
   </Card>
 </CardGrid>
 
-## 先走通一条真实路径
+## 按任务找到答案
 
 第一次接入时，不需要先理解所有底层包。建议从 `@aelion/sdk` 开始，依次完成：导入媒体、创建 Project、加载 Session、连接预览画布、提交一次编辑、执行一次导出。
 
-1. 阅读[快速开始](./start/getting-started/)，运行完整的 TypeScript 示例。
-2. 打开[能力全景](./start/capabilities/)，确认你的产品需求与当前边界。
-3. 在进入生产环境前阅读[兼容性与部署](./production/compatibility/)，按实际设备执行 capability probe 和 export preflight。
+1. 初次接入：阅读[快速开始](./start/getting-started/)，走通导入、预览、编辑和 H.264 导出。
+2. 构建产品：从[剪辑 UI 集成](./guides/editor-ui/)开始，继续查看媒体、时间线、预览和播放专题。
+3. 上线前：执行[能力探测与 Preflight](./production/capability-preflight/)，再按[安全与部署清单](./production/security-deployment/)验收。
+4. 查询签名：使用由 13 个公开包源码自动生成的 API Reference。
 
 :::note[当前版本]
 AelionSDK 当前为 `0.1.0-alpha.0` 源码里程碑，公开包尚未发布到 npm。文档中的安装命令描述发布后的接入方式；现在可以 clone 仓库运行源码、参考编辑器和测试。
@@ -67,5 +68,5 @@ AelionSDK 提供剪辑引擎和公共集成 API，不限定你的 UI。你可以
     <strong>准备开始？</strong>
     <span>十分钟走通 Project、Preview、编辑与导出。</span>
   </div>
-  <a href="./start/getting-started/">阅读快速开始 →</a>
+  <a href="./start/getting-started/">用一个视频开始 →</a>
 </div>

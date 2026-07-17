@@ -8,6 +8,7 @@ coverage/
 .vitest/
 .vite/
 .astro/
+apps/docs/src/content/docs/api/
 playwright-report/
 test-results/
 **/__screenshots__/
