@@ -19,12 +19,20 @@ export class OpfsSeekableSink {
   #maxInFlightWrites = 0;
   #closed = false;
   #aborted = false;
+  #finalizationError: unknown;
+  readonly #finalized: Promise<void>;
+  readonly #resolveFinalized: () => void;
 
   public constructor(fileName: string) {
     if (fileName.length === 0 || fileName.includes('/')) {
       throw new TypeError('OPFS fileName must be a non-empty leaf name');
     }
     this.#fileName = fileName;
+    let resolveFinalized = (): void => undefined;
+    this.#finalized = new Promise<void>(resolve => {
+      resolveFinalized = resolve;
+    });
+    this.#resolveFinalized = resolveFinalized;
     this.#handlePromise = navigator.storage
       .getDirectory()
       .then(directory => directory.getFileHandle(fileName, { create: true }));
@@ -50,8 +58,15 @@ export class OpfsSeekableSink {
     },
     close: async () => {
       if (this.#closed || this.#aborted) return;
-      this.#closed = true;
-      await (await this.#stream()).close();
+      try {
+        await (await this.#stream()).close();
+        this.#closed = true;
+      } catch (error) {
+        this.#finalizationError = error;
+        throw error;
+      } finally {
+        this.#resolveFinalized();
+      }
     },
     abort: async () => {
       await this.cleanup();
@@ -59,17 +74,32 @@ export class OpfsSeekableSink {
   });
 
   public async getFile(): Promise<File> {
-    if (!this.#closed) throw new Error('OPFS sink is not finalized');
+    await this.waitUntilFinalized();
     return (await this.#handlePromise).getFile();
+  }
+
+  /** Resolves only after the transferred WritableStream has closed on this host. */
+  public async waitUntilFinalized(): Promise<void> {
+    await this.#finalized;
+    if (this.#finalizationError !== undefined) {
+      if (this.#finalizationError instanceof Error) throw this.#finalizationError;
+      throw new Error('OPFS sink finalization failed', { cause: this.#finalizationError });
+    }
+    if (this.#aborted) throw new DOMException('OPFS sink was aborted', 'AbortError');
+    if (!this.#closed) throw new Error('OPFS sink did not finalize');
   }
 
   public async cleanup(): Promise<void> {
     if (this.#aborted) return;
     this.#aborted = true;
-    const stream = await this.#streamPromise;
-    if (stream !== undefined) await stream.abort().catch(() => undefined);
-    const root = await navigator.storage.getDirectory();
-    await root.removeEntry(this.#fileName).catch(() => undefined);
+    try {
+      const stream = await this.#streamPromise;
+      if (stream !== undefined) await stream.abort().catch(() => undefined);
+      const root = await navigator.storage.getDirectory();
+      await root.removeEntry(this.#fileName).catch(() => undefined);
+    } finally {
+      this.#resolveFinalized();
+    }
   }
 
   public snapshot(): OpfsSinkSnapshot {

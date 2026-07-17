@@ -45,6 +45,8 @@ Windows、Linux 和新的 GPU/driver 组合没有独立产品认证。GitHub 的
 | SDR / P3 working space  | RGBA8 SDR 执行      | RGBA8 SDR 执行      | surface presentation 由浏览器决定            |
 | PQ/HLG/10-bit HDR       | Unsupported         | Unsupported         | contract 可校验，执行路径 fail closed        |
 
+仓库内的媒体兼容语料不是只测扩展名：MP4 覆盖 moov 在头/尾、fragmented、H.264 B-frame 和非零 PTS；WebM 覆盖 VP9/Opus VFR 与多 cluster。Node 侧验证 SampleIndex/PTS/decode order，浏览器侧对每个 fixture 做 WebCodecs exact seek 和 PCM decode。随机、截断和损坏输入必须返回有界 diagnostic，不能泄漏未归类异常。
+
 ## 部署要求
 
 ### HTTPS 与跨源隔离

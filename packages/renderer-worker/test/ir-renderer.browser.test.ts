@@ -248,6 +248,143 @@ const source: IrFrameSource = {
 };
 
 describe('Project → Render IR → Material Graph → Worker renderer', () => {
+  it('rasterizes explicit text spacing through the portable glyph layout', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (sequence === undefined || visual === undefined) throw new Error('Fixture is incomplete');
+    const format = sequence.format as { width: number; height: number };
+    format.width = 160;
+    format.height = 60;
+    sequence.transitionIds = [];
+    visual.itemIds = ['title'];
+    value.items = {
+      title: {
+        id: 'title',
+        trackId: 'visual',
+        type: 'text',
+        enabled: true,
+        range: { startUs: 0, durationUs: 1_000_000 },
+        box: { x: 10, y: 10, width: 140, height: 40 },
+        overflow: 'clip',
+        writingMode: 'horizontal-tb',
+        paragraphs: [
+          {
+            style: {},
+            runs: [
+              {
+                text: 'A  A',
+                style: { fontSizePx: 24, lineHeightPx: 28, fill: '#ffffff' },
+              },
+            ],
+          },
+        ],
+        visual: {
+          fit: 'none',
+          transform: {
+            positionPx: { x: 80, y: 30 },
+            anchor: { x: 0.5, y: 0.5 },
+            scale: { x: 1, y: 1 },
+            rotationDeg: 0,
+            skewDeg: { x: 0, y: 0 },
+          },
+          crop: { left: 0, top: 0, right: 0, bottom: 0 },
+          opacity: 1,
+          blendMode: 'normal',
+        },
+        materialInstanceIds: [],
+      } as unknown as ItemEntity,
+    };
+    value.materialInstances = {};
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const result = await renderer.render({
+        ir,
+        timeUs: 0,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+      });
+      try {
+        const canvas = new OffscreenCanvas(result.width, result.height);
+        const context = canvas.getContext('2d');
+        if (context === null) throw new Error('2D context unavailable');
+        context.drawImage(result.bitmap, 0, 0);
+        const pixels = context.getImageData(0, 0, result.width, result.height).data;
+        const occupied: number[] = [];
+        for (let x = 0; x < result.width; x += 1) {
+          let bright = false;
+          for (let y = 0; y < result.height; y += 1) {
+            const index = (y * result.width + x) * 4;
+            if ((pixels[index] ?? 0) > 32) {
+              bright = true;
+              break;
+            }
+          }
+          if (bright) occupied.push(x);
+        }
+        const gaps = occupied.slice(1).map((x, index) => x - (occupied[index] ?? x));
+        expect(occupied.length).toBeGreaterThan(10);
+        expect(Math.max(...gaps)).toBeGreaterThan(12);
+      } finally {
+        result.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
+  it('renders draft previews internally at scale while keeping export full resolution', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (sequence === undefined || visual === undefined) throw new Error('Fixture is incomplete');
+    sequence.transitionIds = [];
+    visual.itemIds = ['from'];
+    value.items.from?.materialInstanceIds.splice(0);
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const draft = await renderer.render({
+        ir,
+        timeUs: 1_000_000,
+        source,
+        mode: 'preview',
+        renderScale: 0.5,
+        preferredBackend: 'webgl2',
+      });
+      const exported = await renderer.render({
+        ir,
+        timeUs: 1_000_000,
+        source,
+        mode: 'export',
+        renderScale: 0.5,
+        preferredBackend: 'webgl2',
+      });
+      try {
+        expect(draft).toMatchObject({ width: 4, height: 4, renderScale: 0.5 });
+        expect(draft.bitmap).toMatchObject({ width: 4, height: 4 });
+        expect(exported).toMatchObject({ width: 8, height: 8, renderScale: 1 });
+      } finally {
+        draft.bitmap.close();
+        exported.bitmap.close();
+      }
+      await expect(
+        renderer.render({
+          ir,
+          timeUs: 1_000_000,
+          source,
+          mode: 'preview',
+          renderScale: 0,
+          preferredBackend: 'webgl2',
+        }),
+      ).rejects.toThrow('renderScale');
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
   it('bounds full frame evaluations before media decode starts', async () => {
     const value = project();
     const sequence = value.sequences.sequence;

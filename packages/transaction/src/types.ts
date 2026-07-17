@@ -74,6 +74,8 @@ export interface TransactionCommit {
 export interface EditOptions {
   readonly label?: string;
   readonly baseRevision?: bigint;
+  /** Consecutive edits with the same key are stored as one undo/redo entry. */
+  readonly historyGroup?: string;
 }
 
 export interface TransactionValidationResult {

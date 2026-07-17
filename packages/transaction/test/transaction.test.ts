@@ -5,7 +5,12 @@ import type { AelionProject } from '@aelion/project-schema';
 import { canonicalHash, ProjectValidator } from '@aelion/project-schema';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { applyOperations, TransactionEngine } from '../src/index.js';
+import {
+  applyOperations,
+  TRANSACTION_MAX_OPERATIONS,
+  TransactionEngine,
+  type AtomicOperation,
+} from '../src/index.js';
 
 const root = new URL('../../../', import.meta.url);
 
@@ -36,6 +41,29 @@ beforeAll(async () => {
 });
 
 describe('TransactionEngine', () => {
+  it('rejects an oversized operation batch before cloning or publishing it', () => {
+    const engine = new TransactionEngine(project, validate);
+    const operation: AtomicOperation = {
+      op: 'setField',
+      collection: 'items',
+      id: 'item_title',
+      path: ['name'],
+      value: 'bounded',
+    };
+    let failure: unknown;
+    try {
+      engine.edit({}, transaction => {
+        transaction.appendOperations(new Array(TRANSACTION_MAX_OPERATIONS + 1).fill(operation));
+      });
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure).toMatchObject({
+      diagnostics: [expect.objectContaining({ code: 'TRANSACTION_OPERATION_LIMIT_EXCEEDED' })],
+    });
+    expect(engine.revision).toBe(0n);
+  });
+
   it('atomically commits operations and emits one event', () => {
     const engine = new TransactionEngine(project, validate);
     const events: unknown[] = [];

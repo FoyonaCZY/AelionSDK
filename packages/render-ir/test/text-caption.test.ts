@@ -74,6 +74,36 @@ describe('portable text layout', () => {
     );
     expect(vertical.lines.flatMap(line => line.spans).map(span => span.text)).toEqual(['字', '幕']);
   });
+
+  it('preserves spaces, grapheme clusters, CJK and RTL alignment in portable metrics', () => {
+    const mixed = layoutIrText(
+      textClip({
+        box: { x: 0, y: 0, width: 400, height: 120 },
+        paragraphs: [
+          {
+            style: {},
+            runs: [{ text: 'A  你好 👨‍👩‍👧‍👦', style: { fontSizePx: 20, letterSpacingPx: 1 } }],
+          },
+        ],
+      }),
+    );
+    const glyphs = mixed.lines.flatMap(line => line.spans.flatMap(span => span.glyphs));
+    expect(glyphs.filter(glyph => glyph.text === ' ')).toHaveLength(3);
+    expect(glyphs.map(glyph => glyph.text)).toContain('👨‍👩‍👧‍👦');
+    expect(
+      glyphs.every((glyph, index) => index === 0 || glyph.x >= (glyphs[index - 1]?.x ?? 0)),
+    ).toBe(true);
+
+    const rtl = layoutIrText(
+      textClip({
+        box: { x: 10, y: 0, width: 200, height: 80 },
+        paragraphs: [{ style: { direction: 'rtl' }, runs: [{ text: 'مرحبا بالعالم', style: {} }] }],
+      }),
+    );
+    expect(rtl.lines[0]?.x).toBeGreaterThan(10);
+    expect(rtl.lines[0]?.spans[0]?.style.direction).toBe('rtl');
+    expect(rtl.lines[0]?.spans[0]?.x).toBeGreaterThan(rtl.lines[0]?.spans.at(-1)?.x ?? 0);
+  });
 });
 
 describe('SRT and WebVTT adapters', () => {

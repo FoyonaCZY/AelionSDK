@@ -140,6 +140,21 @@ describe('@aelion/sdk public browser facade', () => {
       } finally {
         preview.bitmap.close();
       }
+      const draft = await session.preview.renderFrame({
+        timeUs: 15_000_000,
+        quality: 'draft',
+      });
+      try {
+        expect(draft).toMatchObject({ width: 160, height: 90, renderScale: 0.5 });
+        expect(draft.bitmap).toMatchObject({ width: 160, height: 90 });
+      } finally {
+        draft.bitmap.close();
+      }
+      session.player.setPreviewQuality({ quality: 'draft', renderScale: 0.75 });
+      expect(session.player.getStats().previewQuality).toEqual({
+        quality: 'draft',
+        renderScale: 0.75,
+      });
 
       // Keep the consumer export short while proving that the public facade
       // freezes the edited IR and supplies both render callbacks itself.
@@ -163,6 +178,11 @@ describe('@aelion/sdk public browser facade', () => {
       const output = sink.finalize();
       const index = await createSampleIndex(output);
       expect(exported.videoFrames).toBe(30);
+      expect(exported.encoderConfiguration).toMatchObject({
+        profile: 'webm-vp9-opus',
+        video: { targetBitrate: 500_000 },
+        audio: { targetBitrate: 64_000 },
+      });
       expect(index.container).toBe('webm');
       expect(index.tracks.some(track => track.kind === 'video')).toBe(true);
       expect(index.tracks.some(track => track.kind === 'audio')).toBe(true);

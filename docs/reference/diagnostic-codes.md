@@ -72,25 +72,27 @@ interface Diagnostic {
 
 ### 4.1 原子 operation
 
-| Code                              | 含义与建议                                                              |
-| --------------------------------- | ----------------------------------------------------------------------- |
-| `REVISION_CONFLICT`               | `baseRevision` 已过期；刷新 snapshot 后重新生成意图                     |
-| `TRANSACTION_EMPTY`               | Transaction 没有 operation；不要提交 no-op                              |
-| `TRANSACTION_ENTITY_EXISTS`       | create 的实体 ID 已存在                                                 |
-| `TRANSACTION_ENTITY_ID_MISMATCH`  | operation ID 与 `value.id` 不一致                                       |
-| `TRANSACTION_ENTITY_MISSING`      | operation 目标实体不存在                                                |
-| `TRANSACTION_PATH_INVALID`        | field path 为空或中间节点不是 object                                    |
-| `TRANSACTION_FIELD_MISSING`       | remove 的 field 不存在                                                  |
-| `TRANSACTION_LIST_INVALID`        | 目标不是 string ID list                                                 |
-| `TRANSACTION_LIST_DUPLICATE`      | listInsert 会产生重复 ID                                                |
-| `TRANSACTION_LIST_VALUE_MISSING`  | listRemove/listMove 的目标不在 list                                     |
-| `TRANSACTION_LIST_ANCHOR_MISSING` | `beforeId` 不在目标 list                                                |
-| `TRANSACTION_LIST_ANCHOR_INVALID` | 试图把元素移动到自己之前                                                |
-| `TRANSACTION_REENTRANT`           | transaction callback、preparation 或 commit observer 同步发起了嵌套事务 |
-| `HISTORY_REENTRANT`               | undo/redo/edit 及其通知尚未完成时同步修改 history                       |
-| `HISTORY_UNDO_EMPTY`              | 没有可撤销记录；先检查 `canUndo`                                        |
-| `HISTORY_REDO_EMPTY`              | 没有可重做记录；先检查 `canRedo`                                        |
-| `HISTORY_REVISION_DIVERGED`       | History 与 engine revision 被外部 edit 分叉；重新建立 history/session   |
+| Code                                   | 含义与建议                                                              |
+| -------------------------------------- | ----------------------------------------------------------------------- |
+| `REVISION_CONFLICT`                    | `baseRevision` 已过期；刷新 snapshot 后重新生成意图                     |
+| `TRANSACTION_EMPTY`                    | Transaction 没有 operation；不要提交 no-op                              |
+| `TRANSACTION_ENTITY_EXISTS`            | create 的实体 ID 已存在                                                 |
+| `TRANSACTION_ENTITY_ID_MISMATCH`       | operation ID 与 `value.id` 不一致                                       |
+| `TRANSACTION_ENTITY_MISSING`           | operation 目标实体不存在                                                |
+| `TRANSACTION_PATH_INVALID`             | field path 为空或中间节点不是 object                                    |
+| `TRANSACTION_FIELD_MISSING`            | remove 的 field 不存在                                                  |
+| `TRANSACTION_LIST_INVALID`             | 目标不是 string ID list                                                 |
+| `TRANSACTION_LIST_DUPLICATE`           | listInsert 会产生重复 ID                                                |
+| `TRANSACTION_LIST_VALUE_MISSING`       | listRemove/listMove 的目标不在 list                                     |
+| `TRANSACTION_LIST_ANCHOR_MISSING`      | `beforeId` 不在目标 list                                                |
+| `TRANSACTION_LIST_ANCHOR_INVALID`      | 试图把元素移动到自己之前                                                |
+| `TRANSACTION_REENTRANT`                | transaction callback、preparation 或 commit observer 同步发起了嵌套事务 |
+| `TRANSACTION_OPERATION_LIMIT_EXCEEDED` | 单次事务超过 16,384 个 operation；拆分业务意图或使用交互合并            |
+| `HISTORY_REENTRANT`                    | undo/redo/edit 及其通知尚未完成时同步修改 history                       |
+| `HISTORY_UNDO_EMPTY`                   | 没有可撤销记录；先检查 `canUndo`                                        |
+| `HISTORY_REDO_EMPTY`                   | 没有可重做记录；先检查 `canRedo`                                        |
+| `HISTORY_REVISION_DIVERGED`            | History 与 engine revision 被外部 edit 分叉；重新建立 history/session   |
+| `HISTORY_GROUP_NOT_ACTIVE`             | 取消的交互 history group 已结束或不在栈顶；丢弃过期 UI handle           |
 
 ### 4.2 语义命令
 

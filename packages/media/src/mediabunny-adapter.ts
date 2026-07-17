@@ -28,6 +28,21 @@ const MICROSECONDS_PER_SECOND = 1_000_000;
 let activeVideoDecoders = 0;
 let retainedVideoFrames = 0;
 
+function inputFromReader(reader: RangeReader, signal?: AbortSignal): Input {
+  return new Input({
+    source: new CustomSource({
+      getSize: () => reader.size(signal),
+      read: async (start, end) => {
+        const result = await reader.read({ offset: start, length: end - start }, signal);
+        return result.bytes;
+      },
+      maxCacheSize: 8 * 1_024 * 1_024,
+      prefetchProfile: reader.kind === 'network' ? 'network' : 'fileSystem',
+    }),
+    formats: ALL_FORMATS,
+  });
+}
+
 export function videoDecoderResourceSnapshot(): {
   readonly activeDecoders: number;
   readonly retainedFrames: number;
@@ -258,16 +273,7 @@ export async function createSampleIndexFromReader(
   options: MediaProbeOptions = {},
 ): Promise<SampleIndex> {
   throwIfAborted(options.signal, 'media range probe');
-  const source = new CustomSource({
-    getSize: () => reader.size(options.signal),
-    read: async (start, end) => {
-      const result = await reader.read({ offset: start, length: end - start }, options.signal);
-      return result.bytes;
-    },
-    maxCacheSize: 8 * 1_024 * 1_024,
-    prefetchProfile: reader.kind === 'network' ? 'network' : 'fileSystem',
-  });
-  const input = new Input({ source, formats: ALL_FORMATS });
+  const input = inputFromReader(reader, options.signal);
   try {
     const [format, durationSeconds, tracks] = await Promise.all([
       input.getFormat(),
@@ -370,6 +376,35 @@ export async function decodeAudioPcmRange(
   durationUs: number,
   options: AudioDecodeOptions = {},
 ): Promise<AudioPcmBlock> {
+  return decodeAudioPcmRangeFromInput(
+    new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS }),
+    startUs,
+    durationUs,
+    options,
+  );
+}
+
+/** Decode an audio interval without first loading the complete media resource. */
+export async function decodeAudioPcmRangeFromReader(
+  reader: RangeReader,
+  startUs: number,
+  durationUs: number,
+  options: AudioDecodeOptions = {},
+): Promise<AudioPcmBlock> {
+  return decodeAudioPcmRangeFromInput(
+    inputFromReader(reader, options.signal),
+    startUs,
+    durationUs,
+    options,
+  );
+}
+
+async function decodeAudioPcmRangeFromInput(
+  input: Input,
+  startUs: number,
+  durationUs: number,
+  options: AudioDecodeOptions,
+): Promise<AudioPcmBlock> {
   throwIfAborted(options.signal, 'audio PCM decode');
   if (
     !Number.isSafeInteger(startUs) ||
@@ -379,7 +414,6 @@ export async function decodeAudioPcmRange(
   ) {
     throw new RangeError('Audio decode range must use non-negative safe integer microseconds');
   }
-  const input = new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS });
   try {
     const tracks = await input.getAudioTracks();
     const track = tracks[options.streamIndex ?? 0];
@@ -458,18 +492,52 @@ export async function decodeVideoFrameAt(
   targetUs: number,
   options: VideoDecodeOptions = {},
 ): Promise<VideoDecodeResult> {
-  throwIfAborted(options.signal, 'video exact seek');
-  if (!Number.isSafeInteger(targetUs) || targetUs < 0) {
-    throw new RangeError('targetUs must be a non-negative safe integer');
-  }
-  if (typeof VideoDecoder !== 'function') throw new Error('VideoDecoder is unavailable');
-
   const index =
     options.sampleIndex ??
     (await createSampleIndex(
       bytes,
       options.signal === undefined ? {} : { signal: options.signal },
     ));
+  return decodeVideoFrameAtFromInput(
+    new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS }),
+    index,
+    targetUs,
+    options,
+  );
+}
+
+/** Decode an exact video frame using demand-driven byte-range reads. */
+export async function decodeVideoFrameAtFromReader(
+  reader: RangeReader,
+  targetUs: number,
+  options: VideoDecodeOptions = {},
+): Promise<VideoDecodeResult> {
+  const index =
+    options.sampleIndex ??
+    (await createSampleIndexFromReader(
+      reader,
+      options.signal === undefined ? {} : { signal: options.signal },
+    ));
+  return decodeVideoFrameAtFromInput(
+    inputFromReader(reader, options.signal),
+    index,
+    targetUs,
+    options,
+  );
+}
+
+async function decodeVideoFrameAtFromInput(
+  input: Input,
+  index: SampleIndex,
+  targetUs: number,
+  options: VideoDecodeOptions,
+): Promise<VideoDecodeResult> {
+  throwIfAborted(options.signal, 'video exact seek');
+  if (!Number.isSafeInteger(targetUs) || targetUs < 0) {
+    throw new RangeError('targetUs must be a non-negative safe integer');
+  }
+  if (typeof VideoDecoder !== 'function') throw new Error('VideoDecoder is unavailable');
+
   const streamIndex = options.streamIndex ?? 0;
   if (!Number.isSafeInteger(streamIndex) || streamIndex < 0) {
     throw new RangeError('Video stream index must be a non-negative safe integer');
@@ -483,7 +551,6 @@ export async function decodeVideoFrameAt(
     throw new Error('SampleIndex returned an invalid seek plan');
   }
 
-  const input = new Input({ source: new BufferSource(bytes), formats: ALL_FORMATS });
   let decoder: VideoDecoder | undefined;
   let selectedFrame: VideoFrame | undefined;
   let selectedTimestampUs = Number.MIN_SAFE_INTEGER;

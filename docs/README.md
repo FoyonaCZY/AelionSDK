@@ -4,15 +4,16 @@
 
 ## 从哪里开始
 
-| 你想做什么                 | 阅读                             |
-| -------------------------- | -------------------------------- |
-| 第一次接入 SDK             | [快速开始](getting-started.md)   |
-| 了解 SDK 能做什么          | [能力全景](capabilities.md)      |
-| 设计宿主应用或排查模块边界 | [架构设计](architecture.md)      |
-| 创作或接入滤镜、转场和特效 | [Material 创作](materials.md)    |
-| 判断浏览器、格式和部署条件 | [兼容性与部署](compatibility.md) |
-| 参与开发、测试或发布       | [开发与发布](development.md)     |
-| 查看当前成熟度和验证证据   | [项目状态](status.md)            |
+| 你想做什么                 | 阅读                                        |
+| -------------------------- | ------------------------------------------- |
+| 第一次接入 SDK             | [快速开始](getting-started.md)              |
+| 了解 SDK 能做什么          | [能力全景](capabilities.md)                 |
+| 设计宿主应用或排查模块边界 | [架构设计](architecture.md)                 |
+| 创作或接入滤镜、转场和特效 | [Material 创作](materials.md)               |
+| 判断浏览器、格式和部署条件 | [兼容性与部署](compatibility.md)            |
+| 参与开发、测试或发布       | [开发与发布](development.md)                |
+| 查看当前成熟度和验证证据   | [项目状态](status.md)                       |
+| 运行完整的上层剪辑 UI      | [参考编辑器](../apps/editor-demo/README.md) |
 
 ## Reference
 

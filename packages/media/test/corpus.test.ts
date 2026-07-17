@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -111,5 +112,21 @@ describe('media corpus normalization', () => {
       ok: false,
       diagnostics: [expect.objectContaining({ code: 'MEDIA_INPUT_INVALID' })],
     });
+  });
+
+  it('fails closed for bounded arbitrary media bytes', async () => {
+    await fc.assert(
+      fc.asyncProperty(fc.uint8Array({ minLength: 0, maxLength: 4_096 }), async bytes => {
+        const result = await probeSampleIndex(bytes);
+        if (result.ok) {
+          expect(result.index.tracks.length).toBeGreaterThan(0);
+        } else {
+          expect(result.diagnostics).toEqual(
+            expect.arrayContaining([expect.objectContaining({ code: 'MEDIA_INPUT_INVALID' })]),
+          );
+        }
+      }),
+      { numRuns: 250, endOnFailure: true },
+    );
   });
 });

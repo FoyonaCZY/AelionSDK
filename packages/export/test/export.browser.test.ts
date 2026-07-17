@@ -118,6 +118,11 @@ describe('offline WebCodecs + streaming WebM export', () => {
     const result = await exportFrozenRenderIrMp4(common);
     const bytes = sink.finalize();
     expect(result.mimeType).toContain('video/mp4');
+    expect(result.encoderConfiguration).toMatchObject({
+      profile: 'mp4-h264-aac',
+      video: { codec: 'avc', codecString: 'avc1.640028', targetBitrate: 500_000 },
+      audio: { codec: 'aac', targetBitrate: 64_000 },
+    });
     expect(bytes.byteLength).toBeGreaterThan(1_000);
     const index = await createSampleIndex(bytes);
     expect(index.container).toBe('mp4');
@@ -456,13 +461,9 @@ describe('offline WebCodecs + streaming WebM export', () => {
 
   it('streams seekable output to OPFS without assembling a full in-memory Blob', async () => {
     const sink = new OpfsSeekableSink(`aelion-export-${crypto.randomUUID()}.webm`);
-    const result = await exportWebM({
-      durationUs: 200_000,
-      width: 160,
-      height: 90,
-      frameRate: { numerator: 30, denominator: 1 },
-      sampleRate: 48_000,
-      channelCount: 2,
+    const result = await exportFrozenRenderIrWebM({
+      ir: frozenIr(),
+      projectRevision: 7n,
       videoBitrate: 500_000,
       audioBitrate: 64_000,
       sink: sink.writable,
@@ -485,11 +486,46 @@ describe('offline WebCodecs + streaming WebM export', () => {
     });
     const file = await sink.getFile();
     expect(result.videoFrames).toBe(6);
+    expect(result.encoderConfiguration).toEqual({
+      profile: 'webm-vp9-opus',
+      video: {
+        codec: 'vp9',
+        codecString: 'vp09.00.10.08',
+        width: 160,
+        height: 90,
+        frameRate: 30,
+        bitrateMode: 'variable',
+        targetBitrate: 500_000,
+      },
+      audio: {
+        codec: 'opus',
+        sampleRate: 48_000,
+        channelCount: 2,
+        bitrateMode: 'variable',
+        targetBitrate: 64_000,
+      },
+    });
     expect(file.size).toBeGreaterThan(500);
     expect(sink.snapshot()).toMatchObject({
       closed: true,
       aborted: false,
       maxInFlightWrites: 1,
     });
+  });
+
+  it('waits for OPFS stream finalization when getFile is requested early', async () => {
+    const sink = new OpfsSeekableSink(`aelion-finalize-${crypto.randomUUID()}.bin`);
+    const pendingFile = sink.getFile();
+    let settled = false;
+    void pendingFile.finally(() => {
+      settled = true;
+    });
+    await new Promise(resolve => globalThis.setTimeout(resolve, 0));
+    expect(settled).toBe(false);
+    const writer = sink.writable.getWriter();
+    await writer.write({ type: 'write', position: 0, data: new Uint8Array([1, 2, 3]) });
+    await writer.close();
+    await expect(pendingFile).resolves.toMatchObject({ size: 3 });
+    await sink.cleanup();
   });
 });

@@ -54,6 +54,22 @@ importers:
         specifier: workspace:*
         version: link:../../packages/capability
 
+  apps/editor-demo:
+    dependencies:
+      '@aelion/export':
+        specifier: workspace:*
+        version: link:../../packages/export
+      '@aelion/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+    devDependencies:
+      '@aelion/vite-plugin':
+        specifier: workspace:*
+        version: link:../../packages/vite-plugin
+      vite:
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@20.19.8)
+
   apps/evidence-runner:
     dependencies:
       '@aelion/audio':

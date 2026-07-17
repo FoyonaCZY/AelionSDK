@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  BlobRangeReader,
   createSampleIndex,
   decodeAudioPcmRange,
+  decodeAudioPcmRangeFromReader,
   decodeVideoFrameAt,
+  decodeVideoFrameAtFromReader,
   resolveVideoSeek,
 } from '../src/index.js';
 
@@ -28,6 +31,11 @@ describe('WebCodecs exact seek', () => {
     const targetUs = 1_550_000;
     const oracle = resolveVideoSeek(index, video.id, targetUs);
     const result = await decodeVideoFrameAt(bytes, targetUs, { maxDecodeQueueSize: 8 });
+    const rangeResult = await decodeVideoFrameAtFromReader(
+      new BlobRangeReader(`${file}:range`, new Blob([bytes])),
+      targetUs,
+      { maxDecodeQueueSize: 8 },
+    );
 
     try {
       expect(result.timestampUs).toBe(oracle.presentationUs);
@@ -39,8 +47,11 @@ describe('WebCodecs exact seek', () => {
       expect(result.decodedPackets).toBeGreaterThan(0);
       expect(result.decodedPackets).toBeLessThanOrEqual(31);
       expect(result.decodedPackets).toBe(result.plannedPackets);
+      expect(rangeResult.timestampUs).toBe(result.timestampUs);
+      expect(rangeResult.frame.displayWidth).toBe(result.frame.displayWidth);
     } finally {
       result.close();
+      rangeResult.close();
     }
   });
 
@@ -66,12 +77,25 @@ describe('WebCodecs exact seek', () => {
     'normalizes decoded audio from %s to interleaved f32 PCM',
     async file => {
       const bytes = await fixture(file);
-      const block = await decodeAudioPcmRange(bytes, 500_000, 100_000);
+      const [block, rangeBlock] = await Promise.all([
+        decodeAudioPcmRange(bytes, 500_000, 100_000),
+        decodeAudioPcmRangeFromReader(
+          new BlobRangeReader(`${file}:audio-range`, new Blob([bytes])),
+          500_000,
+          100_000,
+        ),
+      ]);
       expect(block.sampleRate).toBe(48_000);
       expect(block.channelCount).toBe(1);
       expect(block.frameCount).toBe(4_800);
       expect(block.interleaved).toHaveLength(4_800);
       expect(block.interleaved.some(value => Math.abs(value) > 0.001)).toBe(true);
+      expect(rangeBlock).toMatchObject({
+        sampleRate: block.sampleRate,
+        channelCount: block.channelCount,
+        frameCount: block.frameCount,
+      });
+      expect(rangeBlock.interleaved).toEqual(block.interleaved);
     },
   );
 });

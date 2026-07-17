@@ -608,6 +608,34 @@ describe('EditingCommands', () => {
 });
 
 describe('TransactionHistory', () => {
+  it('coalesces interactive updates into one undo entry and can cancel without redo', () => {
+    const engine = new TransactionEngine(project, validate);
+    const history = new TransactionHistory(engine);
+    const initialStartUs = engine.getSnapshot().items.item_title?.range.startUs;
+
+    for (let step = 1; step <= 250; step += 1) {
+      const startUs = step * 3_000;
+      history.edit({ label: 'Drag title', historyGroup: 'drag-title' }, transaction => {
+        transaction.setField('items', 'item_title', ['range', 'startUs'], startUs);
+      });
+    }
+    expect(history.state).toMatchObject({ undoDepth: 1, redoDepth: 0 });
+    expect(engine.getSnapshot().items.item_title?.range.startUs).toBe(750_000);
+    history.finishGroup('drag-title');
+    history.undo();
+    expect(engine.getSnapshot().items.item_title?.range.startUs).toBe(initialStartUs);
+    history.redo();
+    expect(engine.getSnapshot().items.item_title?.range.startUs).toBe(750_000);
+
+    history.edit({ label: 'Drag title', historyGroup: 'cancel-drag' }, transaction => {
+      transaction.setField('items', 'item_title', ['range', 'startUs'], 900_000);
+    });
+    const cancelled = history.cancelGroup('cancel-drag');
+    expect(cancelled?.changeSet.label).toBe('Cancel: Drag title');
+    expect(engine.getSnapshot().items.item_title?.range.startUs).toBe(750_000);
+    expect(history.state).toMatchObject({ undoDepth: 1, redoDepth: 0 });
+  });
+
   it('undoes and redoes an optional solo field without changing its legacy default', () => {
     const engine = new TransactionEngine(project, validate);
     const history = new TransactionHistory(engine);

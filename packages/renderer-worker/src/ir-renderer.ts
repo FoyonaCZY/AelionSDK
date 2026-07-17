@@ -18,12 +18,18 @@ import type { ComposeSuccess } from './protocol.js';
 
 export type RenderMode = 'preview' | 'export';
 
+export interface IrFrameRequest {
+  readonly purpose: RenderMode;
+  readonly maxDimension: number;
+}
+
 export interface IrFrameSource {
   frameAt(
     assetId: string,
     streamIndex: number,
     sourceTimeUs: number,
     signal?: AbortSignal,
+    request?: IrFrameRequest,
   ): Promise<VideoFrame>;
 }
 
@@ -34,6 +40,8 @@ export interface RenderIrFrameOptions {
   readonly mode: RenderMode;
   readonly preferredBackend?: 'webgpu' | 'webgl2';
   readonly allowFallback?: boolean;
+  /** Preview-only output scale. Export always renders at full Project resolution. */
+  readonly renderScale?: number;
   readonly signal?: AbortSignal;
 }
 
@@ -41,6 +49,9 @@ export interface RenderIrFrameResult {
   readonly bitmap: ImageBitmap;
   readonly backend: 'webgpu' | 'webgl2';
   readonly materialIds: readonly string[];
+  readonly width: number;
+  readonly height: number;
+  readonly renderScale: number;
 }
 
 export interface RenderIrFrameRendererOptions {
@@ -399,8 +410,10 @@ function finite(value: unknown, fallback: number): number {
 
 function visualParameters(
   visual: object,
-  width: number,
-  height: number,
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
   sequenceTimeUs: number,
   ownerStartUs: number,
 ): Readonly<Record<string, number>> {
@@ -412,17 +425,19 @@ function visualParameters(
   const anchor = record(evaluated(transform.anchor));
   const scale = record(evaluated(transform.scale));
   const crop = record(evaluated(visualRecord.crop));
+  const positionScaleX = outputWidth / projectWidth;
+  const positionScaleY = outputHeight / projectHeight;
   return {
-    positionX: finite(position.x, width / 2),
-    positionY: finite(position.y, height / 2),
+    positionX: finite(position.x, projectWidth / 2) * positionScaleX,
+    positionY: finite(position.y, projectHeight / 2) * positionScaleY,
     anchorX: finite(anchor.x, 0.5),
     anchorY: finite(anchor.y, 0.5),
     scaleX: finite(scale.x, 1),
     scaleY: finite(scale.y, 1),
     rotationRad: (finite(evaluated(transform.rotationDeg), 0) * Math.PI) / 180,
     opacity: Math.max(0, Math.min(1, finite(evaluated(visualRecord.opacity), 1))),
-    outputWidth: width,
-    outputHeight: height,
+    outputWidth,
+    outputHeight,
     cropLeft: finite(crop.left, 0),
     cropTop: finite(crop.top, 0),
     cropRight: finite(crop.right, 0),
@@ -460,16 +475,19 @@ function canvasFont(style: PortableTextStyle): string {
 
 function rasterTextFrame(
   clip: IrTextClip,
-  width: number,
-  height: number,
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
   timestampUs: number,
 ): VideoFrame {
-  const canvas = new OffscreenCanvas(width, height);
+  const canvas = new OffscreenCanvas(outputWidth, outputHeight);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('TEXT_CANVAS_UNAVAILABLE');
   const layout = layoutIrText(clip);
-  context.clearRect(0, 0, width, height);
+  context.clearRect(0, 0, outputWidth, outputHeight);
   context.save();
+  context.scale(outputWidth / projectWidth, outputHeight / projectHeight);
   if (clip.overflow !== 'visible') {
     context.beginPath();
     context.rect(clip.box.x, clip.box.y, clip.box.width, clip.box.height);
@@ -481,12 +499,20 @@ function rasterTextFrame(
       context.font = canvasFont(span.style);
       context.fillStyle = span.style.fill;
       const y = line.y + Math.max(0, (line.height - span.style.lineHeightPx) / 2);
-      if (span.style.stroke !== undefined && span.style.strokeWidthPx > 0) {
-        context.strokeStyle = span.style.stroke;
-        context.lineWidth = span.style.strokeWidthPx;
-        context.strokeText(span.text, span.x, y);
+      context.direction = span.style.direction;
+      const draw = (value: string, x: number): void => {
+        if (span.style.stroke !== undefined && span.style.strokeWidthPx > 0) {
+          context.strokeStyle = span.style.stroke;
+          context.lineWidth = span.style.strokeWidthPx;
+          context.strokeText(value, x, y);
+        }
+        context.fillText(value, x, y);
+      };
+      if (span.style.direction === 'rtl') {
+        draw(span.text, span.x + span.advancePx);
+      } else {
+        for (const glyph of span.glyphs) draw(glyph.text, glyph.x);
       }
-      context.fillText(span.text, span.x, y);
     }
   }
   context.restore();
@@ -513,12 +539,17 @@ function canvasColor(value: unknown, fallback = 'rgba(0, 0, 0, 0)'): string {
   return `rgba(${Math.round(linearChannelToSrgb(red) * 255).toString()}, ${Math.round(linearChannelToSrgb(green) * 255).toString()}, ${Math.round(linearChannelToSrgb(blue) * 255).toString()}, ${Math.max(0, Math.min(1, alpha)).toString()})`;
 }
 
-function rasterBackgroundFrame(ir: RenderIr, timestampUs: number): VideoFrame {
-  const canvas = new OffscreenCanvas(ir.width, ir.height);
+function rasterBackgroundFrame(
+  ir: RenderIr,
+  width: number,
+  height: number,
+  timestampUs: number,
+): VideoFrame {
+  const canvas = new OffscreenCanvas(width, height);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('BACKGROUND_CANVAS_UNAVAILABLE');
   context.fillStyle = canvasColor(ir.backgroundColor);
-  context.fillRect(0, 0, ir.width, ir.height);
+  context.fillRect(0, 0, width, height);
   return new VideoFrame(canvas, { timestamp: timestampUs });
 }
 
@@ -616,12 +647,19 @@ export class RenderIrFrameRenderer implements Disposable {
   }
 
   async #renderFrame(options: RenderIrFrameOptions): Promise<RenderIrFrameResult> {
+    const requestedScale = options.mode === 'export' ? 1 : (options.renderScale ?? 1);
+    if (!Number.isFinite(requestedScale) || requestedScale <= 0 || requestedScale > 1) {
+      throw new RangeError('renderScale must be greater than 0 and at most 1');
+    }
+    const width = Math.max(1, Math.round(options.ir.width * requestedScale));
+    const height = Math.max(1, Math.round(options.ir.height * requestedScale));
+    const renderScale = Math.min(width / options.ir.width, height / options.ir.height);
     const color = preflightColorPipeline(options.ir, LOCAL_RGBA8_COLOR_CAPABILITY);
     if (!color.ok) throw new AelionError(color.issues);
     const state = evaluateVisualState(options.ir, options.timeUs);
     const backgroundId = '__aelion_background__';
     const rendered = new Map<string, VideoFrame>([
-      [backgroundId, rasterBackgroundFrame(options.ir, options.timeUs)],
+      [backgroundId, rasterBackgroundFrame(options.ir, width, height, options.timeUs)],
     ]);
     const appliedMaterialIds: string[] = [];
     try {
@@ -635,16 +673,19 @@ export class RenderIrFrameRenderer implements Disposable {
             active.clip.source.streamIndex,
             active.sourceTimeUs,
             options.signal,
+            { purpose: options.mode, maxDimension: Math.max(width, height) },
           );
         } else if (active.clip.kind === 'text-clip') {
-          frame = rasterTextFrame(active.clip, options.ir.width, options.ir.height, options.timeUs);
-        } else if (active.clip.kind === 'generator-clip') {
-          frame = rasterGeneratorFrame(
-            active.clip.generator,
+          frame = rasterTextFrame(
+            active.clip,
             options.ir.width,
             options.ir.height,
+            width,
+            height,
             options.timeUs,
           );
+        } else if (active.clip.kind === 'generator-clip') {
+          frame = rasterGeneratorFrame(active.clip.generator, width, height, options.timeUs);
         } else {
           if (active.sourceTimeUs === null) continue;
           const subgraph = options.ir.subgraphs?.[active.clip.source.sequenceId];
@@ -665,10 +706,12 @@ export class RenderIrFrameRenderer implements Disposable {
             active.clip.visual,
             options.ir.width,
             options.ir.height,
+            width,
+            height,
             options.timeUs,
             active.clip.range.startUs,
           );
-          if (requiresBaseVisualPass(baseParameters, options.ir.width, options.ir.height)) {
+          if (requiresBaseVisualPass(baseParameters, width, height)) {
             const input = frame;
             // WorkerCompositor owns every input once compose() is invoked,
             // including its rejected/aborted admission paths.
@@ -677,8 +720,8 @@ export class RenderIrFrameRenderer implements Disposable {
               inputs: { source: input },
               program: BASE_VISUAL_PROGRAM,
               parameters: baseParameters,
-              width: options.ir.width,
-              height: options.ir.height,
+              width,
+              height,
               preferredBackend: 'webgl2',
               allowFallback: false,
               ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -699,8 +742,9 @@ export class RenderIrFrameRenderer implements Disposable {
               inputs: { source: input },
               program,
               parameters: evaluated.parameters,
-              width: options.ir.width,
-              height: options.ir.height,
+              systems: { qualityScale: renderScale },
+              width,
+              height,
               preferredBackend: options.preferredBackend ?? 'webgpu',
               allowFallback: options.allowFallback ?? true,
               ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -736,17 +780,19 @@ export class RenderIrFrameRenderer implements Disposable {
             active.clip.visual,
             options.ir.width,
             options.ir.height,
+            width,
+            height,
             options.timeUs,
             active.clip.range.startUs,
           );
-          if (requiresBaseVisualPass(targetSpace, options.ir.width, options.ir.height)) {
+          if (requiresBaseVisualPass(targetSpace, width, height)) {
             try {
               const aligned = await this.#composeOwned({
                 inputs: { source: ownedMask },
                 program: BASE_VISUAL_PROGRAM,
                 parameters: targetSpace,
-                width: options.ir.width,
-                height: options.ir.height,
+                width,
+                height,
                 preferredBackend: 'webgl2',
                 allowFallback: false,
                 ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -767,8 +813,8 @@ export class RenderIrFrameRenderer implements Disposable {
             featherUvX: mask.featherPx / options.ir.width,
             featherUvY: mask.featherPx / options.ir.height,
           },
-          width: options.ir.width,
-          height: options.ir.height,
+          width,
+          height,
           preferredBackend: 'webgl2',
           allowFallback: false,
           ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -807,9 +853,9 @@ export class RenderIrFrameRenderer implements Disposable {
           inputs: { from, to },
           program,
           parameters: evaluated.parameters,
-          systems: { transitionProgress: state.transition.progress },
-          width: options.ir.width,
-          height: options.ir.height,
+          systems: { transitionProgress: state.transition.progress, qualityScale: renderScale },
+          width,
+          height,
           preferredBackend: options.preferredBackend ?? 'webgpu',
           allowFallback: options.allowFallback ?? true,
           ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -854,8 +900,8 @@ export class RenderIrFrameRenderer implements Disposable {
             inputs: { base, overlay: layer.frame },
             program: BLEND_PROGRAM,
             parameters: { blendMode: blendModeCode(layer.blendMode) },
-            width: options.ir.width,
-            height: options.ir.height,
+            width,
+            height,
             preferredBackend: options.preferredBackend ?? 'webgpu',
             allowFallback: options.allowFallback ?? true,
             ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -882,8 +928,9 @@ export class RenderIrFrameRenderer implements Disposable {
                 inputs: { source: input },
                 program,
                 parameters: evaluated.parameters,
-                width: options.ir.width,
-                height: options.ir.height,
+                systems: { qualityScale: renderScale },
+                width,
+                height,
                 preferredBackend: options.preferredBackend ?? 'webgpu',
                 allowFallback: options.allowFallback ?? true,
                 ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -896,18 +943,20 @@ export class RenderIrFrameRenderer implements Disposable {
               active.clip.visual,
               options.ir.width,
               options.ir.height,
+              width,
+              height,
               options.timeUs,
               active.clip.range.startUs,
             );
-            if (requiresBaseVisualPass(adjustmentParameters, options.ir.width, options.ir.height)) {
+            if (requiresBaseVisualPass(adjustmentParameters, width, height)) {
               const adjustedInput = composite;
               composite = undefined;
               const adjusted = await this.#composeOwned({
                 inputs: { source: adjustedInput },
                 program: BASE_VISUAL_PROGRAM,
                 parameters: adjustmentParameters,
-                width: options.ir.width,
-                height: options.ir.height,
+                width,
+                height,
                 preferredBackend: 'webgl2',
                 allowFallback: false,
                 ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -919,8 +968,8 @@ export class RenderIrFrameRenderer implements Disposable {
                 inputs: { base, overlay },
                 program: BLEND_PROGRAM,
                 parameters: { blendMode: 0 },
-                width: options.ir.width,
-                height: options.ir.height,
+                width,
+                height,
                 preferredBackend: options.preferredBackend ?? 'webgpu',
                 allowFallback: options.allowFallback ?? true,
                 ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -937,6 +986,9 @@ export class RenderIrFrameRenderer implements Disposable {
           bitmap: await presentationBitmap(composite, options.signal),
           backend: compositeBackend,
           materialIds: appliedMaterialIds,
+          width,
+          height,
+          renderScale,
         };
       } finally {
         composite?.close();

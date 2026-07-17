@@ -25,6 +25,7 @@ import {
 } from '@aelion/transaction';
 
 import { AelionPlayer } from './player.js';
+import { normalizePreviewQuality } from './preview-quality.js';
 import { defaultSchemas } from './default-schemas.js';
 import { ExportJob } from './export-job.js';
 import type {
@@ -32,12 +33,15 @@ import type {
   AelionExportJob,
   AelionExportJobSnapshot,
   AelionExportOptions,
+  AelionInteractiveEdit,
+  AelionInteractiveEditOptions,
   AelionProfileExportJob,
   AelionProfileExportOptions,
   AelionProfileExportResult,
   AelionRemoteExportJob,
   AelionRemoteExportOptions,
   AelionPreviewApi,
+  AelionPreviewOptions,
   AelionSessionApi,
   AelionSessionEvent,
   AelionSessionEventOf,
@@ -70,6 +74,14 @@ function diagnosticHistoryLimit(value: number | undefined): number {
   return limit;
 }
 
+interface ActiveInteractiveEdit {
+  readonly id: string;
+  readonly label?: string;
+  readonly baseRevision?: bigint;
+  active: boolean;
+  updateCount: number;
+}
+
 export class AelionSession implements AelionSessionApi {
   readonly #options: AelionSessionOptions;
   readonly #validator: ProjectValidator;
@@ -93,6 +105,9 @@ export class AelionSession implements AelionSessionApi {
   #previewRenderedFrames = 0;
   #previewFailedFrames = 0;
   #lastPreviewBackend: 'webgpu' | 'webgl2' | undefined;
+  #lastPreviewWidth: number | undefined;
+  #lastPreviewHeight: number | undefined;
+  #lastPreviewRenderScale: number | undefined;
   #exportJobsStarted = 0;
   #exportJobsCompleted = 0;
   #exportJobsFailed = 0;
@@ -103,6 +118,8 @@ export class AelionSession implements AelionSessionApi {
   #loadInProgress = 0;
   #loadTail: Promise<void> = Promise.resolve();
   #disposeTask: Promise<void> | undefined;
+  #activeInteractiveEdit: ActiveInteractiveEdit | undefined;
+  #nextInteractiveEditId = 1;
 
   public readonly player: AelionPlayer;
   public readonly transaction: AelionTransactionApi;
@@ -131,6 +148,7 @@ export class AelionSession implements AelionSessionApi {
     const canRedo = (): boolean => this.#history?.state.canRedo ?? false;
     this.transaction = {
       edit: (callback, editOptions = {}) => this.#edit(callback, editOptions),
+      beginInteractive: editOptions => this.#beginInteractiveEdit(editOptions),
       undo: () => this.#undoChange(),
       redo: () => this.#redoChange(),
       get commands() {
@@ -193,6 +211,7 @@ export class AelionSession implements AelionSessionApi {
 
   async #installProject(project: AelionProject, generation: number): Promise<void> {
     this.#assertLoadCurrent(generation);
+    this.#invalidateInteractiveEdit();
     await this.player.reset();
     this.#assertLoadCurrent(generation);
 
@@ -213,7 +232,24 @@ export class AelionSession implements AelionSessionApi {
     );
     engineRef.current = engine;
     const history = new TransactionHistory(engine);
-    const commands = new EditingCommands(history);
+    const commands = new EditingCommands({
+      get revision() {
+        return history.revision;
+      },
+      getSnapshot: () => history.getSnapshot(),
+      subscribe: listener => history.subscribe(listener),
+      edit: (editOptions, callback) => {
+        this.#assertTransactionAvailable();
+        if (this.#history !== history)
+          throw new Error('Editing command belongs to a stale Project');
+        if (this.#activeInteractiveEdit?.active === true) {
+          throw new Error(
+            'Finish or cancel the active interactive edit before starting another edit',
+          );
+        }
+        return history.edit(editOptions, callback);
+      },
+    });
     const sequenceId = this.#options.sequenceId ?? project.settings.defaultSequenceId;
     const compiler = new IncrementalRenderCompiler();
     const compilation = compiler.compile(engine.getSnapshot(), sequenceId, engine.revision, {
@@ -260,17 +296,18 @@ export class AelionSession implements AelionSessionApi {
     });
   }
 
-  public async renderFrame(options: { readonly timeUs: number; readonly signal?: AbortSignal }) {
+  public async renderFrame(options: AelionPreviewOptions) {
     return this.#renderPreviewFrame(options);
   }
 
-  async #renderPreviewFrame(options: { readonly timeUs: number; readonly signal?: AbortSignal }) {
+  async #renderPreviewFrame(options: AelionPreviewOptions) {
     this.#previewRequestedFrames += 1;
     this.#emitStats();
     try {
       const ir = this.requireIr();
       const media = this.#options.media;
       if (media === undefined) throw new Error('AelionSession requires a media provider to render');
+      const previewQuality = normalizePreviewQuality(options);
       const result = await this.#requireRenderer().render({
         ir,
         timeUs: options.timeUs,
@@ -278,10 +315,14 @@ export class AelionSession implements AelionSessionApi {
         mode: 'preview',
         preferredBackend: this.#options.preferredBackend ?? 'webgl2',
         allowFallback: this.#options.allowBackendFallback ?? true,
+        renderScale: previewQuality.renderScale,
         ...(options.signal === undefined ? {} : { signal: options.signal }),
       });
       this.#previewRenderedFrames += 1;
       this.#lastPreviewBackend = result.backend;
+      this.#lastPreviewWidth = result.width;
+      this.#lastPreviewHeight = result.height;
+      this.#lastPreviewRenderScale = result.renderScale;
       this.#emitStats();
       return result;
     } catch (error) {
@@ -338,6 +379,9 @@ export class AelionSession implements AelionSessionApi {
         renderedFrames: this.#previewRenderedFrames,
         failedFrames: this.#previewFailedFrames,
         lastBackend: this.#lastPreviewBackend ?? null,
+        lastWidth: this.#lastPreviewWidth ?? null,
+        lastHeight: this.#lastPreviewHeight ?? null,
+        lastRenderScale: this.#lastPreviewRenderScale ?? null,
         pendingFrames: renderer?.pendingFrames ?? 0,
         maxPendingFrames: renderer?.maxPendingFrames ?? this.#options.maxPendingFrames ?? 2,
         rendererPresent: renderer !== undefined,
@@ -408,6 +452,7 @@ export class AelionSession implements AelionSessionApi {
 
   async #dispose(): Promise<void> {
     this.#loadGeneration += 1;
+    this.#invalidateInteractiveEdit();
     const drainLoads = this.#loadTail.then(
       () => undefined,
       () => undefined,
@@ -465,6 +510,9 @@ export class AelionSession implements AelionSessionApi {
     options: { readonly label?: string; readonly baseRevision?: bigint },
   ): TransactionCommit {
     this.#assertTransactionAvailable();
+    if (this.#activeInteractiveEdit?.active === true) {
+      throw new Error('Finish or cancel the active interactive edit before starting another edit');
+    }
     const history = this.#history;
     if (history === undefined) throw unloaded();
     return history.edit(
@@ -476,8 +524,90 @@ export class AelionSession implements AelionSessionApi {
     );
   }
 
+  #beginInteractiveEdit(options: AelionInteractiveEditOptions = {}): AelionInteractiveEdit {
+    this.#assertTransactionAvailable();
+    if (this.#activeInteractiveEdit?.active === true) {
+      throw new Error('An interactive edit is already active');
+    }
+    const state: ActiveInteractiveEdit = {
+      id: `interactive_${this.#nextInteractiveEditId.toString()}`,
+      ...(options.label === undefined ? {} : { label: options.label }),
+      ...(options.baseRevision === undefined ? {} : { baseRevision: options.baseRevision }),
+      active: true,
+      updateCount: 0,
+    };
+    this.#nextInteractiveEditId += 1;
+    this.#activeInteractiveEdit = state;
+    const isActive = (): boolean => state.active && this.#activeInteractiveEdit === state;
+    return Object.freeze({
+      get active() {
+        return isActive();
+      },
+      get updateCount() {
+        return state.updateCount;
+      },
+      update: (callback: (transaction: TransactionBuilder) => void) =>
+        this.#updateInteractiveEdit(state, callback),
+      commit: () => this.#finishInteractiveEdit(state),
+      cancel: () => this.#cancelInteractiveEdit(state),
+    });
+  }
+
+  #updateInteractiveEdit(
+    state: ActiveInteractiveEdit,
+    callback: (transaction: TransactionBuilder) => void,
+  ): TransactionCommit {
+    this.#assertInteractiveEditActive(state);
+    const history = this.#history;
+    if (history === undefined) throw unloaded();
+    const commit = history.edit(
+      {
+        ...(state.label === undefined ? {} : { label: state.label }),
+        ...(state.updateCount === 0 && state.baseRevision !== undefined
+          ? { baseRevision: state.baseRevision }
+          : {}),
+        historyGroup: state.id,
+      },
+      callback,
+    );
+    state.updateCount += 1;
+    return commit;
+  }
+
+  #finishInteractiveEdit(state: ActiveInteractiveEdit): void {
+    this.#assertInteractiveEditActive(state);
+    this.#history?.finishGroup(state.id);
+    state.active = false;
+    this.#activeInteractiveEdit = undefined;
+  }
+
+  #cancelInteractiveEdit(state: ActiveInteractiveEdit): TransactionCommit | null {
+    this.#assertInteractiveEditActive(state);
+    const history = this.#history;
+    if (history === undefined) throw unloaded();
+    const commit = state.updateCount === 0 ? null : history.cancelGroup(state.id);
+    state.active = false;
+    this.#activeInteractiveEdit = undefined;
+    return commit;
+  }
+
+  #assertInteractiveEditActive(state: ActiveInteractiveEdit): void {
+    this.#assertTransactionAvailable();
+    if (!state.active || this.#activeInteractiveEdit !== state) {
+      throw new Error('Interactive edit is no longer active');
+    }
+  }
+
+  #invalidateInteractiveEdit(): void {
+    if (this.#activeInteractiveEdit !== undefined) this.#activeInteractiveEdit.active = false;
+    this.#activeInteractiveEdit = undefined;
+  }
+
   #undoChange(): TransactionCommit {
     this.#assertTransactionAvailable();
+    if (this.#activeInteractiveEdit?.active === true) {
+      throw new Error('Finish or cancel the active interactive edit before undo');
+    }
     const history = this.#history;
     if (history === undefined) throw unloaded();
     return history.undo();
@@ -485,6 +615,9 @@ export class AelionSession implements AelionSessionApi {
 
   #redoChange(): TransactionCommit {
     this.#assertTransactionAvailable();
+    if (this.#activeInteractiveEdit?.active === true) {
+      throw new Error('Finish or cancel the active interactive edit before redo');
+    }
     const history = this.#history;
     if (history === undefined) throw unloaded();
     return history.redo();

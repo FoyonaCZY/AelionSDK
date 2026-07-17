@@ -63,6 +63,8 @@ function createDraft(
 
 let changeSetSequence = 0;
 
+export const TRANSACTION_MAX_OPERATIONS = 16_384;
+
 function createChangeSetId(): string {
   changeSetSequence += 1;
   return `chg_${Date.now().toString(36)}_${changeSetSequence.toString(36)}`;
@@ -82,15 +84,21 @@ export class TransactionBuilder {
    * callers cannot mutate a transaction after it has been committed.
    */
   public appendOperations(operations: readonly AtomicOperation[]): void {
+    if (this.#operations.length + operations.length > TRANSACTION_MAX_OPERATIONS) {
+      throw transactionError(
+        'TRANSACTION_OPERATION_LIMIT_EXCEEDED',
+        `A transaction cannot contain more than ${TRANSACTION_MAX_OPERATIONS.toString()} operations`,
+      );
+    }
     this.#operations.push(...operations.map(operation => structuredClone(operation)));
   }
 
   public createEntity(collection: CollectionName, id: EntityId, value: JsonObject): void {
-    this.#operations.push({ op: 'createEntity', collection, id, value });
+    this.#push({ op: 'createEntity', collection, id, value });
   }
 
   public deleteEntity(collection: CollectionName, id: EntityId): void {
-    this.#operations.push({ op: 'deleteEntity', collection, id });
+    this.#push({ op: 'deleteEntity', collection, id });
   }
 
   public setField(
@@ -99,11 +107,11 @@ export class TransactionBuilder {
     path: readonly string[],
     value: JsonValue,
   ): void {
-    this.#operations.push({ op: 'setField', collection, id, path, value });
+    this.#push({ op: 'setField', collection, id, path, value });
   }
 
   public removeField(collection: CollectionName, id: EntityId, path: readonly string[]): void {
-    this.#operations.push({ op: 'removeField', collection, id, path });
+    this.#push({ op: 'removeField', collection, id, path });
   }
 
   public listInsert(
@@ -113,7 +121,7 @@ export class TransactionBuilder {
     valueId: EntityId,
     beforeId?: EntityId,
   ): void {
-    this.#operations.push({
+    this.#push({
       op: 'listInsert',
       collection,
       id,
@@ -129,7 +137,7 @@ export class TransactionBuilder {
     path: readonly string[],
     valueId: EntityId,
   ): void {
-    this.#operations.push({ op: 'listRemove', collection, id, path, valueId });
+    this.#push({ op: 'listRemove', collection, id, path, valueId });
   }
 
   public listMove(
@@ -139,7 +147,7 @@ export class TransactionBuilder {
     valueId: EntityId,
     beforeId?: EntityId,
   ): void {
-    this.#operations.push({
+    this.#push({
       op: 'listMove',
       collection,
       id,
@@ -147,6 +155,16 @@ export class TransactionBuilder {
       valueId,
       ...(beforeId === undefined ? {} : { beforeId }),
     });
+  }
+
+  #push(operation: AtomicOperation): void {
+    if (this.#operations.length >= TRANSACTION_MAX_OPERATIONS) {
+      throw transactionError(
+        'TRANSACTION_OPERATION_LIMIT_EXCEEDED',
+        `A transaction cannot contain more than ${TRANSACTION_MAX_OPERATIONS.toString()} operations`,
+      );
+    }
+    this.#operations.push(operation);
   }
 }
 

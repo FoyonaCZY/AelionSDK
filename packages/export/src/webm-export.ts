@@ -61,12 +61,38 @@ export interface WebMExportResult {
   readonly videoFrames: number;
   readonly audioFrames: number;
   readonly durationUs: number;
+  /**
+   * Configuration submitted to the encoders. Variable bitrate targets are not
+   * promises about the measured bitrate of the resulting media.
+   */
+  readonly encoderConfiguration: MuxedEncoderConfiguration;
+}
+
+export interface MuxedEncoderConfiguration {
+  readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac';
+  readonly video: {
+    readonly codec: string;
+    readonly codecString: string;
+    readonly width: number;
+    readonly height: number;
+    readonly frameRate: number;
+    readonly bitrateMode: 'variable';
+    readonly targetBitrate: number;
+  };
+  readonly audio: {
+    readonly codec: string;
+    readonly sampleRate: number;
+    readonly channelCount: number;
+    readonly bitrateMode: 'variable';
+    readonly targetBitrate: number;
+  };
 }
 
 export type Mp4ExportOptions = WebMExportOptions;
 export type Mp4ExportResult = WebMExportResult;
 
 interface MuxedExportProfile {
+  readonly id: MuxedEncoderConfiguration['profile'];
   readonly operationName: string;
   readonly format: WebMOutputFormat | Mp4OutputFormat;
   readonly videoCodec: 'vp9' | 'avc';
@@ -264,6 +290,25 @@ async function exportMuxed(
       videoFrames,
       audioFrames,
       durationUs: options.durationUs,
+      encoderConfiguration: {
+        profile: profile.id,
+        video: {
+          codec: profile.videoCodec,
+          codecString: profile.fullVideoCodecString,
+          width: options.width,
+          height: options.height,
+          frameRate: options.frameRate.numerator / options.frameRate.denominator,
+          bitrateMode: 'variable',
+          targetBitrate: options.videoBitrate,
+        },
+        audio: {
+          codec: profile.audioCodec,
+          sampleRate: options.sampleRate,
+          channelCount: options.channelCount,
+          bitrateMode: 'variable',
+          targetBitrate: options.audioBitrate,
+        },
+      },
     };
   } catch (error) {
     try {
@@ -283,6 +328,7 @@ async function exportMuxed(
 
 export function exportWebM(options: WebMExportOptions): Promise<WebMExportResult> {
   return exportMuxed(options, {
+    id: 'webm-vp9-opus',
     operationName: 'WebM export',
     format: new WebMOutputFormat(),
     videoCodec: 'vp9',
@@ -293,6 +339,7 @@ export function exportWebM(options: WebMExportOptions): Promise<WebMExportResult
 
 export function exportMp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
   return exportMuxed(options, {
+    id: 'mp4-h264-aac',
     operationName: 'MP4 export',
     format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
     videoCodec: 'avc',

@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-15T06:29:54.099Z",
+  "generatedAt": "2026-07-17T03:16:04.990Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
     "package": "@aelion/vite-plugin",
     "version": "0.1.0-alpha.0",
-    "packageSha256": "021fec08b850c7c4b32b06feeaaa03b28a0b6420f7987f975d2c56e59ee6e26d",
+    "packageSha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a",
     "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
     "public": true,
     "zeroConfigVite": false,
@@ -59,7 +59,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "5dd495ae471e00677d9a8cfc8d9eb78970822231ec0272fe8cb8a527c93fb663",
+    "packageJsonSha256": "0f861d8636a51b3b852a63955bb4d4d1b565e409b1dd027a8294f1b1eed5a2be",
     "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -67,7 +67,7 @@
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "9aafa85ebf931da1034ce6c07f3680a3b0fd5a42fdf9d788abc87e90aae1f95c"
+      "sha256": "8b91b0ab113115382ebef05abecd03c66f0f8c6e06b29d10e756e16f9589fb71"
     },
     {
       "name": "@aelion/capability",
@@ -82,7 +82,7 @@
     {
       "name": "@aelion/export",
       "version": "0.1.0-alpha.0",
-      "sha256": "9dabf6f3ae423a96535948869a38d9d85c5a941aabdc24a56c3cae46bcdebf16"
+      "sha256": "caa236d03adce648bbbb205a9283f433b6210d881ab0f8d58fc73190abe3ae7e"
     },
     {
       "name": "@aelion/material-compiler",
@@ -92,42 +92,42 @@
     {
       "name": "@aelion/material-sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "4cdbccc243fee843ced35058ab694a757bd19ed7835d0b406107cd5deb684765"
+      "sha256": "390a695ba6273e20e68b49a75fcfe972565cc5d20620ca6315d809c83dea9e47"
     },
     {
       "name": "@aelion/media",
       "version": "0.1.0-alpha.0",
-      "sha256": "b7e29eb2dcd9ed46a45b49ba59a8ad714c1b03ee147196e0e74bfe29bb6ed4c6"
+      "sha256": "b03d61dd763c29e9049ba28a4714a765cb2bb571de979932692f6083af17b517"
     },
     {
       "name": "@aelion/project-schema",
       "version": "0.1.0-alpha.0",
-      "sha256": "af60724e31b8fe4a530ae2dc723ace68c8eaf934be8950d18793077f6cc95c49"
+      "sha256": "f3bf8d09352de03b88f2370f4a7ba610e31845bcafb5aff5b0debfaa58d97c8b"
     },
     {
       "name": "@aelion/render-ir",
       "version": "0.1.0-alpha.0",
-      "sha256": "1d19c9871bff159a6c10b56b5f5e4473ae0288aab63f211f089c29dc5dde245c"
+      "sha256": "d1e4d043ecb317ad9776076efb21fd45d57a7ca45ea0fcedb512795c8aa1e228"
     },
     {
       "name": "@aelion/renderer-worker",
       "version": "0.1.0-alpha.0",
-      "sha256": "bb0b7d465a525c2531c8bc5d652213f2c1289de8ab91183a3be69f94b3b3a9f3"
+      "sha256": "5b243e64c489dff89ba7d4409f5bb61f2f19c3f47f93bde5bbc710b5560a0b46"
     },
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "aa8eadb4f931ab86c23ce9be0ae86a68df757936292e56548bf7158f66b81cd4"
+      "sha256": "490490833416f2bb1f3947161d489f2d8537328ffff050126af9ec6fcf012fd7"
     },
     {
       "name": "@aelion/transaction",
       "version": "0.1.0-alpha.0",
-      "sha256": "2abb0566ffcaf88cddb7b8d09969eea03ebd558e45e20f354da45c49bfbfd172"
+      "sha256": "787af33851b2408088a01aab177ac370af1f6d4e3d804ab04ab370b1829287c5"
     },
     {
       "name": "@aelion/vite-plugin",
       "version": "0.1.0-alpha.0",
-      "sha256": "021fec08b850c7c4b32b06feeaaa03b28a0b6420f7987f975d2c56e59ee6e26d"
+      "sha256": "daa4077d731dffb102406852d0041845ae826394fe7adf85cb9cd656ab696d3a"
     }
   ],
   "runtimeAssets": [
@@ -147,10 +147,10 @@
     },
     {
       "id": "webgl2-worker",
-      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-BGTr4J-E.js",
-      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-BGTr4J-E.js",
-      "bytes": 11038,
-      "sha256": "3f5d04a431affd3487c372b79d736d91013827a261c51a01348e4847585bf88d"
+      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-nzX94HhF.js",
+      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-nzX94HhF.js",
+      "bytes": 12939,
+      "sha256": "18a4f8a6bd7a98f73d90167408b7484bb298a11a1c2ec86b6442f89b100ee627"
     }
   ],
   "browsers": [
@@ -168,7 +168,7 @@
             225,
             255
           ],
-          "workerTimingUs": 26450
+          "workerTimingUs": 20770
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -204,7 +204,7 @@
             225,
             255
           ],
-          "workerTimingUs": 59440
+          "workerTimingUs": 62580
         },
         "audioWorkletClock": {
           "contextState": "suspended",

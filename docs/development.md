@@ -20,14 +20,18 @@ corepack pnpm run ci
 | ------------------------------------ | ---------------------------------------------------------- |
 | `corepack pnpm run ci`               | format、Schema、lint、typecheck、unit、build、API snapshot |
 | `corepack pnpm run docs:check`       | 检查全部 Markdown 本地链接                                 |
+| `corepack pnpm run docs:typecheck`   | 编译文档引用的完整 TypeScript 集成示例                     |
 | `corepack pnpm test:browser`         | Chromium source browser suite                              |
 | `corepack pnpm test:browser:firefox` | Firefox source browser suite                               |
 | `corepack pnpm test:golden`          | 确定性像素 Golden                                          |
+| `corepack pnpm test:security`        | Project/媒体 fuzz、Package trust 与资源预算                |
+| `corepack pnpm test:soak`            | 十分钟音频模拟和大工程增量编译/长时间线求值                |
 | `corepack pnpm bench`                | 固定 benchmark                                             |
 | `corepack pnpm test:pack`            | 真实 `.tgz` Node consumer                                  |
 | `corepack pnpm test:consumer`        | 真实 `.tgz` Vite/browser consumer                          |
 | `corepack pnpm release:dry-run`      | 13 个公开包的发布前检查                                    |
 | `corepack pnpm dev:lab`              | Capability / Material Lab                                  |
+| `corepack pnpm dev:editor`           | 只使用公开包 API 的参考剪辑器                              |
 
 证据生成命令和产物说明位于 [`reports/baseline/README.md`](../reports/baseline/README.md)。
 
@@ -67,6 +71,8 @@ Project / Transaction
 - 画面和声音：Golden/oracle；
 - 完整产品链路：tarball consumer/vertical evidence；
 - 队列、内存和吞吐：benchmark/soak。
+
+`test:soak` 是适合 CI 的加速门禁：十分钟 PCM producer/consumer、1000 clips 增量编译和 5000 个长时间线求值点。Worker cancel/retry 与资源归零由 `test:browser` 覆盖。真实设备的小时级运行仍应使用 `report:performance` 捕获 heap、Long Task、GPU/decoder/Sink 资源并保存环境指纹；不能用加速模拟替代目标设备认证。
 
 ## 变更检查表
 

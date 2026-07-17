@@ -24,12 +24,20 @@ export interface AelionProjectSchemas {
   readonly materialInstance: JsonObject;
 }
 
+export interface AelionMediaRequest {
+  /** Preview may use an appropriate proxy. Export always requests the original representation. */
+  readonly purpose: 'preview' | 'export';
+  /** Largest requested output dimension, used to choose a right-sized preview proxy. */
+  readonly maxDimension: number;
+}
+
 export interface AelionMediaProvider {
   frameAt(
     assetId: string,
     streamIndex: number,
     sourceTimeUs: number,
     signal?: AbortSignal,
+    request?: AelionMediaRequest,
   ): Promise<VideoFrame>;
   pcmRange(
     assetId: string,
@@ -82,7 +90,14 @@ export type AelionSessionEventOf<T extends AelionSessionEventType> = Extract<
   { readonly type: T }
 >;
 
-export interface AelionPreviewOptions {
+export interface AelionPreviewQualityOptions {
+  /** Draft defaults to half-resolution; full defaults to Project resolution. */
+  readonly quality?: 'draft' | 'full';
+  /** Explicit preview scale in (0, 1]. Overrides the quality default. */
+  readonly renderScale?: number;
+}
+
+export interface AelionPreviewOptions extends AelionPreviewQualityOptions {
   readonly timeUs: number;
   readonly signal?: AbortSignal;
 }
@@ -102,6 +117,7 @@ export interface AelionPlayerApi {
   pause(): Promise<void>;
   seek(timeUs: number): Promise<void>;
   scrub(timeUs: number): Promise<RenderIrFrameResult>;
+  setPreviewQuality(options: AelionPreviewQualityOptions): void;
   getStats(): AelionPlayerStats;
   subscribe(listener: (frame: AelionPlayerFrame) => void): () => void;
 }
@@ -115,6 +131,10 @@ export interface AelionPlayerStats {
   readonly droppedFrames: number;
   readonly errors: number;
   readonly lastErrorCode: string | null;
+  readonly previewQuality: {
+    readonly quality: 'draft' | 'full';
+    readonly renderScale: number;
+  };
   /** Bounded runtime ownership state for diagnostics and leak conformance. */
   readonly resources: AelionPlayerResourceStats;
 }
@@ -153,10 +173,27 @@ export interface AelionTransactionApi {
     callback: (transaction: TransactionBuilder) => void,
     options?: { readonly label?: string; readonly baseRevision?: bigint },
   ): TransactionCommit;
+  beginInteractive(options?: AelionInteractiveEditOptions): AelionInteractiveEdit;
   undo(): TransactionCommit;
   redo(): TransactionCommit;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
+}
+
+export interface AelionInteractiveEditOptions {
+  readonly label?: string;
+  /** Optimistic revision checked by the first update in the interaction. */
+  readonly baseRevision?: bigint;
+}
+
+export interface AelionInteractiveEdit {
+  readonly active: boolean;
+  readonly updateCount: number;
+  update(callback: (transaction: TransactionBuilder) => void): TransactionCommit;
+  /** Seals the coalesced undo entry. No extra Project revision is created. */
+  commit(): void;
+  /** Restores the pre-interaction Project without leaving a redo entry. */
+  cancel(): TransactionCommit | null;
 }
 
 export interface AelionExportOptions {
@@ -272,6 +309,9 @@ export interface AelionSessionStats {
     readonly renderedFrames: number;
     readonly failedFrames: number;
     readonly lastBackend: 'webgpu' | 'webgl2' | null;
+    readonly lastWidth: number | null;
+    readonly lastHeight: number | null;
+    readonly lastRenderScale: number | null;
     readonly pendingFrames: number;
     readonly maxPendingFrames: number;
     readonly rendererPresent: boolean;

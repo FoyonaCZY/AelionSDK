@@ -7,7 +7,7 @@
 - Project v1 是 normalized、可版本化、可 canonical serialize 的 JSON snapshot。
 - 所有实体使用稳定 ID；顺序只存在于显式 ID list，不依赖对象属性顺序。
 - Transaction 是唯一写入入口，提供 revision conflict、原子校验、inverse、ChangeSet 和最小 affected ranges。
-- History 以成功事务为单位执行有界 undo/redo；新编辑清空 redo 分支。
+- History 以成功事务为单位执行有界 undo/redo；`beginInteractive()` 把拖拽/调参的连续更新合并为一个历史项，`cancel()` 可回到交互开始前且不留下 redo。
 - Project 不保存媒体 bytes、帧、波形、缓存、undo 栈或任意可执行代码。
 
 ### 时间线编辑
@@ -38,7 +38,7 @@
 - 多视觉轨按 Project 顺序做 premultiplied alpha 合成。
 - WebGL2/WebGPU 共用 12 种 blend mode 编号和公式。
 - alpha/luma mask 支持 invert、feather、source/canvas 空间和 consumed matte。
-- Text/Caption 提供 deterministic metrics、grapheme 换行、auto-fit、竖排 fallback、SRT/WebVTT 转换。
+- Text/Caption 提供 deterministic metrics、显式空格和 letter spacing、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、竖排 fallback、SRT/WebVTT 转换。
 - `BrowserFontManager` 对字体数量、字节、加载、fallback 和卸载执行预算；像素复现应显式注册字体资源。
 - Generator 支持 solid/linear-gradient；Adjustment 对已合成内容应用 Material stack。
 - Nested Sequence、显式透明/不透明背景和 image/animated-image adapter 已进入共享 IR。
@@ -56,18 +56,24 @@
 
 ## 媒体与资源治理
 
+- `ProductionMediaProvider` 直接接入 File/Blob、HTTP Range URL、OPFS 和自定义 `RangeReader`；Preview 按输出尺寸选 proxy，Export 强制 original。
+- SampleIndex 同时有有界 resident LRU 与可注入的内容寻址 `CacheStore`，相同 SHA-256/variant 可跨 Provider 实例复用。
 - MP4/H.264/AAC 和 WebM/VP9/Opus 的 SampleIndex、同步样本定位、exact seek、VideoFrame 与 PCM decode。
+- 固定真实语料覆盖 MP4 moov head/tail、fragmented MP4、B-frame、非零 PTS 和 WebM VFR；截断、损坏及随机有界输入必须 fail closed。
 - `SegmentedIndex` 按时间段 single-flight 加载，并限制 resident segment。
 - 内容寻址 `CacheStore`/OPFS cache 使用 namespace、content identity、version 和 variant 组成地址，支持 quota、LRU 和 clear。
 - Proxy selection 校验 source/proxy duration，不一致时诊断并回退 original。
 - image/animated-image adapter 保留方向、颜色描述、帧时长、循环和取消语义。
 - `PageMediaResourceGovernor` 统一管理 decoder slot、GPU bytes 和 cache bytes，支持优先级、公平排队、取消和 lease 释放。
 
-`ByteMediaProvider` 是短媒体 convenience provider。长视频、CDN 和大文件应使用 range-backed provider、分段索引、proxy 与持久缓存。
+`ByteMediaProvider` 是短媒体 convenience provider。长视频、CDN 和大文件使用 `ProductionMediaProvider`，并按业务注入 proxy、持久 CacheStore 与共享 `PageMediaResourceGovernor`。
 
 ## Preview、Player 与渲染
 
+- `attachPreviewCanvas()` 提供 latest-wins scrub、DPR/ResizeObserver、bitmap ownership、页面隐藏策略和自适应预览质量，可直接作为上层剪辑 UI 的画布控制器。
 - Project 编译为 frozen Render IR；Preview、Player 和 Export 共享节点语义。
+- Preview 支持 `quality: 'draft' | 'full'` 和 `(0, 1]` 的 `renderScale`；降采样发生在文字、Generator、变换、Material 与合成之前，不是对全尺寸结果做事后缩放。Export 始终使用 1.0。
+- Player 可通过 `setPreviewQuality()` 切换播放/seek/scrub 的预览策略，当前策略和实际比例进入 `getStats()`。
 - renderer 在 Dedicated Worker 中运行 WebGL2/WebGPU compositor，并复用 GPU pipeline 与资源。
 - bounded queue、generation、AbortSignal 和 context-lost recovery 防止过期工作泄漏。
 - Frame 所有权显式转移给调用方，`ImageBitmap` 必须关闭。
@@ -84,7 +90,7 @@
 | Audio     | WAV、RF64                                                            |
 | Remote    | canonical frozen manifest、content ID、idempotency、鉴权、进度和取消 |
 
-导出支持 profile preflight、冻结 revision、背压、进度、取消、partial cleanup 和 checkpoint unit。连续 WebM/MP4 文件失败后从 profile 起点重启，不宣称容器中点恢复。
+导出支持 profile preflight、冻结 revision、背压、进度、取消、partial cleanup 和 checkpoint unit。WebM/MP4 结果返回提交给编码器的 codec、尺寸、采样率、声道和 VBR target；target 不是输出文件的实测平均码率。`OpfsSeekableSink.getFile()` 会等待 transferred stream 真正 close 后再读取。连续 WebM/MP4 文件失败后从 profile 起点重启，不宣称容器中点恢复。
 
 ## Material
 

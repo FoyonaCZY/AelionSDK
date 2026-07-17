@@ -90,6 +90,41 @@ describe('@aelion/sdk session facade', () => {
     expect(session.state).toBe('disposed');
   });
 
+  it('publishes interactive updates immediately while coalescing and cancelling history', async () => {
+    const project = await json('examples/aelion-vertical-slice-30s.project.json');
+    const session = new AelionSession();
+    await session.loadProject(project);
+    try {
+      const before = session.getSnapshot().project?.items.item_opening?.range.startUs;
+      const drag = session.transaction.beginInteractive({ label: 'Move title' });
+      drag.update(edit => edit.setField('items', 'item_opening', ['range', 'startUs'], 2_000_000));
+      drag.update(edit => edit.setField('items', 'item_opening', ['range', 'startUs'], 3_000_000));
+      expect(drag.updateCount).toBe(2);
+      expect(session.getSnapshot().project?.items.item_opening?.range.startUs).toBe(3_000_000);
+      expect(() => session.transaction.undo()).toThrow('active interactive edit');
+      expect(() =>
+        session.transaction.commands.moveItem({ itemId: 'item_closing', startUs: 16_000_000 }),
+      ).toThrow('active interactive edit');
+      drag.commit();
+      expect(drag.active).toBe(false);
+      session.transaction.undo();
+      expect(session.getSnapshot().project?.items.item_opening?.range.startUs).toBe(before);
+
+      const cancelled = session.transaction.beginInteractive({ label: 'Move title again' });
+      cancelled.update(edit =>
+        edit.setField('items', 'item_opening', ['range', 'startUs'], 4_000_000),
+      );
+      expect(cancelled.cancel()).not.toBeNull();
+      expect(session.getSnapshot().project?.items.item_opening?.range.startUs).toBe(before);
+      expect(session.transaction.canRedo).toBe(false);
+
+      const empty = session.transaction.beginInteractive();
+      expect(empty.cancel()).toBeNull();
+    } finally {
+      await session.dispose();
+    }
+  });
+
   it('keeps Project, Render IR, history and events unchanged when Material preparation fails', async () => {
     const project = await json('examples/aelion-vertical-slice-30s.project.json');
     let fail = false;

@@ -9,9 +9,11 @@ import { sampleIndexAtTime } from '@aelion/core';
 import type { ChangeSet } from '@aelion/transaction';
 
 import type { AelionSession } from './session.js';
+import { normalizePreviewQuality, type NormalizedPreviewQuality } from './preview-quality.js';
 import type {
   AelionPlayerApi,
   AelionPlayerFrame,
+  AelionPlayerStats,
   AelionPlayerResourceStats,
   AelionPlayerState,
 } from './types.js';
@@ -57,6 +59,7 @@ export class AelionPlayer implements AelionPlayerApi {
   #droppedFrames = 0;
   #errors = 0;
   #lastErrorCode: string | undefined;
+  #previewQuality: NormalizedPreviewQuality = normalizePreviewQuality();
   #lastDisposedRuntime: AelionPlayerResourceStats['lastDisposedRuntime'] = null;
 
   public constructor(session: AelionSession, onRuntimeError?: RuntimeErrorListener) {
@@ -135,7 +138,11 @@ export class AelionPlayer implements AelionPlayerApi {
       if (generation !== this.#generation) return;
       const signal = this.#videoController.signal;
       if (signal.aborted) return;
-      const result = await this.#session.preview.renderFrame({ timeUs, signal });
+      const result = await this.#session.preview.renderFrame({
+        timeUs,
+        signal,
+        ...this.#previewQuality,
+      });
       if (generation !== this.#generation) {
         result.bitmap.close();
         return;
@@ -148,10 +155,17 @@ export class AelionPlayer implements AelionPlayerApi {
   }
 
   public scrub(timeUs: number) {
-    return this.#session.preview.renderFrame({ timeUs });
+    return this.#session.preview.renderFrame({ timeUs, ...this.#previewQuality });
   }
 
-  public getStats() {
+  public setPreviewQuality(options: Parameters<AelionPlayerApi['setPreviewQuality']>[0]): void {
+    if (this.#state === 'disposed') throw new ReferenceError('AelionPlayer is disposed');
+    this.#previewQuality = normalizePreviewQuality(options);
+    this.#advanceGeneration();
+    this.#session.notifyStatsChanged();
+  }
+
+  public getStats(): AelionPlayerStats {
     return Object.freeze({
       state: this.#state,
       currentTimeUs: this.currentTimeUs,
@@ -160,6 +174,7 @@ export class AelionPlayer implements AelionPlayerApi {
       droppedFrames: this.#droppedFrames,
       errors: this.#errors,
       lastErrorCode: this.#lastErrorCode ?? null,
+      previewQuality: this.#previewQuality,
       resources: this.#resourceStats(),
     });
   }
@@ -381,6 +396,7 @@ export class AelionPlayer implements AelionPlayerApi {
     const result = await this.#session.preview.renderFrame({
       timeUs: scheduled.timestampUs,
       signal,
+      ...this.#previewQuality,
     });
     if (signal.aborted || scheduled.generation !== this.#scheduler?.generation) {
       result.bitmap.close();

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="AelionSDK reference browser video editor" />
+    <title>Aelion Studio · Reference Editor</title>
+  </head>
+  <body>
+    <main class="studio">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">A</span><strong>Aelion Studio</strong></div>
+        <div class="project-state">
+          <span class="status-dot"></span><span id="status">选择一个视频开始</span>
+        </div>
+        <div class="top-actions">
+          <button id="undo" class="ghost" type="button" disabled>撤销</button>
+          <button id="redo" class="ghost" type="button" disabled>重做</button>
+          <label class="import-button"
+            >导入媒体<input id="media-file" type="file" accept="video/*,audio/*"
+          /></label>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <aside class="library panel">
+          <div class="panel-title"><span>媒体</span><small>PROJECT</small></div>
+          <div id="asset-list" class="asset-list">
+            <p class="empty-copy">File、Blob、URL 与 OPFS 都可绑定为运行时媒体。</p>
+          </div>
+        </aside>
+
+        <section class="viewer panel">
+          <div class="canvas-shell">
+            <canvas id="preview" width="1280" height="720"></canvas>
+            <label id="empty-state" class="empty-state">
+              <span class="empty-icon">＋</span>
+              <strong>放入一段素材</strong>
+              <span>浏览器内完成解码、预览、编辑与导出</span>
+              <input type="file" accept="video/*,audio/*" />
+            </label>
+          </div>
+          <div class="transport">
+            <button id="play" class="play" type="button" disabled aria-label="播放">▶</button>
+            <span id="timecode" class="timecode">00:00:00.000</span>
+            <input id="scrubber" type="range" min="0" max="1" value="0" disabled />
+            <select id="quality" disabled aria-label="预览质量">
+              <option value="adaptive">自适应</option>
+              <option value="full">全画质</option>
+              <option value="draft">流畅</option>
+            </select>
+          </div>
+        </section>
+
+        <aside class="inspector panel">
+          <div class="panel-title"><span>检查器</span><small>SELECTION</small></div>
+          <div id="inspector"><p class="empty-copy">在时间线上选择一个片段。</p></div>
+          <div class="export-card">
+            <div><strong>导出</strong><small>本地 WebCodecs</small></div>
+            <select id="profile" disabled>
+              <option value="webm-vp9-opus">WebM · VP9 / Opus</option>
+              <option value="mp4-h264-aac">MP4 · H.264 / AAC</option>
+            </select>
+            <button id="export" type="button" disabled>导出成片</button>
+            <div class="progress"><span id="progress"></span></div>
+          </div>
+        </aside>
+
+        <section class="timeline panel">
+          <div class="timeline-toolbar">
+            <div><strong>时间线</strong><span id="duration">00:00</span></div>
+            <div>
+              <button id="move-left" class="ghost" type="button" disabled>← 1 秒</button>
+              <button id="split" class="ghost" type="button" disabled>在播放头分割</button>
+              <button id="move-right" class="ghost" type="button" disabled>1 秒 →</button>
+            </div>
+          </div>
+          <div id="tracks" class="tracks">
+            <p class="empty-copy">导入媒体后，这里会显示可编辑的视频与音频轨。</p>
+          </div>
+          <div class="playhead" id="playhead"></div>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

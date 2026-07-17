@@ -32,6 +32,7 @@ export interface HistoryState {
 
 interface HistoryEntry {
   readonly label?: string;
+  readonly group?: string;
   readonly operations: readonly AtomicOperation[];
   readonly inverse: readonly AtomicOperation[];
 }
@@ -42,6 +43,28 @@ function historyError(code: string, message: string): AelionError {
 
 function cloneOperations(operations: readonly AtomicOperation[]): readonly AtomicOperation[] {
   return operations.map(operation => structuredClone(operation));
+}
+
+function sameField(left: AtomicOperation, right: AtomicOperation): boolean {
+  return (
+    left.op === 'setField' &&
+    right.op === 'setField' &&
+    left.collection === right.collection &&
+    left.id === right.id &&
+    left.path.length === right.path.length &&
+    left.path.every((segment, index) => segment === right.path[index])
+  );
+}
+
+function canReplaceGroupedFields(previous: HistoryEntry, next: HistoryEntry): boolean {
+  return (
+    previous.operations.length === next.operations.length &&
+    previous.inverse.length === next.inverse.length &&
+    previous.operations.every((operation, index) => {
+      const nextOperation = next.operations[index];
+      return nextOperation !== undefined && sameField(operation, nextOperation);
+    })
+  );
 }
 
 /**
@@ -102,14 +125,69 @@ export class TransactionHistory implements TransactionHost {
   ): TransactionCommit {
     this.#assertNotPublishing();
     this.#assertSynchronized();
+    if (options.historyGroup !== undefined && options.historyGroup.length === 0) {
+      throw new TypeError('historyGroup must be a non-empty string');
+    }
     const commit = this.#engine.edit(options, callback);
-    this.#undo.push({
+    const entry: HistoryEntry = {
       ...(commit.changeSet.label === undefined ? {} : { label: commit.changeSet.label }),
+      ...(options.historyGroup === undefined ? {} : { group: options.historyGroup }),
       operations: cloneOperations(commit.changeSet.operations),
       inverse: cloneOperations(commit.inverse),
-    });
+    };
+    const previous = this.#undo.at(-1);
+    if (options.historyGroup !== undefined && previous?.group === options.historyGroup) {
+      const replaceFields = canReplaceGroupedFields(previous, entry);
+      this.#undo[this.#undo.length - 1] = {
+        ...((entry.label ?? previous.label) === undefined
+          ? {}
+          : { label: entry.label ?? previous.label }),
+        group: options.historyGroup,
+        operations: replaceFields
+          ? entry.operations
+          : [...previous.operations, ...entry.operations],
+        inverse: replaceFields ? previous.inverse : [...entry.inverse, ...previous.inverse],
+      };
+    } else {
+      this.#undo.push(entry);
+    }
     this.#trim(this.#undo);
     this.#redo.length = 0;
+    this.#expectedRevision = commit.revision;
+    this.#notify(commit);
+    return commit;
+  }
+
+  /** Ends a coalescing group so a later edit with the same key starts a new undo entry. */
+  public finishGroup(group: string): void {
+    this.#assertNotPublishing();
+    this.#assertSynchronized();
+    const entry = this.#undo.at(-1);
+    if (entry?.group !== group) return;
+    this.#undo[this.#undo.length - 1] = {
+      ...(entry.label === undefined ? {} : { label: entry.label }),
+      operations: entry.operations,
+      inverse: entry.inverse,
+    };
+  }
+
+  /** Reverts the active group without creating redo history. */
+  public cancelGroup(group: string): TransactionCommit | null {
+    this.#assertNotPublishing();
+    this.#assertSynchronized();
+    const entry = this.#undo.at(-1);
+    if (entry === undefined) return null;
+    if (entry.group !== group) {
+      throw historyError('HISTORY_GROUP_NOT_ACTIVE', `History group ${group} is not active`);
+    }
+    const commit = this.#engine.edit(
+      {
+        baseRevision: this.#engine.revision,
+        label: entry.label === undefined ? 'Cancel interactive edit' : `Cancel: ${entry.label}`,
+      },
+      transaction => transaction.appendOperations(entry.inverse),
+    );
+    this.#undo.pop();
     this.#expectedRevision = commit.revision;
     this.#notify(commit);
     return commit;

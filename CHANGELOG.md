@@ -13,6 +13,14 @@
 
 ### Added
 
+- Added the public `ProductionMediaProvider` for File/Blob, HTTP Range, OPFS and custom readers, including proxy-aware preview selection, content-addressed SampleIndex reuse, bounded resident indexes, decoder admission and deterministic disposal.
+- Added a type-safe Project Builder with media probing/import, linked A/V clip creation and exact seconds/milliseconds/frame helpers, plus a latest-wins Preview Canvas Controller with bitmap ownership, DPR/resize handling, visibility lifecycle and adaptive quality.
+- Added a production-built reference editor that imports only public packages and demonstrates import, scrub/playback, linked split/move, undo/redo and WebM or H.264 MP4 export. Its complete TypeScript integration example is compiled in CI.
+- Preview now supports Draft/Full quality and explicit render scale, Player quality switching, actual output dimensions in frame results, and matching Session statistics; Export remains fixed at full Project resolution.
+- Interactive transactions publish every drag update while coalescing the interaction into one undo entry, with commit/cancel lifecycle and cancel-without-redo semantics.
+- Export results now report the exact codec/dimension/sample/channel/VBR target submitted to the encoders. OPFS reads wait for transferred WritableStream finalization instead of racing host-side close.
+- Portable text regression now preserves explicit spacing and grapheme advances, covers CJK/emoji/RTL, and keeps complex RTL shaping on the browser text path.
+- Added bounded Project/media fuzz gates and an accelerated production soak covering ten-minute PCM flow, 1,000-clip incremental compilation and 5,000 long-timeline evaluations; browser conformance continues to cover repeated Worker cancellation/release.
 - Production editing commands now include ripple insert/remove, roll, slip, slide, linked groups, marker/range/selection metadata and nested Sequence subgraphs with atomic inverse/affected-range semantics.
 - Render IR now has canonical curve/hold/reverse TimeMap evaluation and inversion, recursive automation, deterministic Text/Caption layout, SRT/WebVTT, Image/Generator/Adjustment clips, masks/mattes, 12 blend modes and explicit color/bit-depth contracts.
 - Audio now supports sample-accurate gain/pan/fades, generic TimeMap varispeed, 1–8 channel matrices, ducking/sidechain, waveform peaks, LUFS/true-peak analysis, limiting and device/interruption recovery state.

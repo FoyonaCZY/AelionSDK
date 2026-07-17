@@ -13,7 +13,14 @@ export interface IrLaidOutTextSpan {
   readonly x: number;
   readonly y: number;
   readonly advancePx: number;
+  readonly glyphs: readonly IrLaidOutTextGlyph[];
   readonly style: PortableTextStyle;
+}
+
+export interface IrLaidOutTextGlyph {
+  readonly text: string;
+  readonly x: number;
+  readonly advancePx: number;
 }
 
 export interface IrLaidOutTextLine {
@@ -42,6 +49,7 @@ export interface PortableTextStyle {
   readonly stroke: string | undefined;
   readonly strokeWidthPx: number;
   readonly align: 'start' | 'center' | 'end';
+  readonly direction: 'ltr' | 'rtl';
 }
 
 function finite(value: unknown, fallback: number): number {
@@ -64,6 +72,7 @@ export function portableTextStyle(
   const fontSizePx = Math.max(1, finite(combined.fontSizePx, 32) * scale);
   const fontStyle = text(combined.fontStyle, 'normal');
   const align = text(combined.align, 'start');
+  const direction = text(combined.direction, 'ltr');
   return {
     fontFamilies: families.length === 0 ? ['sans-serif'] : families,
     fontSizePx,
@@ -75,10 +84,11 @@ export function portableTextStyle(
     stroke: typeof combined.stroke === 'string' ? combined.stroke : undefined,
     strokeWidthPx: Math.max(0, finite(combined.strokeWidthPx, 0) * scale),
     align: align === 'center' || align === 'end' ? align : 'start',
+    direction: direction === 'rtl' ? 'rtl' : 'ltr',
   };
 }
 
-function glyphAdvance(character: string, style: PortableTextStyle): number {
+export function portableGlyphAdvance(character: string, style: PortableTextStyle): number {
   const codePoint = character.codePointAt(0) ?? 0;
   const em =
     character === ' '
@@ -100,11 +110,37 @@ function runTokens(run: IrTextRun): readonly string[] {
 }
 
 function tokenAdvance(token: string, style: PortableTextStyle): number {
-  return graphemes(token).reduce((total, character) => total + glyphAdvance(character, style), 0);
+  return graphemes(token).reduce(
+    (total, character) => total + portableGlyphAdvance(character, style),
+    0,
+  );
 }
 
-function lineOffset(width: number, boxWidth: number, align: PortableTextStyle['align']): number {
-  return align === 'center' ? (boxWidth - width) / 2 : align === 'end' ? boxWidth - width : 0;
+function lineOffset(
+  width: number,
+  boxWidth: number,
+  align: PortableTextStyle['align'],
+  direction: PortableTextStyle['direction'],
+): number {
+  if (align === 'center') return (boxWidth - width) / 2;
+  if (align === 'end') return direction === 'rtl' ? 0 : boxWidth - width;
+  return direction === 'rtl' ? boxWidth - width : 0;
+}
+
+function laidOutSpan(
+  value: string,
+  x: number,
+  y: number,
+  style: PortableTextStyle,
+): IrLaidOutTextSpan {
+  let cursor = x;
+  const glyphs = graphemes(value).map(character => {
+    const advancePx = portableGlyphAdvance(character, style);
+    const glyph = { text: character, x: cursor, advancePx };
+    cursor += advancePx;
+    return glyph;
+  });
+  return { text: value, x, y, advancePx: cursor - x, glyphs, style };
 }
 
 function layoutAtScale(clip: IrTextClip, scale: number): IrTextLayout {
@@ -114,16 +150,32 @@ function layoutAtScale(clip: IrTextClip, scale: number): IrTextLayout {
   let width = 0;
   let height = 0;
   let align: PortableTextStyle['align'] = 'start';
+  let direction: PortableTextStyle['direction'] = 'ltr';
   let overflowed = false;
   const flush = (): void => {
     if (current.length === 0 && height === 0) return;
-    const offset = lineOffset(width, clip.box.width, align);
+    const offset = lineOffset(width, clip.box.width, align, direction);
+    let rtlCursor = clip.box.x + width;
+    const positioned = current.map(span => {
+      if (direction !== 'rtl') return span;
+      rtlCursor -= span.advancePx;
+      const shift = rtlCursor - span.x;
+      return {
+        ...span,
+        x: rtlCursor,
+        glyphs: span.glyphs.map(glyph => ({ ...glyph, x: glyph.x + shift })),
+      };
+    });
     lines.push({
       x: clip.box.x + offset,
       y: cursorY,
       width,
       height,
-      spans: current.map(span => ({ ...span, x: span.x + offset })),
+      spans: positioned.map(span => ({
+        ...span,
+        x: span.x + offset,
+        glyphs: span.glyphs.map(glyph => ({ ...glyph, x: glyph.x + offset })),
+      })),
     });
     cursorY += height;
     current = [];
@@ -133,24 +185,21 @@ function layoutAtScale(clip: IrTextClip, scale: number): IrTextLayout {
   for (const paragraph of clip.paragraphs) {
     for (const run of paragraph.runs) {
       const style = portableTextStyle(run.style, paragraph.style, scale);
-      align = style.align;
       for (const token of runTokens(run)) {
         if (token === '\n' || token === '\r\n') {
           flush();
           continue;
+        }
+        if (current.length === 0) {
+          align = style.align;
+          direction = style.direction;
         }
         const advance = tokenAdvance(token, style);
         if (width > 0 && width + advance > clip.box.width && token.trim().length > 0) flush();
         if (cursorY + Math.max(height, style.lineHeightPx) > clip.box.y + clip.box.height) {
           overflowed = true;
         }
-        current.push({
-          text: token,
-          x: clip.box.x + width,
-          y: cursorY,
-          advancePx: advance,
-          style,
-        });
+        current.push(laidOutSpan(token, clip.box.x + width, cursorY, style));
         width += advance;
         height = Math.max(height, style.lineHeightPx);
       }
@@ -162,8 +211,10 @@ function layoutAtScale(clip: IrTextClip, scale: number): IrTextLayout {
     if (last !== undefined && last.spans.length > 0) {
       const spans = last.spans.slice();
       const tail = spans.at(-1);
-      if (tail !== undefined)
-        spans[spans.length - 1] = { ...tail, text: `${tail.text.trimEnd()}…` };
+      if (tail !== undefined) {
+        const replacement = laidOutSpan(`${tail.text.trimEnd()}…`, tail.x, tail.y, tail.style);
+        spans[spans.length - 1] = replacement;
+      }
       const index = lines.indexOf(last);
       lines.splice(index, lines.length - index, { ...last, spans });
     }
