@@ -11,11 +11,12 @@ import {
   Output,
   Mp4OutputFormat,
   StreamTarget,
-  type StreamTargetChunk,
   VideoSample,
   VideoSampleSource,
   WebMOutputFormat,
 } from 'mediabunny';
+
+import { createSinkCompletionBarrier } from './sink-completion.js';
 
 export interface OfflineFrameRequest {
   readonly frameIndex: number;
@@ -156,28 +157,6 @@ function assertPositiveInteger(value: number, name: string): void {
   if (!Number.isSafeInteger(value) || value <= 0) {
     throw new RangeError(`${name} must be a positive safe integer`);
   }
-}
-
-interface SinkCompletionBarrier {
-  readonly writable: WritableStream<StreamTargetChunk>;
-  readonly completion: Promise<void>;
-  abort(reason: unknown): void;
-}
-
-function createSinkCompletionBarrier(
-  sink: WritableStream<StreamTargetChunk>,
-): SinkCompletionBarrier {
-  const stream = new TransformStream<StreamTargetChunk, StreamTargetChunk>();
-  const controller = new AbortController();
-  const completion = stream.readable.pipeTo(sink, { signal: controller.signal });
-  // The muxer may report a sink failure through its own writer before the
-  // pipe promise is awaited. Keep that rejection observed in the meantime.
-  void completion.catch(() => undefined);
-  return {
-    writable: stream.writable,
-    completion,
-    abort: reason => controller.abort(reason),
-  };
 }
 
 async function exportMuxed(

@@ -229,13 +229,9 @@ describe('offline WebCodecs + streaming WebM export', () => {
         await closeGate;
       },
     });
-    const result = exportWebM({
-      durationUs: 100_000,
-      width: 16,
-      height: 16,
-      frameRate: { numerator: 10, denominator: 1 },
-      sampleRate: 48_000,
-      channelCount: 2,
+    const result = exportFrozenRenderIrWebM({
+      ir: frozenIr(),
+      projectRevision: 7n,
       videoBitrate: 100_000,
       audioBitrate: 32_000,
       sink,

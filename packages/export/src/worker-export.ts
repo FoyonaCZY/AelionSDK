@@ -1,5 +1,6 @@
 import { AelionError, type Disposable } from '@aelion/core';
 
+import { createSinkCompletionBarrier } from './sink-completion.js';
 import type { WebMExportOptions, WebMExportResult } from './webm-export.js';
 import type {
   ExportWorkerAudioRequest,
@@ -26,15 +27,6 @@ function copiedPcm(pcm: Float32Array): Float32Array<ArrayBuffer> {
   const copy = new Float32Array(pcm.length);
   copy.set(pcm);
   return copy;
-}
-
-async function drainTransferredSinkClose(): Promise<void> {
-  // Firefox can deliver the Worker completion message before the transferred
-  // WritableStream's host-side close callback becomes observable. Two host
-  // tasks preserve the public invariant that a resolved export has a finalized
-  // sink without adding work to the steady-state mux loop.
-  await new Promise<void>(resolve => globalThis.setTimeout(resolve, 0));
-  await new Promise<void>(resolve => globalThis.setTimeout(resolve, 0));
 }
 
 export class WorkerMuxedExporter implements Disposable {
@@ -70,6 +62,7 @@ export class WorkerMuxedExporter implements Disposable {
     if (options.signal?.aborted === true) {
       return Promise.reject(new DOMException('Export cancelled', 'AbortError'));
     }
+    const sinkBarrier = createSinkCompletionBarrier(options.sink);
     this.#running = true;
     return new Promise((resolve, reject) => {
       let settled = false;
@@ -128,7 +121,29 @@ export class WorkerMuxedExporter implements Disposable {
         else if (response.type === 'render-audio') respondAudio(response);
         else if (response.type === 'progress') options.onProgress?.(response.value);
         else if (response.type === 'completed') {
-          void drainTransferredSinkClose().then(() => settle(() => resolve(response.result)));
+          void sinkBarrier.completion.then(
+            () => settle(() => resolve(response.result)),
+            (cause: unknown) => {
+              const error =
+                cause instanceof AelionError
+                  ? cause
+                  : new AelionError([
+                      {
+                        code: 'EXPORT_STORAGE_WRITE_FAILED',
+                        severity: 'error',
+                        message: `Export sink did not finalize: ${cause instanceof Error ? cause.message : 'unknown storage failure'}`,
+                        recoverable: true,
+                        cause,
+                      },
+                    ]);
+              settle(() => {
+                void Promise.resolve(options.cleanupSink?.(error)).then(
+                  () => reject(error),
+                  () => reject(error),
+                );
+              });
+            },
+          );
         } else {
           const error = response.aborted
             ? new DOMException(response.message, 'AbortError')
@@ -141,20 +156,28 @@ export class WorkerMuxedExporter implements Disposable {
                 },
               ]);
           settle(() => {
-            void Promise.resolve(options.cleanupSink?.(error)).then(
-              () => reject(error),
-              () => reject(error),
-            );
+            sinkBarrier.abort(error);
+            void sinkBarrier.completion
+              .catch(() => undefined)
+              .then(() => options.cleanupSink?.(error))
+              .then(
+                () => reject(error),
+                () => reject(error),
+              );
           });
         }
       };
       const onError = (event: ErrorEvent): void => {
         const error = new Error(event.message || 'Export Worker crashed');
         settle(() => {
-          void Promise.resolve(options.cleanupSink?.(error)).then(
-            () => reject(error),
-            () => reject(error),
-          );
+          sinkBarrier.abort(error);
+          void sinkBarrier.completion
+            .catch(() => undefined)
+            .then(() => options.cleanupSink?.(error))
+            .then(
+              () => reject(error),
+              () => reject(error),
+            );
         });
       };
       const onAbort = (): void => {
@@ -182,9 +205,9 @@ export class WorkerMuxedExporter implements Disposable {
           videoBitrate: options.videoBitrate,
           audioBitrate: options.audioBitrate,
         },
-        sink: options.sink,
+        sink: sinkBarrier.writable,
       };
-      this.#post(start, [options.sink]);
+      this.#post(start, [sinkBarrier.writable]);
     });
   }
 
