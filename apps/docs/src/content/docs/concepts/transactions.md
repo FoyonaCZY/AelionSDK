@@ -1,25 +1,29 @@
 ---
-title: 事务、历史与交互编辑
-description: 理解原子提交、revision、undo/redo 和高频拖拽的合并语义。
+title: Transaction、revision 和撤销
+description: 理解编辑命令如何原子修改 Project，以及如何合并拖拽历史和处理版本冲突。
 ---
 
-Session 加载 Project 后，所有修改通过 Transaction 进入内核。成功提交会产生新 revision、不可变 Project snapshot、ChangeSet 和 inverse operations。
+加载 Project 后，所有修改都通过 `session.transaction` 完成。成功提交会同时得到新 Project、递增 revision、撤销信息和受影响范围；任何一步失败，原工程保持不变。
 
-## 高层命令优先
+## 普通编辑优先用命令
 
 ```ts
 const result = session.transaction.commands.splitItem({
   itemId: 'item_video_1',
   rightItemId: 'item_video_2',
   atUs: 3_500_000,
+  label: '切分片段',
 });
 
-console.log(result.commit.revision, result.commit.changeSet.affectedRanges);
+console.log(result.commit.revision);
+console.log(result.commit.changeSet.affectedRanges);
 ```
 
-高层命令会同时维护引用、轨道顺序、link group 和相关时间字段。只有实现高级功能时才直接使用 `session.transaction.edit()` 的原子操作。
+高层命令会一起维护轨道列表、Item 引用、source range 和 Link Group。移动、裁剪、切分、ripple、roll、slip、slide 等操作都有对应命令，业务代码不需要自己拼底层 operations。
 
-## 原子事务
+## 一次改多个字段
+
+确实需要把多项改动绑定成一步时，使用 `transaction.edit()`：
 
 ```ts
 session.transaction.edit(
@@ -27,39 +31,58 @@ session.transaction.edit(
     tx.setField('tracks', 'track_audio_1', ['audio', 'muted'], true);
     tx.setField('items', 'item_title', ['enabled'], false);
   },
-  { label: '静音并隐藏标题', baseRevision: session.revision! },
+  {
+    label: '静音并隐藏标题',
+    baseRevision: session.revision!,
+  },
 );
 ```
 
-同一事务内的操作全部验证通过才发布。失败时 Project 不会停在中间状态。事务禁止重入，并有操作数量上限。
+两个字段要么都成功，要么都不发布。如果第二个路径无效，第一个也不会留下。
 
-## Revision 和冲突
+`transaction.edit()` 适合 Inspector 的组合修改和引擎扩展，不建议用它重新实现 `splitItem()` 等已有命令，因为很容易漏掉引用、历史或 affected ranges。
 
-`baseRevision` 是乐观并发检查。UI 发出基于旧快照的命令时会得到 `REVISION_CONFLICT`，此时应读取最新 snapshot，重新计算意图，而不是盲目重试旧坐标。
+## revision 是什么
+
+`session.revision` 是当前 Session 中的 bigint 版本。每次成功提交、撤销和重做都会产生新 revision。
+
+用户开始拖动时记录版本：
 
 ```ts
 const baseRevision = session.revision!;
-// 用户交互期间可能有其他提交
+```
+
+提交时带回：
+
+```ts
 session.transaction.commands.moveItem({
   itemId,
-  toTrackId,
-  startUs: timelineStartUs,
+  startUs: nextStartUs,
   baseRevision,
 });
 ```
 
-## Undo / Redo
+如果期间协作消息、自动操作或另一个 UI 命令已经修改工程，SDK 会返回 `REVISION_CONFLICT`。正确做法是读取最新 snapshot，重新计算用户意图；只把 `baseRevision` 改成最新值并重发旧坐标，可能覆盖别人的变化。
+
+Revision 只在当前 Session 中单调增长。它不是跨设备数据库版本号，也不属于 Project JSON；协作系统可以建立自己的 server version 和操作协议。
+
+## Undo 和 Redo
 
 ```ts
+undoButton.disabled = !session.transaction.canUndo;
+redoButton.disabled = !session.transaction.canRedo;
+
 if (session.transaction.canUndo) session.transaction.undo();
 if (session.transaction.canRedo) session.transaction.redo();
 ```
 
-每次普通命令是一条历史记录。新编辑会清空 redo 分支。UI 不要维护第二套独立 Project 历史；选择、滚动位置和面板开关等视图状态可以有自己的历史策略。
+普通命令默认形成一条历史记录。Undo 后发起新编辑会清空 redo 分支。Timeline zoom、scroll、hover 等视图操作不经过 Transaction，因此不会污染工程撤销历史。
 
-## 高频交互编辑
+Undo/redo 也会触发 `project-changed`。时间线、Inspector、预览和自动保存不需要写另一套刷新分支。
 
-拖拽片段或调节参数时，每个 pointermove 都创建 undo 记录会破坏体验。使用 Interactive Edit：
+## 拖拽只留一条撤销记录
+
+一次拖动可能有几十次位置更新。用 Interactive Edit：
 
 ```ts
 const drag = session.transaction.beginInteractive({
@@ -67,32 +90,50 @@ const drag = session.transaction.beginInteractive({
   baseRevision: session.revision!,
 });
 
-function onPointerMove(timeUs: number) {
+function onPointerMove(timeUs: number): void {
   drag.update(tx => {
     tx.setField('items', itemId, ['range', 'startUs'], timeUs);
   });
 }
 
-function onPointerUp() {
+function onPointerUp(): void {
   drag.commit();
 }
 
-function onEscape() {
+function onEscape(): void {
   drag.cancel();
 }
 ```
 
-`update()` 会产生 Project revision 并触发预览更新，但整个交互最终只保留一条 undo 记录。`commit()` 不额外创建 revision；`cancel()` 恢复交互开始前的 Project，并且不留下 redo 项。
+每次 `update()` 都会发布新 revision，预览可以实时跟随；`commit()` 只封口，不再产生额外 revision。最后按一次 Undo 会回到整个拖动开始前。
+
+`cancel()` 会恢复最初 Project，而且不会留下 redo 记录。组件卸载、pointercancel、权限变化或 Esc 都应进入取消逻辑。
 
 ## 订阅变化
 
 ```ts
 const unsubscribe = session.subscribe('project-changed', event => {
-  renderTimeline(event.commit.snapshot);
-  invalidateThumbnails(event.commit.changeSet.affectedRanges);
+  const { snapshot, changeSet, revision } = event.commit;
+
+  timeline.render(snapshot);
+  thumbnailCache.invalidate(changeSet.affectedRanges);
+  autosave.schedule(snapshot, revision);
 });
 ```
 
-Change listener 是提交后的观察者。不要在 listener 中同步启动另一个事务；把后续动作排入微任务或业务状态机。
+Commit 提供的是本次提交对应的 snapshot，不需要回调里再猜版本。`affectedRanges` 可以只刷新被编辑时间段的缩略图和缓存。
 
-命令的选项和约束见 [Editing Commands](/AelionSDK/reference/editing-commands/)。
+Listener 是提交完成后的观察者。不要在同一个同步回调里立刻开始另一次 Transaction；需要后续动作时，用微任务或产品状态机安排。
+
+## 提交失败后 UI 怎么处理
+
+常见失败包括：
+
+- revision 已过期；
+- Item 或 Track 已被删除；
+- 目标轨 locked；
+- 时间或 source handle 不合法；
+- Link Group / Transition 引用冲突；
+- 字段路径不符合 Schema。
+
+失败时 Project 和 history 都不变。取消 UI 的乐观状态，读取最新 snapshot，把 Diagnostic code 映射成明确提示。完整命令参考见 [Editing Commands](/AelionSDK/reference/editing-commands/)。

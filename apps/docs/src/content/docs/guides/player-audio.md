@@ -1,82 +1,144 @@
 ---
 title: 播放与音频
-description: 控制播放、暂停、seek、音频时钟、质量和播放器资源。
+description: 接入播放、暂停和定位，处理浏览器手势限制、音频时钟与播放状态。
 ---
 
-Player 使用音频时钟驱动视频调度。播放过程中迟到视频帧可以丢弃，但音频时间线保持连续。
+Session 创建后就有一个 `player`。它负责音频输出和视频帧调度，主预览 Canvas 通常由 `PreviewCanvasController` 自动接收这些帧。
 
-## 基本控制
+## 最小播放控制
 
 ```ts
-await session.player.play();
-await session.player.pause();
-await session.player.seek(2_000_000);
+playButton.addEventListener('click', () => {
+  void togglePlayback();
+});
 
-console.log(session.player.state, session.player.currentTimeUs);
+async function togglePlayback(): Promise<void> {
+  if (session.player.state === 'playing') {
+    await session.player.pause();
+    playButton.textContent = '播放';
+    return;
+  }
+
+  await session.player.seek(currentTimeUs);
+  await session.player.play();
+  playButton.textContent = '暂停';
+}
 ```
 
-`seek()` 目标必须位于 `[0, durationUs)`。如果当前位于结尾，重新 `play()` 会从 0 开始。
+第一次 `play()` 必须直接由 click、keydown 等可信用户手势触发。不要先等待网络请求再播放，否则浏览器可能认为已经离开手势调用栈并拒绝启动 AudioContext。
 
-浏览器通常要求 `AudioContext` 在用户手势中启动，因此首次 `play()` 应由 click、keydown 等可信交互直接触发，并对拒绝 Promise 给出 UI 提示。
+```ts
+try {
+  await session.player.play();
+} catch (error) {
+  showMessage('浏览器阻止了音频播放，请再次点击播放按钮。');
+}
+```
 
-## Scrub 与 Seek 的区别
+## Player 状态
 
-- `player.seek(timeUs)`：重置音频时钟、填充音频并发布定位帧；
-- `player.scrub(timeUs)`：只渲染单帧，不改变播放时钟；
-- `preview.render(timeUs)`：由 Canvas Controller 处理绘制和 latest-wins。
+`session.player.state` 可能是：
 
-拖动播放头时通常 pause + preview.render；松手后再 seek。不要在每个 pointermove 中重建播放器运行时。
+| 状态       | UI 通常怎么显示                  |
+| ---------- | -------------------------------- |
+| `idle`     | 工程刚加载，还没有开始播放       |
+| `paused`   | 显示播放按钮                     |
+| `playing`  | 显示暂停按钮                     |
+| `ended`    | 播放头在结尾，再次播放会从头开始 |
+| `error`    | 停用控制并显示 diagnostic        |
+| `disposed` | 编辑器已经关闭，不能再调用       |
 
-## 音频传输模式
+当前时间可从 `session.player.currentTimeUs` 读取。更适合更新 UI 的方式是通过 Preview Controller 的 `onFrame`，因为它对应实际显示出来的画面。
 
-在 cross-origin isolated 且支持 SharedArrayBuffer 时，Player 使用 `shared-ring`。否则回退到 `transferable-queue`。
+## seek、scrub 和 preview.render 的区别
+
+| 方法                     | 会不会改变播放时钟 | 适合场景                             |
+| ------------------------ | ------------------ | ------------------------------------ |
+| `player.seek(timeUs)`    | 会                 | 用户松开播放头、跳转章节、播放前定位 |
+| `player.scrub(timeUs)`   | 不会               | 自己接管 Player 帧时请求一帧         |
+| `preview.render(timeUs)` | 不会               | 标准 Canvas 预览和拖动播放头         |
+
+拖动时暂停播放并调用 `preview.render()`；松手后再调用 `player.seek()`。这样不会在每个 pointermove 中反复清空音频缓冲。
+
+目标时间必须是非负安全整数，并且小于 Sequence 时长：
+
+```ts
+const durationUs = session.getSnapshot().renderIr?.durationUs ?? 0;
+const targetUs = Math.min(requestedUs, Math.max(0, durationUs - 1));
+await session.player.seek(targetUs);
+```
+
+## 为什么音频是主时钟
+
+播放声音时，真正的时间进度来自 AudioContext/AudioWorklet 已经消费的 PCM。视频帧跟随这个时间：渲染来不及时可以丢帧，但不能让视频定时器拖慢或反向推动声音。
+
+这意味着 `setInterval()` 不应该成为产品播放头的真实时钟。它可以用于低频 UI 刷新，但最终位置以 Player 发布的帧和状态为准。
+
+## 检查音频传输模式
 
 ```ts
 const stats = session.player.getStats();
 console.log(stats.resources.audio.mode);
 ```
 
-Shared ring 的稳定性和延迟更适合专业播放。Transferable queue 是功能回退，不是部署时忽略 COOP/COEP 的理由。
+| 模式                 | 何时使用                             |
+| -------------------- | ------------------------------------ |
+| `shared-ring`        | 页面跨源隔离并支持 SharedArrayBuffer |
+| `transferable-queue` | 没有跨源隔离时的兼容路径             |
+| `none`               | 尚未初始化、没有音频或已经释放       |
 
-## 预览质量
+`transferable-queue` 能播放，但高负载下的延迟余量更小。正式剪辑器应部署 COOP/COEP，而不是把回退模式当作最终配置。
 
-```ts
-session.player.setPreviewQuality({ quality: 'draft', renderScale: 0.5 });
-```
-
-`attachPreviewCanvas()` 在自适应模式下会同步 Player 质量。自定义帧消费者需要自己决定何时降级和恢复。
-
-## 订阅播放帧
+## 设置播放预览质量
 
 ```ts
-const unsubscribe = session.player.subscribe(frame => {
-  console.log(frame.timestampUs, frame.droppedFrames);
-  // 消费并关闭 frame.result.bitmap
+session.player.setPreviewQuality({
+  quality: 'draft',
+  renderScale: 0.5,
 });
 ```
 
-Player 强制单一帧 owner。推荐让 PreviewCanvasController 订阅；只有实现 WebGL/Canvas 自定义呈现层时才直接订阅。
+如果使用 `attachPreviewCanvas({ quality: 'adaptive' })`，Controller 会自动同步 Player 质量。只有不使用 Controller、自己消费帧时，才需要单独管理这项设置。
 
-## 编辑中的播放
+## 编辑发生在播放过程中
 
-Transaction 提交会使 Player 的生成代次失效，并让时钟停留在合法范围。上层可以选择：
+Transaction 提交后，旧一代尚未完成的帧会失效。产品可以选择两种策略：
 
-- 播放中允许安全编辑并继续；
-- 对结构性编辑先 pause；
-- 提交后 seek 到当前 playhead 以刷新音频缓冲。
+- 移动、开关轨道等轻量操作允许边播边改；
+- 分割、ripple 或大范围结构变化先暂停，提交后 seek 到当前播放头。
 
-无论选择哪种产品策略，都让 `project-changed` 成为刷新来源，不要直接修改播放器内部状态。
+无论采用哪一种，刷新来源都是 `project-changed`：
 
-## 监控与释放
+```ts
+const unsubscribe = session.subscribe('project-changed', async () => {
+  const timeUs = session.player.currentTimeUs;
+  if (session.player.state !== 'playing') {
+    await preview.render(timeUs);
+  }
+});
+```
+
+不要直接写 Player 内部时间，也不要在 UI 中维护第二套媒体时钟。
+
+## 监控卡顿和音频问题
 
 ```ts
 const stats = session.player.getStats();
+
 console.table({
-  rendered: stats.renderedFrames,
-  dropped: stats.droppedFrames,
+  state: stats.state,
+  renderedFrames: stats.renderedFrames,
+  droppedFrames: stats.droppedFrames,
   errors: stats.errors,
-  buffered: stats.resources.audio.bufferedFrames,
+  lastErrorCode: stats.lastErrorCode,
+  audioMode: stats.resources.audio.mode,
+  audioContext: stats.resources.audio.contextState,
+  bufferedFrames: stats.resources.audio.bufferedFrames,
 });
 ```
 
-播放质量指标应按设备档位和工程复杂度解释。销毁 Session 会释放 Player、关闭 AudioContext、停止 scheduler 和 transport。测试可检查 `lastDisposedRuntime` 验证资源终态。
+偶尔丢帧并不等于音画不同步；持续增长并伴随画面跳跃时，再结合 Preview 渲染耗时、Provider pending 和工程复杂度定位。完全没有声音时先检查：用户手势、轨道 mute/solo、素材是否真的含音频、Worklet 文件是否 404。
+
+## 释放
+
+不需要单独销毁 Player。`await session.dispose()` 会停止 scheduler、关闭 AudioContext 和音频传输。长会话测试可以读取 `lastDisposedRuntime`，确认这些资源确实进入终态。

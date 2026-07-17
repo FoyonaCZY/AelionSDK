@@ -1,11 +1,11 @@
 ---
-title: 开发与发布
-description: 仓库环境、质量门禁、变更流程和发布检查。
+title: 维护仓库与准备发布
+description: 给仓库贡献者的环境、常用命令、变更检查、CI 和发布前验收。
 ---
 
-本页面向仓库维护者。贡献者的行为与提交流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/CONTRIBUTING.md)。
+这篇文档面向修改 AelionSDK 本身的开发者。只接入 SDK 的产品团队不需要运行所有门禁；先看[安装与工程配置](/AelionSDK/start/installation/)。代码风格、提交和贡献流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/CONTRIBUTING.md)。
 
-## 环境
+## 准备开发环境
 
 - Node.js `>=20.19 <21`
 - pnpm `10.13.1`（由 Corepack 和 `packageManager` 锁定）
@@ -38,9 +38,9 @@ corepack pnpm run ci
 
 证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
 
-## 变更流程
+## 开发一个引擎功能
 
-### 1. 先定义语义
+### 先写清输入、结果和失败方式
 
 涉及持久化、时间、颜色、alpha、音频、公共 API、安全或浏览器支持时，先明确：
 
@@ -50,7 +50,7 @@ corepack pnpm run ci
 - capability、迁移和兼容性边界；
 - correctness oracle、Golden 或独立回读方式。
 
-### 2. 完成最短垂直链路
+### 让功能走完整条执行路径
 
 ```text
 Project / Transaction
@@ -60,13 +60,13 @@ Project / Transaction
   → diagnostic / oracle / resource report
 ```
 
-不要在 Demo 中绕过 Project 或 Render IR 建立第二套效果逻辑。
+Demo 只能调用公开能力，不能绕过 Project 或 Render IR 另写一套效果。否则页面上“看起来能用”，导出和真实 SDK 用户却得不到同样结果。
 
-### 3. 覆盖失败和资源路径
+### 同时实现失败、取消和释放
 
 至少考虑：空输入、边界时间、过期 revision、取消、损坏媒体、不支持的 capability、backend lost、存储/编码失败、预算超限和重复 dispose。成功与失败必须有同等级的释放保证。
 
-### 4. 按风险验证
+### 按改动风险选择测试
 
 - 纯语义：unit/property；
 - 模块边界：contract；

@@ -1,89 +1,102 @@
 ---
-title: 包与入口
-description: AelionSDK 公开包、用途、主要导出和推荐使用层级。
+title: 包和公开入口
+description: 查询 13 个 @aelion 包的职责、主要导出和使用对象。
 ---
 
-所有公开包当前版本一致为 `0.1.0-alpha.0`，只保证 package `exports` 中的入口。不要导入 `src/*`、`dist/*` 或未导出的内部文件。
+当前所有公开包版本都是 `0.1.0-alpha.0`。只有 `package.json` 的 `exports` 暴露的入口属于公共 API；`src/*`、`dist/*` 和测试 helper 不在兼容范围内。
 
-## 产品层
+如果你在做普通剪辑应用，先看[我需要安装哪些包](/AelionSDK/start/packages/)。本页主要供查询和底层扩展使用。
+
+## 产品应用直接依赖的包
 
 ### `@aelion/sdk`
 
-应用聚合入口。主要导出：
+大多数业务代码的入口：
 
 - `Aelion.createSession()`；
-- `createProject()` / `ProjectBuilder` / 时间 helpers；
-- `ProductionMediaProvider` / `ByteMediaProvider`；
+- `createProject()`、`ProjectBuilder`；
+- `seconds()`、`milliseconds()`、`frames()`；
+- `ProductionMediaProvider`、`ByteMediaProvider`；
 - `attachPreviewCanvas()`；
-- Session、Player、Preview、Transaction、Export 类型；
-- Runtime Material Registry 和默认 Schema。
+- Session、Player、Transaction、Preview、Export 的公开类型；
+- `RuntimeMaterialRegistry` 和默认 Schema。
+
+```ts
+import {
+  Aelion,
+  ProductionMediaProvider,
+  attachPreviewCanvas,
+  createProject,
+  seconds,
+} from '@aelion/sdk';
+```
 
 ### `@aelion/export`
 
-导出 Profile、preflight 底层实现和 Sink：
+产品层通常直接使用 Sink 和远程导出类型：
 
-- `SeekableMemorySink`、`OpfsSeekableSink`；
-- `EXPORT_PROFILES`、`probeExportProfiles()`、`selectExportProfile()`；
-- WebM/MP4、WAV/RF64、静帧/GIF 类型；
-- checkpoint 和 Remote Export 协议；
-- Worker exporter。
+- `SeekableMemorySink`；
+- `OpfsSeekableSink`；
+- `EXPORT_PROFILES`；
+- `RemoteExportProvider` / `RemoteExportAuthorizer`；
+- checkpoint、Worker exporter 和底层 profile 函数。
+
+```ts
+import { OpfsSeekableSink, type RemoteExportProvider } from '@aelion/export';
+```
+
+通过 Session 导出时，不需要直接调用底层 `exportMp4()` 或 `exportWebM()`。
 
 ### `@aelion/vite-plugin`
 
-导出 `aelion()`，把 Renderer Worker 和 AudioWorklet 作为真实构建入口发布，并处理开发服务器 URL。
+只在 Vite 配置中使用：
+
+```ts
+import { aelion } from '@aelion/vite-plugin';
+
+export default defineConfig({ plugins: [aelion()] });
+```
+
+它负责 Renderer Worker 和 AudioWorklet 构建入口。
 
 ### `@aelion/material-sdk`
 
-Material 作者工具：manifest/definition/graph 构建、校验、签名、迁移和测试相关公开契约。
+给 Material 作者和 Catalog/安装系统使用：
 
-## 引擎层
+- `materialGraph()`、`materialDefinition()`；
+- `packMaterialPackage()`；
+- `MaterialRegistry`、`MaterialCatalog`；
+- `MaterialLabSession`；
+- 签名、TrustStore、migration、Golden helper。
 
-### `@aelion/core`
+## 引擎层包
 
-`AelionError`、Diagnostic、canonical JSON、微秒/帧/采样换算、Rational、JSON 类型和通用校验。
-
-### `@aelion/project-schema`
-
-Project v1 实体类型、`ProjectValidator`、input admission、canonical clone 和集合常量。
-
-### `@aelion/transaction`
-
-`TransactionEngine`、History、`EditingCommands`、atomic operations、ChangeSet、affected ranges、undo/redo 和交互合并。
-
-### `@aelion/render-ir`
-
-Project → Render IR compiler、IR 类型、音视频求值、色彩 contract、compile stats 和资源计划。
-
-### `@aelion/media`
-
-RangeReader、MP4/WebM SampleIndex、精确 seek、Video/Audio decode、CacheStore、proxy selection 和页面级资源 governor。
-
-### `@aelion/audio`
-
-PCM source/mix、AudioWorklet clock、shared ring/transferable queue 和 audio-driven video scheduler。
-
-### `@aelion/renderer-worker`
-
-Renderer Worker client/protocol、WebGL2/WebGPU composition、frame result 和队列/资源生命周期。
-
-### `@aelion/capability`
-
-环境、GPU、codec、音频、存储和 WASM 能力探测与分级。
-
-### `@aelion/material-compiler`
-
-Material Graph 的类型检查、Core Node 编译、WebGL2/WebGPU 程序和执行预算。
+| 包                          | 主要内容                                                             | 谁会直接用                      |
+| --------------------------- | -------------------------------------------------------------------- | ------------------------------- |
+| `@aelion/core`              | `AelionError`、Diagnostic、时间/帧/采样换算、JSON 类型               | 错误处理、底层扩展              |
+| `@aelion/project-schema`    | Project v1 类型、`ProjectValidator`、canonical clone、输入 admission | 自定义 Project 工具、服务端校验 |
+| `@aelion/transaction`       | `EditingCommands`、Transaction Engine、History、ChangeSet            | 引擎贡献者、自定义宿主          |
+| `@aelion/render-ir`         | Project 编译、音视频求值、色彩描述、compile stats                    | 自定义 renderer/exporter        |
+| `@aelion/media`             | RangeReader、MP4/WebM 索引、seek/decode、CacheStore、proxy/governor  | 自定义媒体来源和缓存            |
+| `@aelion/audio`             | PCM 混音、AudioWorklet clock、ring/queue、视频调度                   | 自定义音频宿主和分析            |
+| `@aelion/renderer-worker`   | Worker client/protocol、WebGL2/WebGPU 合成、帧结果                   | 自定义渲染表面                  |
+| `@aelion/capability`        | GPU、codec、音频、存储和 WASM 探测                                   | 独立能力实验和宿主              |
+| `@aelion/material-compiler` | Graph 类型检查、Core Node、WebGL2/WebGPU 编译和预算                  | Material 工具和自定义宿主       |
 
 ## 依赖方向
 
-业务应用通常只直接依赖产品层。引擎层通过公开类型组合，但不应形成业务对内部实现的横向耦合。
-
 ```text
 Application
-  → @aelion/sdk
-    → Project / Transaction / Render IR
-    → Media / Audio / Renderer / Export
-    → Capability / Material
+  ├─ @aelion/sdk
+  ├─ @aelion/export        只为 Sink/Remote 类型
+  └─ @aelion/vite-plugin   只在构建配置
+
+@aelion/sdk
+  → project-schema / transaction / render-ir
+  → media / audio / renderer-worker / export
+  → capability / material-compiler
 ```
 
-每个符号的签名和 source link 见站点侧栏中的 API Reference。
+应用不应把 SDK 内部依赖关系复制成自己的横向调用网络。能从 Session 获得的功能就从 Session 使用，这样升级时只需要跟踪公共接口。
+
+每个符号的参数、返回类型和源码链接见侧栏 API Reference。Alpha 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。

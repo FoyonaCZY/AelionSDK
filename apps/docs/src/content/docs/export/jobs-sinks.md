@@ -1,77 +1,120 @@
 ---
-title: 任务、进度与 Sink
-description: 管理可取消导出 Job、内存/OPFS Sink、背压、失败清理和完成状态。
+title: 导出任务、进度和文件写入
+description: 管理可取消 Job，正确使用 Memory/OPFS Sink，并清理失败或取消的半成品。
 ---
 
-`start()`、`startProfile()` 和 `startRemote()` 返回 await-compatible Job。既可以直接 `await job`，也可以订阅状态和主动取消。
+`start()`、`startProfile()` 和 `startRemote()` 都返回 Job。Job 本身可以 `await`，也可以订阅状态、读取快照和取消。
 
-## Job 生命周期
+## 把 Job 接进任务 UI
 
 ```ts
 const job = session.export.startProfile(options);
 const unsubscribe = job.subscribe(snapshot => {
-  renderExportState(snapshot.state, snapshot.progress);
+  exportStore.update({
+    id: snapshot.id,
+    status: snapshot.state,
+    progress: snapshot.progress,
+  });
 });
 
 try {
   const result = await job.result;
-  console.log(result);
+  exportStore.complete(result);
+} catch (error) {
+  exportStore.fail(error);
 } finally {
   unsubscribe();
 }
 ```
 
-状态是 `running`、`completed`、`failed`、`cancelled`。Progress 范围为 0–1，应按非精确估算展示，不要把它转换成承诺的剩余秒数。
+状态有 `running`、`completed`、`failed` 和 `cancelled`。Progress 是 0–1 的完成比例，可以画进度条，但不代表稳定速度；没有足够历史数据时不要把它直接换算成承诺的剩余秒数。
 
-同一 Session 同时只暴露一个 active job。启动前检查产品任务状态，避免用户重复点击。
-
-## 取消
+同一个 Session 同时只运行一个 active export job：
 
 ```ts
-await job.cancel(new DOMException('User cancelled', 'AbortError'));
-// 或取消 Session 当前任务
+if (session.export.activeJob !== null) {
+  showMessage('当前已有导出任务');
+  return;
+}
+```
+
+产品任务队列可以跨 Session 排队，但不要让用户重复点击时意外覆盖同一个文件。
+
+## 取消任务
+
+```ts
+await job.cancel(new DOMException('用户取消', 'AbortError'));
+```
+
+或者取消当前 Session 的 active job：
+
+```ts
 await session.export.cancel();
 ```
 
-取消会等待编码管线清理。UI 在 Promise 完成前显示“正在取消”，不要立即允许覆盖同一个文件名。
+取消需要等 encoder、Worker 和 Sink 完成清理。按钮点击后先显示“正在取消”，等 Promise resolve 再允许用同一目标文件名开始新任务。
 
-也可以传入 AbortSignal：
+业务已经有 AbortController 时也可以传 signal：
 
 ```ts
 const controller = new AbortController();
-const job = session.export.startProfile({ ...options, signal: controller.signal });
-controller.abort();
+const job = session.export.startProfile({
+  ...options,
+  signal: controller.signal,
+});
+
+controller.abort(new DOMException('页面已离开', 'AbortError'));
 ```
 
-## Memory Sink
+## Memory Sink 的真实内存成本
 
 ```ts
 const sink = new SeekableMemorySink();
-await session.export.startProfile({ ...options, sink: sink.writable });
-const bytes = sink.finalize();
+
+try {
+  await session.export.startProfile({
+    ...options,
+    sink: sink.writable,
+    cleanupSink: () => sink.cleanup(),
+  });
+
+  const bytes = sink.finalize();
+} catch (error) {
+  sink.cleanup();
+  throw error;
+}
 ```
 
-只有 writer 正常 close 后才能 `finalize()`。失败时调用 `sink.cleanup()` 丢弃 chunks。Memory Sink 会保留所有写入块并在 finalize 分配最终连续数组，峰值可能明显高于文件大小。
+只有 writer 正常关闭后才能 `finalize()`。它会把已写入的块合并为一份连续 Uint8Array；转成 Blob 时还可能再占用内存。短片和静帧很方便，长视频和 WAV 不适合。
 
-## OPFS Sink
+## OPFS Sink 的完成顺序
 
 ```ts
 const sink = new OpfsSeekableSink('output.mp4');
-await session.export.startProfile({
-  ...options,
-  sink: sink.writable,
-  cleanupSink: reason => sink.cleanup(),
-});
 
-await sink.waitUntilFinalized();
-const file = await sink.getFile();
+try {
+  await session.export.startProfile({
+    ...options,
+    sink: sink.writable,
+    cleanupSink: () => sink.cleanup(),
+  });
+
+  await sink.waitUntilFinalized();
+  const file = await sink.getFile();
+  deliver(file);
+} catch (error) {
+  await sink.cleanup();
+  throw error;
+}
 ```
 
-OPFS 允许 seek 写入并控制内存峰值。文件名必须是单个 leaf name；目录型工作流可以用自定义 Sink。
+文件名必须是单个 leaf name，不能传 `folder/output.mp4`。需要目录管理时实现自己的 Sink 或先使用 OPFS API 获取目录句柄。
 
-## 自定义 Sink 契约
+OPFS 仍受 quota、浏览器 eviction 和隐私模式影响。导出前可以探测存储，失败时显示空间提示并清理半成品。
 
-WritableStream 接收：
+## 自定义 Sink 要实现什么
+
+导出 Writer 写入的是带位置的 chunk：
 
 ```ts
 interface StreamTargetChunk {
@@ -81,23 +124,33 @@ interface StreamTargetChunk {
 }
 ```
 
-Sink 必须：
+实现要求：
 
-- 在 Promise resolve 前完成该块写入，提供真实背压；
-- 支持非顺序 position；
-- `close()` 后确保数据持久化完成；
-- `abort()` 幂等；
-- 失败时抛出可诊断错误；
-- 不吞掉 quota、权限和磁盘错误。
+- 支持非顺序 position，因为容器可能回填头部；
+- 写入 Promise resolve 时，该 chunk 才算真正完成，才能形成背压；
+- `close()` resolve 前完成持久化；
+- `abort()` 可以重复调用而不产生更大错误；
+- quota、权限和磁盘错误必须向上抛出；
+- 不在失败后返回一个看似成功的空文件。
 
-## Cleanup 是必需契约
+如果目标是普通 HTTP 上传，不要假设所有容器都只顺序 append。可以先落 OPFS，再分片上传，或在服务端提供支持 seek/commit 的上传协议。
 
-编码失败、取消或写入错误时，SDK 会 abort writer，并调用 `cleanupSink(reason)`。清理函数应幂等，因为业务层和管线都可能触发它。
+## cleanupSink 不是可选的善后
+
+编码、Worker、页面取消和存储都可能失败。每次启动都提供幂等清理：
 
 ```ts
-cleanupSink: async reason => {
+cleanupSink: async () => {
   await removePartialOutput().catch(() => undefined);
 };
 ```
 
-监控 `session.getStats().export` 可以看到 started/completed/failed/cancelled、activeJobId 和 progress。
+SDK 和业务层可能从不同路径触发 cleanup，因此重复执行必须安全。成功文件的保留和删除则由产品决定。
+
+Session 级统计可以确认任务终态：
+
+```ts
+console.table(session.getStats().export);
+```
+
+started 数不断增加但 completed/failed/cancelled 不动，通常说明有任务卡在未完成资源或 Sink 上。

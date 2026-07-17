@@ -1,11 +1,18 @@
 ---
 title: 运行参考编辑器
-description: 用仓库内的参考编辑器验证导入、预览、剪辑、撤销与导出。
+description: 启动仓库中的完整示例，并知道应该从哪些源码位置学习接入方式。
 ---
 
-参考编辑器位于 `apps/editor-demo`。它只使用公开包入口，是 SDK 产品接入的可运行基线，不是另一套隐藏内核。
+仓库提供两个可以直接运行的应用：
 
-## 启动
+| 应用               | 适合什么时候看                                                 |
+| ------------------ | -------------------------------------------------------------- |
+| `apps/quickstart`  | 第一次接入。代码少，主线集中在一个文件中                       |
+| `apps/editor-demo` | 已经跑通 SDK，想看时间线、选择、分割、撤销和多格式导出如何组合 |
+
+如果你还没有成功显示过第一帧，先运行 Quickstart。参考编辑器功能更多，不适合拿来排查最初的工程配置。
+
+## 启动参考编辑器
 
 ```bash
 corepack pnpm install --frozen-lockfile
@@ -13,37 +20,68 @@ corepack pnpm run build
 corepack pnpm dev:editor
 ```
 
-浏览器打开终端提示的本地地址。选择一个本地音视频文件后，可以验证：
+默认地址是 `http://127.0.0.1:4174`。选择本地音视频文件后，按下面的顺序操作：
 
-- File → Range Provider → 媒体探测；
-- Project Builder 自动创建音视频轨和联动片段；
-- Canvas 实时预览、scrub 和自适应质量；
-- 片段选择、联动移动、分割、undo/redo；
-- WebM VP9/Opus 与 MP4 H.264/AAC 本地导出。
+1. 确认监看窗口出现第一帧；
+2. 拖动播放头，再点击播放；
+3. 在时间线上选择一个片段；
+4. 点击左右移动或分割；
+5. 撤销并重做；
+6. 分别尝试 WebM 和 H.264 MP4 导出。
 
-## 用它做接入基线
+## 源码从哪里看
 
-建议先在目标浏览器和目标素材上完成以下检查：
+参考编辑器没有隐藏 API，核心都在公开包中。建议按调用顺序阅读：
 
-1. 导入至少一个真实相机文件，而不只使用短测试素材。
-2. 快速拖动播放头，确认旧帧不会覆盖新帧。
-3. 播放含音频素材，观察启动、暂停和 seek 后是否同步。
-4. 执行移动、分割、撤销和重做，确认 UI 与 Project revision 一致。
-5. 分别执行 WebM、H.264 MP4 导出并播放成片。
-6. 查看控制台和 capability/preflight 诊断，不忽略 fallback。
+| 文件                                                                                                                  | 可以学到什么                                                 |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [`apps/editor-demo/vite.config.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/vite.config.ts) | Vite 插件、Worker/Worklet 和跨源隔离响应头                   |
+| [`apps/editor-demo/src/main.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/main.ts)       | Provider、Project、Session、Preview 和 Export 的完整生命周期 |
+| [`apps/editor-demo/src/style.css`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/style.css)   | Demo 的布局；这部分不是 SDK 接口                             |
 
-## 生产构建
+`main.ts` 中值得重点找的函数：
+
+- `importFile()`：注册 File、探测、创建 Project、加载 Session；
+- `refreshPreview()`：提交编辑后刷新时间线和画面；
+- `moveSelection()`：普通片段和音视频联动组的移动方式；
+- `splitSelection()`：普通切分和联动切分；
+- `exportProject()`：创建 Sink、显示进度和下载文件；
+- `releaseProject()`：切换素材时的释放顺序。
+
+## 如何把 Demo 迁到自己的应用
+
+不必复制整个文件。先保留下面这条生命周期：
+
+```text
+打开工程
+  1. 创建 Media Provider
+  2. 注册素材
+  3. 创建 Session 并 loadProject
+  4. 连接 Preview Controller
+  5. 订阅 project-changed / diagnostic
+
+关闭工程
+  1. dispose Preview Controller
+  2. await Session.dispose()
+  3. dispose Media Provider
+```
+
+然后把 DOM 操作替换成你的组件和状态管理。时间线的 zoom、scroll、hover、框选和面板开关留在 UI state；轨道、片段、Marker 和效果写入 Project。
+
+## 参考编辑器没有替你解决什么
+
+它是 SDK 集成样例，不是可以直接上线的剪辑产品。正式产品还要补上：
+
+- 项目保存、素材重新授权和缺失素材重连；
+- 快捷键冲突、无障碍和移动端交互；
+- 自动保存、崩溃恢复和协作；
+- 任务队列、长片 OPFS 导出和远程导出；
+- 设备分级、埋点、错误文案和灰度策略。
+
+构建生产包：
 
 ```bash
 corepack pnpm run build:editor
 ```
 
-构建产物位于 `apps/editor-demo/dist`。参考应用的 Vite 配置展示了运行时资源和跨源隔离响应头；部署到你的平台时需要在 CDN 或 Web Server 上复现这些响应头。
-
-## 应该复用什么
-
-可以复用：Session 生命周期、Provider 注册方式、预览 Controller、交互命令映射、导出 Job 和清理顺序。
-
-不应照搬：视觉样式、产品状态管理、权限模型、素材服务、快捷键体系和协作逻辑。这些属于上层产品，而不是 SDK 契约。
-
-读完后继续看[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)，了解如何把这些能力放入专业编辑器架构。
+产物位于 `apps/editor-demo/dist`。接下来阅读[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)，把 Demo 中的单文件状态拆成自己的产品架构。

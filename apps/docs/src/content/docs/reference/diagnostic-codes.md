@@ -1,12 +1,27 @@
 ---
-title: AelionSDK Diagnostic Codes
-description: 稳定错误码、严重级别、恢复建议和结构化诊断字段。
+title: Diagnostic 错误码
+description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---
 
-> 对应源码版本：`0.1.0-alpha.0`  
-> 规则：业务分支只依赖 `code` 和结构化字段，不解析英文 `message`
+本表对应源码版本 `0.1.0-alpha.0`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
 
-## 1. Diagnostic 结构
+产品代码只依赖 `code` 和结构化字段，不解析英文 `message`：
+
+```ts
+const messages: Partial<Record<string, string>> = {
+  REVISION_CONFLICT: '工程已经发生变化，请重新执行刚才的操作。',
+  COMMAND_TRACK_LOCKED: '目标轨道已锁定。',
+  EXPORT_VIDEO_CONFIG_UNSUPPORTED: '当前设备不支持这组视频导出设置。',
+};
+
+function messageFor(code: string): string {
+  return messages[code] ?? '操作失败，请打开诊断信息查看详情。';
+}
+```
+
+`recoverable: true` 表示调用方改变输入、权限、资源或配置后可以重新尝试，不表示 SDK 已经自动重试。
+
+## Diagnostic 结构
 
 ```ts
 interface Diagnostic {
@@ -22,21 +37,21 @@ interface Diagnostic {
 }
 ```
 
-- `code`：稳定的机器标识；同一语义不因浏览器原始错误文案变化；
-- `severity`：展示和 stop policy，不等价于 HTTP status；
-- `recoverable`：表示调用方修正输入、能力组合或资源后可以重试，不表示 SDK 已自动重试；
+- `code`：稳定的机器标识；浏览器原始错误文案变化时，业务分支不需要跟着改；
+- `severity`：用于展示和停止策略，不等于 HTTP status；
+- `recoverable`：调用方改变条件后是否值得重试；
 - `path`：JSON/Graph/operation 路径；
 - `entityId`、`rangeUs`：定位工程实体和受影响时间；
 - `details`：可记录 codec/backend/limit 等结构化上下文；
 - `cause`：只用于日志/调试，不序列化进 Project，也不能作为稳定业务条件。
 
-结构化诊断可能通过 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 返回。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material package registry 的部分拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 Alpha 兼容层，不建议上层长期解析，后续会统一为结构化 `AelionError`。
+结构化诊断可能出现在 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 中。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material Registry 的少量拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 alpha 阶段的临时形式，产品不要长期依赖这种字符串解析。
 
 参数/生命周期前置条件仍可能用标准 `RangeError`、`TypeError`、`ReferenceError` 表达，例如无 MediaProvider、dispose 后调用、非法 seek、重复 Player subscriber 或重复 Material runtime registration。这些不是可枚举 diagnostic code；调用方应在类型/UI 状态层预防，并按 error class 处理，不解析英文 message。
 
 底层浏览器取消还可能直接返回 `DOMException` 且 `name === 'AbortError'`。业务取消处理应同时接受它与 `OPERATION_ABORTED`。
 
-## 2. 通用、时间与 canonical JSON
+## 通用、时间与 canonical JSON
 
 | Code                          | 含义与建议                                                  |
 | ----------------------------- | ----------------------------------------------------------- |
@@ -50,7 +65,7 @@ interface Diagnostic {
 | `CANONICAL_NEGATIVE_ZERO`     | 出现会破坏 canonical 等价的 `-0`                            |
 | `CANONICAL_UNSAFE_INTEGER`    | 整数超过安全范围，无法稳定序列化/比较                       |
 
-## 3. Project
+## Project
 
 | Code                                    | 含义与建议                                                                                                                                                        |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -71,7 +86,7 @@ interface Diagnostic {
 | `PROJECT_AUDIO_FADE_OUT_OF_RANGE`       | fade 长于 Item duration                                                                                                                                           |
 | `PROJECT_HDR_FORMAT_INVALID`            | PQ/HLG 未同时使用 Rec.2020 linear 与 10-bit contract                                                                                                              |
 
-## 4. Transaction、History 与编辑命令
+## Transaction、History 与编辑命令
 
 ### 4.1 原子 operation
 

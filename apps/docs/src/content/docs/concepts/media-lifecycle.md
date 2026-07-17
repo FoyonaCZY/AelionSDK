@@ -1,24 +1,72 @@
 ---
-title: 媒体表示与生命周期
-description: 理解 Asset、Representation、RangeReader、Proxy、缓存和资源所有权。
+title: 素材表示、缓存和生命周期
+description: 理解 Asset、original/proxy、Range 读取、SampleIndex、资源上限和释放顺序。
 ---
 
-媒体字节不会嵌入 Project。Project 的 Asset 保存“它是什么”，Media Provider 保存“当前运行时如何读取它”。
+Project 只记录素材身份，Media Provider 才持有当前页面中可读取的 File、URL 和缓存。把这两部分拆开后，工程可以跨设备保存，也可以预览用代理文件、导出用原片。
 
-## Asset 与 Representation
+## Asset 和 Representation
 
-同一个 Asset 可以注册多个表示：
+一个 Asset 可以有多个实际表示：
 
-- `original`：导出必须请求的原始表示；
-- `proxy`：预览时可选择的低分辨率表示；
-- `thumbnail`：上层缩略图工作流使用；
-- `waveform`：上层波形工作流使用。
+| role        | 用途                   |
+| ----------- | ---------------------- |
+| `original`  | 原片。导出必须使用它   |
+| `proxy`     | 较低分辨率的预览文件   |
+| `thumbnail` | 业务自己的缩略图来源   |
+| `waveform`  | 业务自己的波形数据来源 |
 
-Provider 根据 `purpose` 和 `maxDimension` 为预览选择合适 proxy；导出始终请求 original。Proxy 可以有 `sourceStartUs`，用于和原片时间线对齐。
+例如同一个 `asset_camera_a` 可以同时注册 4K original 和 540p proxy：
 
-## Range-backed 读取
+```ts
+media.registerUrl('asset_camera_a', originalUrl, {
+  id: 'asset_camera_a:original',
+  role: 'original',
+  width: 3840,
+  height: 2160,
+});
 
-`ProductionMediaProvider` 支持 File/Blob、URL、OPFS 和自定义 RangeReader。它不会默认把整个长视频复制进 JavaScript 内存，而是按范围建立 SampleIndex 和解码请求。
+media.registerUrl('asset_camera_a', proxyUrl, {
+  id: 'asset_camera_a:proxy-540p',
+  role: 'proxy',
+  width: 960,
+  height: 540,
+});
+```
+
+预览请求会带目标最大尺寸，Provider 选择合适 proxy；导出请求明确要求 original。产品不用在 Project 中把 Asset ID 换来换去。
+
+## Range 读取为什么重要
+
+打开长视频时，不应该先把完整文件复制进 JavaScript 内存。`ProductionMediaProvider` 通过 RangeReader 按区间读取容器和媒体数据，支持：
+
+- `File` / `Blob`；
+- 支持 HTTP Range 的 URL；
+- OPFS 文件；
+- 自定义 `RangeReader`。
+
+它先建立 SampleIndex，再根据目标时间从最近同步样本开始解码。快速 seek 不需要顺序解码整个前半段视频。
+
+远端 URL 必须保留 206、Content-Range 和 CORS。浏览器能下载文件，不代表它适合随机读取。
+
+## SampleIndex 是什么
+
+SampleIndex 记录容器中可以可靠得到的信息：媒体轨、时长、codec、样本位置、展示顺序、解码顺序和同步样本。它不是解码后的帧缓存。
+
+给 original 提供 SHA-256 后，可以按内容身份复用索引：
+
+```ts
+media.registerFile('asset_camera_a', file, {
+  role: 'original',
+  contentHash: '0123456789abcdef...共 64 位小写十六进制',
+});
+```
+
+同一内容再次打开时，可以避免重复扫描容器。Hash 只证明内容身份，不代替访问权限，也不要为了主线程同步算 hash 而卡住 UI；大文件可以在 Worker 中分块计算。
+
+## Provider 为什么有并发上限
+
+拖动播放头、播放、缩略图和导出可能同时请求媒体。Provider 默认限制 active 和 pending 操作：
 
 ```ts
 const media = new ProductionMediaProvider({
@@ -27,46 +75,60 @@ const media = new ProductionMediaProvider({
   maxConcurrentOperations: 4,
   maxPendingOperations: 64,
 });
-
-media.registerFile('asset_1', file, { role: 'original' });
-media.registerUrl('asset_1', proxyUrl, {
-  role: 'proxy',
-  width: 960,
-  height: 540,
-  headers: { Authorization: `Bearer ${token}` },
-});
 ```
 
-URL 源应支持 Range 请求，并通过 CORS 暴露必要响应头。短期授权 URL 过期后，重新注册表示或由自定义 Reader 刷新授权。
-
-## SampleIndex 和缓存
-
-Provider 为媒体容器创建 SampleIndex，记录轨道、样本、展示顺序和诊断。提供小写 SHA-256 `contentHash` 后，可以进行内容寻址的持久索引复用，避免每次打开工程都重新扫描。
-
-缓存命中不代表 decoder 或 VideoFrame 可以永久保留。索引、解码器、GPU 帧和 PCM 分别受不同资源预算约束。
-
-## 并发与背压
-
-Provider 限制 active 和 pending 操作，并使用页面级 governor 管理 decoder slot、GPU 和 cache 预算。高频 scrub 应由 latest-wins 取消机制收敛，不能无限排队每个时间点。
+查看当前压力：
 
 ```ts
 const snapshot = media.snapshot();
-console.log(snapshot.activeOperations, snapshot.pendingOperations);
+console.table({
+  active: snapshot.activeOperations,
+  pending: snapshot.pendingOperations,
+  cachedIndexes: snapshot.cachedIndexes,
+  cachedIndexBytes: snapshot.cachedIndexBytes,
+});
 ```
 
-当 pending 长期增长时，优先降低预览分辨率、取消过期请求、使用 proxy，而不是简单提高上限。
+Pending 持续接近上限时，优先取消过期请求、限制缩略图并发、使用 proxy 和降低预览 scale。直接把并发从 4 改成 32，通常只会把卡顿转移到 decoder、网络或内存。
 
-## 所有权顺序
+## 谁负责关闭帧
 
-一个典型编辑器实例拥有：
+浏览器媒体对象经常持有 GPU 或系统资源：`ImageBitmap`、`VideoFrame`、`AudioData` 用完必须关闭或释放。
+
+标准 `PreviewCanvasController` 会在绘制后关闭 bitmap。直接调用 `session.preview.renderFrame()` 时由调用方负责：
+
+```ts
+const frame = await session.preview.renderFrame({ timeUs, quality: 'draft' });
+try {
+  context.drawImage(frame.bitmap, 0, 0);
+} finally {
+  frame.bitmap.close();
+}
+```
+
+把这些对象放进长期 UI store 会导致资源无法及时回收。Store 只保存时间、ID 和普通 JSON 数据。
+
+## 生命周期和释放顺序
+
+一个编辑器实例通常这样拥有资源：
 
 ```text
-UI
+UI component
 └─ PreviewCanvasController
    └─ Session
       └─ MediaProvider
 ```
 
-销毁时按外到内释放：Controller → Session → Provider。`ImageBitmap`、`VideoFrame`、AudioData 等可关闭对象在消费后立即关闭。切换 Project 不等于自动释放业务创建的 Provider。
+关闭时从外到内：
 
-具体注册方式见[导入与管理媒体](/AelionSDK/guides/media-import/)，资源预算见[性能与资源预算](/AelionSDK/production/performance/)。
+```ts
+preview.dispose();
+await session.dispose();
+media.dispose();
+```
+
+原因很直接：Preview 不再发新帧请求后，Session 才能安全停止 Player、Renderer 和导出；Session 完成清理后，Provider 才不会被正在执行的任务继续访问。
+
+切换 Project 不会自动释放业务创建的 Provider。最简单的做法是一个打开的工程拥有一套 runtime，切换时整套销毁后重建。
+
+注册方法和错误排查见[导入与管理媒体](/AelionSDK/guides/media-import/)，长会话资源检查见[性能与资源预算](/AelionSDK/production/performance/)。

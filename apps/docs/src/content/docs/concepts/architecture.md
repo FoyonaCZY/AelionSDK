@@ -1,9 +1,11 @@
 ---
-title: 架构与执行模型
-description: 理解 Project、Transaction、Render IR 以及 Preview、Player、Export 的共享语义。
+title: 引擎如何执行一个 Project
+description: 从 Session 的公开接口深入到 Transaction、Render IR、Worker、AudioWorklet 和 Export。
 ---
 
-AelionSDK 的核心约束是：持久化、编辑和执行各自拥有清晰边界，同时 Preview、Player 与 Export 共享同一套语义。
+这篇文档面向需要排查引擎问题、开发底层扩展或评估运行成本的开发者。普通产品接入不必先读完；先完成[快速开始](/AelionSDK/start/getting-started/)会更容易理解下面各层的作用。
+
+从应用视角看，入口只有 Session：加载 Project，提交编辑，获取预览、播放和导出。Session 内部再把持久化数据、编辑状态和执行资源拆开管理。
 
 ## 系统视图
 
@@ -25,13 +27,13 @@ flowchart LR
   Export --> Sink["Writable / OPFS / Remote"]
 ```
 
-### Project：持久化真相
+### Project：可以保存的工程数据
 
-Project 是 normalized JSON snapshot。实体以稳定 ID 存储，关系通过 ID 引用，顺序通过显式 ID list 表达。它适合保存、同步、diff 和迁移，不承担实时命令流或运行时缓存。
+Project 是规范化的 JSON snapshot。实体以稳定 ID 存储，关系通过 ID 引用，顺序通过明确的 ID 数组表达。它适合保存、同步、diff 和迁移，不保存实时命令、文件对象和运行时缓存。
 
-Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1/project.schema.json)。加载时先创建 ownership-isolated JSON snapshot，再执行 Schema、引用、时间和能力约束校验。不可信输入在 Ajv 前会经过深度、节点数、数组、对象属性和字符串字节预算。
+Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1/project.schema.json)。加载时先复制成 SDK 自己持有的纯 JSON，再检查 Schema、引用、时间和执行条件。不可信输入在进入 Ajv 前还会限制深度、节点数、数组长度、对象属性数和字符串字节，避免一个异常大对象先耗尽页面资源。
 
-### Transaction：唯一写入入口
+### Transaction：修改工程的唯一入口
 
 所有 Project 变化通过 Transaction 提交。一次提交产生：
 
@@ -42,11 +44,11 @@ Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/Fo
 
 校验、IR preparation 或 observer 重入失败时，不发布部分 Project、history 或 Render IR。领域命令编译为 Transaction，而不是建立第二套 Timeline 模型。
 
-### Render IR：共享执行语义
+### Render IR：给预览和导出共用的执行图
 
 Render IR 是从有效 Project 编译出的内部、可冻结执行图。它解析引用、默认值、时间映射、轨道参与规则、Material program 和资源需求。导出启动后持有 frozen IR，因此编辑可以继续进行，但不会改变当前输出。
 
-Preview、Player 和 Export 复用相同的 TimeMap、automation、compositor 和 audio mixer evaluator。平台 backend 只负责执行，不重新解释 Project。
+Preview、Player 和 Export 复用相同的时间映射、关键帧求值、画面合成和音频混音逻辑。WebGL2、WebGPU 和编码器负责执行这些结果，不会各自重新解释 Project。
 
 ## 线程与资源
 

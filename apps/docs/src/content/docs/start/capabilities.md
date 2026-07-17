@@ -1,116 +1,142 @@
 ---
-title: 能力全景
-description: AelionSDK 当前已经实现的编辑、渲染、音频、媒体、导出和 Material 能力。
+title: 当前已经支持什么
+description: 按开发者会用到的功能查看编辑、预览、媒体、音频、导出和 Material 的完成情况。
 ---
 
-本页描述当前源码中的产品能力和明确边界。公开 API 的精确类型以 [`@aelion/sdk` declaration snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 为准。
+本页回答两个问题：现在能用 AelionSDK 做什么，以及哪些地方还不能当作跨平台承诺。具体类型以 [`@aelion/sdk` API Snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 和站内 API Reference 为准。
 
-## 工程与编辑模型
+## 做一个基础剪辑器
 
-- Project v1 是 normalized、可版本化、可 canonical serialize 的 JSON snapshot。
-- 所有实体使用稳定 ID；顺序只存在于显式 ID list，不依赖对象属性顺序。
-- Transaction 是唯一写入入口，提供 revision conflict、原子校验、inverse、ChangeSet 和最小 affected ranges。
-- History 以成功事务为单位执行有界 undo/redo；`beginInteractive()` 把拖拽/调参的连续更新合并为一个历史项，`cancel()` 可回到交互开始前且不留下 redo。
-- Project 不保存媒体 bytes、帧、波形、缓存、undo 栈或任意可执行代码。
+下面这条接入路径已经存在，并在 Quickstart 和参考编辑器中实际使用：
 
-### 时间线编辑
+```text
+File / URL / OPFS
+  → 创建 Project
+  → 加载 Session
+  → Canvas 预览与播放
+  → 编辑命令 + Undo/Redo
+  → MP4 / WebM / 图片 / GIF / WAV 导出
+```
 
-| 类型            | 命令                                                                                                      |
-| --------------- | --------------------------------------------------------------------------------------------------------- |
-| 基础            | `insertItem`、`removeItem`、`moveItem`、`trimItem`、`splitItem`、`replaceItem`                            |
-| Ripple/三点编辑 | `rippleInsertItem`、`rippleRemoveItem`、`rollEdit`、`slipItem`、`slideItem`                               |
-| 关联编辑        | `linkItems`、`unlinkItems`、`moveLinkedGroup`、`trimLinkedGroup`、`splitLinkedGroup`、`removeLinkedGroup` |
-| Track           | `reorderTrack`、`setTrackLocked`、`setTrackEnabled`、`setTrackMuted`、`setTrackSolo`                      |
-| 标记与选择      | `addMarker`、`updateMarker`、`removeMarker`、range/selection metadata                                     |
+可以直接使用：
 
-命令在一个 Transaction 中提交。Track lock、引用完整性、Transition ownership、LinkGroup 和 revision 都在发布新 Project/Render IR 前验证。复杂字段级改动可以使用 `transaction.edit()`，但它不替代语义命令的业务约束。
+- Project Builder 创建空工程、轨道、Asset、媒体片段和 Marker；
+- `ProductionMediaProvider` 读取 File、Blob、HTTP Range、OPFS 和自定义 RangeReader；
+- `attachPreviewCanvas()` 显示首帧、拖动和播放画面；
+- Player 控制 play、pause、seek、scrub 和预览画质；
+- Transaction Commands 修改时间线；
+- Session events 驱动 UI、自动保存、诊断和统计；
+- 本地或远程导出。
 
-## 时间、变速与动画
+完整最短示例见[从本地视频到 MP4](/AelionSDK/start/getting-started/)。
 
-- 对外时间统一为非负安全整数微秒；帧率使用有理数，避免累计帧时长取整误差。
-- TimeMap 支持 linear、reverse、hold/freeze 和分段 curve，并提供正向求值与带方向提示的求逆。
-- Preview、音频采样、seek 和 Export 使用同一个 source-time 映射。
-- Automation 支持 step、linear、cubic-bezier，标量和 JSON vector/object 递归插值。
-- pre/post infinity 支持 hold、cycle 和 ping-pong。
-- Nested Sequence 在校验阶段拒绝循环引用，并编译为 Render IR subgraph。
+## 时间线编辑
 
-音频变速当前使用显式 `varispeed`：速度和方向改变时音高随之变化；不声称已经实现保音高 time-stretch。
+| 操作                   | 已有命令                                                                 |
+| ---------------------- | ------------------------------------------------------------------------ |
+| 插入、移除、移动、替换 | `insertItem`、`removeItem`、`moveItem`、`replaceItem`                    |
+| 裁剪和切分             | `trimItem`、`splitItem`                                                  |
+| Ripple                 | `rippleInsertItem`、`rippleRemoveItem`                                   |
+| 专业修剪               | `rollEdit`、`slipItem`、`slideItem`                                      |
+| 音视频联动             | `linkItems`、`moveLinkedGroup`、`trimLinkedGroup`、`splitLinkedGroup` 等 |
+| 轨道                   | 排序、enabled、locked、mute、solo                                        |
+| Marker                 | 添加、更新、删除；可属于 Sequence 或 Item                                |
 
-## 画面、文字与颜色
+每次命令都会校验引用、轨道类型、锁定状态、时间、source handle、Transition 和 revision。成功后可以 Undo/Redo。拖拽和滑块使用 `beginInteractive()`，中间实时更新，最后只保留一条撤销记录。
 
-- 多视觉轨按 Project 顺序做 premultiplied alpha 合成。
-- WebGL2/WebGPU 共用 12 种 blend mode 编号和公式。
-- alpha/luma mask 支持 invert、feather、source/canvas 空间和 consumed matte。
-- Text/Caption 提供 deterministic metrics、显式空格和 letter spacing、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、竖排 fallback、SRT/WebVTT 转换。
-- `BrowserFontManager` 对字体数量、字节、加载、fallback 和卸载执行预算；像素复现应显式注册字体资源。
-- Generator 支持 solid/linear-gradient；Adjustment 对已合成内容应用 Material stack。
-- Nested Sequence、显式透明/不透明背景和 image/animated-image adapter 已进入共享 IR。
-- 当前本地执行路径为 RGBA8 SDR。P3 working space 可进入线性处理；PQ/HLG/10-bit/HDR presentation 会在 renderer/export preflight 拒绝。
+## 时间、变速和关键帧
 
-## 音频
+- API 使用整数微秒，帧率使用有理数；
+- TimeMap 支持线性速度、反向、hold/freeze 和分段曲线；
+- Preview、seek、音频和 Export 使用同一套素材时间映射；
+- Automation 支持 step、linear 和 cubic-bezier；
+- 标量和 JSON vector/object 可以递归插值；
+- 曲线区间外支持 hold、cycle 和 ping-pong；
+- Nested Sequence 会检查循环引用。
 
-- AudioWorklet 驱动有声播放主时钟，视频跟随音频进度。
-- mixer 逐 sample 计算 clip/track gain、equal-power pan、fade、mute/solo 和最多 8 声道 matrix。
-- TimeMap、Automation 和 Preview/Export 共享 sample-time 语义。
-- `SidechainDucker` 提供 lookahead、attack/release 和 latency 报告。
-- waveform 生成支持分块、取消、点数预算以及 min/max/RMS。
-- 提供 EBU-style gated LUFS、4× true-peak estimate 和 lookahead limiter。
-- `AudioRuntimeStateMachine` 管理 device switch、interruption、resume/recovery 和诊断上限。
+音频变速目前是 varispeed：速度改变时音高也改变。当前没有“保持音高”的 time-stretch，这一点不能只靠 UI 参数补上。
 
-## 媒体与资源治理
+## 画面合成、文字和颜色
 
-- `ProductionMediaProvider` 直接接入 File/Blob、HTTP Range URL、OPFS 和自定义 `RangeReader`；Preview 按输出尺寸选 proxy，Export 强制 original。
-- SampleIndex 同时有有界 resident LRU 与可注入的内容寻址 `CacheStore`，相同 SHA-256/variant 可跨 Provider 实例复用。
-- MP4/H.264/AAC 和 WebM/VP9/Opus 的 SampleIndex、同步样本定位、exact seek、VideoFrame 与 PCM decode。
-- 固定真实语料覆盖 MP4 moov head/tail、fragmented MP4、B-frame、非零 PTS 和 WebM VFR；截断、损坏及随机有界输入必须 fail closed。
-- `SegmentedIndex` 按时间段 single-flight 加载，并限制 resident segment。
-- 内容寻址 `CacheStore`/OPFS cache 使用 namespace、content identity、version 和 variant 组成地址，支持 quota、LRU 和 clear。
-- Proxy selection 校验 source/proxy duration，不一致时诊断并回退 original。
-- image/animated-image adapter 保留方向、颜色描述、帧时长、循环和取消语义。
-- `PageMediaResourceGovernor` 统一管理 decoder slot、GPU bytes 和 cache bytes，支持优先级、公平排队、取消和 lease 释放。
+- 多条 visual 轨按 Project 顺序合成；
+- WebGL2 和 WebGPU 共享 12 种 blend mode 定义；
+- 支持 alpha/luma mask、invert、feather 和 consumed matte；
+- 支持文字和字幕布局、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、SRT/WebVTT；
+- 字体加载有数量、字节和生命周期上限；
+- Generator 支持纯色和线性渐变；
+- Adjustment 可以作用于已经合成的下层画面；
+- 支持嵌套 Sequence、图片和 animated image 适配。
 
-`ByteMediaProvider` 是短媒体 convenience provider。长视频、CDN 和大文件使用 `ProductionMediaProvider`，并按业务注入 proxy、持久 CacheStore 与共享 `PageMediaResourceGovernor`。
+当前本地画面管线是 RGBA8 SDR。P3 可以进入线性工作空间，但 PQ、HLG、10-bit 和 HDR 输出会在 renderer/export preflight 中明确拒绝，不会偷偷转成 SDR。
 
-## Preview、Player 与渲染
+## 预览和播放
 
-- `attachPreviewCanvas()` 提供 latest-wins scrub、DPR/ResizeObserver、bitmap ownership、页面隐藏策略和自适应预览质量，可直接作为上层剪辑 UI 的画布控制器。
-- Project 编译为 frozen Render IR；Preview、Player 和 Export 共享节点语义。
-- Preview 支持 `quality: 'draft' | 'full'` 和 `(0, 1]` 的 `renderScale`；降采样发生在文字、Generator、变换、Material 与合成之前，不是对全尺寸结果做事后缩放。Export 始终使用 1.0。
-- Player 可通过 `setPreviewQuality()` 切换播放/seek/scrub 的预览策略，当前策略和实际比例进入 `getStats()`。
-- renderer 在 Dedicated Worker 中运行 WebGL2/WebGPU compositor，并复用 GPU pipeline 与资源。
-- bounded queue、generation、AbortSignal 和 context-lost recovery 防止过期工作泄漏。
-- Frame 所有权显式转移给调用方，`ImageBitmap` 必须关闭。
-- Capability 选择 backend；不支持的 blend、color contract 或 Material 不会静默当作普通画面渲染。
+`attachPreviewCanvas()` 已处理：
+
+- 快速拖动时只保留最新请求；
+- Canvas DPR 和 ResizeObserver；
+- 自适应、draft 和 full 画质；
+- 页面隐藏时暂停；
+- Player 帧订阅和 ImageBitmap 关闭；
+- WebGL2/WebGPU backend 选择和 Renderer Worker；
+- context lost、generation 和有上限的请求队列。
+
+有声音时 AudioWorklet 是主时钟，视频跟随实际 PCM 消费进度。页面跨源隔离时使用 SharedArrayBuffer ring；否则使用有界 transferable queue。
+
+## 音频处理
+
+- 多轨 PCM 混音；
+- Item/Track gain、equal-power pan、fade、mute/solo；
+- 最多 8 声道 channel matrix；
+- 与画面相同的 TimeMap 和 Automation 时间；
+- Sidechain ducking 的 lookahead、attack/release；
+- 可取消的 waveform min/max/RMS；
+- EBU-style gated LUFS、4× true-peak estimate 和 lookahead limiter；
+- 音频设备切换、interruption 和恢复状态机。
+
+基础播放通过 Session Player 使用；音频分析和底层处理接口位于 `@aelion/audio`。
+
+## 媒体输入和缓存
+
+- MP4/H.264/AAC 与 WebM/VP9/Opus 的容器索引、seek、VideoFrame 和 PCM decode；
+- 支持 MP4 moov 在头/尾、fragmented MP4、B-frame、非零 PTS 和 WebM VFR 固定语料；
+- 损坏、截断和随机输入会有上限地失败；
+- SampleIndex 有 resident LRU，也可以注入持久 CacheStore；
+- 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；
+- 页面级资源 Governor 控制 decoder、GPU 和 cache 预算；
+- SegmentedIndex 支持长媒体按时间段加载。
+
+`ByteMediaProvider` 只适合短媒体。产品代码应优先使用 `ProductionMediaProvider`。
 
 ## 导出
 
-| 输出      | 当前实现                                                             |
-| --------- | -------------------------------------------------------------------- |
-| WebM      | VP9/Opus、Worker/inline、流式 mux、Writable/OPFS Sink                |
-| MP4       | H.264/AAC、capability + AAC runtime canary，必要时 inline            |
-| Still     | PNG、JPEG、WebP                                                      |
-| Animation | GIF                                                                  |
-| Audio     | WAV、RF64                                                            |
-| Remote    | canonical frozen manifest、content ID、idempotency、鉴权、进度和取消 |
+| 输出 | 当前格式        | 备注                                       |
+| ---- | --------------- | ------------------------------------------ |
+| 视频 | VP9/Opus WebM   | Worker/inline，流式 mux                    |
+| 视频 | H.264/AAC MP4   | 必须通过 codec 检查和 AAC runtime canary   |
+| 静帧 | PNG、JPEG、WebP | 指定时间点                                 |
+| 动图 | GIF             | 当前按完整 Sequence                        |
+| 音频 | PCM WAV、RF64   | s16/f32，大文件用 OPFS                     |
+| 远程 | 自定义 Provider | canonical manifest、幂等、鉴权、进度、取消 |
 
-导出支持 profile preflight、冻结 revision、背压、进度、取消、partial cleanup 和 checkpoint unit。WebM/MP4 结果返回提交给编码器的 codec、尺寸、采样率、声道和 VBR target；target 不是输出文件的实测平均码率。`OpfsSeekableSink.getFile()` 会等待 transferred stream 真正 close 后再读取。连续 WebM/MP4 文件失败后从 profile 起点重启，不宣称容器中点恢复。
+导出支持 preflight、冻结 revision、进度、取消、背压和半成品清理。连续 MP4/WebM 文件中途失败后从 profile 起点重启；当前不声称能从任意容器位置继续。
 
 ## Material
 
-Material 统一表达 Filter、Transition、Effect 和 Generator：
+Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式是由标准 Core Node 组成的声明式 Graph；可以校验、编译到 WebGL2/WebGPU、打包、签名、安装和迁移。
 
-- 默认安全路径是 typed declarative Graph；
-- Package、Definition、Graph、Instance 分别承担分发、能力、执行和工程参数；
-- Authoring SDK、Composition、Catalog、migration、deterministic package export 和 Material Lab 已实现；
-- 支持 Ed25519/ECDSA publisher signature、TrustStore、revocation 和安装审计；
-- Shader、WASM、网络访问需要宿主 execution policy 显式授权，签名不会自动赋予执行权限。
+Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者和内容完整，宿主仍要按 publisher、租户和执行预算授权。
 
-接入步骤见 [Material 创作](/AelionSDK/guides/materials/)，协议见 [Material Protocol v1](/AelionSDK/reference/material-protocol-v1/)。
+从实际 builder 开始见 [Material 创作与接入](/AelionSDK/guides/materials/)。
 
-## 运行边界
+## 当前不能直接承诺的范围
 
-- 桌面 Chromium/Firefox 是当前自动化验证范围；其他平台需独立认证。
-- 4K compositor 有离线 probe，没有跨设备 4K30 实时保证。
-- 大型输出必须使用流式 Sink；内存 Sink 只适合有明确字节上限的任务。
-- 浏览器暴露 API 不等于 codec/backend 可用；始终执行 capability probe 和 export preflight。
-- Alpha API 仍可能变化，Project/Material 公共协议变更必须提供迁移策略。
+- 目前自动化重点是桌面 Chromium 和 Firefox；Safari、iOS、Android 未认证；
+- 4K 可以离线探测和导出，但没有跨设备 4K30 实时预览保证；
+- HDR/10-bit 尚未实现；
+- 音频变速不保音高；
+- 非 Vite bundler 还没有官方适配和认证；
+- 公开包尚未发布 npm，版本仍是 alpha；
+- API 可能变化，Project/Material 协议变化必须配迁移。
+
+浏览器和平台细节见[兼容性与部署](/AelionSDK/production/compatibility/)。

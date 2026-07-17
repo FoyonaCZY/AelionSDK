@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>AelionSDK Quickstart</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <span class="eyebrow">AelionSDK Quickstart</span>
+          <h1>从一个本地视频开始</h1>
+          <p>这个页面展示最短接入路径，所有逻辑都在 <code>src/main.ts</code>。</p>
+        </div>
+        <label class="file-button">
+          选择视频
+          <input id="media-file" type="file" accept="video/*,audio/*" />
+        </label>
+      </header>
+
+      <section class="monitor">
+        <canvas id="preview" aria-label="视频预览"></canvas>
+        <p id="empty">选择一个 MP4 或 WebM 文件后，这里会显示第一帧。</p>
+      </section>
+
+      <section class="transport" aria-label="播放控制">
+        <button id="play" type="button" disabled>播放</button>
+        <input id="scrubber" type="range" min="0" max="1" value="0" disabled />
+        <output id="timecode">00:00.000</output>
+      </section>
+
+      <section class="actions" aria-label="编辑与导出">
+        <button id="move" type="button" disabled>片段右移 1 秒</button>
+        <button id="undo" type="button" disabled>撤销</button>
+        <button id="redo" type="button" disabled>重做</button>
+        <button id="export" type="button" disabled>导出 H.264 MP4</button>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <strong id="status">等待选择素材</strong>
+        <progress id="progress" max="1" value="0"></progress>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

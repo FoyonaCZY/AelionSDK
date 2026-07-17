@@ -1,9 +1,11 @@
 ---
-title: Aelion Visual Core Node Math 1.0.0
-description: Material Core Node 的数学语义、精度约束和 Golden 容差。
+title: Core Node Math 1.0.0
+description: 查询 Material Core Node 的计算公式、颜色和 alpha 前提，以及 Golden 容差。
 ---
 
-本规范绑定 `aelion.visual.nodes/1.0.0`。除特别说明外，颜色输入是线性、premultiplied RGBA 的 `vec4`，标量使用 32-bit GPU float；WebGL2 与 WebGPU 必须使用同一公式。
+本规范绑定 `aelion.visual.nodes/1.0.0`，主要给 Material Compiler、Shader 实现和 Golden 测试使用。普通 Material 作者可以通过 `materialGraph()` 的类型化方法调用这些节点，不需要自己重写公式。
+
+除特别说明外，颜色输入都是线性、预乘 alpha 的 RGBA `vec4`，标量使用 32-bit GPU float。WebGL2 和 WebGPU 必须实现同一公式；修改公式或 alpha 行为需要升级 node set/typeVersion，而不是直接改变现有节点结果。
 
 ## 数学与时间节点
 

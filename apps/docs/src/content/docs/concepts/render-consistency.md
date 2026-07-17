@@ -1,63 +1,82 @@
 ---
-title: 预览与导出一致性
-description: 理解 Project、Render IR、Preview、Player 和 Export 之间的共享语义。
+title: 为什么预览和导出应当一致
+description: 理解 Render IR、代理素材、预览降质和导出冻结 revision 之间的关系。
 ---
 
-AelionSDK 不让预览和导出各自解释 Project。它们共享经过验证和编译的 Render IR，这是“所见接近所得”的基础。
+预览和导出都从同一份 Project 编译结果执行。它们不会各自解释一遍片段时间、效果和音频，因此调整一次工程后，不需要再为导出维护另一套配置。
 
-## 编译链路
+## Project 加载后发生什么
 
 ```text
 Project JSON
-  → admission / schema / semantic validation
-  → frozen Project revision
-  → deterministic Render IR
-  → Preview / Player / Local Export / Remote manifest
+  ↓ 输入、Schema 和引用校验
+只读 Project snapshot + revision
+  ↓ 编译
+Render IR
+  ├─ 单帧预览
+  ├─ 实时播放
+  ├─ 本地导出
+  └─ 远程导出 manifest
 ```
 
-Render IR 把编辑友好的实体图转换为按时间可求值的渲染计划，包含画布、轨道、片段、时间映射、音频、Material 和资源依赖。
+Render IR 是内部执行图。它已经解析轨道顺序、片段可见范围、素材时间、效果参数、音频混音和资源依赖。上层应用不需要保存或编辑它，Project 改变后 Session 会更新编译结果。
 
-## 共享什么
+## 哪些规则是共享的
 
-Preview、Player 和 Export 共享：
+预览、播放和导出使用相同的：
 
-- 片段可见性、层级和时间范围；
-- source 时间映射与边界策略；
-- 变换、透明度、混合与 Material Graph；
-- 音量、pan、mute/solo 和音频时间映射；
-- 色彩工作空间和背景；
-- 同一 Project revision 的实体引用。
+- Item 入点、出点和层级；
+- source range、变速、反向和边界行为；
+- 变换、透明度、混合、遮罩和 Material；
+- gain、pan、mute/solo、fade 和音频时间映射；
+- Sequence 背景、画布和工作色彩空间；
+- 当前 Project revision 中的所有实体引用。
 
-因此，修复语义问题应发生在 Project validation、IR compiler 或公共 renderer，而不是在 UI 和 exporter 分别打补丁。
+如果某个效果在预览和导出里意义不同，应修正 Project/Render IR/公共 renderer，而不是在 UI 和 exporter 里各写一份补丁。
 
-## 有意存在的差异
+## 预览为什么可以更模糊或偶尔跳帧
 
-实时预览可以为了交互流畅度降低成本：
+为了跟上交互，预览允许降低执行成本：
 
-- `draft` 或 `renderScale < 1`；
-- 使用 proxy representation；
-- latest-wins 取消过期 scrub；
-- 播放中允许丢弃迟到帧。
+- 使用 `renderScale < 1`；
+- 读取 proxy，而不是 4K original；
+- 新 scrub 到来时取消旧请求；
+- 播放中丢弃已经迟到的视频帧。
 
-导出使用 original representation、冻结 revision、确定输出分辨率，并等待每帧完成。它不会继承预览的动态降级策略。
+这些差异只影响实时成本，不应改变构图、片段时间和效果含义。导出会使用 original、完整画布和完整帧序列，不继承 Preview Controller 的自适应 scale。
 
-## 冻结 Revision
+停帧检查时可以临时切到完整质量：
 
 ```ts
-const job = session.export.startProfile(options);
-// 此后继续编辑不会改变正在运行的 job
+preview.setQuality('full', 1);
+await preview.render(playheadUs);
 ```
 
-导出启动时冻结当前 Project/IR。UI 应显示“导出的是 revision N”，避免用户误以为后续修改会进入正在执行的任务。
+## 导出固定的是启动时版本
 
-## 如何验证一致性
+```ts
+const revisionAtStart = session.revision;
+const job = session.export.startProfile(options);
+```
 
-生产项目至少建立三层回归：
+任务启动时会冻结当前 Render IR。此后继续移动片段，正在运行的 Job 仍然输出 `revisionAtStart` 的内容。
 
-1. IR golden：相同 Project 产生稳定 IR；
-2. 帧 golden：关键时间点的像素结果在容差内稳定；
-3. 成片检查：导出容器时长、codec、关键帧、音频和 A/V sync 正确。
+导出 UI 应明确提示“本次导出不包含开始后产生的修改”，并在任务记录中保存 revision。不要自动取消并重启，除非产品明确提供“始终导出最新版本”模式。
 
-对降分辨率预览不做逐像素等同要求，而是比较构图、时间和效果语义。需要精确审片时切换 `quality: 'full'`、`renderScale: 1`。
+## 远程导出如何保持一致
 
-完整执行模型见[架构与执行模型](/AelionSDK/concepts/architecture/)，导出行为见[导出概览](/AelionSDK/export/overview/)。
+Remote Export 会发送 canonical、冻结的 Project manifest 和稳定 content ID。服务端必须使用兼容的 Project、Render IR 和 Material 版本重新校验执行，不能把客户端画面截图或 UI 状态当作渲染输入。
+
+如果服务端引擎版本不同，任务记录应包含双方版本，并在不兼容时明确失败。
+
+## 产品应该怎么验证
+
+至少保留三类回归素材：
+
+1. **Project/IR fixture**：同一输入产生稳定结构和时长；
+2. **关键帧截图**：开头、转场中点、效果边界等时间点在容差内一致；
+3. **导出回读**：检查容器时长、codec、画面尺寸、音频和 A/V sync。
+
+低分辨率预览不要求和导出逐像素相同，但物体位置、片段边界、效果进度和声音时间应一致。需要像素对比时，使用 full/1.0 预览和固定字体、素材、backend。
+
+Render IR 的完整线程与资源模型见[架构与执行模型](/AelionSDK/concepts/architecture/)。

@@ -1,24 +1,34 @@
 ---
-title: 安全与部署清单
-description: 上线前检查 HTTPS、CSP、跨源隔离、媒体授权、不可信 Project 和 Material。
+title: 上线前安全检查
+description: 配置 HTTPS、CSP、COOP/COEP、媒体授权、Project 输入限制、Material 信任和本地文件清理。
 ---
 
-视频编辑器同时处理用户文件、远端媒体、Worker、GPU、WASM、持久存储和大 JSON。安全边界必须由产品部署和 SDK 输入校验共同建立。
+浏览器剪辑器会同时接触用户文件、远端媒体、Worker、GPU、持久存储和大 JSON。SDK 会校验工程和资源预算，但部署、鉴权、日志和数据保留仍由产品负责。
 
-## 传输和响应头
+## 1. HTTPS 和隔离响应头
 
-- 全站 HTTPS；
-- COOP `same-origin`；
-- COEP `require-corp`；
-- 对同源运行时资源设置合理 CORP；
-- 所有跨源素材明确 CORS/CORP；
-- 不在生产中使用通配凭据 CORS。
+生产页面使用 HTTPS，并配置：
 
-部署后用真实页面验证 `window.isSecureContext` 和 `window.crossOriginIsolated`，不能只检查 CDN 配置面板。
+```http
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Resource-Policy: same-origin
+```
 
-## CSP
+部署后在最终页面验证：
 
-根据实际部署收紧：
+```ts
+console.table({
+  secureContext: window.isSecureContext,
+  crossOriginIsolated: window.crossOriginIsolated,
+});
+```
+
+登录跳转、CDN 缓存、404 页面和 Service Worker 都可能漏掉头部。还要确认所有第三方字体、图片、脚本和媒体满足 CORS/CORP，否则启用 COEP 后会被浏览器拦截。
+
+## 2. 收紧 CSP
+
+可以从下面开始，再按实际资源调整：
 
 ```http
 Content-Security-Policy:
@@ -30,64 +40,80 @@ Content-Security-Policy:
   media-src 'self' blob: https://media.example.com;
   object-src 'none';
   base-uri 'none';
+  frame-ancestors 'none';
 ```
 
-这只是起点。是否需要 `blob:` 取决于业务实现；官方 Vite 插件发布同源模块入口，不要求开放任意远端脚本。
+如果构建产物不使用 blob worker，可以去掉 `blob:`。不要为了第三方 Material 或临时排错开放任意远程 script、`unsafe-eval` 或过宽的 connect-src。
 
-## 媒体授权
+## 3. 素材授权
 
-- Project 保存稳定 asset key，不保存 token；
-- 签名 URL 短期有效并绑定用户/资源/方法；
-- Range 请求也要鉴权；
-- Service Worker 不应把带凭据响应错误共享；
-- contentHash 用于身份和缓存，不替代授权；
-- 日志去除 query token 和 Authorization。
+- Project 只保存稳定 Asset key，不保存 token；
+- 签名 URL 短期有效，并绑定用户、资源和 HTTP 方法；
+- Range 请求也必须鉴权；
+- Service Worker 不能把带凭据的响应错误共享给另一用户；
+- contentHash 用于内容身份和缓存，不代表访问许可；
+- 日志删除 URL query token 和 Authorization。
 
-## 不可信 Project
+服务端 Remote Export 重新检查 Project 中每个 Asset 的权限。客户端能读到素材，不等于服务端可以直接信任 locator。
 
-始终把服务端、分享链接和用户导入的 Project 当作 `unknown` 交给 `loadProject()`。Admission 层在 Schema 前限制深度、值数量、数组/对象规模、字符串总量，并拒绝 accessor、循环、非 canonical number 等结构。
+## 4. 把 Project 当作不可信输入
 
-服务端 Remote Export 必须重新校验，不能信任“浏览器已经验证过”。
+从服务端、分享链接或用户文件读到的 JSON 都以 `unknown` 传给 `loadProject()`：
 
-## Material 信任
+```ts
+const project: unknown = JSON.parse(text);
+await session.loadProject(project);
+```
 
-声明式 Core Graph 可以在预算内执行。Trusted Shader/WASM 需要同时满足：
+不要先 `as AelionProject` 后直接访问深层字段。SDK admission 会在 Schema 前限制对象深度、节点总数、数组长度、属性数和字符串体积，也会拒绝循环、accessor 和非标准数字。
 
-- 包完整性和签名有效；
-- publisher 在 allowlist 且未吊销；
-- 宿主显式授权 shader/wasm/network；
-- 执行预算允许；
-- 版本和 migration 链合法。
+这些检查保护当前浏览器进程；服务端渲染仍要独立执行同样的输入和语义校验。
 
-不要因为文件来自自己的 CDN 就默认可信；供应链、租户隔离和发布权限仍需验证。
+## 5. Material 不只是“签名正确就能执行”
 
-## OPFS 和下载
+声明式 Core Graph 在 Schema、类型、拓扑和预算通过后可以执行。自定义 Shader/WASM 还需要同时满足：
 
-- 文件名来自用户输入时清理路径；
-- 定期扫描和清理取消/失败半成品；
-- 处理 quota 和 eviction；
-- Blob URL 用完立即 revoke；
-- 不在公共设备长期保存敏感原片；
-- 提供项目和缓存删除入口。
+- package integrity 和签名有效；
+- publisher 在 allowlist 中且未被吊销；
+- 宿主策略明确允许 shader/wasm/network；
+- 运行预算允许当前 node、pass、纹理、内存和时间；
+- 版本和 migration 链可验证。
 
-## 供应链
+文件来自自家 CDN 也不等于天然可信。签名回答“谁发布了这些字节”，执行策略回答“当前租户和设备是否允许运行”。
 
-- 锁定依赖和 pnpm lockfile；
-- CI 使用 frozen install；
-- 只从 package exports 导入；
-- 审查 Worker、WASM 和 codec 依赖；
-- 发布后验证 provenance、tag 和包内容；
-- 定期运行安全 corpus 和 fuzz 测试。
+## 6. OPFS、Blob URL 和本地数据
 
-## 上线门禁
+- 用户输入文件名时只取 leaf name，拒绝路径片段；
+- 取消或失败后删除半成品；
+- 定期清理过期缓存和孤儿任务；
+- 处理 quota、eviction 和隐私模式；
+- Blob URL 用完立即 `URL.revokeObjectURL()`；
+- 公共设备不长期保存敏感原片；
+- 产品提供“删除项目和本地缓存”入口。
 
-- [ ] 目标浏览器 capability 和关键 profile preflight 通过；
-- [ ] 生产域名的 Worker/AudioWorklet 加载成功；
-- [ ] COOP/COEP 与所有第三方资源兼容；
-- [ ] CSP 无多余远程执行权限；
-- [ ] 媒体 CDN Range + CORS + token 刷新通过；
-- [ ] 非法 Project、损坏媒体和恶意 Material fail closed；
-- [ ] 取消/失败导出无半成品泄漏；
-- [ ] 日志不含 Project 内容、token 和签名 URL；
-- [ ] Project 自动保存和恢复演练通过；
-- [ ] 依赖、SDK 和服务端引擎版本可追踪。
+OPFS 在当前 origin 下，换域名或清站点数据都会失去访问。它不是云端备份。
+
+## 7. 依赖和发布供应链
+
+- 提交并锁定 `pnpm-lock.yaml`；
+- CI 使用 `--frozen-lockfile`；
+- 业务只从 package exports 导入；
+- 审阅新增 Worker、WASM、codec 和原生依赖；
+- 正式发布后验证 npm provenance、tag 和包内容；
+- 定期运行 Project/媒体 fuzz、安全语料和 Material trust 测试。
+
+## 上线验收表
+
+- [ ] 最终生产域名是 HTTPS，`isSecureContext` 为 true；
+- [ ] `crossOriginIsolated` 为 true，且第三方资源没有被 COEP 拦截；
+- [ ] Renderer Worker 和 AudioWorklet 在生产构建中返回正确 MIME；
+- [ ] CSP 没有多余远程执行权限；
+- [ ] 媒体 CDN 的 Range、CORS 和 token 刷新通过；
+- [ ] 外部 Project、损坏媒体和异常大输入能被安全拒绝；
+- [ ] 未授权或被吊销的 Material 不能执行；
+- [ ] 导出取消、编码失败和 quota 失败都不会留下半成品；
+- [ ] 日志不含 Project 内容、素材名、token 和签名 URL；
+- [ ] 自动保存、工程恢复和缺失素材重连演练通过；
+- [ ] SDK、服务端引擎、Project Schema 和 Material 版本可追踪。
+
+部署兼容信息见[浏览器兼容性与部署要求](/AelionSDK/production/compatibility/)。

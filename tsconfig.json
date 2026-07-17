@@ -17,6 +17,7 @@
     { "path": "./apps/capability-lab" },
     { "path": "./apps/editor-demo" },
     { "path": "./apps/evidence-runner" },
+    { "path": "./apps/quickstart" },
     { "path": "./examples/typescript" }
   ]
 }

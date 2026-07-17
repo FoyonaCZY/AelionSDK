@@ -1,97 +1,120 @@
 ---
-title: 兼容性与部署
-description: 浏览器、codec、GPU、存储、跨源隔离和生产部署要求。
+title: 浏览器兼容性与部署要求
+description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/Worklet 和平台限制。
 ---
 
-AelionSDK 的“可用”由浏览器、操作系统、codec、GPU、存储、页面隔离和具体 Project 共同决定。浏览器名称只能描述测试范围，不能替代运行时探测。
+本页区分“仓库测试通过”和“某台真实设备一定能用”。视频编辑依赖浏览器、操作系统、GPU、codec、音频和存储，最终判断仍来自运行时 capability 和 export preflight。
 
-## 支持状态
+## 文档中的状态是什么意思
 
-| 状态        | 含义                                                 |
-| ----------- | ---------------------------------------------------- |
-| Tested      | 固定自动化场景在仓库当前版本通过                     |
-| Degraded    | 语义保持，但 backend、性能或功能显式下降             |
-| Unsupported | capability/preflight 已明确拒绝                      |
-| Uncertified | 没有足够的目标环境证据；既不声明支持，也不声明不可用 |
+| 状态        | 含义                                                |
+| ----------- | --------------------------------------------------- |
+| Tested      | 仓库固定场景在当前版本持续通过                      |
+| Degraded    | 可以运行，但后端、画质或性能明确降低                |
+| Unsupported | SDK 已知无法满足，会返回 capability/preflight issue |
+| Uncertified | 还没有足够目标设备证据，不能承诺支持                |
 
-每个 Session 调用 `probeCapabilities()`，每个 Export 调用 `preflightProfile()`。不要依赖 UA 判断。
+Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前，需要你自己完成目标设备测试。
 
-## 当前浏览器范围
+## 当前自动化覆盖
 
-| 环境                       | 当前结论                                            | 主要路径                                                         |
-| -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Desktop Chromium           | 源码 CI 与本地 browser suite 持续通过               | WebGL2 默认；WebGPU 按 capability；WebCodecs、AudioWorklet、OPFS |
-| Desktop Firefox            | macOS CI browser suite 与 tarball consumer 持续通过 | WebGL2；WebGPU 依设备；OPFS；不依赖 File System Access picker    |
-| Desktop Safari             | Uncertified                                         | 需要真实 Safari 自动化、codec、GPU、AudioContext 和存储证据      |
-| iOS / iPadOS Safari        | Uncertified                                         | 需要真机前后台、内存、音频 interruption 和导出验证               |
-| Android Chromium / WebView | Uncertified                                         | 需要真机 codec、GPU、存储、内存和后台策略验证                    |
+| 环境                       | 当前结论    | 已覆盖的主要路径                                         |
+| -------------------------- | ----------- | -------------------------------------------------------- |
+| Desktop Chromium           | Tested      | WebGL2、按能力选择 WebGPU、WebCodecs、AudioWorklet、OPFS |
+| Desktop Firefox            | Tested      | WebGL2、按设备选择 WebGPU、WebCodecs、AudioWorklet、OPFS |
+| Desktop Safari             | Uncertified | 需要 Safari 真机/自动化、codec、GPU、音频和存储验证      |
+| iPhone / iPad Safari       | Uncertified | 需要前后台、内存、音频 interruption、温控和导出验证      |
+| Android Chromium / WebView | Uncertified | 需要实际 codec、GPU、内存、存储和后台策略验证            |
 
-Windows、Linux 和新的 GPU/driver 组合没有独立产品认证。GitHub 的 Chromium Linux smoke 是源码回归证据，不等于对全部 Linux 桌面发行版作兼容承诺。
+Chromium Linux CI 证明固定 smoke 可以运行，不等于所有 Linux 发行版和显卡驱动都经过产品认证。Windows 和更广 GPU 组合也需要目标环境测试。
 
-## 能力矩阵
+## 主要功能的判断方式
 
-| 能力                    | Chromium            | Firefox             | 运行规则                                     |
-| ----------------------- | ------------------- | ------------------- | -------------------------------------------- |
-| Project/Transaction     | Tested              | Tested              | 纯语义测试与浏览器集成都需通过               |
-| Worker + WebGL2 Preview | Tested              | Tested              | context lost 可恢复；queue 和资源有界        |
-| WebGPU Material         | Capability-selected | Capability-selected | 不可用时按策略回退 WebGL2 或拒绝             |
-| AudioWorklet Player     | Tested              | Tested              | 用户手势、采样率和 interruption 仍由环境决定 |
-| SharedArrayBuffer PCM   | 需要 COOP/COEP      | 需要 COOP/COEP      | 无隔离时使用有界 Transferable fallback       |
-| MP4/H.264/AAC 输入      | Capability-selected | Capability-selected | 以实际 demux/decode probe 为准               |
-| WebM/VP9/Opus 输入      | Tested fixtures     | Tested fixtures     | 具体 profile 仍需 probe                      |
-| WebM/VP9/Opus 导出      | Tested              | Tested              | Worker/inline 由能力决定                     |
-| MP4/H.264/AAC 导出      | Capability-selected | Capability-selected | 必须通过 AAC runtime canary；不静默换格式    |
-| PNG/JPEG/WebP/GIF       | Capability-selected | Capability-selected | Canvas/ImageEncoder 不满足时拒绝             |
-| WAV/RF64                | Tested core         | Tested core         | 大输出使用流式 Sink                          |
-| OPFS Sink               | Capability-selected | Capability-selected | quota 和持久化策略由浏览器决定               |
-| File System Access      | Capability-selected | 通常不可用          | Firefox 使用 OPFS 或自定义 Sink              |
-| SDR / P3 working space  | RGBA8 SDR 执行      | RGBA8 SDR 执行      | surface presentation 由浏览器决定            |
-| PQ/HLG/10-bit HDR       | Unsupported         | Unsupported         | contract 可校验，执行路径 fail closed        |
+| 功能                    | 现状                   | 上线时怎么判断                    |
+| ----------------------- | ---------------------- | --------------------------------- |
+| Project / Transaction   | Chromium、Firefox 已测 | 单元和浏览器集成                  |
+| Worker + WebGL2 Preview | Chromium、Firefox 已测 | `probeCapabilities()` + 实际首帧  |
+| WebGPU Material         | 设备相关               | capability 支持后按策略启用       |
+| AudioWorklet Player     | Chromium、Firefox 已测 | 用户手势 + 实际播放               |
+| SharedArrayBuffer 音频  | 需要 COOP/COEP         | `window.crossOriginIsolated`      |
+| MP4/H.264/AAC 输入      | 环境相关               | 实际 probe/decode                 |
+| WebM/VP9/Opus 输入      | 固定语料已测           | 具体素材仍要 probe                |
+| MP4/H.264/AAC 导出      | 环境相关               | `preflightProfile()` + AAC canary |
+| WebM/VP9/Opus 导出      | Chromium、Firefox 已测 | 每个 Project preflight            |
+| 图片/GIF                | Canvas 能力相关        | preflight                         |
+| WAV/RF64                | 核心路径已测           | 大文件使用流式 Sink               |
+| OPFS                    | 环境和 quota 相关      | capability + 实际写入             |
+| HDR/PQ/HLG/10-bit       | 当前不支持             | preflight 会拒绝                  |
 
-仓库内的媒体兼容语料不是只测扩展名：MP4 覆盖 moov 在头/尾、fragmented、H.264 B-frame 和非零 PTS；WebM 覆盖 VP9/Opus VFR 与多 cluster。Node 侧验证 SampleIndex/PTS/decode order，浏览器侧对每个 fixture 做 WebCodecs exact seek 和 PCM decode。随机、截断和损坏输入必须返回有界 diagnostic，不能泄漏未归类异常。
+## 生产必须使用 HTTPS
 
-## 部署要求
+WebCodecs、OPFS、Worker 和音频相关 API 应运行在 secure context。部署后检查：
 
-### HTTPS 与跨源隔离
+```ts
+if (!window.isSecureContext) {
+  throw new Error('编辑器必须运行在 HTTPS 安全上下文中');
+}
+```
 
-生产环境必须使用 secure context。推荐响应头：
+localhost 通常被浏览器视为安全环境，但这不能替代生产 HTTPS。
+
+## 配置 COOP/COEP
+
+为了使用 SharedArrayBuffer 音频通道，主页面需要：
 
 ```http
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp
 ```
 
-启用后应确认 `window.crossOriginIsolated === true`。所有跨源脚本、字体、图片和媒体都必须与 COEP 策略兼容。
-
-### 媒体 CDN
-
-大媒体应支持：
+如果同源静态资源需要明确声明，还可以配置：
 
 ```http
-Access-Control-Allow-Origin: https://your-editor.example
-Accept-Ranges: bytes
-Content-Range: bytes 0-1048575/73400320
+Cross-Origin-Resource-Policy: same-origin
 ```
 
-不要把 opaque response 当作可随机访问媒体。CDN、签名 URL 和 Service Worker 必须保留 Range 语义以及稳定的 asset identity。
+上线后在最终页面检查：
 
-### CSP 与 runtime assets
+```ts
+console.log(window.crossOriginIsolated); // 应为 true
+```
 
-Vite 插件会发布 Worker 和 AudioWorklet `.js`。CSP 至少需要允许产品实际使用的同源 script/worker 资源；不要为了方便开放任意远程代码执行。
+仅在 CDN 控制台看到响应头不够。登录跳转、HTML 缓存、错误页和 Service Worker 都可能让最终页面缺少头部。
 
-### Autoplay、存储与退出
+COEP 会拦截没有 CORS/CORP 的第三方字体、图片、脚本和媒体。启用前把所有外部资源列出来逐一验证。
 
-- 在用户手势中调用 `player.play()` 或恢复 AudioContext。
-- OPFS 和 quota 由浏览器管理，业务仍需处理空间不足和 eviction。
-- 页面隐藏、路由切换和设备变化时暂停或释放不再需要的 Session。
-- 取消导出时清理 partial output；成功文件由宿主决定保留或删除。
+## 媒体 CDN 必须支持 Range 和 CORS
 
-## 质量边界
+理想响应示例：
 
-- 4K 只存在离线 compositor probe，不承诺跨设备实时 4K30。
-- 1080p30 数据是固定环境基线，不是所有设备的最低 SLA。
-- HDR、移动端和 Safari 不应从其他浏览器结果推断。
-- trusted Shader/WASM 的平台可执行性不等于安全授权。
-- npm publish、provenance、Tag 和 Release 状态与源码兼容性是两件事。
+```http
+HTTP/1.1 206 Partial Content
+Access-Control-Allow-Origin: https://editor.example.com
+Accept-Ranges: bytes
+Content-Range: bytes 0-1048575/73400320
+Content-Type: video/mp4
+```
 
-当前验证记录见[项目状态](/AelionSDK/project/status/)和 [reports/baseline](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
+授权要覆盖 Range 请求。CDN 和 Service Worker 不能把 206 改成全量 200，也不能返回 opaque response。签名 URL 刷新后，Asset 身份仍应保持稳定。
+
+## Worker、AudioWorklet 和 CSP
+
+`@aelion/vite-plugin` 会在构建产物中发布 Renderer Worker 和 AudioWorklet JavaScript。部署后用 Network 面板确认：
+
+- URL 不为 404；
+- Content-Type 是 JavaScript；
+- CSP 允许加载同源 worker/script；
+- base path 和 CDN public path 正确；
+- 缓存升级不会让主包和 Worker 版本错配。
+
+CSP 起点见[安全与部署清单](/AelionSDK/production/security-deployment/)。不要为了让 Worker 运行而开放任意远程 script。
+
+## 4K、移动端和 HDR 的边界
+
+- 4K 有离线合成探测，不承诺所有设备实时 4K30 预览；
+- 1080p30 基线来自固定环境，不是所有电脑的最低 SLA；
+- 移动端需要单独验证前后台、内存、温控和 AudioContext interruption；
+- 当前本地画面执行为 RGBA8 SDR，HDR/PQ/HLG/10-bit 会明确失败；
+- Material 的 Shader/WASM 能执行，不代表已经获得安全授权。
+
+当前源码测试和基线报告见[项目状态](/AelionSDK/project/status/)。
