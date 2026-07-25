@@ -124,9 +124,24 @@ function passingPostflight(commands = gateCommands()) {
 test('workspace identity excludes only the exact post-gate projections plus generated evidence', () => {
   assert.equal(excludedWorkspacePath(root, '/workspace/reports/a.json'), true);
   assert.equal(excludedWorkspacePath(root, '/workspace/a/__screenshots__/x.png'), true);
+  assert.equal(
+    excludedWorkspacePath(
+      root,
+      '/workspace/apps/docs/src/content/docs/api/@aelion/sdk/classes/Aelion.md',
+    ),
+    true,
+  );
   for (const path of PHASE_1_POST_GATE_DOCUMENTS) {
     assert.equal(excludedWorkspacePath(root, `/workspace/${path}`), true);
   }
+  assert.equal(
+    excludedWorkspacePath(root, '/workspace/apps/docs/src/content/docs/apis/overview.md'),
+    false,
+  );
+  assert.equal(
+    excludedWorkspacePath(root, '/workspace/apps/editor/src/content/docs/api/index.md'),
+    false,
+  );
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/architecture.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/reference/other.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/packages/sdk/src/index.ts'), false);

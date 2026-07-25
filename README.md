@@ -189,7 +189,7 @@ corepack pnpm test:browser:firefox
 ## 最新验证状态
 
 2026-07-26 在 Windows 参考机上完成了与源清单
-`a68f762699012506e65dcbf784565ae85ebd65008a465630fbc7e712fa9cd910`
+`7cef4917e5671187b5214de44bb23e8ee7ad7772fde70220a83515da0a4b2525`
 绑定的串行最终门禁：14/14 个命令通过，门禁前后源清单一致，产物 postflight
 语义校验通过。Chromium 72 项和 Firefox 66 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、golden、

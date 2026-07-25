@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-25T22:37:39.037Z",
+  "generatedAt": "2026-07-25T23:03:41.517Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "e0b1770b55be3b5967834634dad1dae8c4a594ec2ca404c3463fd0e235827fdb",
+    "packageJsonSha256": "dfb3f6bf84c3fe7496663655ff5cb920de2838c9f1f976632bcbad4e2c391c11",
     "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -66,7 +66,7 @@
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "95fb8ddb5450be1375e0a505c0e8b8695deb63448a4cd392af4537e65bdc428f"
+      "sha256": "75bdd3164d2691372164cd31b8b790d6ee0d6917e27036713ac45645e8a3d6bf"
     },
     {
       "name": "@aelion/capability",
@@ -116,7 +116,7 @@
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "9b8ade4ade0e63562525e06fb3832b8fd5295671e790f83547714758b63b087c"
+      "sha256": "5edd35be179adc7adda322ee463461c511094fe606ec1ee4e099f34c1fa3efde"
     },
     {
       "name": "@aelion/transaction",
@@ -167,7 +167,7 @@
             225,
             255
           ],
-          "workerTimingUs": 86420
+          "workerTimingUs": 85650
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -203,7 +203,7 @@
             225,
             255
           ],
-          "workerTimingUs": 25720
+          "workerTimingUs": 22480
         },
         "audioWorkletClock": {
           "contextState": "suspended",
