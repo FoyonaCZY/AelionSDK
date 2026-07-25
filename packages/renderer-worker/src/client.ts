@@ -4,8 +4,10 @@ import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
 
 import type {
   ComposeFailure,
+  ComposeFrameGraphRequest,
   ComposeRequest,
   ComposeSuccess,
+  FrameGraphNode,
   RendererWorkerResponse,
 } from './protocol.js';
 
@@ -21,6 +23,17 @@ export interface ComposeOptions {
   readonly signal?: AbortSignal;
   /** @internal Used only by backend loss conformance tests. */
   readonly debugSimulateLoss?: 'webgpu-device' | 'webgl2-context';
+}
+
+export interface ComposeFrameGraphOptions {
+  readonly inputs: Readonly<Record<string, VideoFrame>>;
+  readonly nodes: readonly FrameGraphNode[];
+  readonly outputNodeId: string;
+  readonly width: number;
+  readonly height: number;
+  readonly preferredBackend?: 'webgpu' | 'webgl2';
+  readonly allowFallback?: boolean;
+  readonly signal?: AbortSignal;
 }
 
 export interface WorkerCompositorSnapshot {
@@ -167,6 +180,75 @@ export class WorkerCompositor implements Disposable {
           this.#failAll(new Error('Renderer Worker cancellation failed'));
         }
         pending.reject(new DOMException('Composition aborted', 'AbortError'));
+      };
+      this.#pending.set(id, {
+        state: 'pending',
+        resolve,
+        reject,
+        ...(options.signal === undefined ? {} : { signal: options.signal, onAbort }),
+      });
+      options.signal?.addEventListener('abort', onAbort, { once: true });
+      try {
+        this.#worker.postMessage(request, Object.values(options.inputs));
+      } catch (error) {
+        this.#pending.delete(id);
+        options.signal?.removeEventListener('abort', onAbort);
+        Object.values(options.inputs).forEach(frame => frame.close());
+        this.#failAll(error instanceof Error ? error : new Error('Renderer Worker request failed'));
+        reject(error instanceof Error ? error : new Error('Renderer Worker request failed'));
+      }
+    });
+  }
+
+  public composeFrameGraph(options: ComposeFrameGraphOptions): Promise<ComposeSuccess> {
+    if (this.#disposed) return Promise.reject(new ReferenceError('WorkerCompositor is disposed'));
+    if (options.signal?.aborted) {
+      Object.values(options.inputs).forEach(frame => frame.close());
+      return Promise.reject(new DOMException('Frame graph aborted', 'AbortError'));
+    }
+    if (options.nodes.length === 0) {
+      Object.values(options.inputs).forEach(frame => frame.close());
+      return Promise.reject(new RangeError('Frame graph must contain at least one node'));
+    }
+    if (this.#pending.size >= this.#maxPendingRequests) {
+      Object.values(options.inputs).forEach(frame => frame.close());
+      return Promise.reject(
+        new AelionError([
+          {
+            code: 'RENDERER_QUEUE_FULL',
+            severity: 'error',
+            message: `Worker compositor queue reached its ${this.#maxPendingRequests.toString()} request limit`,
+            recoverable: true,
+          },
+        ]),
+      );
+    }
+
+    const id = this.#nextId;
+    this.#nextId += 1;
+    const request: ComposeFrameGraphRequest = {
+      type: 'compose-frame-graph',
+      id,
+      inputs: options.inputs,
+      nodes: options.nodes,
+      outputNodeId: options.outputNodeId,
+      width: options.width,
+      height: options.height,
+      preferredBackend: options.preferredBackend ?? 'webgl2',
+      allowFallback: options.allowFallback ?? true,
+    };
+    return new Promise<ComposeSuccess>((resolve, reject) => {
+      const onAbort = (): void => {
+        const pending = this.#pending.get(id);
+        if (pending === undefined || pending.state === 'cancelled') return;
+        pending.signal?.removeEventListener('abort', onAbort);
+        this.#pending.set(id, { state: 'cancelled' });
+        try {
+          this.#worker.postMessage({ type: 'cancel', id });
+        } catch {
+          this.#failAll(new Error('Renderer Worker cancellation failed'));
+        }
+        pending.reject(new DOMException('Frame graph aborted', 'AbortError'));
       };
       this.#pending.set(id, {
         state: 'pending',

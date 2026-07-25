@@ -4,7 +4,9 @@ import {
   analyzeLoudness,
   applyChannelMatrix,
   buildWaveformPeaks,
+  detectSilence,
   SidechainDucker,
+  StreamingLoudnessAnalyzer,
   TruePeakLimiter,
 } from '../src/index.js';
 
@@ -37,6 +39,22 @@ describe('production audio processing', () => {
     const second = splitProcessor.process(program.subarray(10), sidechain.subarray(10));
     expect([...first, ...second]).toEqual([...whole]);
     expect(Math.min(...whole)).toBeLessThan(0.5);
+  });
+
+  it('does not insert a hidden frame of latency when ducking lookahead is zero', () => {
+    const ducker = new SidechainDucker({
+      sampleRate: 1_000,
+      channelCount: 1,
+      thresholdDb: -20,
+      reductionDb: -12,
+      attackUs: 0,
+      releaseUs: 0,
+      lookaheadUs: 0,
+    });
+    const output = ducker.process(new Float32Array([1, 1]), new Float32Array([1, 0]));
+    expect(ducker.latencyFrames).toBe(0);
+    expect(output[0]).toBeCloseTo(10 ** (-12 / 20), 6);
+    expect(output[1]).toBe(1);
   });
 
   it('reports loudness and limits delayed true peaks below the ceiling', () => {
@@ -78,5 +96,35 @@ describe('production audio processing', () => {
     expect(result.peaks[0]).toMatchObject({ startFrame: 0, frameCount: 50, min: [0] });
     expect(result.peaks.at(-1)?.max[0]).toBe(1);
     expect(progress.at(-1)).toBe(1);
+  });
+
+  it('matches bounded streaming loudness blocks and detects removable silence', async () => {
+    const pcm = Float32Array.from({ length: 2_000 }, (_, index) =>
+      index >= 500 && index < 1_500 ? Math.sin(index / 10) * 0.5 : 0,
+    );
+    const analyzer = new StreamingLoudnessAnalyzer(1_000, 1);
+    analyzer.process(pcm.subarray(0, 777));
+    analyzer.process(pcm.subarray(777));
+    const streamed = analyzer.finish();
+    const whole = analyzeLoudness(pcm, 1_000, 1);
+    expect(streamed.integratedLufs).toBeCloseTo(whole.integratedLufs, 6);
+    expect(streamed.samplePeakDbfs).toBeCloseTo(whole.samplePeakDbfs, 6);
+
+    const result = await detectSilence({
+      sampleRate: 1_000,
+      channelCount: 1,
+      totalFrames: pcm.length,
+      thresholdDb: -30,
+      minimumSilenceUs: 200_000,
+      paddingUs: 0,
+      windowFrames: 100,
+      readFrames: (start, count) => Promise.resolve(pcm.slice(start, start + count)),
+    });
+    expect(result.nonSilent).toEqual([{ startFrame: 500, frameCount: 1_000 }]);
+    expect(result.silent).toEqual([
+      { startFrame: 0, frameCount: 500 },
+      { startFrame: 1_500, frameCount: 500 },
+    ]);
+    expect(result.removedFrames).toBe(1_000);
   });
 });

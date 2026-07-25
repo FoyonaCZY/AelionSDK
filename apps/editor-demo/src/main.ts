@@ -1,9 +1,12 @@
 import { SeekableMemorySink } from '@aelion/export';
 import {
   Aelion,
+  IndexedDbProjectRevisionStore,
+  ProjectPersistenceController,
   ProductionMediaProvider,
   attachPreviewCanvas,
   createProject,
+  restoreLatestProject,
   seconds,
   type AelionSessionApi,
   type PreviewCanvasController,
@@ -43,11 +46,15 @@ const progress = element('#progress') as HTMLElement;
 
 let media: ProductionMediaProvider | undefined;
 let session: AelionSessionApi | undefined;
+let persistence: ProjectPersistenceController | undefined;
 let preview: PreviewCanvasController | undefined;
 let durationUs = 1;
 let currentTimeUs = 0;
 let selectedItemId: string | undefined;
 let idCounter = 0;
+const projectStore = new IndexedDbProjectRevisionStore({
+  databaseName: 'aelion-reference-editor',
+});
 
 function safeText(value: unknown): string {
   return String(value)
@@ -169,10 +176,21 @@ async function refreshPreview(): Promise<void> {
 async function releaseProject(): Promise<void> {
   preview?.dispose();
   preview = undefined;
-  if (session !== undefined) await session.dispose();
+  const activePersistence = persistence;
+  const activeSession = session;
+  const activeMedia = media;
+  persistence = undefined;
   session = undefined;
-  media?.dispose();
   media = undefined;
+  try {
+    await activePersistence?.dispose();
+  } finally {
+    try {
+      await activeSession?.dispose();
+    } finally {
+      activeMedia?.dispose();
+    }
+  }
 }
 
 async function importFile(file: File): Promise<void> {
@@ -187,8 +205,9 @@ async function importFile(file: File): Promise<void> {
   try {
     const probe = await provider.probe('asset_media');
     const video = probe.index.tracks.find(track => track.kind === 'video');
+    const projectId = `editor_${file.size.toString()}_${file.lastModified.toString()}`;
     const builder = createProject({
-      projectId: 'editor_project',
+      projectId,
       sequenceId: 'main_sequence',
       title: file.name,
       sequenceName: 'Main Timeline',
@@ -207,12 +226,20 @@ async function importFile(file: File): Promise<void> {
       preferredBackend: 'webgl2',
       allowBackendFallback: true,
     });
-    await nextSession.loadProject(builder.build());
+    const restored = await restoreLatestProject(nextSession, projectStore, projectId);
+    if (restored === null) await nextSession.loadProject(builder.build());
     session = nextSession;
+    persistence = await ProjectPersistenceController.attach(nextSession, projectStore, {
+      debounceMs: 300,
+      onError: error =>
+        setStatus(error instanceof Error ? `自动保存失败：${error.message}` : '自动保存失败', true),
+    });
     durationUs = nextSession.getSnapshot().renderIr?.durationUs ?? imported.durationUs;
     scrubber.max = Math.max(0, durationUs - 1).toString();
     durationLabel.textContent = formatTime(durationUs, false);
-    selectedItemId = imported.videoItemId ?? imported.audioItemId;
+    const project = nextSession.getSnapshot().project;
+    selectedItemId =
+      imported.videoItemId ?? imported.audioItemId ?? Object.values(project?.items ?? {})[0]?.id;
     preview = attachPreviewCanvas(nextSession, canvas, {
       quality: 'adaptive',
       fit: 'contain',
@@ -229,7 +256,7 @@ async function importFile(file: File): Promise<void> {
     syncPlayhead(0);
     await preview.render(0);
     setStatus(
-      `${probe.index.container.toUpperCase()} · Range Provider · ${probe.index.tracks.length.toString()} 条媒体流`,
+      `${probe.index.container.toUpperCase()} · ${restored === null ? '已创建工程' : `已恢复本地草稿 #${restored.record.generation.toString()}`} · 自动保存`,
     );
   } catch (error) {
     await releaseProject();
@@ -400,4 +427,7 @@ syncPlayhead(0);
 window.addEventListener('beforeunload', () => {
   preview?.dispose();
   media?.dispose();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') void persistence?.flush();
 });

@@ -1,5 +1,5 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { basename, dirname, extname, resolve } from 'node:path';
+import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 
 const root = process.cwd();
 const docsContentDirectory = resolve(root, 'apps/docs/src/content/docs');
@@ -47,9 +47,14 @@ async function exists(path) {
   }
 }
 
+function isWithin(file, directory) {
+  const path = relative(directory, file);
+  return path.length > 0 && !path.startsWith('..') && !isAbsolute(path);
+}
+
 async function localTargetExists(file, target) {
   if (
-    file.startsWith(`${docsContentDirectory}/`) &&
+    isWithin(file, docsContentDirectory) &&
     (target === docsSiteBase.slice(0, -1) || target.startsWith(docsSiteBase))
   ) {
     const route =
@@ -100,14 +105,14 @@ for (const file of await collectMarkdownFiles()) {
   for (const match of source.matchAll(/(!?)\[[^\]]*\]\(([^)]+)\)/gu)) {
     const target = localTarget(match[2]);
     if (target === null) continue;
-    if (file.startsWith(`${docsContentDirectory}/`) && /\.mdx?$/u.test(target)) {
+    if (isWithin(file, docsContentDirectory) && /\.mdx?$/u.test(target)) {
       failures.push(
         `${file.slice(root.length + 1)} -> ${match[2]} (use the generated route without .md/.mdx)`,
       );
       continue;
     }
     if (
-      file.startsWith(`${docsContentDirectory}/`) &&
+      isWithin(file, docsContentDirectory) &&
       match[1] !== '!' &&
       target !== docsSiteBase.slice(0, -1) &&
       !target.startsWith(docsSiteBase)

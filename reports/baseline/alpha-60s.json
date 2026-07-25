@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 30097333,
-    "emittedFrames": 5,
+    "currentTimeUs": 29990667,
+    "emittedFrames": 10,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 30066666
+    "lastTimestampUs": 29966666
   },
   "preview": {
     "width": 320,
@@ -33,12 +33,31 @@
     "mimeType": "video/webm; codecs=\"vp09.00.10.08, opus\"",
     "videoFrames": 1800,
     "audioFrames": 2880000,
-    "durationUs": 60000000
+    "durationUs": 60000000,
+    "encoderConfiguration": {
+      "profile": "webm-vp9-opus",
+      "video": {
+        "codec": "vp9",
+        "codecString": "vp09.00.10.08",
+        "width": 320,
+        "height": 180,
+        "frameRate": 30,
+        "bitrateMode": "variable",
+        "targetBitrate": 800000
+      },
+      "audio": {
+        "codec": "opus",
+        "sampleRate": 48000,
+        "channelCount": 2,
+        "bitrateMode": "variable",
+        "targetBitrate": 96000
+      }
+    }
   },
   "sink": {
-    "fileName": "aelion-alpha-8abf838e-61b3-4f85-9ecf-849047f452bf.webm",
+    "fileName": "aelion-alpha-c012ff7d-8ff1-417d-a70c-ab379230b6c8.webm",
     "writes": 135,
-    "bytesWritten": 4743489,
+    "bytesWritten": 4740540,
     "maxInFlightWrites": 1,
     "closed": true,
     "aborted": false
@@ -4709,6 +4728,21 @@
       "stats-changed",
       "stats-changed",
       "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
       "stats-changed"
     ],
     "usedFacadeOnly": true
@@ -4738,10 +4772,13 @@
     "sessionStateAfterDispose": "disposed",
     "sessionRuntimeBeforeDispose": {
       "renderer": {
-        "requestedFrames": 6,
-        "renderedFrames": 6,
+        "requestedFrames": 11,
+        "renderedFrames": 11,
         "failedFrames": 0,
         "lastBackend": "webgl2",
+        "lastWidth": 320,
+        "lastHeight": 180,
+        "lastRenderScale": 1,
         "pendingFrames": 0,
         "maxPendingFrames": 2,
         "rendererPresent": true,
@@ -4775,10 +4812,13 @@
     },
     "sessionRuntimeAfterDispose": {
       "renderer": {
-        "requestedFrames": 6,
-        "renderedFrames": 6,
+        "requestedFrames": 11,
+        "renderedFrames": 11,
         "failedFrames": 0,
         "lastBackend": "webgl2",
+        "lastWidth": 320,
+        "lastHeight": 180,
+        "lastRenderScale": 1,
         "pendingFrames": 0,
         "maxPendingFrames": 2,
         "rendererPresent": false,
@@ -4849,49 +4889,51 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 11666554,
-      "totalJsHeapBytes": 14793662
+      "usedJsHeapBytes": 16288607,
+      "totalJsHeapBytes": 19570979
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 47489004,
-      "totalJsHeapBytes": 78517052
+      "usedJsHeapBytes": 43362675,
+      "totalJsHeapBytes": 80157631
     }
   },
-  "elapsedMs": 59540.89499998093,
-  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+  "elapsedMs": 15803.284999996424,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-07-15T04:47:24.829Z",
+  "generatedAt": "2026-07-25T22:39:44.627Z",
   "referenceDevice": {
-    "model": "MacBookPro16,1",
-    "cpu": "6-Core Intel Core i7 2.6 GHz, 12 logical CPUs",
-    "memoryGiB": 16,
-    "os": "macOS 15.6.1 (24G90)",
-    "platform": "darwin",
+    "model": "Windows_NT x86_64",
+    "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
+    "memoryGiB": 32,
+    "os": "Windows_NT 10.0.26200",
+    "platform": "win32",
     "architecture": "x64",
     "logicalCpuCount": 12,
-    "physicalCoreCount": 6,
-    "memoryBytes": 17179869184,
-    "osVersion": "15.6.1",
-    "osBuild": "24G90",
+    "physicalCoreCount": null,
+    "memoryBytes": 33947557888,
+    "osVersion": "10.0.26200",
+    "osBuild": null,
     "probe": {
-      "source": "node:os+system_profiler+sw_vers",
-      "limitations": []
+      "source": "node:os",
+      "limitations": [
+        "physical core count and hardware model are unavailable from portable node:os"
+      ]
     },
-    "browser": "Google Chrome 150.0.7871.115",
-    "browserVersion": "150.0.7871.115",
-    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36"
+    "browser": "Google Chrome 150.0.7871.186",
+    "browserVersion": "150.0.7871.186",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36"
   },
-  "browserVersion": "150.0.7871.115",
+  "browserVersion": "150.0.7871.186",
   "artifact": {
     "file": "reports/baseline/alpha-60s.webm",
-    "bytes": 4743101,
-    "sha256": "b516854fceaade43e9c8cf46f8fe76531a40a395772b5ffda0d43f09f66e75c3"
+    "bytes": 4740152,
+    "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8"
   },
   "externalReadback": {
-    "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+    "implementation": "ffmpeg version 20.5.0-f2bcd19d3f Copyright (c) 2000-2024 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "75e215772f246d4206797c6b81eb3c8569a9488e30787b0e8bf8e448e253010c",
-    "audioPcmMd5": "MD5=371ec886039f227eef24418f05a4b6dc"
+    "videoFrameMd5DocumentSha256": "e6ae4056cf1ae74649e31aa4946796b5603abacbad84e5bfb824b492b00fc49c",
+    "audioPcmMd5": "MD5=a0781de6f5258ebb546fc79a536ac803"
   }
 }

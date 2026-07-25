@@ -155,8 +155,15 @@ test('post-gate projections do not churn source identity but every other documen
 test('source identity rejects every non-excluded symbolic link', async () => {
   const workspace = await mkdtemp(join(tmpdir(), 'aelion-phase-1-symlink-'));
   try {
-    await writeFile(join(workspace, 'target.ts'), 'export {};\n');
-    await symlink('target.ts', join(workspace, 'linked.ts'));
+    if (process.platform === 'win32') {
+      const target = join(workspace, 'target');
+      await mkdir(target);
+      await writeFile(join(target, 'index.ts'), 'export {};\n');
+      await symlink(target, join(workspace, 'linked'), 'junction');
+    } else {
+      await writeFile(join(workspace, 'target.ts'), 'export {};\n');
+      await symlink('target.ts', join(workspace, 'linked.ts'));
+    }
     await assert.rejects(sourceIdentity(workspace), /refuses non-excluded symbolic link/u);
   } finally {
     await rm(workspace, { recursive: true, force: true });
@@ -194,7 +201,7 @@ test(
 
 test('the final runner policy is exactly nine gates plus five evidence refreshes', () => {
   assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 9);
-  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 59, firefox: 54 });
+  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 72, firefox: 66 });
   assert.deepEqual(PHASE_1_EVIDENCE_REFRESH_COMMANDS, [
     'corepack pnpm report:browser:chromium',
     'corepack pnpm report:browser:firefox',

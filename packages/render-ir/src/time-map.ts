@@ -234,8 +234,14 @@ export function mapIrSourceTime(
   source: IrMediaSource,
   itemDurationUs: number,
   localUs: number,
+  options: { readonly allowOutsideItem?: boolean } = {},
 ): number | null {
-  if (!Number.isSafeInteger(localUs) || localUs < 0 || localUs >= itemDurationUs) return null;
+  if (
+    !Number.isSafeInteger(localUs) ||
+    (!options.allowOutsideItem && (localUs < 0 || localUs >= itemDurationUs))
+  ) {
+    return null;
+  }
   const mapping = irTimeMapping(source);
   const mapped =
     mapping.type === 'linear'

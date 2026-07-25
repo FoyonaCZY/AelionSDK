@@ -17,8 +17,23 @@ export interface PreviewCanvasControllerOptions {
   readonly renderOnResize?: boolean;
   readonly targetFrameMs?: number;
   readonly adaptiveScales?: readonly number[];
+  readonly onPointer?: (event: PreviewCanvasPointerEvent) => void;
   readonly onFrame?: (frame: PreviewCanvasFrame) => void;
   readonly onError?: (error: unknown) => void;
+}
+
+export interface PreviewCanvasPoint {
+  readonly x: number;
+  readonly y: number;
+  readonly inside: boolean;
+}
+
+export interface PreviewCanvasPointerEvent {
+  readonly type: 'down' | 'move' | 'up' | 'cancel';
+  readonly point: PreviewCanvasPoint;
+  readonly pointerId: number;
+  readonly buttons: number;
+  readonly originalEvent: PointerEvent;
 }
 
 export interface PreviewCanvasFrame {
@@ -47,6 +62,8 @@ export interface PreviewCanvasController {
   render(timeUs: number): Promise<void>;
   setQuality(quality: PreviewCanvasQuality, renderScale?: number): void;
   resize(): void;
+  toProjectPoint(clientX: number, clientY: number): PreviewCanvasPoint;
+  captureStream(frameRate?: number): MediaStream;
   snapshot(): PreviewCanvasControllerSnapshot;
   dispose(): void;
 }
@@ -146,6 +163,12 @@ class CanvasController implements PreviewCanvasController {
     if ((options.pauseWhenHidden ?? true) && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.#onVisibilityChange);
     }
+    if (options.onPointer !== undefined) {
+      canvas.addEventListener('pointerdown', this.#onPointer);
+      canvas.addEventListener('pointermove', this.#onPointer);
+      canvas.addEventListener('pointerup', this.#onPointer);
+      canvas.addEventListener('pointercancel', this.#onPointer);
+    }
   }
 
   public async render(timeUs: number): Promise<void> {
@@ -218,6 +241,56 @@ class CanvasController implements PreviewCanvasController {
     if (this.#canvas.height !== height) this.#canvas.height = height;
   }
 
+  public toProjectPoint(clientX: number, clientY: number): PreviewCanvasPoint {
+    this.#assertActive();
+    if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) {
+      throw new RangeError('Canvas coordinates must be finite');
+    }
+    const bounds = this.#canvas.getBoundingClientRect();
+    const cssWidth = bounds.width || this.#canvas.width;
+    const cssHeight = bounds.height || this.#canvas.height;
+    const canvasX = (clientX - bounds.left) * (this.#canvas.width / cssWidth);
+    const canvasY = (clientY - bounds.top) * (this.#canvas.height / cssHeight);
+    const renderIr = this.#session.getSnapshot().renderIr;
+    const projectWidth = renderIr?.width ?? this.#canvas.width;
+    const projectHeight = renderIr?.height ?? this.#canvas.height;
+    if (this.#fit === 'fill') {
+      const x = (canvasX / this.#canvas.width) * projectWidth;
+      const y = (canvasY / this.#canvas.height) * projectHeight;
+      return {
+        x,
+        y,
+        inside: x >= 0 && x <= projectWidth && y >= 0 && y <= projectHeight,
+      };
+    }
+    const scale =
+      this.#fit === 'cover'
+        ? Math.max(this.#canvas.width / projectWidth, this.#canvas.height / projectHeight)
+        : Math.min(this.#canvas.width / projectWidth, this.#canvas.height / projectHeight);
+    const contentWidth = projectWidth * scale;
+    const contentHeight = projectHeight * scale;
+    const offsetX = (this.#canvas.width - contentWidth) / 2;
+    const offsetY = (this.#canvas.height - contentHeight) / 2;
+    const x = (canvasX - offsetX) / scale;
+    const y = (canvasY - offsetY) / scale;
+    return {
+      x,
+      y,
+      inside: x >= 0 && x <= projectWidth && y >= 0 && y <= projectHeight,
+    };
+  }
+
+  public captureStream(frameRate = 30): MediaStream {
+    this.#assertActive();
+    if (!Number.isFinite(frameRate) || frameRate <= 0 || frameRate > 240) {
+      throw new RangeError('frameRate must be greater than 0 and at most 240');
+    }
+    if (typeof this.#canvas.captureStream !== 'function') {
+      throw new Error('HTMLCanvasElement.captureStream is unavailable');
+    }
+    return this.#canvas.captureStream(frameRate);
+  }
+
   public snapshot(): PreviewCanvasControllerSnapshot {
     return Object.freeze({
       disposed: this.#disposed,
@@ -245,6 +318,12 @@ class CanvasController implements PreviewCanvasController {
     this.#resizeObserver?.disconnect();
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.#onVisibilityChange);
+    }
+    if (this.#options.onPointer !== undefined) {
+      this.#canvas.removeEventListener('pointerdown', this.#onPointer);
+      this.#canvas.removeEventListener('pointermove', this.#onPointer);
+      this.#canvas.removeEventListener('pointerup', this.#onPointer);
+      this.#canvas.removeEventListener('pointercancel', this.#onPointer);
     }
   }
 
@@ -359,6 +438,25 @@ class CanvasController implements PreviewCanvasController {
       this.#resumeWhenVisible = false;
       void this.#session.player.play().catch((error: unknown) => this.#reportError(error));
     }
+  };
+
+  readonly #onPointer = (event: PointerEvent): void => {
+    if (this.#disposed) return;
+    const type =
+      event.type === 'pointerdown'
+        ? 'down'
+        : event.type === 'pointerup'
+          ? 'up'
+          : event.type === 'pointercancel'
+            ? 'cancel'
+            : 'move';
+    this.#options.onPointer?.({
+      type,
+      point: this.toProjectPoint(event.clientX, event.clientY),
+      pointerId: event.pointerId,
+      buttons: event.buttons,
+      originalEvent: event,
+    });
   };
 
   #reportError(error: unknown): void {

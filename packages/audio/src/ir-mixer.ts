@@ -29,6 +29,9 @@ export interface RenderIrAudioOptions {
   readonly frameCount: number;
   readonly channelCount: number;
   readonly source: IrPcmSource;
+  /** Optional stem selection used by waveform, silence removal and sidechain export. */
+  readonly trackIds?: readonly string[];
+  readonly itemIds?: readonly string[];
   readonly signal?: AbortSignal;
 }
 
@@ -187,7 +190,17 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
     options.startFrame + options.frameCount,
     options.ir.sampleRate,
   );
-  const state = evaluateAudioState(options.ir, startUs, endUs - startUs);
+  const selectedTracks = options.trackIds === undefined ? undefined : new Set(options.trackIds);
+  const selectedItems = options.itemIds === undefined ? undefined : new Set(options.itemIds);
+  const evaluatedState = evaluateAudioState(options.ir, startUs, endUs - startUs);
+  const state = {
+    ...evaluatedState,
+    clips: evaluatedState.clips.filter(
+      active =>
+        (selectedTracks === undefined || selectedTracks.has(active.clip.trackId)) &&
+        (selectedItems === undefined || selectedItems.has(active.clip.id)),
+    ),
+  };
   const output = new Float32Array(options.frameCount * options.channelCount);
   await Promise.all(
     state.clips.map(async active => {

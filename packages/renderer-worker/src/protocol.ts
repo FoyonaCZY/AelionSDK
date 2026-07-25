@@ -16,6 +16,34 @@ export interface ComposeRequest {
   readonly debugSimulateLoss?: 'webgpu-device' | 'webgl2-context';
 }
 
+export type FrameGraphInput =
+  | { readonly kind: 'external'; readonly id: string }
+  | { readonly kind: 'node'; readonly id: string };
+
+export interface FrameGraphNode {
+  readonly id: string;
+  readonly inputs: Readonly<Record<string, FrameGraphInput>>;
+  readonly program: WebGl2MaterialProgram;
+  readonly parameters: Readonly<Record<string, JsonValue>>;
+  readonly systems: Readonly<Record<string, number>>;
+}
+
+/**
+ * One complete output-frame graph. Intermediate node outputs remain Worker/GPU
+ * owned; only the final node is transferred back to the caller.
+ */
+export interface ComposeFrameGraphRequest {
+  readonly type: 'compose-frame-graph';
+  readonly id: number;
+  readonly inputs: Readonly<Record<string, VideoFrame>>;
+  readonly nodes: readonly FrameGraphNode[];
+  readonly outputNodeId: string;
+  readonly width: number;
+  readonly height: number;
+  readonly preferredBackend: 'webgpu' | 'webgl2';
+  readonly allowFallback: boolean;
+}
+
 export interface RendererWorkerResourceSnapshot {
   /** Worker requests still executing after this request completed. */
   readonly activeRequests: number;
@@ -67,6 +95,7 @@ export interface RendererWorkerRequestSetSnapshot {
 
 export type RendererWorkerRequest =
   | ComposeRequest
+  | ComposeFrameGraphRequest
   | CancelRequest
   | DisposeRequest
   | InspectResourcesRequest;

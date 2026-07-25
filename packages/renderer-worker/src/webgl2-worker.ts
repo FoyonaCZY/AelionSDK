@@ -1,7 +1,9 @@
 /// <reference lib="webworker" />
 
 import type {
+  ComposeFrameGraphRequest,
   ComposeRequest,
+  FrameGraphNode,
   RendererWorkerDiagnostic,
   RendererWorkerRequest,
   RendererWorkerResourceSnapshot,
@@ -367,6 +369,210 @@ async function composeWebGpu(
   }
 }
 
+function frameGraphWebGpuInput(
+  node: FrameGraphNode,
+  port: string,
+  externalTextures: ReadonlyMap<string, AcquiredGpuTexture>,
+  nodeTextures: ReadonlyMap<string, AcquiredGpuTexture>,
+): AcquiredGpuTexture {
+  const reference = node.inputs[port];
+  if (reference === undefined) {
+    throw new RangeError(`Frame graph node ${node.id} is missing input ${port}`);
+  }
+  const texture =
+    reference.kind === 'external'
+      ? externalTextures.get(reference.id)
+      : nodeTextures.get(reference.id);
+  if (texture === undefined) {
+    const sourceKind = reference.kind === 'external' ? 'external input' : 'prior node';
+    throw new RangeError(
+      `Frame graph node ${node.id} references unknown ${sourceKind} ${reference.id}`,
+    );
+  }
+  return texture;
+}
+
+async function composeWebGpuFrameGraph(
+  request: ComposeFrameGraphRequest,
+  resources: RendererWorkerResourceSnapshot,
+  timing: MutableWorkerTiming,
+): Promise<ImageBitmap> {
+  if (
+    !Number.isInteger(request.width) ||
+    !Number.isInteger(request.height) ||
+    request.width <= 0 ||
+    request.height <= 0
+  ) {
+    throw new RangeError('Frame graph dimensions must be positive integers');
+  }
+  if (request.nodes.length === 0) throw new RangeError('Frame graph has no nodes');
+  const device = await gpuDevice();
+  (resources as { webgpuDevices: number }).webgpuDevices = 1;
+  const textureUsage =
+    GPU_TEXTURE_USAGE.TEXTURE_BINDING |
+    GPU_TEXTURE_USAGE.COPY_DST |
+    GPU_TEXTURE_USAGE.COPY_SRC |
+    GPU_TEXTURE_USAGE.RENDER_ATTACHMENT;
+  const allocatedTextures: AcquiredGpuTexture[] = [];
+  const uniformBuffers: GpuBuffer[] = [];
+  const externalTextures = new Map<string, AcquiredGpuTexture>();
+  const nodeTextures = new Map<string, AcquiredGpuTexture>();
+  let readback: GpuBuffer | undefined;
+  let errorScopeOpen = false;
+  try {
+    device.pushErrorScope('validation');
+    errorScopeOpen = true;
+    for (const [id, frame] of Object.entries(request.inputs)) {
+      const texture = acquireGpuTexture(
+        device,
+        Math.max(1, frame.displayWidth),
+        Math.max(1, frame.displayHeight),
+        textureUsage,
+      );
+      allocatedTextures.push(texture);
+      externalTextures.set(id, texture);
+      device.queue.copyExternalImageToTexture({ source: frame }, { texture: texture.texture }, [
+        Math.max(1, frame.displayWidth),
+        Math.max(1, frame.displayHeight),
+      ]);
+    }
+    const encoder = device.createCommandEncoder();
+    for (const node of request.nodes) {
+      if (cancelledRequestIds.has(request.id)) {
+        throw new DOMException('Renderer request cancelled', 'AbortError');
+      }
+      if (nodeTextures.has(node.id)) {
+        throw new RangeError(`Frame graph node id ${node.id} is duplicated`);
+      }
+      const webgpu = node.program.webgpu;
+      if (webgpu === undefined) {
+        throw new RendererBackendError(
+          'RENDERER_WEBGPU_GRAPH_NODE_UNAVAILABLE',
+          `Frame graph node ${node.id} (${node.program.graphHash}) has no WebGPU program`,
+        );
+      }
+      const inputs = webgpu.inputPorts.map(port =>
+        frameGraphWebGpuInput(node, port, externalTextures, nodeTextures),
+      );
+      const output = acquireGpuTexture(device, request.width, request.height, textureUsage);
+      allocatedTextures.push(output);
+      nodeTextures.set(node.id, output);
+      const uniformData = new Float32Array(Math.max(1, webgpu.uniforms.length) * 4);
+      webgpu.uniforms.forEach((uniform, index) => {
+        uniformData[index * 4] = materialUniformValue(uniform, node.parameters, node.systems);
+      });
+      const uniformBuffer = device.createBuffer({
+        size: uniformData.byteLength,
+        usage: GPU_BUFFER_USAGE.UNIFORM | GPU_BUFFER_USAGE.COPY_DST,
+      });
+      uniformBuffers.push(uniformBuffer);
+      device.queue.writeBuffer(uniformBuffer, 0, uniformData);
+      const pipelineKey = `${node.program.graphHash}:${webgpu.shader}`;
+      let pipeline = persistentGpuPipelines.get(pipelineKey);
+      if (pipeline === undefined) {
+        const module = device.createShaderModule({ code: webgpu.shader });
+        pipeline = device.createRenderPipeline({
+          layout: 'auto',
+          vertex: { module, entryPoint: 'vs' },
+          fragment: { module, entryPoint: 'fs', targets: [{ format: 'rgba8unorm' }] },
+          primitive: { topology: 'triangle-list' },
+        });
+        persistentGpuPipelines.set(pipelineKey, pipeline);
+      }
+      const bindGroup = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [
+          {
+            binding: 0,
+            resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }),
+          },
+          ...inputs.map((texture, index) => ({
+            binding: index + 1,
+            resource: texture.texture.createView(),
+          })),
+          { binding: inputs.length + 1, resource: { buffer: uniformBuffer } },
+        ],
+      });
+      const pass = encoder.beginRenderPass({
+        colorAttachments: [
+          {
+            view: output.texture.createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: 'clear',
+            storeOp: 'store',
+          },
+        ],
+      });
+      pass.setPipeline(pipeline);
+      pass.setBindGroup(0, bindGroup);
+      pass.draw(3);
+      pass.end();
+    }
+    const output = nodeTextures.get(request.outputNodeId);
+    if (output === undefined) {
+      throw new RangeError(`Frame graph output node ${request.outputNodeId} is missing`);
+    }
+    const bytesPerRow = Math.ceil((request.width * 4) / 256) * 256;
+    readback = device.createBuffer({
+      size: bytesPerRow * request.height,
+      usage: GPU_BUFFER_USAGE.COPY_DST | GPU_BUFFER_USAGE.MAP_READ,
+    });
+    encoder.copyTextureToBuffer(
+      { texture: output.texture },
+      { buffer: readback, bytesPerRow, rowsPerImage: request.height },
+      { width: request.width, height: request.height },
+    );
+    (resources as { webgpuTextures: number }).webgpuTextures = allocatedTextures.length;
+    (resources as { webgpuBuffers: number }).webgpuBuffers = uniformBuffers.length + 1;
+    (resources as { webgpuPipelines: number }).webgpuPipelines = request.nodes.length;
+    device.queue.submit([encoder.finish()]);
+    const gpuStartedAt = performance.now();
+    await Promise.race([
+      device.queue.onSubmittedWorkDone(),
+      device.lost.then(info => {
+        throw new RendererBackendError(
+          'RENDERER_WEBGPU_DEVICE_LOST',
+          `WebGPU device was lost (${info.reason}): ${info.message}`,
+        );
+      }),
+    ]);
+    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
+    const validationError = await device.popErrorScope();
+    errorScopeOpen = false;
+    if (validationError !== null) {
+      throw new RendererBackendError(
+        'RENDERER_WEBGPU_VALIDATION_FAILED',
+        `WebGPU validation failed: ${validationError.message}`,
+      );
+    }
+    await readback.mapAsync(1);
+    const mapped = new Uint8Array(readback.getMappedRange());
+    const pixels = new Uint8ClampedArray(request.width * request.height * 4);
+    for (let row = 0; row < request.height; row += 1) {
+      const start = row * bytesPerRow;
+      pixels.set(mapped.subarray(start, start + request.width * 4), row * request.width * 4);
+    }
+    readback.unmap();
+    const canvas = new OffscreenCanvas(request.width, request.height);
+    const context = canvas.getContext('2d');
+    if (context === null) throw new Error('WebGPU frame graph readback canvas is unavailable');
+    context.putImageData(new ImageData(pixels, request.width, request.height), 0, 0);
+    return canvas.transferToImageBitmap();
+  } finally {
+    if (errorScopeOpen) void device.popErrorScope();
+    readback?.destroy();
+    uniformBuffers.forEach(buffer => buffer.destroy());
+    allocatedTextures.forEach(texture => {
+      if (persistentGpuDevice === device) releaseGpuTexture(texture);
+      else texture.texture.destroy();
+    });
+    (resources as { webgpuDevices: number }).webgpuDevices = 0;
+    (resources as { webgpuPipelines: number }).webgpuPipelines = 0;
+    (resources as { webgpuBuffers: number }).webgpuBuffers = 0;
+    (resources as { webgpuTextures: number }).webgpuTextures = 0;
+  }
+}
+
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
 in vec2 a_uv;
@@ -547,10 +753,18 @@ function uniformValue(
   uniform: ComposeRequest['program']['uniforms'][number],
   request: ComposeRequest,
 ): number {
+  return materialUniformValue(uniform, request.parameters, request.systems);
+}
+
+function materialUniformValue(
+  uniform: ComposeRequest['program']['uniforms'][number],
+  parameters: ComposeRequest['parameters'],
+  systems: ComposeRequest['systems'],
+): number {
   const value =
     uniform.source.kind === 'parameter'
-      ? request.parameters[uniform.source.id]
-      : request.systems[uniform.source.id];
+      ? parameters[uniform.source.id]
+      : systems[uniform.source.id];
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     throw new TypeError(`Material uniform ${uniform.source.id} must be a finite number`);
   }
@@ -727,6 +941,311 @@ async function composeWebGl2WithAdmissionRetry(
   );
 }
 
+interface FrameGraphTexture {
+  readonly texture: WebGLTexture;
+  readonly framebuffer?: WebGLFramebuffer;
+}
+
+const FRAME_GRAPH_COPY_SHADER = `#version 300 es
+precision highp float;
+uniform sampler2D u_input_source;
+in vec2 v_uv;
+out vec4 out_color;
+void main() {
+  out_color = texture(u_input_source, v_uv);
+}`;
+
+function createFrameGraphTexture(
+  gl: WebGL2RenderingContext,
+  width: number,
+  height: number,
+  source?: VideoFrame,
+): FrameGraphTexture {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  if (source === undefined) {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+      gl.deleteFramebuffer(framebuffer);
+      gl.deleteTexture(texture);
+      throw new RendererBackendError(
+        'RENDERER_WEBGL_FRAMEBUFFER_INCOMPLETE',
+        'Unable to allocate a complete WebGL2 frame graph target',
+      );
+    }
+    return { texture, framebuffer };
+  }
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    source as unknown as TexImageSource,
+  );
+  return { texture };
+}
+
+function bindFrameGraphInputs(
+  runtime: WebGl2Runtime,
+  program: WebGLProgram,
+  inputs: readonly { readonly sampler: string; readonly texture: WebGLTexture }[],
+): void {
+  const gl = runtime.gl;
+  inputs.forEach((input, index) => {
+    if (index >= gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)) {
+      throw new RangeError('Frame graph node exceeds the WebGL2 texture unit limit');
+    }
+    gl.activeTexture(gl.TEXTURE0 + index);
+    gl.bindTexture(gl.TEXTURE_2D, input.texture);
+    gl.uniform1i(gl.getUniformLocation(program, `u_input_${input.sampler}`), index);
+  });
+}
+
+function drawFrameGraphPass(
+  runtime: WebGl2Runtime,
+  fragmentShader: string,
+  inputs: readonly { readonly sampler: string; readonly texture: WebGLTexture }[],
+  uniforms: ComposeRequest['program']['uniforms'],
+  parameters: ComposeRequest['parameters'],
+  systems: ComposeRequest['systems'],
+  target: WebGLFramebuffer | null,
+): void {
+  const gl = runtime.gl;
+  const program = runtime.program(fragmentShader);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, target);
+  gl.useProgram(program);
+  runtime.bindAttributes(program);
+  bindFrameGraphInputs(runtime, program, inputs);
+  for (const uniform of uniforms) {
+    gl.uniform1f(
+      gl.getUniformLocation(program, uniform.name),
+      materialUniformValue(uniform, parameters, systems),
+    );
+  }
+  gl.viewport(0, 0, runtime.width, runtime.height);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+function frameGraphInputTexture(
+  request: ComposeFrameGraphRequest,
+  node: FrameGraphNode,
+  port: string,
+  externalTextures: ReadonlyMap<string, FrameGraphTexture>,
+  nodeTextures: ReadonlyMap<string, FrameGraphTexture>,
+): WebGLTexture {
+  const reference = node.inputs[port];
+  if (reference === undefined) {
+    throw new RangeError(`Frame graph node ${node.id} is missing input ${port}`);
+  }
+  const resolved =
+    reference.kind === 'external'
+      ? externalTextures.get(reference.id)
+      : nodeTextures.get(reference.id);
+  if (resolved === undefined) {
+    const sourceKind = reference.kind === 'external' ? 'external input' : 'prior node';
+    throw new RangeError(
+      `Frame graph node ${node.id} references unknown ${sourceKind} ${reference.id}`,
+    );
+  }
+  if (reference.kind === 'external' && request.inputs[reference.id] === undefined) {
+    throw new RangeError(`Frame graph external input ${reference.id} is missing`);
+  }
+  return resolved.texture;
+}
+
+function executeFrameGraphNode(
+  request: ComposeFrameGraphRequest,
+  runtime: WebGl2Runtime,
+  node: FrameGraphNode,
+  externalTextures: ReadonlyMap<string, FrameGraphTexture>,
+  nodeTextures: Map<string, FrameGraphTexture>,
+  allocated: FrameGraphTexture[],
+): void {
+  if (nodeTextures.has(node.id)) {
+    throw new RangeError(`Frame graph node id ${node.id} is duplicated`);
+  }
+  const passes = node.program.passes;
+  if (passes === undefined) {
+    const target = createFrameGraphTexture(runtime.gl, request.width, request.height);
+    allocated.push(target);
+    const inputs = node.program.inputPorts.map(port => ({
+      sampler: port.replaceAll(/[^a-zA-Z0-9_]/gu, '_'),
+      texture: frameGraphInputTexture(request, node, port, externalTextures, nodeTextures),
+    }));
+    drawFrameGraphPass(
+      runtime,
+      node.program.fragmentShader,
+      inputs,
+      node.program.uniforms,
+      node.parameters,
+      node.systems,
+      target.framebuffer ?? null,
+    );
+    nodeTextures.set(node.id, target);
+    return;
+  }
+  if (passes.length === 0) {
+    throw new TypeError(`Frame graph node ${node.id} has an empty multi-pass program`);
+  }
+  const passTextures = new Map<string, FrameGraphTexture>();
+  for (const pass of passes) {
+    if (passTextures.has(pass.id)) {
+      throw new RangeError(`Material pass id ${pass.id} is duplicated in node ${node.id}`);
+    }
+    const target = createFrameGraphTexture(runtime.gl, request.width, request.height);
+    allocated.push(target);
+    const inputs = pass.inputs.map(input => {
+      const texture =
+        input.source.kind === 'external'
+          ? frameGraphInputTexture(request, node, input.source.port, externalTextures, nodeTextures)
+          : passTextures.get(input.source.passId)?.texture;
+      if (texture === undefined) {
+        throw new RangeError(
+          `Frame graph node ${node.id} pass ${pass.id} references unknown input ${input.sampler}`,
+        );
+      }
+      return { sampler: input.sampler, texture };
+    });
+    drawFrameGraphPass(
+      runtime,
+      pass.fragmentShader,
+      inputs,
+      pass.uniforms,
+      node.parameters,
+      node.systems,
+      target.framebuffer ?? null,
+    );
+    passTextures.set(pass.id, target);
+  }
+  const output = passTextures.get(passes.at(-1)?.id ?? '');
+  if (output === undefined) throw new Error(`Frame graph node ${node.id} produced no output`);
+  nodeTextures.set(node.id, output);
+}
+
+function composeWebGl2FrameGraph(
+  request: ComposeFrameGraphRequest,
+  resources: RendererWorkerResourceSnapshot,
+  timing: MutableWorkerTiming,
+): ImageBitmap {
+  if (
+    !Number.isInteger(request.width) ||
+    !Number.isInteger(request.height) ||
+    request.width <= 0 ||
+    request.height <= 0
+  ) {
+    throw new RangeError('Frame graph dimensions must be positive integers');
+  }
+  if (request.nodes.length === 0) throw new RangeError('Frame graph has no nodes');
+  const runtime = webGl2Runtime(request.width, request.height);
+  const gl = runtime.gl;
+  const allocated: FrameGraphTexture[] = [];
+  const externalTextures = new Map<string, FrameGraphTexture>();
+  const nodeTextures = new Map<string, FrameGraphTexture>();
+  (resources as { webgl2Contexts: number }).webgl2Contexts = 1;
+  (resources as { webgl2Buffers: number }).webgl2Buffers = 2;
+  try {
+    for (const [id, frame] of Object.entries(request.inputs)) {
+      const texture = createFrameGraphTexture(gl, request.width, request.height, frame);
+      allocated.push(texture);
+      externalTextures.set(id, texture);
+    }
+    const gpuStartedAt = performance.now();
+    for (const node of request.nodes) {
+      if (cancelledRequestIds.has(request.id)) {
+        throw new DOMException('Renderer request cancelled', 'AbortError');
+      }
+      executeFrameGraphNode(request, runtime, node, externalTextures, nodeTextures, allocated);
+    }
+    const output = nodeTextures.get(request.outputNodeId);
+    if (output === undefined) {
+      throw new RangeError(`Frame graph output node ${request.outputNodeId} is missing`);
+    }
+    drawFrameGraphPass(
+      runtime,
+      FRAME_GRAPH_COPY_SHADER,
+      [{ sampler: 'source', texture: output.texture }],
+      [],
+      {},
+      {},
+      null,
+    );
+    gl.finish();
+    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
+    if (gl.isContextLost()) {
+      webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
+      runtime.dispose();
+      throw new RendererBackendError(
+        'RENDERER_WEBGL_CONTEXT_LOST',
+        'WebGL2 context was lost during frame graph composition',
+      );
+    }
+    (resources as { webgl2Programs: number }).webgl2Programs = runtime.snapshot().programs;
+    (resources as { webgl2Textures: number }).webgl2Textures = allocated.length;
+    const bitmap = runtime.canvas.transferToImageBitmap();
+    if (gl.isContextLost()) {
+      bitmap.close();
+      webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
+      runtime.dispose();
+      throw new RendererBackendError(
+        'RENDERER_WEBGL_CONTEXT_LOST',
+        'WebGL2 context was lost while transferring the frame graph result',
+      );
+    }
+    return bitmap;
+  } finally {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    allocated.forEach(({ framebuffer, texture }) => {
+      if (framebuffer !== undefined) gl.deleteFramebuffer(framebuffer);
+      gl.deleteTexture(texture);
+    });
+    (resources as { webgl2Contexts: number }).webgl2Contexts = 0;
+    (resources as { webgl2Programs: number }).webgl2Programs = 0;
+    (resources as { webgl2Buffers: number }).webgl2Buffers = 0;
+    (resources as { webgl2Textures: number }).webgl2Textures = 0;
+  }
+}
+
+async function composeWebGl2FrameGraphWithAdmissionRetry(
+  request: ComposeFrameGraphRequest,
+  resources: RendererWorkerResourceSnapshot,
+  timing: MutableWorkerTiming,
+): Promise<ImageBitmap> {
+  const maxAttempts = 80;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return composeWebGl2FrameGraph(request, resources, timing);
+    } catch (error) {
+      const unavailable =
+        error instanceof Error && error.message === 'Worker WebGL2 context is unavailable';
+      if (!unavailable) throw error;
+      if (cancelledRequestIds.has(request.id)) {
+        throw new DOMException('Renderer request cancelled', 'AbortError');
+      }
+      if (attempt === maxAttempts - 1) {
+        throw new RendererBackendError(
+          'RENDERER_WEBGL_ADMISSION_TIMEOUT',
+          'Timed out waiting for a page WebGL2 context budget',
+        );
+      }
+      await new Promise(resolve => globalThis.setTimeout(resolve, 50));
+    }
+  }
+  throw new RendererBackendError(
+    'RENDERER_WEBGL_ADMISSION_TIMEOUT',
+    'Timed out waiting for a page WebGL2 context budget',
+  );
+}
+
 const worker = globalThis as unknown as DedicatedWorkerGlobalScope;
 const MAX_ACTIVE_REQUESTS = 8;
 const activeRequestIds = new Set<number>();
@@ -792,7 +1311,23 @@ worker.addEventListener('message', (event: MessageEvent<RendererWorkerRequest>) 
     try {
       let bitmap: ImageBitmap;
       let backend: 'webgpu' | 'webgl2';
-      if (request.preferredBackend === 'webgpu') {
+      if (request.type === 'compose-frame-graph') {
+        if (request.preferredBackend === 'webgpu') {
+          try {
+            bitmap = await composeWebGpuFrameGraph(request, resources, timing);
+            backend = 'webgpu';
+          } catch (error) {
+            const failure = backendError(error, 'RENDERER_WEBGPU_FRAME_GRAPH_FAILED');
+            if (!request.allowFallback) throw failure;
+            diagnostics.push({ code: failure.code, message: failure.message });
+            bitmap = await composeWebGl2FrameGraphWithAdmissionRetry(request, resources, timing);
+            backend = 'webgl2';
+          }
+        } else {
+          bitmap = await composeWebGl2FrameGraphWithAdmissionRetry(request, resources, timing);
+          backend = 'webgl2';
+        }
+      } else if (request.preferredBackend === 'webgpu') {
         try {
           bitmap = await composeWebGpu(request, resources, timing);
           backend = 'webgpu';
@@ -820,7 +1355,12 @@ worker.addEventListener('message', (event: MessageEvent<RendererWorkerRequest>) 
         id: request.id,
         bitmap,
         backend,
-        graphHash: request.program.graphHash,
+        graphHash:
+          request.type === 'compose'
+            ? request.program.graphHash
+            : `frame-graph:${request.nodes
+                .map(node => `${node.id}:${node.program.graphHash}`)
+                .join('|')}`,
         diagnostics,
         resources,
         outputBitmapOwner: 'caller',

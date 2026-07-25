@@ -7,10 +7,12 @@ import {
   EncodedPacketSink,
   Input,
   MP4,
+  VideoSampleSink,
   WEBM,
   type EncodedPacket,
   type InputTrack,
   type InputVideoTrack,
+  type VideoSample,
 } from 'mediabunny';
 
 import type {
@@ -356,6 +358,42 @@ export interface VideoDecodeOptions {
   readonly sampleIndex?: SampleIndex;
 }
 
+export interface VideoFrameDecodeSessionOptions {
+  /** Zero-based index within the container's video tracks. */
+  readonly streamIndex?: number;
+  /** Maximum decoded frames retained by this session. */
+  readonly maxCachedFrames?: number;
+  /** Maximum decoded frame bytes retained by this session. */
+  readonly maxCachedBytes?: number;
+  /**
+   * Forward jumps larger than this restart at the nearest GOP instead of
+   * decoding every intervening frame.
+   */
+  readonly maxSequentialGapUs?: number;
+}
+
+export interface VideoFrameDecodeSessionSnapshot {
+  readonly streamIndex: number;
+  readonly cachedFrames: number;
+  readonly cachedBytes: number;
+  readonly maxCachedFrames: number;
+  readonly maxCachedBytes: number;
+  readonly maxSequentialGapUs: number;
+  readonly cacheHits: number;
+  readonly cacheMisses: number;
+  readonly seeks: number;
+  readonly sequentialFrames: number;
+  readonly resets: number;
+  readonly active: boolean;
+  readonly disposed: boolean;
+}
+
+interface CachedVideoFrame {
+  readonly frame: VideoFrame;
+  readonly byteLength: number;
+  access: number;
+}
+
 export interface AudioPcmBlock {
   readonly sampleRate: number;
   readonly channelCount: number;
@@ -485,6 +523,355 @@ async function waitForDecodeCapacity(
       signal?.addEventListener('abort', onAbort, { once: true });
     });
   }
+}
+
+function positiveSessionInteger(value: number, name: string): number {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new RangeError(`${name} must be a positive safe integer`);
+  }
+  return value;
+}
+
+function videoFrameBytes(frame: VideoFrame): number {
+  try {
+    return frame.allocationSize();
+  } catch {
+    return frame.codedWidth * frame.codedHeight * 4;
+  }
+}
+
+function decodeResultFromFrame(
+  frame: VideoFrame,
+  options: {
+    readonly timestampUs: number;
+    readonly durationUs: number;
+    readonly decodedPackets: number;
+    readonly plannedPackets: number;
+    readonly decodeStartUs: number;
+    readonly targetUs: number;
+  },
+): VideoDecodeResult {
+  let closed = false;
+  retainedVideoFrames += 1;
+  return {
+    frame,
+    ...options,
+    close: () => {
+      if (closed) return;
+      closed = true;
+      frame.close();
+      retainedVideoFrames -= 1;
+    },
+  };
+}
+
+function operationWithSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (signal === undefined) return promise;
+  throwIfAborted(signal, 'persistent video decode');
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = (): void => {
+      reject(
+        signal.reason instanceof Error
+          ? signal.reason
+          : new DOMException('Persistent video decode was aborted', 'AbortError'),
+      );
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    void promise.then(
+      value => {
+        signal.removeEventListener('abort', onAbort);
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(error instanceof Error ? error : new Error('Persistent video decode failed'));
+      },
+    );
+  });
+}
+
+/**
+ * A bounded, persistent video decoder session.
+ *
+ * Sequential requests share one Input, decoder and packet iterator. Backward
+ * seeks and large forward jumps restart at the nearest verified key packet.
+ * Returned frames are caller-owned; cached frames remain session-owned.
+ */
+export class VideoFrameDecodeSession {
+  readonly #reader: RangeReader;
+  readonly #index: SampleIndex;
+  readonly #streamIndex: number;
+  readonly #videoInfo: VideoTrackInfo;
+  readonly #maxCachedFrames: number;
+  readonly #maxCachedBytes: number;
+  readonly #maxSequentialGapUs: number;
+  readonly #cache = new Map<number, CachedVideoFrame>();
+  #input: Input | undefined;
+  #iterator: AsyncIterator<VideoSample> | undefined;
+  #current: VideoSample | undefined;
+  #lookahead: VideoSample | undefined;
+  #inputAbort: AbortController | undefined;
+  #tail: Promise<void> = Promise.resolve();
+  #clock = 0;
+  #cachedBytes = 0;
+  #cacheHits = 0;
+  #cacheMisses = 0;
+  #seeks = 0;
+  #sequentialFrames = 0;
+  #resets = 0;
+  #decoderActive = false;
+  #disposed = false;
+
+  public constructor(
+    reader: RangeReader,
+    index: SampleIndex,
+    options: VideoFrameDecodeSessionOptions = {},
+  ) {
+    this.#reader = reader;
+    this.#index = index;
+    this.#streamIndex = options.streamIndex ?? 0;
+    if (!Number.isSafeInteger(this.#streamIndex) || this.#streamIndex < 0) {
+      throw new RangeError('streamIndex must be a non-negative safe integer');
+    }
+    const videoInfo = index.tracks.filter(track => track.kind === 'video')[this.#streamIndex];
+    if (videoInfo === undefined) throw new RangeError('Requested video stream does not exist');
+    this.#videoInfo = videoInfo;
+    this.#maxCachedFrames = positiveSessionInteger(
+      options.maxCachedFrames ?? 24,
+      'maxCachedFrames',
+    );
+    this.#maxCachedBytes = positiveSessionInteger(
+      options.maxCachedBytes ?? 96 * 1_024 * 1_024,
+      'maxCachedBytes',
+    );
+    this.#maxSequentialGapUs = positiveSessionInteger(
+      options.maxSequentialGapUs ?? 3_000_000,
+      'maxSequentialGapUs',
+    );
+  }
+
+  public frameAt(targetUs: number, signal?: AbortSignal): Promise<VideoDecodeResult> {
+    if (this.#disposed) {
+      return Promise.reject(new ReferenceError('VideoFrameDecodeSession is disposed'));
+    }
+    if (!Number.isSafeInteger(targetUs) || targetUs < 0) {
+      return Promise.reject(new RangeError('targetUs must be a non-negative safe integer'));
+    }
+    const operation = this.#tail.then(() => this.#frameAt(targetUs, signal));
+    this.#tail = operation.then(
+      () => undefined,
+      () => undefined,
+    );
+    return operation;
+  }
+
+  public snapshot(): VideoFrameDecodeSessionSnapshot {
+    return {
+      streamIndex: this.#streamIndex,
+      cachedFrames: this.#cache.size,
+      cachedBytes: this.#cachedBytes,
+      maxCachedFrames: this.#maxCachedFrames,
+      maxCachedBytes: this.#maxCachedBytes,
+      maxSequentialGapUs: this.#maxSequentialGapUs,
+      cacheHits: this.#cacheHits,
+      cacheMisses: this.#cacheMisses,
+      seeks: this.#seeks,
+      sequentialFrames: this.#sequentialFrames,
+      resets: this.#resets,
+      active: this.#decoderActive,
+      disposed: this.#disposed,
+    };
+  }
+
+  public dispose(): void {
+    if (this.#disposed) return;
+    this.#disposed = true;
+    void this.#reset(false);
+    for (const cached of this.#cache.values()) {
+      cached.frame.close();
+      retainedVideoFrames -= 1;
+    }
+    this.#cache.clear();
+    this.#cachedBytes = 0;
+  }
+
+  async #frameAt(targetUs: number, signal?: AbortSignal): Promise<VideoDecodeResult> {
+    if (this.#disposed) throw new ReferenceError('VideoFrameDecodeSession is disposed');
+    throwIfAborted(signal, 'persistent video decode');
+    const seek = resolveVideoSeek(this.#index, this.#videoInfo.id, targetUs);
+    const cached = this.#cache.get(seek.presentationUs);
+    if (cached !== undefined) {
+      cached.access = ++this.#clock;
+      this.#cacheHits += 1;
+      return decodeResultFromFrame(cached.frame.clone(), {
+        timestampUs: seek.presentationUs,
+        durationUs: cached.frame.duration ?? 0,
+        decodedPackets: 0,
+        plannedPackets: seek.samplesToDecode,
+        decodeStartUs: seek.decodeStartUs,
+        targetUs,
+      });
+    }
+    this.#cacheMisses += 1;
+
+    const currentUs = this.#current?.microsecondTimestamp;
+    if (
+      currentUs === undefined ||
+      seek.presentationUs < currentUs ||
+      seek.presentationUs - currentUs > this.#maxSequentialGapUs
+    ) {
+      await this.#start(seek.presentationUs, signal);
+    }
+
+    let decodedSamples = 0;
+    while (
+      this.#current !== undefined &&
+      this.#current.microsecondTimestamp < seek.presentationUs
+    ) {
+      const next = await this.#next(signal);
+      if (next === undefined) break;
+      this.#current.close();
+      this.#current = next;
+      decodedSamples += 1;
+      this.#sequentialFrames += 1;
+    }
+
+    if (this.#current === undefined || this.#current.microsecondTimestamp !== seek.presentationUs) {
+      // A container/decoder may have produced an unexpected order. Restarting
+      // from the exact timestamp preserves the strict seek contract.
+      await this.#start(seek.presentationUs, signal);
+    }
+    if (this.#current === undefined || this.#current.microsecondTimestamp !== seek.presentationUs) {
+      throw new Error(
+        `Persistent seek expected PTS ${seek.presentationUs}, received ${
+          this.#current?.microsecondTimestamp ?? 'end-of-stream'
+        }`,
+      );
+    }
+
+    const decodedFrame = this.#current.toVideoFrame();
+    const result = decodeResultFromFrame(decodedFrame.clone(), {
+      timestampUs: seek.presentationUs,
+      durationUs: this.#current.microsecondDuration,
+      decodedPackets: Math.max(1, decodedSamples),
+      plannedPackets: seek.samplesToDecode,
+      decodeStartUs: seek.decodeStartUs,
+      targetUs,
+    });
+    this.#cacheFrame(seek.presentationUs, decodedFrame);
+    return result;
+  }
+
+  async #start(targetUs: number, signal?: AbortSignal): Promise<void> {
+    await this.#reset();
+    throwIfAborted(signal, 'persistent video seek');
+    this.#inputAbort = new AbortController();
+    this.#input = inputFromReader(this.#reader, this.#inputAbort.signal);
+    try {
+      const tracks = await operationWithSignal(this.#input.getVideoTracks(), signal);
+      const track = tracks.find(candidate => candidate.id === this.#videoInfo.id);
+      if (track === undefined) throw new Error('Indexed video track is missing from input');
+      const sink = new VideoSampleSink(track);
+      this.#iterator = sink.samples(targetUs / MICROSECONDS_PER_SECOND)[Symbol.asyncIterator]();
+      this.#decoderActive = true;
+      activeVideoDecoders += 1;
+      this.#seeks += 1;
+      const first = await this.#next(signal);
+      if (first === undefined) throw new Error('Video stream ended before the requested timestamp');
+      this.#current = first;
+    } catch (error) {
+      await this.#reset();
+      throw error;
+    }
+  }
+
+  async #next(signal?: AbortSignal): Promise<VideoSample | undefined> {
+    if (this.#lookahead !== undefined) {
+      const sample = this.#lookahead;
+      this.#lookahead = undefined;
+      return sample;
+    }
+    const iterator = this.#iterator;
+    if (iterator === undefined) return undefined;
+    try {
+      const result = await operationWithSignal(iterator.next(), signal);
+      return result.done ? undefined : result.value;
+    } catch (error) {
+      if (signal?.aborted ?? false) await this.#reset();
+      throw error;
+    }
+  }
+
+  async #reset(countReset = true): Promise<void> {
+    const iterator = this.#iterator;
+    this.#iterator = undefined;
+    this.#inputAbort?.abort(new DOMException('Video decode session reset', 'AbortError'));
+    this.#inputAbort = undefined;
+    this.#current?.close();
+    this.#current = undefined;
+    this.#lookahead?.close();
+    this.#lookahead = undefined;
+    this.#input?.dispose();
+    this.#input = undefined;
+    if (this.#decoderActive) {
+      this.#decoderActive = false;
+      activeVideoDecoders -= 1;
+    }
+    if (iterator?.return !== undefined) {
+      try {
+        await iterator.return();
+      } catch {
+        // The Input has already been disposed above.
+      }
+    }
+    if (countReset) this.#resets += 1;
+  }
+
+  #cacheFrame(timestampUs: number, frame: VideoFrame): void {
+    const byteLength = videoFrameBytes(frame);
+    if (byteLength > this.#maxCachedBytes) {
+      frame.close();
+      return;
+    }
+    const previous = this.#cache.get(timestampUs);
+    if (previous !== undefined) {
+      previous.frame.close();
+      retainedVideoFrames -= 1;
+      this.#cachedBytes -= previous.byteLength;
+    }
+    this.#cache.set(timestampUs, {
+      frame,
+      byteLength,
+      access: ++this.#clock,
+    });
+    retainedVideoFrames += 1;
+    this.#cachedBytes += byteLength;
+    while (this.#cache.size > this.#maxCachedFrames || this.#cachedBytes > this.#maxCachedBytes) {
+      let oldestKey: number | undefined;
+      let oldestAccess = Number.POSITIVE_INFINITY;
+      for (const [key, value] of this.#cache) {
+        if (value.access < oldestAccess) {
+          oldestKey = key;
+          oldestAccess = value.access;
+        }
+      }
+      if (oldestKey === undefined) break;
+      const oldest = this.#cache.get(oldestKey);
+      if (oldest === undefined) break;
+      this.#cache.delete(oldestKey);
+      this.#cachedBytes -= oldest.byteLength;
+      oldest.frame.close();
+      retainedVideoFrames -= 1;
+    }
+  }
+}
+
+export function createVideoFrameDecodeSessionFromReader(
+  reader: RangeReader,
+  index: SampleIndex,
+  options: VideoFrameDecodeSessionOptions = {},
+): VideoFrameDecodeSession {
+  return new VideoFrameDecodeSession(reader, index, options);
 }
 
 export async function decodeVideoFrameAt(

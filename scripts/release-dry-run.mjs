@@ -7,6 +7,8 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
+
 const execFileAsync = promisify(execFile);
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const packagesDirectory = join(root, 'packages');
@@ -37,8 +39,8 @@ try {
       throw new Error(`${manifest.name} must declare public access and npm provenance`);
     }
     const { stdout, stderr } = await execFileAsync(
-      'corepack',
-      ['pnpm', 'publish', '--dry-run', '--no-git-checks'],
+      corepackExecutable,
+      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks']),
       {
         cwd: packageDirectory,
         env: {

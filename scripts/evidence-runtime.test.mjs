@@ -272,7 +272,7 @@ test('Alpha pair publication serializes canonical path aliases in one process', 
   });
   let secondEnteredBuild = false;
   try {
-    await symlink(directory, alias);
+    await symlink(directory, alias, process.platform === 'win32' ? 'junction' : 'dir');
     const first = publishGeneration({
       mediaPath,
       reportPath,

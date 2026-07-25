@@ -71,7 +71,7 @@ export class SidechainDucker {
     }
     this.#options = options;
     const lookaheadFrames = Math.ceil((options.lookaheadUs * options.sampleRate) / 1_000_000);
-    this.#delay = new Float32Array(Math.max(1, lookaheadFrames) * options.channelCount);
+    this.#delay = new Float32Array(lookaheadFrames * options.channelCount);
     this.#attack = smoothingCoefficient(options.attackUs, options.sampleRate);
     this.#release = smoothingCoefficient(options.releaseUs, options.sampleRate);
   }
@@ -100,12 +100,19 @@ export class SidechainDucker {
       const coefficient = target < this.#gain ? this.#attack : this.#release;
       this.#gain = target + coefficient * (this.#gain - target);
       for (let channel = 0; channel < this.#options.channelCount; channel += 1) {
+        const inputSample = program[frame * this.#options.channelCount + channel] ?? 0;
+        if (this.latencyFrames === 0) {
+          output[frame * this.#options.channelCount + channel] = inputSample * this.#gain;
+          continue;
+        }
         const delayIndex = this.#delayFrame * this.#options.channelCount + channel;
         output[frame * this.#options.channelCount + channel] =
           (this.#delay[delayIndex] ?? 0) * this.#gain;
-        this.#delay[delayIndex] = program[frame * this.#options.channelCount + channel] ?? 0;
+        this.#delay[delayIndex] = inputSample;
       }
-      this.#delayFrame = (this.#delayFrame + 1) % this.latencyFrames;
+      if (this.latencyFrames > 0) {
+        this.#delayFrame = (this.#delayFrame + 1) % this.latencyFrames;
+      }
     }
     return output;
   }
@@ -204,7 +211,7 @@ export class TruePeakLimiter {
     this.#ceiling = 10 ** ((options.ceilingDbtp ?? -1) / 20);
     this.#release = smoothingCoefficient(options.releaseUs ?? 100_000, options.sampleRate);
     const frames = Math.max(
-      1,
+      0,
       Math.ceil(((options.lookaheadUs ?? 5_000) * options.sampleRate) / 1_000_000),
     );
     this.#delay = new Float32Array(frames * options.channelCount);
@@ -225,13 +232,94 @@ export class TruePeakLimiter {
       const target = peak > this.#ceiling ? this.#ceiling / peak : 1;
       this.#gain = target < this.#gain ? target : target + this.#release * (this.#gain - target);
       for (let channel = 0; channel < this.#channels; channel += 1) {
+        const inputSample = input[frame * this.#channels + channel] ?? 0;
+        if (this.latencyFrames === 0) {
+          output[frame * this.#channels + channel] = inputSample * this.#gain;
+          continue;
+        }
         const index = this.#frame * this.#channels + channel;
         output[frame * this.#channels + channel] = (this.#delay[index] ?? 0) * this.#gain;
-        this.#delay[index] = input[frame * this.#channels + channel] ?? 0;
+        this.#delay[index] = inputSample;
       }
-      this.#frame = (this.#frame + 1) % this.latencyFrames;
+      if (this.latencyFrames > 0) this.#frame = (this.#frame + 1) % this.latencyFrames;
     }
     return output;
+  }
+}
+
+/** Incremental variant of analyzeLoudness for bounded-memory export prepasses. */
+export class StreamingLoudnessAnalyzer {
+  readonly #channelCount: number;
+  readonly #blockFrames: number;
+  readonly #energies: number[] = [];
+  readonly #carry: number[] = [];
+  readonly #previous: number[];
+  #samplePeak = 0;
+  #truePeak = 0;
+
+  public constructor(sampleRate: number, channelCount: number) {
+    if (
+      !Number.isSafeInteger(sampleRate) ||
+      !Number.isSafeInteger(channelCount) ||
+      sampleRate <= 0 ||
+      channelCount <= 0
+    ) {
+      throw new RangeError('Invalid loudness PCM format');
+    }
+    this.#channelCount = channelCount;
+    this.#blockFrames = Math.max(1, Math.round(sampleRate * 0.4));
+    this.#previous = Array.from({ length: channelCount }, () => 0);
+  }
+
+  public process(pcm: Float32Array): void {
+    if (pcm.length % this.#channelCount !== 0) {
+      throw new RangeError('Invalid loudness PCM block length');
+    }
+    for (let index = 0; index < pcm.length; index += 1) {
+      const sample = pcm[index] ?? 0;
+      const channel = index % this.#channelCount;
+      const previous = this.#previous[channel] ?? sample;
+      this.#samplePeak = Math.max(this.#samplePeak, Math.abs(sample));
+      for (let phase = 1; phase <= 4; phase += 1) {
+        this.#truePeak = Math.max(
+          this.#truePeak,
+          Math.abs(previous + ((sample - previous) * phase) / 4),
+        );
+      }
+      this.#previous[channel] = sample;
+      this.#carry.push(sample);
+      if (this.#carry.length === this.#blockFrames * this.#channelCount) {
+        this.#commitCarry();
+      }
+    }
+  }
+
+  public finish(): LoudnessReport {
+    if (this.#carry.length > 0) this.#commitCarry();
+    const lufs = (energy: number): number =>
+      energy <= 0 ? Number.NEGATIVE_INFINITY : -0.691 + 10 * Math.log10(energy);
+    const absoluteGated = this.#energies.filter(energy => lufs(energy) >= -70);
+    const ungatedEnergy =
+      absoluteGated.reduce((sum, value) => sum + value, 0) / Math.max(1, absoluteGated.length);
+    const relativeThreshold = lufs(ungatedEnergy) - 10;
+    const gated = absoluteGated.filter(energy => lufs(energy) >= relativeThreshold);
+    const integratedEnergy =
+      gated.reduce((sum, value) => sum + value, 0) / Math.max(1, gated.length);
+    return {
+      integratedLufs: lufs(integratedEnergy),
+      ungatedLufs: lufs(ungatedEnergy),
+      truePeakDbtp: decibels(this.#truePeak),
+      samplePeakDbfs: decibels(this.#samplePeak),
+      gatedBlocks: gated.length,
+      totalBlocks: this.#energies.length,
+    };
+  }
+
+  #commitCarry(): void {
+    let sumSquares = 0;
+    for (const sample of this.#carry) sumSquares += sample * sample;
+    this.#energies.push(sumSquares / Math.max(1, this.#carry.length));
+    this.#carry.length = 0;
   }
 }
 
@@ -320,5 +408,126 @@ export async function buildWaveformPeaks(
     totalFrames: options.totalFrames,
     windowFrames,
     peaks,
+  };
+}
+
+export interface AudioFrameRange {
+  readonly startFrame: number;
+  readonly frameCount: number;
+}
+
+export interface SilenceDetectionResult {
+  readonly sampleRate: number;
+  readonly channelCount: number;
+  readonly totalFrames: number;
+  readonly thresholdDb: number;
+  readonly nonSilent: readonly AudioFrameRange[];
+  readonly silent: readonly AudioFrameRange[];
+  readonly removedFrames: number;
+}
+
+export interface DetectSilenceOptions {
+  readonly sampleRate: number;
+  readonly channelCount: number;
+  readonly totalFrames: number;
+  readonly thresholdDb?: number;
+  readonly minimumSilenceUs?: number;
+  readonly paddingUs?: number;
+  readonly windowFrames?: number;
+  readonly readFrames: (
+    startFrame: number,
+    frameCount: number,
+    signal?: AbortSignal,
+  ) => Promise<Float32Array>;
+  readonly signal?: AbortSignal;
+  readonly onProgress?: (progress: number) => void;
+}
+
+function invertFrameRanges(
+  ranges: readonly AudioFrameRange[],
+  totalFrames: number,
+): readonly AudioFrameRange[] {
+  const result: AudioFrameRange[] = [];
+  let cursor = 0;
+  for (const range of ranges) {
+    if (range.startFrame > cursor) {
+      result.push({ startFrame: cursor, frameCount: range.startFrame - cursor });
+    }
+    cursor = Math.max(cursor, range.startFrame + range.frameCount);
+  }
+  if (cursor < totalFrames) result.push({ startFrame: cursor, frameCount: totalFrames - cursor });
+  return result;
+}
+
+/** Detect audible ranges with bounded reads and deterministic window merging. */
+export async function detectSilence(
+  options: DetectSilenceOptions,
+): Promise<SilenceDetectionResult> {
+  const thresholdDb = options.thresholdDb ?? -45;
+  const minimumSilenceUs = options.minimumSilenceUs ?? 250_000;
+  const paddingUs = options.paddingUs ?? 20_000;
+  const windowFrames = options.windowFrames ?? 1_024;
+  if (
+    !Number.isSafeInteger(options.sampleRate) ||
+    !Number.isSafeInteger(options.channelCount) ||
+    !Number.isSafeInteger(options.totalFrames) ||
+    !Number.isSafeInteger(windowFrames) ||
+    options.sampleRate <= 0 ||
+    options.channelCount <= 0 ||
+    options.totalFrames < 0 ||
+    windowFrames <= 0 ||
+    !Number.isFinite(thresholdDb) ||
+    minimumSilenceUs < 0 ||
+    paddingUs < 0
+  ) {
+    throw new RangeError('Invalid silence detection options');
+  }
+  const threshold = 10 ** (thresholdDb / 20);
+  const audibleWindows: AudioFrameRange[] = [];
+  for (let startFrame = 0; startFrame < options.totalFrames; startFrame += windowFrames) {
+    throwIfAborted(options.signal, 'Silence detection');
+    const frameCount = Math.min(windowFrames, options.totalFrames - startFrame);
+    const pcm = await options.readFrames(startFrame, frameCount, options.signal);
+    if (pcm.length !== frameCount * options.channelCount) {
+      throw new RangeError('Silence source returned an unexpected PCM length');
+    }
+    let sumSquares = 0;
+    for (const sample of pcm) sumSquares += sample * sample;
+    const rms = Math.sqrt(sumSquares / Math.max(1, pcm.length));
+    if (rms > threshold) audibleWindows.push({ startFrame, frameCount });
+    options.onProgress?.((startFrame + frameCount) / Math.max(1, options.totalFrames));
+  }
+  const minimumSilenceFrames = Math.round((minimumSilenceUs * options.sampleRate) / 1_000_000);
+  const paddingFrames = Math.round((paddingUs * options.sampleRate) / 1_000_000);
+  const nonSilent: AudioFrameRange[] = [];
+  for (const window of audibleWindows) {
+    const startFrame = Math.max(0, window.startFrame - paddingFrames);
+    const endFrame = Math.min(
+      options.totalFrames,
+      window.startFrame + window.frameCount + paddingFrames,
+    );
+    const previous = nonSilent.at(-1);
+    if (
+      previous !== undefined &&
+      startFrame - (previous.startFrame + previous.frameCount) <= minimumSilenceFrames
+    ) {
+      nonSilent[nonSilent.length - 1] = {
+        startFrame: previous.startFrame,
+        frameCount: endFrame - previous.startFrame,
+      };
+    } else {
+      nonSilent.push({ startFrame, frameCount: endFrame - startFrame });
+    }
+  }
+  const silent = invertFrameRanges(nonSilent, options.totalFrames);
+  if (options.totalFrames === 0) options.onProgress?.(1);
+  return {
+    sampleRate: options.sampleRate,
+    channelCount: options.channelCount,
+    totalFrames: options.totalFrames,
+    thresholdDb,
+    nonSilent,
+    silent,
+    removedFrames: silent.reduce((sum, range) => sum + range.frameCount, 0),
   };
 }

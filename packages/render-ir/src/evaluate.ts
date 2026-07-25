@@ -7,6 +7,8 @@ import type {
   IrTextClip,
   IrNestedSequenceClip,
   IrGeneratorClip,
+  IrMaterialContentClip,
+  IrShapeClip,
   IrAdjustmentClip,
   IrMaterialInstance,
   EvaluatedMaterialInstance,
@@ -198,9 +200,17 @@ function contains(startUs: number, durationUs: number, timeUs: number): boolean 
 function mapBaseClipSourceTime(
   clip: IrBaseClip & { readonly source: IrVisualClip['source'] },
   sequenceTimeUs: number,
+  allowOutsideItem = false,
 ): number | null {
   const localUs = sequenceTimeUs - clip.range.startUs;
-  return mapIrSourceTime(clip.source, clip.range.durationUs, localUs);
+  return mapIrSourceTime(
+    allowOutsideItem ? { ...clip.source, boundary: 'hold' } : clip.source,
+    clip.range.durationUs,
+    localUs,
+    {
+      allowOutsideItem,
+    },
+  );
 }
 
 export function mapClipSourceTime(clip: IrVisualClip, sequenceTimeUs: number): number | null {
@@ -209,17 +219,30 @@ export function mapClipSourceTime(clip: IrVisualClip, sequenceTimeUs: number): n
 
 function isVisualRenderClip(
   clip: IrClip,
-): clip is IrVisualClip | IrTextClip | IrNestedSequenceClip | IrGeneratorClip | IrAdjustmentClip {
+): clip is
+  | IrVisualClip
+  | IrTextClip
+  | IrNestedSequenceClip
+  | IrGeneratorClip
+  | IrShapeClip
+  | IrMaterialContentClip
+  | IrAdjustmentClip {
   return (
     clip.kind === 'visual-clip' ||
     clip.kind === 'text-clip' ||
     clip.kind === 'nested-sequence-clip' ||
     clip.kind === 'generator-clip' ||
+    clip.kind === 'shape-clip' ||
+    clip.kind === 'material-content-clip' ||
     clip.kind === 'adjustment-clip'
   );
 }
 
-function mapNestedSourceTime(clip: IrNestedSequenceClip, sequenceTimeUs: number): number | null {
+function mapNestedSourceTime(
+  clip: IrNestedSequenceClip,
+  sequenceTimeUs: number,
+  allowOutsideItem = false,
+): number | null {
   return mapIrSourceTime(
     {
       assetId: clip.source.sequenceId,
@@ -227,10 +250,11 @@ function mapNestedSourceTime(clip: IrNestedSequenceClip, sequenceTimeUs: number)
       streamIndex: 0,
       sourceRange: clip.source.sourceRange,
       timeMapping: clip.source.timeMapping,
-      boundary: clip.source.boundary,
+      boundary: allowOutsideItem ? 'hold' : clip.source.boundary,
     },
     clip.range.durationUs,
     sequenceTimeUs - clip.range.startUs,
+    { allowOutsideItem },
   );
 }
 
@@ -316,6 +340,11 @@ export function evaluateVisualState(ir: RenderIr, timeUs: number): ActiveVisualS
   if (!Number.isSafeInteger(timeUs) || timeUs < 0 || timeUs >= ir.durationUs) {
     throw new RangeError('timeUs is outside the Render IR duration');
   }
+  const transition = ir.transitions.find(value =>
+    contains(value.range.startUs, value.range.durationUs, timeUs),
+  );
+  const transitionInputIds =
+    transition === undefined ? undefined : new Set([transition.fromItemId, transition.toItemId]);
   const clips = ir.tracks
     .filter(track => (track.kind === 'visual' || track.kind === 'caption') && track.enabled)
     .flatMap(track =>
@@ -328,18 +357,21 @@ export function evaluateVisualState(ir: RenderIr, timeUs: number): ActiveVisualS
             | IrTextClip
             | IrNestedSequenceClip
             | IrGeneratorClip
+            | IrShapeClip
+            | IrMaterialContentClip
             | IrAdjustmentClip =>
             isVisualRenderClip(clip) &&
             clip.enabled &&
-            contains(clip.range.startUs, clip.range.durationUs, timeUs),
+            (contains(clip.range.startUs, clip.range.durationUs, timeUs) ||
+              transitionInputIds?.has(clip.id) === true),
         )
         .map(clip => ({
           clip,
           sourceTimeUs:
             clip.kind === 'visual-clip'
-              ? mapClipSourceTime(clip, timeUs)
+              ? mapBaseClipSourceTime(clip, timeUs, transitionInputIds?.has(clip.id) === true)
               : clip.kind === 'nested-sequence-clip'
-                ? mapNestedSourceTime(clip, timeUs)
+                ? mapNestedSourceTime(clip, timeUs, transitionInputIds?.has(clip.id) === true)
                 : null,
           materials: clip.materialInstanceIds.flatMap(id => {
             const value = ir.materials[id];
@@ -347,9 +379,6 @@ export function evaluateVisualState(ir: RenderIr, timeUs: number): ActiveVisualS
           }),
         })),
     );
-  const transition = ir.transitions.find(value =>
-    contains(value.range.startUs, value.range.durationUs, timeUs),
-  );
   const transitionMaterial =
     transition === undefined ? undefined : ir.materials[transition.materialInstanceId];
   return {

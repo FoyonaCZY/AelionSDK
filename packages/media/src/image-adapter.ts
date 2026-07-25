@@ -1,5 +1,7 @@
 import { throwIfAborted } from '@aelion/core';
 
+import type { RangeReader } from './types.js';
+
 export interface DecodedStillImage {
   readonly frame: VideoFrame;
   readonly width: number;
@@ -36,6 +38,39 @@ export async function decodeStillImage(
   } finally {
     bitmap.close();
   }
+}
+
+export interface DecodeStillImageFromReaderOptions {
+  readonly mimeType?: string;
+  readonly maxBytes?: number;
+  readonly signal?: AbortSignal;
+}
+
+/** Decode a bounded still image from any registered range-backed source. */
+export async function decodeStillImageFromReader(
+  reader: RangeReader,
+  options: DecodeStillImageFromReaderOptions = {},
+): Promise<DecodedStillImage> {
+  const maxBytes = options.maxBytes ?? 64 * 1_024 * 1_024;
+  if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
+    throw new RangeError('maxBytes must be a positive safe integer');
+  }
+  throwIfAborted(options.signal, 'Still image range decode');
+  const size = await reader.size(options.signal);
+  if (!Number.isSafeInteger(size) || size <= 0) {
+    throw new RangeError('Still image source must have a positive safe integer size');
+  }
+  if (size > maxBytes) {
+    throw new RangeError(`Still image exceeds the ${maxBytes.toString()} byte decode limit`);
+  }
+  const read = await reader.read({ offset: 0, length: size }, options.signal);
+  throwIfAborted(options.signal, 'Still image range decode');
+  return decodeStillImage(
+    new Blob([read.bytes], {
+      type: options.mimeType ?? 'application/octet-stream',
+    }),
+    options.signal,
+  );
 }
 
 export interface AnimatedImageInfo {

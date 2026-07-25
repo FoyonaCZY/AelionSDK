@@ -1,6 +1,7 @@
 import {
   AelionError,
   frameStartUs,
+  normalizeRational,
   type JsonObject,
   type JsonValue,
   type Rational,
@@ -10,8 +11,10 @@ import {
   canonicalClone,
   type AelionProject,
   type ItemEntity,
+  type MaterialInstanceEntity,
   type MarkerEntity,
   type TrackEntity,
+  type TransitionEntity,
 } from '@aelion/project-schema';
 
 import { defaultSchemas } from './default-schemas.js';
@@ -29,6 +32,7 @@ export interface CreateProjectOptions {
   readonly frameRate?: Rational;
   readonly sampleRate?: 44_100 | 48_000 | 96_000;
   readonly channelLayout?: 'mono' | 'stereo' | '5.1';
+  readonly backgroundColor?: string | readonly [number, number, number, number];
   /** Omit for content-derived duration. */
   readonly durationUs?: number;
 }
@@ -65,12 +69,146 @@ export interface AddMediaClipOptions {
   readonly sourceDurationUs?: number;
   readonly streamIndex?: number;
   readonly boundary?: 'error' | 'hold' | 'loop' | 'transparent';
+  readonly rate?: Rational;
   readonly name?: string;
   readonly fit?: 'contain' | 'cover' | 'fill' | 'none';
   readonly opacity?: number;
   readonly gainDb?: number;
   readonly pan?: number;
+  readonly fadeInUs?: number;
+  readonly fadeOutUs?: number;
 }
+
+export interface AddImageClipOptions {
+  readonly id?: string;
+  readonly assetId: string;
+  readonly trackId: string;
+  readonly atUs?: number;
+  readonly durationUs?: number;
+  readonly name?: string;
+  readonly fit?: 'contain' | 'cover' | 'fill' | 'none';
+  readonly opacity?: number;
+}
+
+export interface ClipBox {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface AddTextClipOptions {
+  readonly id?: string;
+  readonly trackId: string;
+  readonly text: string;
+  readonly atUs?: number;
+  readonly durationUs: number;
+  readonly box?: ClipBox;
+  readonly style?: JsonObject;
+  /** Optional rich-text runs. Their concatenated text must equal `text`. */
+  readonly runs?: readonly {
+    readonly text: string;
+    readonly style?: JsonObject;
+  }[];
+  readonly paragraphStyle?: JsonObject;
+  readonly overflow?: 'clip' | 'ellipsis' | 'visible' | 'auto-fit';
+  readonly writingMode?: 'horizontal-tb' | 'vertical-rl' | 'vertical-lr';
+  readonly name?: string;
+  readonly opacity?: number;
+}
+
+export interface AddCaptionClipOptions {
+  readonly id?: string;
+  readonly trackId: string;
+  readonly text: string;
+  readonly atUs?: number;
+  readonly durationUs: number;
+  readonly box?: ClipBox;
+  readonly style?: JsonObject;
+  readonly overflow?: 'clip' | 'auto-fit';
+  readonly cueSettings?: JsonObject;
+  readonly name?: string;
+}
+
+export interface AddShapeClipOptions {
+  readonly id?: string;
+  readonly trackId: string;
+  readonly kind: 'rectangle' | 'ellipse' | 'polygon';
+  readonly atUs?: number;
+  readonly durationUs: number;
+  readonly box: ClipBox;
+  readonly fill: string | readonly [number, number, number, number];
+  readonly stroke?: string | readonly [number, number, number, number];
+  readonly strokeWidthPx?: number;
+  readonly cornerRadiusPx?: number;
+  readonly points?: readonly { readonly x: number; readonly y: number }[];
+  readonly name?: string;
+  readonly opacity?: number;
+}
+
+export interface AddMaterialInstanceOptions {
+  readonly id?: string;
+  readonly packageId: string;
+  readonly packageVersion: string;
+  readonly packageIntegrity: `sha256:${string}`;
+  readonly materialId: string;
+  readonly parameters?: JsonObject;
+  readonly name?: string;
+  readonly previewPolicy?: 'required' | 'skippable-when-degraded';
+  readonly resourceBindings?: JsonObject;
+  readonly inputBindings?: JsonObject;
+  readonly randomSeed?: number;
+}
+
+export interface AddTransitionOptions {
+  readonly id?: string;
+  readonly fromItemId: string;
+  readonly toItemId: string;
+  readonly materialInstanceId: string;
+  readonly atUs: number;
+  readonly durationUs: number;
+}
+
+export interface SetMaskOptions {
+  readonly sourceItemId: string;
+  readonly channel?: 'alpha' | 'luma';
+  readonly invert?: boolean;
+  readonly featherPx?: number;
+  readonly space?: 'source' | 'canvas';
+  readonly consumeSource?: boolean;
+}
+
+export interface SetVisualOptions {
+  readonly fit?: 'contain' | 'cover' | 'fill' | 'none';
+  readonly positionPx?: { readonly x: number; readonly y: number };
+  readonly anchor?: { readonly x: number; readonly y: number };
+  readonly scale?: { readonly x: number; readonly y: number };
+  readonly rotationDeg?: number;
+  readonly skewDeg?: { readonly x: number; readonly y: number };
+  readonly opacity?: number;
+  readonly blendMode?:
+    | 'normal'
+    | 'multiply'
+    | 'screen'
+    | 'overlay'
+    | 'darken'
+    | 'lighten'
+    | 'color-dodge'
+    | 'color-burn'
+    | 'hard-light'
+    | 'soft-light'
+    | 'difference'
+    | 'exclusion';
+}
+
+export interface Keyframe<T extends JsonValue = JsonValue> {
+  readonly timeUs: number;
+  readonly value: T;
+  readonly interpolation?: 'hold' | 'linear' | 'cubic-bezier';
+  readonly easing?: JsonObject;
+}
+
+export type ClipAnimatableProperty = 'opacity' | 'position' | 'scale' | 'rotation' | 'gain' | 'pan';
 
 export interface ImportMediaOptions {
   readonly provider: Pick<ProductionMediaProvider, 'probe'>;
@@ -218,7 +356,10 @@ export class ProjectBuilder {
             sampleRate: options.sampleRate ?? 48_000,
             channelLayout: options.channelLayout ?? 'stereo',
             workingColorSpace: 'srgb-linear',
-            backgroundColor: { space: 'srgb-linear', rgba: [0, 0, 0, 1] },
+            backgroundColor:
+              options.backgroundColor === undefined
+                ? { space: 'srgb-linear', rgba: [0, 0, 0, 1] }
+                : this.#color(options.backgroundColor),
           },
           duration:
             options.durationUs === undefined
@@ -310,19 +451,25 @@ export class ProjectBuilder {
     const sourceStartUs = options.sourceStartUs ?? 0;
     const sourceDurationUs = options.sourceDurationUs ?? options.durationUs;
     const streamIndex = options.streamIndex ?? 0;
+    const rate = normalizeRational(options.rate ?? { numerator: 1, denominator: 1 });
     assertTime(atUs, 'atUs');
     assertTime(options.durationUs, 'durationUs', true);
     assertTime(sourceStartUs, 'sourceStartUs');
     assertTime(sourceDurationUs, 'sourceDurationUs', true);
     assertTime(streamIndex, 'streamIndex');
+    if (options.fadeInUs !== undefined) assertTime(options.fadeInUs, 'fadeInUs');
+    if (options.fadeOutUs !== undefined) assertTime(options.fadeOutUs, 'fadeOutUs');
+    if ((options.fadeInUs ?? 0) + (options.fadeOutUs ?? 0) > options.durationUs) {
+      throw new RangeError('audio fades cannot overlap past the Clip duration');
+    }
 
     const source = {
       assetId: options.assetId,
       stream: { type: options.kind, index: streamIndex },
       sourceRange: { startUs: sourceStartUs, durationUs: sourceDurationUs },
       timeMapping: {
-        type: 'linear',
-        rate: { numerator: 1, denominator: 1 },
+        type: 'linear' as const,
+        rate: { numerator: rate.numerator, denominator: rate.denominator },
         reverse: false,
         boundary: options.boundary ?? 'hold',
       },
@@ -348,12 +495,472 @@ export class ProjectBuilder {
             enabled: true,
             range: { startUs: atUs, durationUs: options.durationUs },
             source,
-            audio: { gainDb: options.gainDb ?? 0, pan: options.pan ?? 0 },
+            audio: {
+              gainDb: options.gainDb ?? 0,
+              pan: options.pan ?? 0,
+              ...(options.fadeInUs === undefined ? {} : { fadeInUs: options.fadeInUs }),
+              ...(options.fadeOutUs === undefined ? {} : { fadeOutUs: options.fadeOutUs }),
+            },
             materialInstanceIds: [],
           };
     this.#project.items[id] = item;
     track.itemIds.push(id);
     return id;
+  }
+
+  public setBackgroundColor(value: string | readonly [number, number, number, number]): this {
+    (this.#sequence().format as JsonObject).backgroundColor = this.#color(value);
+    return this;
+  }
+
+  public setProjectExtension(namespace: string, value: JsonValue): this {
+    this.#project.extensions[namespace] = structuredClone(value);
+    return this;
+  }
+
+  public setTrackExtension(trackId: string, namespace: string, value: JsonValue): this {
+    const track = this.#project.tracks[trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${trackId}`);
+    const current =
+      track.extensions !== null &&
+      typeof track.extensions === 'object' &&
+      !Array.isArray(track.extensions)
+        ? track.extensions
+        : {};
+    track.extensions = {
+      ...current,
+      [namespace]: structuredClone(value),
+    };
+    return this;
+  }
+
+  public setItemMetadata(itemId: string, metadata: JsonObject): this {
+    const item = this.#project.items[itemId];
+    if (item === undefined) throw new ReferenceError(`Unknown Item: ${itemId}`);
+    item.metadata = structuredClone(metadata);
+    return this;
+  }
+
+  /** Add a first-class still image Clip backed by an image Asset. */
+  public addImageClip(options: AddImageClipOptions): string {
+    const track = this.#project.tracks[options.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${options.trackId}`);
+    if (track.kind !== 'visual') throw new TypeError('image clips require a visual Track');
+    const asset = this.#project.assets[options.assetId];
+    if (asset === undefined) throw new ReferenceError(`Unknown Asset: ${options.assetId}`);
+    if (asset.kind !== 'image') throw new TypeError('image clips require an image Asset');
+    const id = options.id ?? this.#nextId('item_image');
+    this.#assertUnused(id);
+    const atUs = options.atUs ?? 0;
+    const durationUs = options.durationUs ?? this.#project.settings.defaultStillDurationUs;
+    assertTime(atUs, 'atUs');
+    assertTime(durationUs, 'durationUs', true);
+    const item: ItemEntity = {
+      id,
+      trackId: track.id,
+      type: 'image',
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      range: { startUs: atUs, durationUs },
+      source: {
+        assetId: options.assetId,
+        stream: { type: 'video', index: 0 },
+        sourceRange: { startUs: 0, durationUs },
+        timeMapping: {
+          type: 'linear',
+          rate: { numerator: 1, denominator: 1 },
+          reverse: false,
+          boundary: 'hold',
+        },
+      },
+      visual: this.#visual(options.fit ?? 'contain', options.opacity ?? 1),
+      materialInstanceIds: [],
+    };
+    this.#project.items[id] = item;
+    track.itemIds.push(id);
+    return id;
+  }
+
+  public addTextClip(options: AddTextClipOptions): string {
+    const track = this.#project.tracks[options.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${options.trackId}`);
+    if (track.kind !== 'visual') throw new TypeError('text clips require a visual Track');
+    const id = options.id ?? this.#nextId('item_text');
+    this.#assertUnused(id);
+    const atUs = options.atUs ?? 0;
+    assertTime(atUs, 'atUs');
+    assertTime(options.durationUs, 'durationUs', true);
+    if (options.text.length > 1_000_000) throw new RangeError('text exceeds 1,000,000 characters');
+    if (
+      options.runs !== undefined &&
+      (options.runs.length === 0 || options.runs.map(run => run.text).join('') !== options.text)
+    ) {
+      throw new TypeError('text runs must be non-empty and concatenate to text');
+    }
+    const sequence = this.#sequence();
+    const format = sequence.format as JsonObject;
+    const width = typeof format.width === 'number' ? format.width : 1920;
+    const height = typeof format.height === 'number' ? format.height : 1080;
+    const box = options.box ?? {
+      x: width * 0.1,
+      y: height * 0.1,
+      width: width * 0.8,
+      height: height * 0.8,
+    };
+    this.#assertBox(box);
+    const item: ItemEntity = {
+      id,
+      trackId: track.id,
+      type: 'text',
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      range: { startUs: atUs, durationUs: options.durationUs },
+      box: { ...box },
+      overflow: options.overflow ?? 'auto-fit',
+      writingMode: options.writingMode ?? 'horizontal-tb',
+      paragraphs: [
+        {
+          style: options.paragraphStyle ?? {},
+          runs: options.runs?.map(run => ({
+            text: run.text,
+            style: {
+              ...(options.style ?? {
+                fontFamilies: ['sans-serif'],
+                fontSizePx: 48,
+                fontWeight: 400,
+                fill: '#ffffff',
+              }),
+              ...(run.style ?? {}),
+            },
+          })) ?? [
+            {
+              text: options.text,
+              style: options.style ?? {
+                fontFamilies: ['sans-serif'],
+                fontSizePx: 48,
+                fontWeight: 400,
+                fill: '#ffffff',
+              },
+            },
+          ],
+        },
+      ],
+      visual: this.#visual('none', options.opacity ?? 1),
+      materialInstanceIds: [],
+    };
+    this.#project.items[id] = item;
+    track.itemIds.push(id);
+    return id;
+  }
+
+  public addCaptionClip(options: AddCaptionClipOptions): string {
+    const track = this.#project.tracks[options.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${options.trackId}`);
+    if (track.kind !== 'caption') throw new TypeError('caption clips require a caption Track');
+    const id = options.id ?? this.#nextId('item_caption');
+    this.#assertUnused(id);
+    const atUs = options.atUs ?? 0;
+    assertTime(atUs, 'atUs');
+    assertTime(options.durationUs, 'durationUs', true);
+    if (options.text.length > 1_000_000) {
+      throw new RangeError('caption text exceeds 1,000,000 characters');
+    }
+    const sequence = this.#sequence();
+    const format = sequence.format as JsonObject;
+    const width = typeof format.width === 'number' ? format.width : 1920;
+    const height = typeof format.height === 'number' ? format.height : 1080;
+    const box = options.box ?? {
+      x: width * 0.1,
+      y: height * 0.72,
+      width: width * 0.8,
+      height: height * 0.2,
+    };
+    this.#assertBox(box);
+    const item: ItemEntity = {
+      id,
+      trackId: track.id,
+      type: 'caption',
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      range: { startUs: atUs, durationUs: options.durationUs },
+      text: options.text,
+      box: { ...box },
+      style: options.style ?? {
+        fontFamilies: ['sans-serif'],
+        fontSizePx: 42,
+        fontWeight: 600,
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeWidthPx: 2,
+        align: 'center',
+      },
+      overflow: options.overflow ?? 'auto-fit',
+      ...(options.cueSettings === undefined ? {} : { cueSettings: options.cueSettings }),
+      visual: this.#visual('none', 1),
+      materialInstanceIds: [],
+    };
+    this.#project.items[id] = item;
+    track.itemIds.push(id);
+    return id;
+  }
+
+  public addShapeClip(options: AddShapeClipOptions): string {
+    const track = this.#project.tracks[options.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${options.trackId}`);
+    if (track.kind !== 'visual') throw new TypeError('shape clips require a visual Track');
+    const id = options.id ?? this.#nextId('item_shape');
+    this.#assertUnused(id);
+    const atUs = options.atUs ?? 0;
+    assertTime(atUs, 'atUs');
+    assertTime(options.durationUs, 'durationUs', true);
+    this.#assertBox(options.box);
+    if (options.strokeWidthPx !== undefined) {
+      assertFiniteNumber(options.strokeWidthPx, 'strokeWidthPx');
+    }
+    if (options.cornerRadiusPx !== undefined) {
+      assertFiniteNumber(options.cornerRadiusPx, 'cornerRadiusPx');
+    }
+    if (options.kind === 'polygon' && (options.points?.length ?? 0) < 3) {
+      throw new RangeError('polygon shapes require at least three points');
+    }
+    const item: ItemEntity = {
+      id,
+      trackId: track.id,
+      type: 'shape',
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      range: { startUs: atUs, durationUs: options.durationUs },
+      shape: {
+        kind: options.kind,
+        box: { ...options.box },
+        fill: this.#color(options.fill),
+        ...(options.stroke === undefined ? {} : { stroke: this.#color(options.stroke) }),
+        ...(options.strokeWidthPx === undefined ? {} : { strokeWidthPx: options.strokeWidthPx }),
+        ...(options.cornerRadiusPx === undefined ? {} : { cornerRadiusPx: options.cornerRadiusPx }),
+        ...(options.points === undefined
+          ? {}
+          : { points: options.points.map(point => ({ ...point })) }),
+      },
+      visual: this.#visual('none', options.opacity ?? 1),
+      materialInstanceIds: [],
+    };
+    this.#project.items[id] = item;
+    track.itemIds.push(id);
+    return id;
+  }
+
+  public addMaterialInstance(options: AddMaterialInstanceOptions): string {
+    const id = options.id ?? this.#nextId('material');
+    this.#assertUnused(id);
+    if (!/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/u.test(options.packageId)) {
+      throw new TypeError('packageId is invalid');
+    }
+    if (
+      !/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/u.test(
+        options.packageVersion,
+      )
+    ) {
+      throw new TypeError('packageVersion must be valid SemVer');
+    }
+    if (!/^sha256:[0-9a-f]{64}$/u.test(options.packageIntegrity)) {
+      throw new TypeError('packageIntegrity must be a sha256 integrity value');
+    }
+    if (!/^[A-Za-z][A-Za-z0-9_-]*$/u.test(options.materialId)) {
+      throw new TypeError('materialId is invalid');
+    }
+    if (
+      options.randomSeed !== undefined &&
+      (!Number.isInteger(options.randomSeed) ||
+        options.randomSeed < 0 ||
+        options.randomSeed > 4_294_967_295)
+    ) {
+      throw new RangeError('randomSeed must be a uint32');
+    }
+    const instance: MaterialInstanceEntity = {
+      id,
+      definition: {
+        packageId: options.packageId,
+        packageVersion: options.packageVersion,
+        packageIntegrity: options.packageIntegrity,
+        materialId: options.materialId,
+      },
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      previewPolicy: options.previewPolicy ?? 'required',
+      parameters: options.parameters ?? {},
+      ...(options.resourceBindings === undefined
+        ? {}
+        : { resourceBindings: options.resourceBindings }),
+      ...(options.inputBindings === undefined ? {} : { inputBindings: options.inputBindings }),
+      ...(options.randomSeed === undefined ? {} : { randomSeed: options.randomSeed }),
+    };
+    this.#project.materialInstances[id] = instance;
+    return id;
+  }
+
+  public attachEffect(itemId: string, materialInstanceId: string): this {
+    const item = this.#project.items[itemId];
+    if (item === undefined) throw new ReferenceError(`Unknown Item: ${itemId}`);
+    if (this.#project.materialInstances[materialInstanceId] === undefined) {
+      throw new ReferenceError(`Unknown MaterialInstance: ${materialInstanceId}`);
+    }
+    if (!item.materialInstanceIds.includes(materialInstanceId)) {
+      item.materialInstanceIds.push(materialInstanceId);
+    }
+    return this;
+  }
+
+  public addTransition(options: AddTransitionOptions): string {
+    const from = this.#project.items[options.fromItemId];
+    const to = this.#project.items[options.toItemId];
+    if (from === undefined) throw new ReferenceError(`Unknown Item: ${options.fromItemId}`);
+    if (to === undefined) throw new ReferenceError(`Unknown Item: ${options.toItemId}`);
+    if (from.trackId !== to.trackId) throw new TypeError('Transition Items must share a Track');
+    const track = this.#project.tracks[from.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${from.trackId}`);
+    if (this.#project.materialInstances[options.materialInstanceId] === undefined) {
+      throw new ReferenceError(`Unknown MaterialInstance: ${options.materialInstanceId}`);
+    }
+    assertTime(options.atUs, 'atUs');
+    assertTime(options.durationUs, 'durationUs', true);
+    const id = options.id ?? this.#nextId('transition');
+    this.#assertUnused(id);
+    const transition: TransitionEntity = {
+      id,
+      sequenceId: this.sequenceId,
+      trackId: track.id,
+      kind: track.kind === 'audio' ? 'audio' : 'visual',
+      fromItemId: from.id,
+      toItemId: to.id,
+      range: { startUs: options.atUs, durationUs: options.durationUs },
+      materialInstanceId: options.materialInstanceId,
+    };
+    this.#project.transitions[id] = transition;
+    this.#sequence().transitionIds.push(id);
+    return id;
+  }
+
+  public setMask(itemId: string, options: SetMaskOptions): this {
+    const item = this.#project.items[itemId];
+    const source = this.#project.items[options.sourceItemId];
+    if (item === undefined) throw new ReferenceError(`Unknown Item: ${itemId}`);
+    if (source === undefined) throw new ReferenceError(`Unknown Item: ${options.sourceItemId}`);
+    const visual = (item as JsonObject).visual;
+    if (visual === null || typeof visual !== 'object' || Array.isArray(visual)) {
+      throw new TypeError(`${itemId} is not a visual Item`);
+    }
+    const featherPx = options.featherPx ?? 0;
+    assertFiniteNumber(featherPx, 'featherPx');
+    if (featherPx < 0 || featherPx > 4096) {
+      throw new RangeError('featherPx must be from 0 to 4096');
+    }
+    (visual as JsonObject).mask = {
+      sourceItemId: options.sourceItemId,
+      channel: options.channel ?? 'alpha',
+      invert: options.invert ?? false,
+      featherPx,
+      space: options.space ?? 'canvas',
+      consumeSource: options.consumeSource ?? true,
+    };
+    return this;
+  }
+
+  public setVisual(itemId: string, options: SetVisualOptions): this {
+    const item = this.#project.items[itemId];
+    if (item === undefined) throw new ReferenceError(`Unknown Item: ${itemId}`);
+    const entity = item as JsonObject;
+    const visual = entity.visual;
+    if (visual === null || typeof visual !== 'object' || Array.isArray(visual)) {
+      throw new TypeError(`${itemId} is not a visual Item`);
+    }
+    const target = visual as JsonObject;
+    if (options.fit !== undefined) target.fit = options.fit;
+    if (options.opacity !== undefined) {
+      assertFiniteNumber(options.opacity, 'opacity');
+      if (options.opacity < 0 || options.opacity > 1) {
+        throw new RangeError('opacity must be from 0 to 1');
+      }
+      target.opacity = options.opacity;
+    }
+    if (options.blendMode !== undefined) target.blendMode = options.blendMode;
+    const transform = target.transform;
+    if (transform === null || typeof transform !== 'object' || Array.isArray(transform)) {
+      throw new TypeError(`${itemId} has no visual transform`);
+    }
+    const transformTarget = transform as JsonObject;
+    const assignPoint = (
+      key: 'positionPx' | 'anchor' | 'scale' | 'skewDeg',
+      value: { readonly x: number; readonly y: number } | undefined,
+    ): void => {
+      if (value === undefined) return;
+      assertFiniteNumber(value.x, `${key}.x`);
+      assertFiniteNumber(value.y, `${key}.y`);
+      transformTarget[key] = { x: value.x, y: value.y };
+    };
+    assignPoint('positionPx', options.positionPx);
+    assignPoint('anchor', options.anchor);
+    assignPoint('scale', options.scale);
+    assignPoint('skewDeg', options.skewDeg);
+    if (options.rotationDeg !== undefined) {
+      assertFiniteNumber(options.rotationDeg, 'rotationDeg');
+      transformTarget.rotationDeg = options.rotationDeg;
+    }
+    return this;
+  }
+
+  public setKeyframes(
+    itemId: string,
+    property: ClipAnimatableProperty,
+    keyframes: readonly Keyframe[],
+  ): this {
+    const item = this.#project.items[itemId];
+    if (item === undefined) throw new ReferenceError(`Unknown Item: ${itemId}`);
+    if (keyframes.length === 0) throw new RangeError('keyframes must not be empty');
+    const sorted = [...keyframes].sort((left, right) => left.timeUs - right.timeUs);
+    sorted.forEach((keyframe, index) => {
+      assertTime(keyframe.timeUs, `keyframes[${index.toString()}].timeUs`);
+      if (index > 0 && sorted[index - 1]?.timeUs === keyframe.timeUs) {
+        throw new RangeError('keyframe times must be unique');
+      }
+    });
+    const animation: JsonObject = {
+      animation: {
+        timeSpace: 'item',
+        preInfinity: 'hold',
+        postInfinity: 'hold',
+        keyframes: sorted.map(keyframe => ({
+          timeUs: keyframe.timeUs,
+          value: keyframe.value,
+          interpolation: keyframe.interpolation ?? 'linear',
+          ...(keyframe.easing === undefined ? {} : { easing: keyframe.easing }),
+        })),
+      },
+    };
+    const entity = item as JsonObject;
+    if (property === 'gain' || property === 'pan') {
+      const audio = entity.audio;
+      if (audio === null || typeof audio !== 'object' || Array.isArray(audio)) {
+        throw new TypeError(`${itemId} is not an audio Item`);
+      }
+      (audio as JsonObject)[property === 'gain' ? 'gainDb' : 'pan'] = animation;
+      return this;
+    }
+    const visual = entity.visual;
+    if (visual === null || typeof visual !== 'object' || Array.isArray(visual)) {
+      throw new TypeError(`${itemId} is not a visual Item`);
+    }
+    if (property === 'opacity') {
+      (visual as JsonObject).opacity = animation;
+      return this;
+    }
+    const transform = (visual as JsonObject).transform;
+    if (transform === null || typeof transform !== 'object' || Array.isArray(transform)) {
+      throw new TypeError(`${itemId} has no visual transform`);
+    }
+    const field =
+      property === 'position' ? 'positionPx' : property === 'scale' ? 'scale' : 'rotationDeg';
+    (transform as JsonObject)[field] = animation;
+    return this;
   }
 
   public async importMedia(options: ImportMediaOptions): Promise<ImportedMedia> {
@@ -513,6 +1120,41 @@ export class ProjectBuilder {
     }
     const existing = Object.values(this.#project.tracks).find(track => track.kind === kind);
     return existing?.id ?? this.addTrack({ kind });
+  }
+
+  #assertBox(box: ClipBox): void {
+    assertFiniteNumber(box.x, 'box.x');
+    assertFiniteNumber(box.y, 'box.y');
+    assertFiniteNumber(box.width, 'box.width');
+    assertFiniteNumber(box.height, 'box.height');
+    if (box.width <= 0 || box.height <= 0) {
+      throw new RangeError('box width and height must be positive');
+    }
+  }
+
+  #color(value: string | readonly [number, number, number, number]): JsonObject {
+    let rgba: readonly number[];
+    if (typeof value === 'string') {
+      if (!/^#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$/u.test(value)) {
+        throw new TypeError('color strings must be #RRGGBB or #RRGGBBAA');
+      }
+      const channel = (offset: number): number =>
+        Number.parseInt(value.slice(offset, offset + 2), 16) / 255;
+      const linear = (channelValue: number): number =>
+        channelValue <= 0.04045 ? channelValue / 12.92 : ((channelValue + 0.055) / 1.055) ** 2.4;
+      rgba = [
+        linear(channel(1)),
+        linear(channel(3)),
+        linear(channel(5)),
+        value.length === 9 ? channel(7) : 1,
+      ];
+    } else {
+      rgba = value;
+    }
+    if (rgba.length !== 4 || rgba.some(channelValue => !Number.isFinite(channelValue))) {
+      throw new TypeError('color must contain four finite channels');
+    }
+    return { space: 'srgb-linear', rgba: [...rgba] };
   }
 
   #visual(fit: NonNullable<AddMediaClipOptions['fit']>, opacity: number): JsonObject {

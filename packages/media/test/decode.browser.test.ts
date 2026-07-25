@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   BlobRangeReader,
+  createVideoFrameDecodeSessionFromReader,
   createSampleIndex,
   decodeAudioPcmRange,
   decodeAudioPcmRangeFromReader,
   decodeVideoFrameAt,
   decodeVideoFrameAtFromReader,
   resolveVideoSeek,
+  videoDecoderResourceSnapshot,
 } from '../src/index.js';
 
 async function fixture(path: string): Promise<Uint8Array> {
@@ -71,6 +73,64 @@ describe('WebCodecs exact seek', () => {
     await expect(decodeVideoFrameAt(bytes, 0, { streamIndex: 1 })).rejects.toThrow(
       'Requested video stream does not exist',
     );
+  });
+
+  it('reuses one bounded decoder session for sequential frames and restarts after eviction', async () => {
+    const bytes = await fixture('mp4-moov-head-h264-aac.mp4');
+    const reader = new BlobRangeReader('persistent-session', new Blob([bytes]));
+    const index = await createSampleIndex(bytes);
+    const video = index.tracks.find(track => track.kind === 'video');
+    if (video === undefined) throw new Error('Fixture has no video');
+    const samples = index.samples[video.id];
+    const order = index.presentationOrder[video.id];
+    if (samples === undefined || order === undefined)
+      throw new Error('Fixture has no sample index');
+    const timestamps = order
+      .slice(0, 8)
+      .map(sampleIndex => samples[sampleIndex]?.presentationTimestampUs)
+      .filter((value): value is number => value !== undefined);
+    const baseline = videoDecoderResourceSnapshot();
+    const session = createVideoFrameDecodeSessionFromReader(reader, index, {
+      maxCachedFrames: 3,
+      maxCachedBytes: 4 * 1_024 * 1_024,
+      maxSequentialGapUs: 1_000_000,
+    });
+
+    try {
+      for (const timestampUs of timestamps) {
+        const decoded = await session.frameAt(timestampUs);
+        try {
+          expect(decoded.timestampUs).toBe(timestampUs);
+        } finally {
+          decoded.close();
+        }
+      }
+      const warm = await session.frameAt(timestamps.at(-1) ?? 0);
+      warm.close();
+      const beforeBackwardSeek = session.snapshot();
+      expect(beforeBackwardSeek).toMatchObject({
+        cacheHits: 1,
+        seeks: 1,
+        cachedFrames: 3,
+        active: true,
+      });
+      expect(beforeBackwardSeek.sequentialFrames).toBeGreaterThan(0);
+      expect(beforeBackwardSeek.cachedBytes).toBeLessThanOrEqual(4 * 1_024 * 1_024);
+
+      const backward = await session.frameAt(timestamps[0] ?? 0);
+      backward.close();
+      expect(session.snapshot().seeks).toBe(2);
+    } finally {
+      session.dispose();
+    }
+
+    expect(session.snapshot()).toMatchObject({
+      cachedFrames: 0,
+      cachedBytes: 0,
+      active: false,
+      disposed: true,
+    });
+    expect(videoDecoderResourceSnapshot()).toEqual(baseline);
   });
 
   it.each(['mp4-moov-head-h264-aac.mp4', 'webm-vp9-opus-vfr.webm'])(

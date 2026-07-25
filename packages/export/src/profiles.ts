@@ -79,31 +79,52 @@ export interface ExportProfileSupport {
   readonly reasons: readonly string[];
 }
 
-async function encoderSupport(profile: ExportProfile): Promise<ExportProfileSupport> {
+export interface ExportCapabilityProbeOptions {
+  readonly width?: number;
+  readonly height?: number;
+  readonly framerate?: number;
+  readonly sampleRate?: number;
+  readonly numberOfChannels?: number;
+  readonly videoBitrate?: number;
+  readonly audioBitrate?: number;
+}
+
+async function encoderSupport(
+  profile: ExportProfile,
+  options: ExportCapabilityProbeOptions = {},
+): Promise<ExportProfileSupport> {
   const reasons: string[] = [];
   if (profile.videoCodec !== undefined) {
     if (typeof VideoEncoder !== 'function') reasons.push('EXPORT_VIDEO_ENCODER_UNAVAILABLE');
     else {
-      const supported = await VideoEncoder.isConfigSupported({
-        codec: profile.videoCodec,
-        width: 1280,
-        height: 720,
-        bitrate: 4_000_000,
-        framerate: 30,
-      });
-      if (!supported.supported) reasons.push('EXPORT_VIDEO_CONFIG_UNSUPPORTED');
+      try {
+        const supported = await VideoEncoder.isConfigSupported({
+          codec: profile.videoCodec,
+          width: options.width ?? 1_280,
+          height: options.height ?? 720,
+          bitrate: options.videoBitrate ?? 4_000_000,
+          framerate: options.framerate ?? 30,
+        });
+        if (!supported.supported) reasons.push('EXPORT_VIDEO_CONFIG_UNSUPPORTED');
+      } catch {
+        reasons.push('EXPORT_VIDEO_CONFIG_PROBE_FAILED');
+      }
     }
   }
   if (profile.audioCodec !== undefined) {
     if (typeof AudioEncoder !== 'function') reasons.push('EXPORT_AUDIO_ENCODER_UNAVAILABLE');
     else {
-      const supported = await AudioEncoder.isConfigSupported({
-        codec: profile.audioCodec,
-        sampleRate: 48_000,
-        numberOfChannels: 2,
-        bitrate: 128_000,
-      });
-      if (!supported.supported) reasons.push('EXPORT_AUDIO_CONFIG_UNSUPPORTED');
+      try {
+        const supported = await AudioEncoder.isConfigSupported({
+          codec: profile.audioCodec,
+          sampleRate: options.sampleRate ?? 48_000,
+          numberOfChannels: options.numberOfChannels ?? 2,
+          bitrate: options.audioBitrate ?? 128_000,
+        });
+        if (!supported.supported) reasons.push('EXPORT_AUDIO_CONFIG_UNSUPPORTED');
+      } catch {
+        reasons.push('EXPORT_AUDIO_CONFIG_PROBE_FAILED');
+      }
     }
   }
   if (profile.kind === 'still' && typeof OffscreenCanvas !== 'function') {
@@ -115,11 +136,15 @@ async function encoderSupport(profile: ExportProfile): Promise<ExportProfileSupp
   return { profile, supported: reasons.length === 0, reasons };
 }
 
-export async function probeExportProfiles(): Promise<readonly ExportProfileSupport[]> {
-  return Promise.all(Object.values(EXPORT_PROFILES).map(encoderSupport));
+export async function probeExportProfiles(
+  options: ExportCapabilityProbeOptions = {},
+): Promise<readonly ExportProfileSupport[]> {
+  return Promise.all(
+    Object.values(EXPORT_PROFILES).map(profile => encoderSupport(profile, options)),
+  );
 }
 
-export interface SelectExportProfileOptions {
+export interface SelectExportProfileOptions extends ExportCapabilityProbeOptions {
   readonly preferred: ExportProfileId;
   readonly fallbacks?: readonly ExportProfileId[];
   readonly remoteAvailable?: boolean;
@@ -139,7 +164,11 @@ export async function selectExportProfile(
   );
   const attempts: ExportProfileSupport[] = [];
   for (const id of ids) {
-    const support = await encoderSupport(EXPORT_PROFILES[id]);
+    const profile = (EXPORT_PROFILES as Partial<Record<string, ExportProfile>>)[id];
+    if (profile === undefined) {
+      throw new RangeError(`Unknown export profile ${String(id)}`);
+    }
+    const support = await encoderSupport(profile, options);
     attempts.push(support);
     if (support.supported) return { selected: support.profile, execution: 'local', attempts };
   }
