@@ -140,6 +140,93 @@ async function openVideo(file: File, canvas: HTMLCanvasElement) {
 
 更完整的功能与限制说明见[当前能力](https://foyonaczy.github.io/AelionSDK/start/capabilities/)。
 
+## 性能基线
+
+性能数据来自 2026-07-27 的同一台 Windows 参考机：AMD Ryzen 5 7500F（6 核
+12 线程）、NVIDIA GeForce RTX 5060 Ti、32 GiB 内存、Google Chrome
+150.0.7871.186、Node.js 20.20.2。所有浏览器项目在 cross-origin isolated
+的全新 Headless Chrome 页面中串行运行；p50/p95 均由报告中保留的原始样本按
+nearest-rank 计算。
+
+这些数字是当前提交的回归基线，不是跨设备排行榜。WebCodecs 会受到浏览器版本、
+驱动、硬件编码器策略、温度和电源模式影响，使用 Aelion 的产品应在自己的目标设备
+和真实素材上重新测量。
+
+### 合成、编译和导出
+
+| 项目                                 | 结果                                                     |
+| ------------------------------------ | -------------------------------------------------------- |
+| 720p、单 pass、WebGL2                | 帧调用 p50 0.25 ms，p95 0.33 ms                          |
+| 1080p、单 pass、WebGL2               | 帧调用 p50 0.37 ms，p95 0.97 ms                          |
+| 1080p、单 pass、WebGPU               | 帧调用 p50 4.36 ms，p95 8.41 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2     | 帧调用 p50 0.40 ms，p95 1.34 ms                          |
+| 4K、单 pass、WebGL2                  | 帧调用 p50 1.06 ms，p95 1.38 ms                          |
+| 1,000 clips / 32 tracks 冷编译       | p50 23.42 ms，p95 31.73 ms                               |
+| 1,000 clips / 32 tracks 增量重复编译 | p50 23.05 ms，p95 33.47 ms                               |
+| 单音轨 1,024-frame 音频块            | p95 0.62 ms，整体约 52.0× 实时                           |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps  | 两次导出 p50 394.38 ms，平均约 7.58× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps  | 两次导出 p50 377.66 ms，平均约 7.92× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps    | 508.33 ms，约 1.97× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps    | 运行时拒绝 `avc1.640028`，本机当前不可用                 |
+| OPFS 顺序写入，16 个 1 MiB 块        | 约 251 MiB/s；Memory Sink 约 5.7 GiB/s                   |
+| 1080p WebGL2 180 帧 soak             | 前半 p95 0.99 ms，后半 p95 0.94 ms，dispose 后无 pending |
+
+合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
+时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
+mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入媒体解码。因此
+1080p 的 7.5×–8× 是编码管线基线，不应当直接当作真实多轨工程的导出速度。
+
+同页公开 Profile preflight 中，WebM/VP9/Opus 在 14.24 ms 后通过；MP4/H.264/AAC
+在 29.49 ms 后返回 `EXPORT_AUDIO_CONFIG_UNSUPPORTED`。底层 `exportMp4()` 的
+1080p 样本确实完成并通过 MP4 header 校验，但公开 Session Profile 在本机仍会被
+AAC 运行时探针拒绝，因此上表不能解释为 MP4 公共路径已经可用。
+
+### 真实媒体和端到端工程
+
+五种公开 fixture 覆盖 moov 头/尾 MP4、fragmented MP4、非零 PTS MP4 和
+VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.61–6.32 ms，最慢
+cold seek p95 为 14.37 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
+
+60 秒 Alpha 工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
+外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
+16.51 秒，即约 3.63× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
+偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
+导出更接近完整调用链，但分辨率较低，不能用于推断 1080p 成片速度。
+
+### Aelion、WebAV 与 Diffusion Studio Core 同机调用延迟
+
+同页竞品基准使用两路 320×180 H.264/B-frame 素材，缩放到 1080p，叠加富文本
+和 500 ms dissolve。结果是 API 调用返回延迟，不是长视频导出速度：
+
+| 引擎                        | 连续预览 p95 | warm seek p95 |
+| --------------------------- | -----------: | ------------: |
+| Aelion                      |     13.16 ms |       8.30 ms |
+| WebAV 1.2.8                 |     33.94 ms |      68.31 ms |
+| Diffusion Studio Core 4.0.3 |      0.18 ms |       0.19 ms |
+
+三者的缓存、GPU readback 和 `seek()` 完成语义不同；Diffusion 的低调用耗时尤其
+不能单独证明最终像素已经以相同方式完成。该基准只适合监控同一环境、同一脚本下的
+回归趋势，详细限制见[同机竞品基准](https://foyonaczy.github.io/AelionSDK/production/competitor-benchmark/)。
+
+### 复现与原始数据
+
+```bash
+corepack pnpm report:performance
+corepack pnpm report:seek
+corepack pnpm report:alpha
+corepack pnpm bench:competitors -- \
+  --competitor-node-modules /absolute/path/to/node_modules
+```
+
+- [`performance-1080p30-chromium.json`](reports/baseline/performance-1080p30-chromium.json)：codec/WebGPU 能力、分辨率与 pass 矩阵、10/100/1,000 clip 编译、音频、WebM/MP4/4K 导出、Memory/OPFS、10 分钟 PCM 和 compositor soak；
+- [`media-seek-chromium.json`](reports/baseline/media-seek-chromium.json)：五种真实容器的索引、cold/warm seek、解码包数和资源归零；
+- [`alpha-60s.json`](reports/baseline/alpha-60s.json) 与 [`alpha-60s.webm`](reports/baseline/alpha-60s.webm)：60 秒端到端工程、成片 hash 和 FFmpeg 回读；
+- [`competitor-benchmark-chromium.json`](reports/baseline/competitor-benchmark-chromium.json)：三引擎同机原始样本、版本与环境。
+
+浏览器 JavaScript heap 不包含多数 decoder surface、GPU texture 和浏览器进程
+内存；10 分钟 PCM 是资源上限模拟，不是 10 分钟真实视频导出。当前报告也不构成
+Safari、移动端、HDR、10-bit 或 4K H.264 认证。
+
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于 Alpha。使用前需要了解这些边界：
