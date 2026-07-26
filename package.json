@@ -55,6 +55,8 @@
     "schemas:update": "node scripts/check-default-schemas.mjs --write && node scripts/check-material-sdk-schemas.mjs --write && prettier --write packages/sdk/src/default-schemas.ts packages/material-sdk/src/bundled-schemas.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:browser:firefox": "vitest run --config vitest.firefox.config.ts",
+    "test:browser:webkit": "vitest run --config vitest.webkit.config.ts",
+    "test:browser:mobile": "vitest run --config vitest.mobile.config.ts",
     "test:golden": "vitest run --config vitest.golden.config.ts",
     "test:security": "vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts",
     "test:soak": "vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts",

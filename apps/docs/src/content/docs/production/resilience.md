@@ -75,6 +75,34 @@ const unsubscribe = session.subscribe('diagnostic', ({ diagnostic }) => {
 
 重试必须有次数上限、退避、AbortSignal，并在开始前重新获取输入和 preflight。对同一个 closed Sink 重试没有意义。
 
+## 跨刷新恢复导出
+
+连续 MP4/WebM 不能从任意 container byte offset 安全续写，因此本地 muxed profile
+失败后从头重启。可独立提交的静帧、分片或业务 upload unit 使用 checkpoint runner：
+
+```ts
+import { BrowserStorageExportCheckpointStore, runCheckpointedExport } from '@aelion/export';
+
+const store = new BrowserStorageExportCheckpointStore({
+  namespace: 'my-editor-export',
+});
+
+await runCheckpointedExport({
+  key: jobId,
+  contentId,
+  profileId: 'still-png',
+  totalUnits,
+  store,
+  processUnit: uploadOneIdempotentUnit,
+});
+```
+
+checkpoint 只在一个 unit 原子提交后前进；`processUnit` 必须对
+`(contentId, profileId, unitIndex)` 幂等。新的 store 实例会从 localStorage 读回
+最后提交位置。远程链路使用相同思想：manifest content ID、revision、profile 与
+idempotency key 绑定结果，重连/重试必须向 Provider 发送同一个身份，不能把另一份
+结果冒充为本任务。
+
 ## Revision 冲突怎么恢复
 
 命令基于旧 snapshot 时：

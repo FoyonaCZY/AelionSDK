@@ -10,6 +10,8 @@ description: 根据交付场景选择 MP4、WebM、图片、GIF、WAV、本地�
 | Profile         | 文件          | 适合什么场景                                  |
 | --------------- | ------------- | --------------------------------------------- |
 | `mp4-h264-aac`  | H.264/AAC MP4 | 社交平台、下载交付、通用播放器                |
+| `mp4-av1-aac`   | AV1/AAC MP4   | 支持该 encoder 的现代环境、较高压缩效率       |
+| `mp4-hevc-aac`  | HEVC/AAC MP4  | 支持该 encoder 的 Apple/硬件交付链路          |
 | `webm-vp9-opus` | VP9/Opus WebM | Web 播放、开放格式流程、Chromium/Firefox 环境 |
 | `still-png`     | PNG           | 无损截图、带清晰文字的静帧                    |
 | `still-jpeg`    | JPEG          | 照片类封面和较小文件                          |
@@ -17,7 +19,9 @@ description: 根据交付场景选择 MP4、WebM、图片、GIF、WAV、本地�
 | `animated-gif`  | GIF           | 很短的循环预览，不适合高质量长片              |
 | `audio-wav`     | WAV/RF64      | 混音交付、后续音频处理                        |
 
-MP4 最通用，但浏览器不一定能编码当前分辨率和 AAC。不要通过 UA 或扩展名判断，实际启动前调用 `preflightProfile()`。
+H.264 MP4 的兼容性通常最好，但浏览器不一定能编码当前分辨率和 AAC。AV1/HEVC
+profile 是能力门控选项，不是无条件 fallback。不要通过 UA 或扩展名判断，实际启动前
+调用 `preflightProfile()`，并读取返回的精确 codec string。
 
 ## 一次完整的本地导出
 

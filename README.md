@@ -76,6 +76,21 @@ export default defineConfig({
 });
 ```
 
+非 Vite ESM/CDN 宿主可以把四个运行时入口复制到自己的静态目录，并显式传入 URL；
+SDK 不再要求 bundler 理解 `new URL(..., import.meta.url)`：
+
+```ts
+const session = await Aelion.createSession({
+  media,
+  runtimeAssets: {
+    rendererWorker: '/aelion/webgl2-worker.js',
+    exportWorker: '/aelion/mux-export-worker.js',
+    sharedAudioWorklet: '/aelion/pcm-player.worklet.js',
+    transferableAudioWorklet: '/aelion/pcm-message-player.worklet.js',
+  },
+});
+```
+
 下面这段代码把用户选择的本地文件变成一个可预览的工程：
 
 ```ts
@@ -124,17 +139,17 @@ async function openVideo(file: File, canvas: HTMLCanvasElement) {
 
 ## 已有能力
 
-| 模块       | 目前可以做什么                                                                                         |
-| ---------- | ------------------------------------------------------------------------------------------------------ |
-| 时间线     | 多轨编辑、插入、移动、裁剪、切分、替换、ripple、roll、slip、slide、音视频联动、Marker、关键帧和变速    |
-| 预览与播放 | Canvas 预览、play/pause/seek/scrub、AudioWorklet 音频时钟、自适应画质、WebGL2/WebGPU Worker 合成       |
-| 画面       | 多轨合成、12 种混合模式、mask/matte、文字与字幕、Generator、Adjustment、嵌套 Sequence 和 Material      |
-| 音频       | 多轨混音、gain/pan/fade、mute/solo、声道矩阵、ducking、waveform、响度、true peak 和 limiter            |
-| 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算              |
-| 导出       | H.264/AAC MP4、VP9/Opus WebM、PNG、JPEG、WebP、GIF、WAV/RF64，以及 Memory、OPFS 和自定义 Writable Sink |
-| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                            |
-| 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                         |
-| 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测             |
+| 模块       | 目前可以做什么                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| 时间线     | 多轨编辑、插入、移动、裁剪、切分、替换、ripple、roll、slip、slide、音视频联动、Marker、关键帧和变速     |
+| 预览与播放 | Canvas 预览、play/pause/seek/scrub、AudioWorklet 音频时钟、自适应画质、WebGL2/WebGPU Worker 合成        |
+| 画面       | 多轨合成、12 种混合模式、mask/matte、文字与字幕、Generator、Adjustment、嵌套 Sequence 和 Material       |
+| 音频       | 多轨混音、gain/pan/fade、mute/solo、声道矩阵、保音高变速、ducking、waveform、响度、true peak 和 limiter |
+| 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算               |
+| 导出       | H.264/AV1/HEVC + AAC MP4、VP9/Opus WebM、图片、GIF、WAV/RF64，以及 Memory、OPFS 和自定义 Writable Sink  |
+| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                             |
+| 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                          |
+| 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测              |
 
 编辑操作通过 Transaction 提交。每次成功提交都会产生新的 revision，并可以 Undo/Redo；拖拽或滑块等连续交互可以实时更新，同时只占用一条撤销记录。
 
@@ -154,32 +169,32 @@ nearest-rank 计算。
 
 ### 合成、编译和导出
 
-| 项目                                 | 结果                                                     |
-| ------------------------------------ | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2                | 帧调用 p50 0.25 ms，p95 0.33 ms                          |
-| 1080p、单 pass、WebGL2               | 帧调用 p50 0.37 ms，p95 0.97 ms                          |
-| 1080p、单 pass、WebGPU               | 帧调用 p50 4.36 ms，p95 8.41 ms                          |
-| 1080p、四 pass Soft Glow、WebGL2     | 帧调用 p50 0.40 ms，p95 1.34 ms                          |
-| 4K、单 pass、WebGL2                  | 帧调用 p50 1.06 ms，p95 1.38 ms                          |
-| 1,000 clips / 32 tracks 冷编译       | p50 23.42 ms，p95 31.73 ms                               |
-| 1,000 clips / 32 tracks 增量重复编译 | p50 23.05 ms，p95 33.47 ms                               |
-| 单音轨 1,024-frame 音频块            | p95 0.62 ms，整体约 52.0× 实时                           |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps  | 两次导出 p50 394.38 ms，平均约 7.58× 实时                |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps  | 两次导出 p50 377.66 ms，平均约 7.92× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps    | 508.33 ms，约 1.97× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps    | 运行时拒绝 `avc1.640028`，本机当前不可用                 |
-| OPFS 顺序写入，16 个 1 MiB 块        | 约 251 MiB/s；Memory Sink 约 5.7 GiB/s                   |
-| 1080p WebGL2 180 帧 soak             | 前半 p95 0.99 ms，后半 p95 0.94 ms，dispose 后无 pending |
+| 项目                                | 结果                                                     |
+| ----------------------------------- | -------------------------------------------------------- |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.26 ms，p95 0.34 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.37 ms，p95 1.09 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.78 ms，p95 1.16 ms（WebGL2 的 1.05×）       |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.46 ms，p95 1.16 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 1.06 ms，p95 1.16 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 23.59 ms，p95 35.06 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 2.40 ms，p95 3.28 ms（冷编译的 9.4%）                |
+| 单音轨 1,024-frame 音频块           | p95 0.64 ms，整体约 56.8× 实时                           |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 350.22 ms，平均约 8.48× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 394.61 ms，平均约 7.33× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 523.84 ms，约 1.91× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 476.14 ms，`avc1.640033`，约 2.10× 实时                  |
+| OPFS 顺序写入，16 个 1 MiB 块       | 约 475 MiB/s；Memory Sink 约 6.1 GiB/s                   |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 1.24 ms，后半 p95 1.36 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
 mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入媒体解码。因此
 1080p 的 7.5×–8× 是编码管线基线，不应当直接当作真实多轨工程的导出速度。
 
-同页公开 Profile preflight 中，WebM/VP9/Opus 在 14.24 ms 后通过；MP4/H.264/AAC
-在 29.49 ms 后返回 `EXPORT_AUDIO_CONFIG_UNSUPPORTED`。底层 `exportMp4()` 的
-1080p 样本确实完成并通过 MP4 header 校验，但公开 Session Profile 在本机仍会被
-AAC 运行时探针拒绝，因此上表不能解释为 MP4 公共路径已经可用。
+同页公开 Profile preflight 中，WebM、H.264 MP4、AV1 MP4 和 HEVC MP4 全部按
+实际尺寸协商并通过；H.264 在 1080p 选择 `avc1.640028`，4K 选择
+`avc1.640033`。AV1/HEVC 仍是能力门控路径，只有当前浏览器的 WebCodecs 与 muxer
+同时接受精确配置才会开始写入。
 
 ### 真实媒体和端到端工程
 
@@ -187,9 +202,14 @@ AAC 运行时探针拒绝，因此上表不能解释为 MP4 公共路径已经�
 VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.61–6.32 ms，最慢
 cold seek p95 为 14.37 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
 
+新增的真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
+1080p30 用时 687.80 ms（约 1.45× 实时），4K30 用时 993.83 ms（约 1.01×
+实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close；
+1080p 产物还由 FFmpeg 解出 30 个视频帧并完成音频 PCM MD5 回读。
+
 60 秒 Alpha 工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
-16.51 秒，即约 3.63× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
+16.79 秒，即约 3.57× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
 偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
 导出更接近完整调用链，但分辨率较低，不能用于推断 1080p 成片速度。
 
@@ -218,25 +238,27 @@ corepack pnpm bench:competitors -- \
   --competitor-node-modules /absolute/path/to/node_modules
 ```
 
-- [`performance-1080p30-chromium.json`](reports/baseline/performance-1080p30-chromium.json)：codec/WebGPU 能力、分辨率与 pass 矩阵、10/100/1,000 clip 编译、音频、WebM/MP4/4K 导出、Memory/OPFS、10 分钟 PCM 和 compositor soak；
+- [`performance-1080p30-chromium.json`](reports/baseline/performance-1080p30-chromium.json)：codec/WebGPU 能力、分辨率与 pass 矩阵、10/100/1,000 clip 编译、真实媒体 1080p/4K 全链路与 FFmpeg 回读、Memory/OPFS、10 分钟 PCM 和 compositor soak；
 - [`media-seek-chromium.json`](reports/baseline/media-seek-chromium.json)：五种真实容器的索引、cold/warm seek、解码包数和资源归零；
 - [`alpha-60s.json`](reports/baseline/alpha-60s.json) 与 [`alpha-60s.webm`](reports/baseline/alpha-60s.webm)：60 秒端到端工程、成片 hash 和 FFmpeg 回读；
 - [`competitor-benchmark-chromium.json`](reports/baseline/competitor-benchmark-chromium.json)：三引擎同机原始样本、版本与环境。
 
 浏览器 JavaScript heap 不包含多数 decoder surface、GPU texture 和浏览器进程
 内存；10 分钟 PCM 是资源上限模拟，不是 10 分钟真实视频导出。当前报告也不构成
-Safari、移动端、HDR、10-bit 或 4K H.264 认证。
+Safari 真机、实体移动端、HDR 或 10-bit 认证。
 
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于 Alpha。使用前需要了解这些边界：
 
 - 公开包还没有发布到 npm，API 在首个稳定版本前仍可能调整；
-- 自动化测试覆盖桌面 Chromium 和 Firefox，Safari、iOS、Android 尚未完成认证；
+- 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
+  真机、iOS 与 Android 实体设备仍未认证；
 - 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；
 - 4K 可以探测和离线导出，但没有跨设备的 4K30 实时预览承诺；
-- 音频变速目前会同时改变音高，还没有保音高的 time-stretch；
-- 官方构建集成目前是 Vite，其他 bundler 尚未提供适配和兼容性保证。
+- 线性 TimeMap 可以选择 deterministic WSOLA 保音高；非线性 TimeMap 会在
+  schema/validation 阶段拒绝 `pitchPolicy: 'preserve'`；
+- Vite 有官方插件；其他 ESM/CDN 宿主必须显式部署并传入四个 `runtimeAssets` URL。
 
 MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，取决于实际浏览器、操作系统和硬件。产品应在运行时做 capability probe 和 export preflight，而不是只按浏览器名称判断。
 
@@ -273,18 +295,22 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm run ci
 corepack pnpm test:browser
 corepack pnpm test:browser:firefox
+corepack pnpm test:browser:webkit
+corepack pnpm test:browser:mobile
 ```
 
-`pnpm run ci` 会检查格式、文档链接、Schema、类型、单元测试、应用构建和 API Snapshot；浏览器测试分别使用 Chromium 和 Firefox。
+`pnpm run ci` 会检查格式、文档链接、Schema、类型、单元测试、应用构建和 API
+Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共合约和移动触控
+目标。
 
 贡献代码前请阅读[贡献指南](CONTRIBUTING.md)。开发命令、包验证和发布流程见[维护仓库与准备发布](https://foyonaczy.github.io/AelionSDK/project/development/)。
 
 ## 最新验证状态
 
-2026-07-26 在 Windows 参考机上完成了与源清单
-`127b0dd076b5152b3797b366bfb1cd418b902177d1b03c97d21480600ec9865f`
-绑定的串行最终门禁：14/14 个命令通过，门禁前后源清单一致，产物 postflight
-语义校验通过。Chromium 72 项和 Firefox 66 项浏览器测试均为零失败、零跳过；
+2026-07-27 在 Windows 参考机上完成了与源清单
+`c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578`
+绑定的串行最终门禁：18/18 个命令通过，门禁前后源清单一致，产物 postflight
+语义校验通过。Chromium 75 项和 Firefox 67 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、golden、
 benchmark、1080p30 性能、seek 与 60 秒导出外部 FFmpeg readback 均通过。
 

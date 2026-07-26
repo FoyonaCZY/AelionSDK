@@ -7,9 +7,10 @@ import {
   SeekableMemorySink,
 } from '@aelion/export';
 import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
+import { createSampleIndex } from '@aelion/media';
 import { IncrementalRenderCompiler } from '@aelion/render-ir';
 import { WorkerCompositor } from '@aelion/renderer-worker';
-import { createProject } from '@aelion/sdk';
+import { Aelion, ByteMediaProvider, createProject } from '@aelion/sdk';
 import type { AelionProject } from '@aelion/project-schema';
 
 import { measureLongTasksDuring, sliceLongTaskWindow } from './long-task-window.js';
@@ -59,6 +60,12 @@ function memorySnapshot(): Record<string, number | null> {
 
 function nonEmptyOrNull(value: string | undefined): string | null {
   return value === undefined || value.length === 0 ? null : value;
+}
+
+async function bytes(path: string): Promise<Uint8Array> {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`Failed to fetch ${path}: ${response.status.toString()}`);
+  return new Uint8Array(await response.arrayBuffer());
 }
 
 async function codecSupport(): Promise<Record<string, unknown>> {
@@ -144,6 +151,21 @@ async function codecSupport(): Promise<Record<string, unknown>> {
         framerate: 30,
         bitrate: 12_000_000,
       }),
+      av1_1080p30: await video({
+        codec: 'av01.0.08M.08',
+        width: 1_920,
+        height: 1_080,
+        framerate: 30,
+        bitrate: 4_000_000,
+      }),
+      hevc_1080p30: await video({
+        codec: 'hvc1.1.6.L120.B0',
+        width: 1_920,
+        height: 1_080,
+        framerate: 30,
+        bitrate: 4_000_000,
+        hevc: { format: 'hevc' },
+      } as VideoEncoderConfig),
       aacStereo: await audio({
         codec: 'mp4a.40.2',
         sampleRate: 48_000,
@@ -437,7 +459,7 @@ function compilationBenchmark(): Record<string, unknown> {
   ];
   return {
     definition:
-      'Project build is measured once; cold compilation creates a new compiler; warm compilation reuses an immutable baseline with the same revision.',
+      'Project build is measured once; cold compilation creates a new compiler; warm compilation reuses immutable indexes for a new revision with an explicitly empty affected set.',
     cases: cases.map(definition => {
       const buildStarted = performance.now();
       const project = denseProject(definition.clipCount, definition.trackCount);
@@ -456,7 +478,9 @@ function compilationBenchmark(): Record<string, unknown> {
       let warmStats: unknown;
       for (let index = 0; index < definition.warmRuns; index += 1) {
         const started = performance.now();
-        const result = compiler.compile(project, 'main', 0n);
+        const result = compiler.compile(project, 'main', BigInt(index + 1), {
+          affectedEntityIds: [],
+        });
         warmMs.push(performance.now() - started);
         warmStats = result.stats;
       }
@@ -476,7 +500,7 @@ async function profilePreflightBenchmark(): Promise<Record<string, unknown>> {
   const project = denseProject(1, 1);
   const ir = new IncrementalRenderCompiler().compile(project, 'main', 0n).ir;
   const cases = [];
-  for (const profile of ['webm-vp9-opus', 'mp4-h264-aac'] as const) {
+  for (const profile of ['webm-vp9-opus', 'mp4-h264-aac', 'mp4-av1-aac', 'mp4-hevc-aac'] as const) {
     const sink = new SeekableMemorySink();
     const started = performance.now();
     const result = await preflightProfileExport({
@@ -497,6 +521,7 @@ async function profilePreflightBenchmark(): Promise<Record<string, unknown>> {
         message: issue.message,
         recoverable: issue.recoverable,
       })),
+      encoderConfiguration: result.encoderConfiguration ?? null,
     });
     sink.cleanup();
   }
@@ -738,6 +763,146 @@ async function exportMatrixBenchmark(): Promise<Record<string, unknown>> {
   };
 }
 
+async function realMediaPipelineBenchmark(): Promise<Record<string, unknown>> {
+  const input = await bytes('/fixtures/media/mp4-moov-head-h264-aac.mp4');
+  const sourceIndex = await createSampleIndex(input);
+  const definitions = [
+    { id: 'real-mp4-1080p30', width: 1_920, height: 1_080, bitrate: 4_000_000 },
+    { id: 'real-mp4-4k30', width: 3_840, height: 2_160, bitrate: 12_000_000 },
+  ] as const;
+  const cases: Record<string, unknown>[] = [];
+  for (const definition of definitions) {
+    const assetId = 'fixture';
+    const media = new ByteMediaProvider({
+      maxCachedBytes: 4 * 1_024 * 1_024,
+      resolveAssetBytes: () => Promise.resolve(input),
+    });
+    const builder = createProject({
+      projectId: `pipeline_${definition.width.toString()}x${definition.height.toString()}`,
+      sequenceId: 'main',
+      width: definition.width,
+      height: definition.height,
+      frameRate: { numerator: 30, denominator: 1 },
+      durationUs: 1_000_000,
+    });
+    builder.addAsset({
+      id: assetId,
+      kind: 'video',
+      mimeType: 'video/mp4',
+      byteLength: input.byteLength,
+    });
+    const visualTrack = builder.addTrack({ id: 'video', kind: 'visual' });
+    const audioTrack = builder.addTrack({ id: 'audio', kind: 'audio' });
+    builder.addMediaClip({
+      id: 'video-clip',
+      kind: 'video',
+      assetId,
+      trackId: visualTrack,
+      durationUs: 1_000_000,
+      sourceDurationUs: 1_000_000,
+      fit: 'fill',
+    });
+    builder.addMediaClip({
+      id: 'audio-clip',
+      kind: 'audio',
+      assetId,
+      trackId: audioTrack,
+      durationUs: 1_000_000,
+      sourceDurationUs: 1_000_000,
+    });
+    const session = await Aelion.createSession({
+      media,
+      preferredBackend: 'webgl2',
+      allowBackendFallback: false,
+    });
+    const sink = new SeekableMemorySink();
+    const before = memorySnapshot();
+    try {
+      await session.loadProject(builder.build());
+      const preflight = await session.export.preflightProfile({
+        profile: 'mp4-h264-aac',
+        sink: sink.writable,
+        videoBitrate: definition.bitrate,
+        audioBitrate: 128_000,
+      });
+      if (!preflight.ok) {
+        cases.push({
+          ...definition,
+          status: 'unsupported',
+          preflight: {
+            ok: false,
+            issues: preflight.issues.map(issue => ({
+              code: issue.code,
+              message: issue.message,
+            })),
+          },
+        });
+        continue;
+      }
+      const measured = await measureLongTasksDuring(() =>
+        session.export.startProfile({
+          profile: 'mp4-h264-aac',
+          sink: sink.writable,
+          videoBitrate: definition.bitrate,
+          audioBitrate: 128_000,
+        }),
+      );
+      const output = sink.finalize();
+      const outputIndex = await createSampleIndex(output);
+      if (definition.width === 1_920) {
+        Reflect.set(globalThis, '__AELION_PERFORMANCE_MP4_READBACK__', output);
+      }
+      const video = outputIndex.tracks.find(track => track.kind === 'video');
+      const audio = outputIndex.tracks.find(track => track.kind === 'audio');
+      cases.push({
+        ...definition,
+        status: 'completed',
+        stages: ['decode', 'render', 'audio', 'encode', 'mux', 'sink'],
+        elapsedMs: measured.window.elapsedMs,
+        realtimeMultiple: 1_000 / measured.window.elapsedMs,
+        outputBytes: output.byteLength,
+        input: {
+          container: sourceIndex.container,
+          bytes: input.byteLength,
+          videoCodec: sourceIndex.tracks.find(track => track.kind === 'video')?.codecFamily,
+          audioCodec: sourceIndex.tracks.find(track => track.kind === 'audio')?.codecFamily,
+        },
+        output: {
+          container: outputIndex.container,
+          videoCodec: video?.codecFamily,
+          audioCodec: audio?.codecFamily,
+          videoSamples: video === undefined ? 0 : (outputIndex.samples[video.id]?.length ?? 0),
+          audioSamples: audio === undefined ? 0 : (outputIndex.samples[audio.id]?.length ?? 0),
+        },
+        encoderConfiguration:
+          'encoderConfiguration' in measured.value ? measured.value.encoderConfiguration : null,
+        mainThread: measured.window,
+        memory: { before, after: memorySnapshot() },
+      });
+    } catch (error) {
+      sink.cleanup();
+      cases.push({
+        ...definition,
+        status: 'failed',
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message }
+            : { name: 'UnknownError', message: String(error) },
+      });
+    } finally {
+      await session.dispose();
+      media.clear();
+      sink.cleanup();
+    }
+  }
+  return {
+    definition:
+      'Public Session export of a real H.264/AAC MP4 fixture scaled to the stated output resolution; timing includes lazy input decode, Render IR composition, PCM decode/mix, WebCodecs encode, MP4 mux and sink close.',
+    sourceFixture: 'fixtures/media/mp4-moov-head-h264-aac.mp4',
+    cases,
+  };
+}
+
 async function sinkBenchmark(): Promise<Record<string, unknown>> {
   const totalBytes = 16 * 1_024 * 1_024;
   const chunkBytes = 1 * 1_024 * 1_024;
@@ -893,6 +1058,7 @@ async function run(): Promise<Record<string, unknown>> {
   const audio = await audioBenchmark(project);
   const exportResult = await exportBenchmark();
   const exportMatrix = await exportMatrixBenchmark();
+  const realMediaPipeline = await realMediaPipelineBenchmark();
   const storage = await sinkBenchmark();
   const longTimeline = await longTimelineSimulation(project);
   const compositorSoak = await compositorSoakBenchmark(warmFilm);
@@ -909,8 +1075,8 @@ async function run(): Promise<Record<string, unknown>> {
       correctness:
         'frame/audio counts, muxed container signatures, sink final sizes and resource snapshots are checked',
       limitations: [
-        'synthetic export matrix excludes input-media decode',
-        'headless results are not a mobile or Safari certification',
+        'synthetic export matrix excludes input-media decode; realMediaPipeline covers it separately',
+        'headless results are not physical mobile or Safari certification',
         'WebCodecs throughput depends on browser, driver and hardware encoder policy',
         'JavaScript heap excludes most decoder surfaces, GPU textures and browser-process memory',
         'cases execute serially in the recorded order, so thermal and cache effects remain possible',
@@ -932,6 +1098,7 @@ async function run(): Promise<Record<string, unknown>> {
     audio,
     export: exportResult,
     exportMatrix,
+    realMediaPipeline,
     storage,
     longTimeline,
     compositorSoak,

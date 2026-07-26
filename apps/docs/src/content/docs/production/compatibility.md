@@ -22,6 +22,8 @@ Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前�
 | -------------------------- | ----------- | -------------------------------------------------------- |
 | Desktop Chromium           | Tested      | WebGL2、按能力选择 WebGPU、WebCodecs、AudioWorklet、OPFS |
 | Desktop Firefox            | Tested      | WebGL2、按设备选择 WebGPU、WebCodecs、AudioWorklet、OPFS |
+| Playwright WebKit target   | Tested      | 公共 capability/profile 合约与结构化降级                 |
+| 390×844 touch target       | Tested      | 移动 viewport、3× DPR、触控与 capability/profile 合约    |
 | Desktop Safari             | Uncertified | 需要 Safari 真机/自动化、codec、GPU、音频和存储验证      |
 | iPhone / iPad Safari       | Uncertified | 需要前后台、内存、音频 interruption、温控和导出验证      |
 | Android Chromium / WebView | Uncertified | 需要实际 codec、GPU、内存、存储和后台策略验证            |
@@ -40,6 +42,8 @@ Chromium Linux CI 证明固定 smoke 可以运行，不等于所有 Linux 发行
 | MP4/H.264/AAC 输入      | 环境相关               | 实际 probe/decode                 |
 | WebM/VP9/Opus 输入      | 固定语料已测           | 具体素材仍要 probe                |
 | MP4/H.264/AAC 导出      | 环境相关               | `preflightProfile()` + AAC canary |
+| MP4/AV1/AAC 导出        | 环境相关               | 精确 AV1 config + preflight       |
+| MP4/HEVC/AAC 导出       | 环境相关               | 精确 HEVC config + preflight      |
 | WebM/VP9/Opus 导出      | Chromium、Firefox 已测 | 每个 Project preflight            |
 | 图片/GIF                | Canvas 能力相关        | preflight                         |
 | WAV/RF64                | 核心路径已测           | 大文件使用流式 Sink               |
@@ -99,7 +103,9 @@ Content-Type: video/mp4
 
 ## Worker、AudioWorklet 和 CSP
 
-`@aelion/vite-plugin` 会在构建产物中发布 Renderer Worker 和 AudioWorklet JavaScript。部署后用 Network 面板确认：
+`@aelion/vite-plugin` 会在构建产物中发布 Renderer Worker、Export Worker 和
+AudioWorklet JavaScript。非 Vite 宿主通过 `AelionSessionOptions.runtimeAssets`
+传入四个最终 URL。部署后用 Network 面板确认：
 
 - URL 不为 404；
 - Content-Type 是 JavaScript；

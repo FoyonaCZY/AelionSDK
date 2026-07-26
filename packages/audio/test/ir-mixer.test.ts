@@ -74,6 +74,66 @@ describe('Render IR audio mixer and A/V oracle', () => {
     expect(output[1]).toBeCloseTo(output[0] ?? 0, 7);
   });
 
+  it('routes pitchPolicy preserve through deterministic time-stretch instead of varispeed', async () => {
+    const render = (pitchPolicy: 'varispeed' | 'preserve') => {
+      const stretched: RenderIr = {
+        ...ir,
+        tracks: ir.tracks.map(track => ({
+          ...track,
+          clips: track.clips.map(clip =>
+            clip.kind === 'audio-clip'
+              ? {
+                  ...clip,
+                  source: {
+                    ...clip.source,
+                    rate: { numerator: 2, denominator: 1 },
+                    timeMapping: {
+                      type: 'linear' as const,
+                      rate: { numerator: 2, denominator: 1 },
+                      reverse: false,
+                      boundary: 'error' as const,
+                    },
+                  },
+                  audio: { ...clip.audio, pitchPolicy },
+                }
+              : clip,
+          ),
+        })),
+      };
+      return renderIrAudio({
+        ir: stretched,
+        startFrame: 0,
+        frameCount: 4_800,
+        channelCount: 1,
+        source: {
+          pcmRange: (_assetId, _streamIndex, startUs, durationUs) => {
+            const startFrame = Math.floor((startUs * 48_000) / 1_000_000);
+            const frameCount = Math.ceil((durationUs * 48_000) / 1_000_000);
+            return Promise.resolve({
+              sampleRate: 48_000,
+              channelCount: 1,
+              frameCount,
+              interleaved: Float32Array.from({ length: frameCount }, (_, index) =>
+                Math.sin(((startFrame + index) * 2 * Math.PI * 440) / 48_000),
+              ),
+            });
+          },
+        },
+      });
+    };
+    const frequency = (samples: Float32Array): number => {
+      let crossings = 0;
+      for (let index = 1; index < samples.length; index += 1) {
+        if ((samples[index - 1] ?? 0) <= 0 && (samples[index] ?? 0) > 0) crossings += 1;
+      }
+      return crossings / (samples.length / 48_000);
+    };
+    const [varispeed, preserved] = await Promise.all([render('varispeed'), render('preserve')]);
+    expect(frequency(varispeed)).toBeGreaterThan(850);
+    expect(frequency(preserved)).toBeGreaterThan(420);
+    expect(frequency(preserved)).toBeLessThan(460);
+  });
+
   it('renders silence without reading media when an audio track is muted', async () => {
     let reads = 0;
     const muted: RenderIr = {

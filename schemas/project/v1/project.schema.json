@@ -622,8 +622,8 @@
         "fadeInUs": { "$ref": "#/$defs/timeUs" },
         "fadeOutUs": { "$ref": "#/$defs/timeUs" },
         "pitchPolicy": {
-          "const": "varispeed",
-          "description": "Playback rate and direction deterministically change pitch with source time."
+          "enum": ["varispeed", "preserve"],
+          "description": "Varispeed follows source time directly; preserve uses deterministic overlap-add time stretching."
         },
         "channelMap": {
           "type": "array",

@@ -1,19 +1,19 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-26T07:01:23.856Z",
+  "generatedAt": "2026-07-26T18:46:50.876Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
     "package": "@aelion/vite-plugin",
     "version": "0.1.0-alpha.0",
-    "packageSha256": "f88bd45b09813de628813a973004c0b29a8b229193b7ef656964aaf33feba564",
-    "contractSha256": "c3e23ab64c660dad5facf2daa7fd4c3712acae0dc3ab12e02edd5a0b9aba3ec4",
+    "packageSha256": "6b57279abfeed281c2595b7ad9a04c8bc6183bab34fa0f7fbc096be035da6bd7",
+    "contractSha256": "0209250522bbe5cdef9eb86c3275ba0ed4ab9759b950f45796821973503658cb",
     "public": true,
     "zeroConfigVite": false,
     "configuration": "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
     "viteConfigSha256": "385ca60213b3f1bbd910a1aefc27b5921f6280dc48eb33c95750131eea5d8c29",
-    "note": "The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. No repository path aliases or private test transforms are used."
+    "note": "The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. Renderer Worker, Export Worker and both AudioWorklets are served from production chunks; no repository path aliases or private test transforms are used."
   },
   "consumerContract": {
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
@@ -58,20 +58,20 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "261d82abb86af2169f409733e6943abbe666b1f0472230c306b38a5f5af2b0c3",
-    "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
+    "packageJsonSha256": "192075de9f3c982bd1b565ed90081e1d2547a92c1fa94f4d14e3641e337ddc38",
+    "sourceSha256": "9cdf5beb3d1b1d6d86be6373fecab8a02b2f87d56f88530f7a8c5cedd4785f11",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
   "packages": [
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "95fb8ddb5450be1375e0a505c0e8b8695deb63448a4cd392af4537e65bdc428f"
+      "sha256": "4501e203028eff37da56830fa5ccfd3fd61d17325cc47e28f9c558c58568f57e"
     },
     {
       "name": "@aelion/capability",
       "version": "0.1.0-alpha.0",
-      "sha256": "cb2c61be8fd00b893c5a87045f0edb60ad1b711e74b1db6f5692336b491466c8"
+      "sha256": "4a35fd5b10e64f0959356794b7f4dd0ce08ab253b9a7c115fc52596fa80e1761"
     },
     {
       "name": "@aelion/core",
@@ -81,7 +81,7 @@
     {
       "name": "@aelion/export",
       "version": "0.1.0-alpha.0",
-      "sha256": "b395d2790e6b728f3b356ec5df3f14403344188262f99747f3f9096e20784183"
+      "sha256": "1dc1cea58c5721bb6b5af9b77c8f02e58ba75ff94b72b77e2456942857744b21"
     },
     {
       "name": "@aelion/material-compiler",
@@ -101,7 +101,7 @@
     {
       "name": "@aelion/project-schema",
       "version": "0.1.0-alpha.0",
-      "sha256": "4feb596491b4b094129880cb6d4b228d1b553e0a3aab2a36d37bf6c412aa9038"
+      "sha256": "4d231f3138df15c753d2a952a78ac77f83ff394c42e7c8f44bf1a9b60cd6e83a"
     },
     {
       "name": "@aelion/render-ir",
@@ -111,12 +111,12 @@
     {
       "name": "@aelion/renderer-worker",
       "version": "0.1.0-alpha.0",
-      "sha256": "f4661e53819fd76f4a324ec160c92416516fa195a9ba5ca7c9556a45174f05cc"
+      "sha256": "c468b74925774b41835c9e61f01de9ae8a2be3afd402ad9f1351cb24f426e001"
     },
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "eb544592ae4ef3f32091a39cdfe66e3d1273200a43317ae6d914d0503fb9b9ad"
+      "sha256": "afb0cdca5bccca0653011c4b80405b319f30efad2562a5a1416d2ad5bda06bf9"
     },
     {
       "name": "@aelion/transaction",
@@ -126,7 +126,7 @@
     {
       "name": "@aelion/vite-plugin",
       "version": "0.1.0-alpha.0",
-      "sha256": "f88bd45b09813de628813a973004c0b29a8b229193b7ef656964aaf33feba564"
+      "sha256": "6b57279abfeed281c2595b7ad9a04c8bc6183bab34fa0f7fbc096be035da6bd7"
     }
   ],
   "runtimeAssets": [
@@ -146,10 +146,17 @@
     },
     {
       "id": "webgl2-worker",
-      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-BvK7jARd.js",
-      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-BvK7jARd.js",
-      "bytes": 22794,
-      "sha256": "5f4a59f5f4f9ab4acf6c29795ce78dcec8c60f4e8a5aa003102a331dd90f0839"
+      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-C1Uctlto.js",
+      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-C1Uctlto.js",
+      "bytes": 22323,
+      "sha256": "0473047ac1f1a45e102327489ec7dcde7997d60e2da987e899ac27db61934ea5"
+    },
+    {
+      "id": "mux-export-worker",
+      "publicUrl": "/assets/aelion-export-mux-export-worker.js-CtDSUWBF.js",
+      "file": "dist/assets/aelion-export-mux-export-worker.js-CtDSUWBF.js",
+      "bytes": 7486,
+      "sha256": "d278302dde136096ba228ef3b624f5927b71a8ab9bdaf3d900b6c2ad268b9d94"
     }
   ],
   "browsers": [
@@ -167,7 +174,7 @@
             225,
             255
           ],
-          "workerTimingUs": 84845
+          "workerTimingUs": 85585
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -175,12 +182,50 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23488,
-          "playedFrames": 512,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 10667
+          "timeUs": 21333
         },
         "sessionFacade": {
+          "revision": "3",
+          "state": "ready",
+          "backend": "webgl2",
+          "width": 16,
+          "height": 16
+        },
+        "explicitRuntimeAssets": {
+          "compositor": {
+            "backend": "webgl2",
+            "graphHash": "a080cd2e",
+            "pixel": [
+              245,
+              235,
+              225,
+              255
+            ],
+            "workerTimingUs": 6690
+          },
+          "sharedClock": {
+            "contextState": "suspended",
+            "sampleRate": 48000,
+            "quantumFrames": 128,
+            "queuedFrames": 24000,
+            "capacityFrames": 96000,
+            "availableReadFrames": 22080,
+            "playedFrames": 1920,
+            "underrunFrames": 0,
+            "timeUs": 40000
+          },
+          "transferableWorkletLoaded": true,
+          "exportWorker": {
+            "bytes": 598,
+            "videoFrames": 3,
+            "audioFrames": 4800,
+            "profile": "webm-vp9-opus"
+          }
+        },
+        "explicitSessionFacade": {
           "revision": "3",
           "state": "ready",
           "backend": "webgl2",
@@ -203,7 +248,7 @@
             225,
             255
           ],
-          "workerTimingUs": 32420
+          "workerTimingUs": 21400
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -214,9 +259,47 @@
           "availableReadFrames": 22976,
           "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 37333
+          "timeUs": 21333
         },
         "sessionFacade": {
+          "revision": "3",
+          "state": "ready",
+          "backend": "webgl2",
+          "width": 16,
+          "height": 16
+        },
+        "explicitRuntimeAssets": {
+          "compositor": {
+            "backend": "webgl2",
+            "graphHash": "a080cd2e",
+            "pixel": [
+              245,
+              235,
+              225,
+              255
+            ],
+            "workerTimingUs": 6460
+          },
+          "sharedClock": {
+            "contextState": "suspended",
+            "sampleRate": 48000,
+            "quantumFrames": 128,
+            "queuedFrames": 24000,
+            "capacityFrames": 96000,
+            "availableReadFrames": 22976,
+            "playedFrames": 1024,
+            "underrunFrames": 0,
+            "timeUs": 21333
+          },
+          "transferableWorkletLoaded": true,
+          "exportWorker": {
+            "bytes": 573,
+            "videoFrames": 3,
+            "audioFrames": 4800,
+            "profile": "webm-vp9-opus"
+          }
+        },
+        "explicitSessionFacade": {
           "revision": "3",
           "state": "ready",
           "backend": "webgl2",

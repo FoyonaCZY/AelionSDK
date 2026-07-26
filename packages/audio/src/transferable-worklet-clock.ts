@@ -34,6 +34,8 @@ export interface TransferableClockReport {
 
 export interface TransferableAudioClockOptions {
   readonly context?: AudioContext;
+  /** Host-resolved module URL for non-Vite or CDN deployments. */
+  readonly moduleUrl?: string | URL;
   /** Requested hardware context rate when the clock owns its AudioContext. */
   readonly sampleRate?: number;
   readonly capacityFrames?: number;
@@ -54,8 +56,11 @@ export class TransferableAudioWorkletClock implements Disposable {
   #timelineOriginUs = 0;
   #contextOriginTime?: number;
   #lastReport?: TransferableClockReport;
+  readonly #moduleUrl: string | URL;
 
   public constructor(options: TransferableAudioClockOptions = {}) {
+    this.#moduleUrl =
+      options.moduleUrl ?? new URL('./pcm-message-player.worklet.js', import.meta.url);
     this.context =
       options.context ??
       new AudioContext({ latencyHint: 'playback', sampleRate: options.sampleRate ?? 48_000 });
@@ -99,9 +104,7 @@ export class TransferableAudioWorkletClock implements Disposable {
 
   async #initialize(reportEveryFrames: number, generation: number): Promise<void> {
     await withTimeout(
-      this.context.audioWorklet.addModule(
-        new URL('./pcm-message-player.worklet.js', import.meta.url),
-      ),
+      this.context.audioWorklet.addModule(this.#moduleUrl),
       5_000,
       'AudioWorklet module initialization',
     );

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { exportMp4, exportWebM } from './webm-export.js';
+import { exportAv1Mp4, exportHevcMp4, exportMp4, exportWebM } from './webm-export.js';
 import type { OfflineAudioRequest, OfflineFrameRequest } from './webm-export.js';
 import type {
   ExportWorkerAudioResponse,
@@ -97,7 +97,14 @@ async function start(request: ExportWorkerStartRequest): Promise<void> {
   }
   controller = new AbortController();
   try {
-    const run = request.profile === 'mp4' ? exportMp4 : exportWebM;
+    const run =
+      request.profile === 'mp4'
+        ? exportMp4
+        : request.profile === 'mp4-av1'
+          ? exportAv1Mp4
+          : request.profile === 'mp4-hevc'
+            ? exportHevcMp4
+            : exportWebM;
     const result = await run({
       ...request.config,
       sink: request.sink,

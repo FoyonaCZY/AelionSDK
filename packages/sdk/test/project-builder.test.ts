@@ -110,6 +110,25 @@ describe('ProjectBuilder', () => {
     ).toThrow(/audio Track/u);
   });
 
+  it('authors the pitch-preserving linear audio policy', () => {
+    const builder = createProject();
+    builder.addAsset({ id: 'asset_audio', kind: 'audio' });
+    const audioTrack = builder.addTrack({ kind: 'audio' });
+    const itemId = builder.addMediaClip({
+      kind: 'audio',
+      assetId: 'asset_audio',
+      trackId: audioTrack,
+      durationUs: seconds(1),
+      sourceDurationUs: seconds(2),
+      rate: { numerator: 2, denominator: 1 },
+      pitchPolicy: 'preserve',
+    });
+    expect(builder.build().items[itemId]).toMatchObject({
+      source: { timeMapping: { type: 'linear', rate: { numerator: 2, denominator: 1 } } },
+      audio: { pitchPolicy: 'preserve' },
+    });
+  });
+
   it('adds a first-class image Clip with the Project still-duration default', () => {
     const builder = createProject();
     builder.addAsset({

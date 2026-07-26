@@ -9,6 +9,7 @@ import type {
   CapabilityReport,
   CapabilityTier,
   CodecConfigProbe,
+  ColorCapability,
   GpuCapability,
   StorageCapability,
 } from './types.js';
@@ -151,6 +152,18 @@ function codecConfigs(): {
       config: { codec: 'vp09.00.10.08', codedWidth: 1920, codedHeight: 1080 },
     },
     {
+      id: 'decode-av1-1080p',
+      kind: 'video-decoder',
+      constructorName: 'VideoDecoder',
+      config: { codec: 'av01.0.08M.08', codedWidth: 1920, codedHeight: 1080 },
+    },
+    {
+      id: 'decode-hevc-1080p',
+      kind: 'video-decoder',
+      constructorName: 'VideoDecoder',
+      config: { codec: 'hvc1.1.6.L120.B0', codedWidth: 1920, codedHeight: 1080 },
+    },
+    {
       id: 'encode-h264-1080p30',
       kind: 'video-encoder',
       constructorName: 'VideoEncoder',
@@ -173,6 +186,31 @@ function codecConfigs(): {
         height: 1080,
         bitrate: 8_000_000,
         framerate: 30,
+      },
+    },
+    {
+      id: 'encode-av1-1080p30',
+      kind: 'video-encoder',
+      constructorName: 'VideoEncoder',
+      config: {
+        codec: 'av01.0.08M.08',
+        width: 1920,
+        height: 1080,
+        bitrate: 8_000_000,
+        framerate: 30,
+      },
+    },
+    {
+      id: 'encode-hevc-1080p30',
+      kind: 'video-encoder',
+      constructorName: 'VideoEncoder',
+      config: {
+        codec: 'hvc1.1.6.L120.B0',
+        width: 1920,
+        height: 1080,
+        bitrate: 8_000_000,
+        framerate: 30,
+        hevc: { format: 'hevc' },
       },
     },
     {
@@ -386,6 +424,42 @@ function environment(): CapabilityEnvironment {
   };
 }
 
+function probeColor(): ColorCapability {
+  const query = (condition: string, code: string, description: string): CapabilityProbe => {
+    if (typeof matchMedia !== 'function') {
+      return unsupported('CAPABILITY_MEDIA_QUERY_UNAVAILABLE', 'matchMedia is unavailable');
+    }
+    try {
+      return matchMedia(condition).matches
+        ? supported({ query: condition })
+        : unsupported(code, description);
+    } catch (cause) {
+      return failed('CAPABILITY_COLOR_PROBE_FAILED', `Failed to probe ${condition}`, cause);
+    }
+  };
+  return {
+    displayP3Gamut: query(
+      '(color-gamut: p3)',
+      'CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE',
+      'The current display does not advertise Display-P3 gamut',
+    ),
+    highDynamicRange: query(
+      '(dynamic-range: high)',
+      'CAPABILITY_HDR_DISPLAY_UNAVAILABLE',
+      'The current display does not advertise high dynamic range',
+    ),
+    // This is intentionally the executable local contract, not an inference
+    // from display hardware. HDR/10-bit projects fail closed until the renderer
+    // has a float/10-bit surface and matching encoder path.
+    localExecution: {
+      workingColorSpaces: ['srgb-linear', 'display-p3-linear', 'rec2020-linear'],
+      transferFunctions: ['srgb', 'gamma22'],
+      bitDepths: [8],
+      hdrPresentation: false,
+    },
+  };
+}
+
 function tier(
   codecs: readonly CodecConfigProbe[],
   gpu: GpuCapability,
@@ -420,6 +494,7 @@ export async function probeCapabilities(
   throwIfAborted(options.signal, 'capability probe');
   const audio = probeAudio();
   const storage = probeStorage();
+  const color = probeColor();
   const diagnostics = [
     ...codecs.flatMap(codec => codec.diagnostics),
     ...(gpu.webgpu.diagnostics ?? []),
@@ -432,6 +507,8 @@ export async function probeCapabilities(
     ...(storage.opfs.diagnostics ?? []),
     ...(storage.fileSystemAccess.diagnostics ?? []),
     ...(storage.transferableStreams.diagnostics ?? []),
+    ...(color.displayP3Gamut.diagnostics ?? []),
+    ...(color.highDynamicRange.diagnostics ?? []),
   ];
   return {
     schemaVersion: '1.0.0',
@@ -442,6 +519,7 @@ export async function probeCapabilities(
     gpu,
     audio,
     storage,
+    color,
     wasm:
       typeof WebAssembly === 'object'
         ? { available: supported() }

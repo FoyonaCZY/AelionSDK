@@ -65,13 +65,13 @@ export interface ItemEntity extends ProjectEntity {
   linkGroupId?: EntityId;
 }
 
-/** Project v1 audio Items use deterministic varispeed pitch for every TimeMap. */
+/** Project v1 audio Items can use varispeed or deterministic pitch-preserving stretch. */
 export interface ItemAudioProperties extends JsonObject {
   gainDb: JsonValue;
   pan: JsonValue;
   fadeInUs?: number;
   fadeOutUs?: number;
-  pitchPolicy?: 'varispeed';
+  pitchPolicy?: 'varispeed' | 'preserve';
   channelMap?: JsonValue[];
 }
 

@@ -77,6 +77,7 @@ export interface AddMediaClipOptions {
   readonly pan?: number;
   readonly fadeInUs?: number;
   readonly fadeOutUs?: number;
+  readonly pitchPolicy?: 'varispeed' | 'preserve';
 }
 
 export interface AddImageClipOptions {
@@ -459,6 +460,10 @@ export class ProjectBuilder {
     assertTime(streamIndex, 'streamIndex');
     if (options.fadeInUs !== undefined) assertTime(options.fadeInUs, 'fadeInUs');
     if (options.fadeOutUs !== undefined) assertTime(options.fadeOutUs, 'fadeOutUs');
+    const pitchPolicy: unknown = options.pitchPolicy;
+    if (pitchPolicy !== undefined && pitchPolicy !== 'varispeed' && pitchPolicy !== 'preserve') {
+      throw new RangeError('pitchPolicy must be varispeed or preserve');
+    }
     if ((options.fadeInUs ?? 0) + (options.fadeOutUs ?? 0) > options.durationUs) {
       throw new RangeError('audio fades cannot overlap past the Clip duration');
     }
@@ -500,6 +505,7 @@ export class ProjectBuilder {
               pan: options.pan ?? 0,
               ...(options.fadeInUs === undefined ? {} : { fadeInUs: options.fadeInUs }),
               ...(options.fadeOutUs === undefined ? {} : { fadeOutUs: options.fadeOutUs }),
+              ...(options.pitchPolicy === undefined ? {} : { pitchPolicy: options.pitchPolicy }),
             },
             materialInstanceIds: [],
           };

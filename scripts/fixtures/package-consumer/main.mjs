@@ -1,6 +1,7 @@
 /* eslint-disable */
 
-import { AudioWorkletClock } from '@aelion/audio';
+import { AudioWorkletClock, TransferableAudioWorkletClock } from '@aelion/audio';
+import { exportMuxedInWorker, SeekableMemorySink } from '@aelion/export';
 import { compileMaterialGraphToWebGl2 } from '@aelion/material-compiler';
 import { WorkerCompositor } from '@aelion/renderer-worker';
 import { Aelion } from '@aelion/sdk';
@@ -54,7 +55,7 @@ function centerPixel(bitmap) {
   ];
 }
 
-async function exerciseWorkerCompositor() {
+async function exerciseWorkerCompositor(workerUrl) {
   const graph = {
     $schema: 'https://schemas.aelion.dev/material/graph/v1.json',
     graphVersion: '1.0.0',
@@ -73,7 +74,7 @@ async function exerciseWorkerCompositor() {
     parameters: {},
     inputPorts: { source: 'visual-frame' },
   });
-  const compositor = new WorkerCompositor();
+  const compositor = new WorkerCompositor(workerUrl === undefined ? {} : { workerUrl });
   try {
     const composed = await compositor.compose({
       inputs: { source: solidFrame(10, 20, 30) },
@@ -114,8 +115,12 @@ async function exerciseWorkerCompositor() {
   }
 }
 
-async function exerciseAudioWorkletClock() {
-  const clock = new AudioWorkletClock({ capacityFrames: 96_000, channelCount: 2 });
+async function exerciseAudioWorkletClock(moduleUrl) {
+  const clock = new AudioWorkletClock({
+    capacityFrames: 96_000,
+    channelCount: 2,
+    ...(moduleUrl === undefined ? {} : { moduleUrl }),
+  });
   try {
     const queuedFrames = Math.floor(clock.context.sampleRate / 2);
     const pcm = new Float32Array(queuedFrames * 2);
@@ -146,6 +151,57 @@ async function exerciseAudioWorkletClock() {
   } finally {
     await clock.dispose();
   }
+}
+
+async function exerciseExplicitRuntimeAssets() {
+  const compositor = await exerciseWorkerCompositor('/runtime/webgl2-worker.js');
+  const sharedClock = await exerciseAudioWorkletClock('/runtime/pcm-player.worklet.js');
+  const transferableClock = new TransferableAudioWorkletClock({
+    moduleUrl: '/runtime/pcm-message-player.worklet.js',
+    channelCount: 2,
+  });
+  try {
+    await transferableClock.initialize(128);
+  } finally {
+    transferableClock.dispose();
+  }
+  const sink = new SeekableMemorySink();
+  const result = await exportMuxedInWorker({
+    profile: 'webm',
+    workerUrl: '/runtime/mux-export-worker.js',
+    durationUs: 100_000,
+    width: 16,
+    height: 16,
+    frameRate: { numerator: 30, denominator: 1 },
+    sampleRate: 48_000,
+    channelCount: 2,
+    videoBitrate: 100_000,
+    audioBitrate: 64_000,
+    sink: sink.writable,
+    renderFrame: request => {
+      const canvas = new OffscreenCanvas(16, 16);
+      const context = canvas.getContext('2d');
+      if (context === null) throw new Error('Explicit Export Worker canvas is unavailable');
+      context.fillStyle = 'rgb(32 96 192)';
+      context.fillRect(0, 0, 16, 16);
+      return Promise.resolve(new VideoFrame(canvas, { timestamp: request.timestampUs }));
+    },
+    renderAudio: request =>
+      Promise.resolve(new Float32Array(request.frameCount * request.channelCount)),
+  });
+  const output = sink.finalize();
+  assert(output.byteLength > 500, 'Explicit Export Worker produced no media');
+  return {
+    compositor,
+    sharedClock,
+    transferableWorkletLoaded: true,
+    exportWorker: {
+      bytes: output.byteLength,
+      videoFrames: result.videoFrames,
+      audioFrames: result.audioFrames,
+      profile: result.encoderConfiguration.profile,
+    },
+  };
 }
 
 function createProject() {
@@ -243,10 +299,11 @@ function createProject() {
   };
 }
 
-async function exerciseSessionFacade() {
+async function exerciseSessionFacade(runtimeAssets) {
   const session = await Aelion.createSession({
     preferredBackend: 'webgl2',
     allowBackendFallback: false,
+    ...(runtimeAssets === undefined ? {} : { runtimeAssets }),
     media: {
       frameAt: (_assetId, _streamIndex, sourceTimeUs) => {
         const canvas = new OffscreenCanvas(16, 16);
@@ -314,6 +371,13 @@ async function run() {
     workerCompositor: await exerciseWorkerCompositor(),
     audioWorkletClock: await exerciseAudioWorkletClock(),
     sessionFacade: await exerciseSessionFacade(),
+    explicitRuntimeAssets: await exerciseExplicitRuntimeAssets(),
+    explicitSessionFacade: await exerciseSessionFacade({
+      rendererWorker: '/runtime/webgl2-worker.js',
+      exportWorker: '/runtime/mux-export-worker.js',
+      sharedAudioWorklet: '/runtime/pcm-player.worklet.js',
+      transferableAudioWorklet: '/runtime/pcm-message-player.worklet.js',
+    }),
   };
 }
 

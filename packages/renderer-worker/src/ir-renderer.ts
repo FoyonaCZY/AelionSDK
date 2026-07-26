@@ -68,6 +68,8 @@ export interface RenderIrFrameResult {
 export interface RenderIrFrameRendererOptions {
   /** Maximum full frame evaluations in flight. Defaults to 2. */
   readonly maxPendingFrames?: number;
+  /** Host-resolved renderer Worker URL. */
+  readonly workerUrl?: string | URL;
 }
 
 export interface RenderIrFrameRendererSnapshot {
@@ -925,7 +927,7 @@ function rasterTransparentFrame(width: number, height: number, timestampUs: numb
 }
 
 export class RenderIrFrameRenderer implements Disposable {
-  readonly #compositor = new WorkerCompositor();
+  readonly #compositor: WorkerCompositor;
   readonly #adaptiveBackend = new AdaptiveBackendSelector();
   readonly #disposeController = new AbortController();
   readonly #maxPendingFrames: number;
@@ -934,6 +936,9 @@ export class RenderIrFrameRenderer implements Disposable {
   #pendingFrames = 0;
 
   public constructor(options: RenderIrFrameRendererOptions = {}) {
+    this.#compositor = new WorkerCompositor({
+      ...(options.workerUrl === undefined ? {} : { workerUrl: options.workerUrl }),
+    });
     this.#maxPendingFrames = options.maxPendingFrames ?? 2;
     if (!Number.isSafeInteger(this.#maxPendingFrames) || this.#maxPendingFrames <= 0) {
       throw new RangeError('maxPendingFrames must be a positive safe integer');

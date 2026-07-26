@@ -25,13 +25,13 @@ baseline in the same change.
     "dist/migration-materials.d.ts": "bf462a9059bc0f79b6e06a125b985e1667b2bc05fa56f2533725266c0ca72077",
     "dist/migration.d.ts": "a023def005fef5b2c9b2bc536cc659cfe329491935ba4f0bf863d89c227ff1eb",
     "dist/persistence.d.ts": "8f61fd2947f2e491cade7af4b37b67521b41830172721eb200c441bbeec9532d",
-    "dist/player.d.ts": "7ea33e39fbc7bbb47b6782e8ac1ca06d14e90ab997d359c31970a6e5ebcb7ebf",
+    "dist/player.d.ts": "efe85655250a4397fe9c907d9cb582f001196535367c17bd20da3346b79b62ca",
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
     "dist/production-media-provider.d.ts": "faa406f96bcb9f87247ffcc2e2251cd158d4d7798d888dc5a7934e36be32dcdb",
-    "dist/project-builder.d.ts": "b1a76b425c205295c11e683c55392d15fb74dfcffcb45ccf254acda12848bf33",
+    "dist/project-builder.d.ts": "db214e9d62361247b1d192e65dbc1920bb9e299f211854ac300f96ed23dbcf79",
     "dist/runtime-material-registry.d.ts": "e74c432da12a8f5384fd133d6a30a8dd8953d38ec910ed0491e8c6018bca133b",
     "dist/session.d.ts": "64182031fd650f05eea668d56aecb83ed1ef9917ad08fa58907f9d34c4021f43",
-    "dist/types.d.ts": "4a9867c93ce288479acee784babf15708748f604bd3dc1c4404a5e4d41cad188"
+    "dist/types.d.ts": "981a4e25fbb50eb34a6779ca77bfd49518addb6e93f767234ce6424cde84e394"
   },
   "exports": [
     "AELION_EXTENSION_PROTOCOL",
@@ -90,6 +90,7 @@ baseline in the same change.
     "AelionProjectSchemas",
     "AelionRemoteExportJob",
     "AelionRemoteExportOptions",
+    "AelionRuntimeAssets",
     "AelionRuntimeMaterialRegistry",
     "AelionSession",
     "AelionSessionApi",

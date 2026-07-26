@@ -17,6 +17,8 @@
     "vitest.config.ts",
     "vitest.browser.config.ts",
     "vitest.firefox.config.ts",
-    "vitest.golden.config.ts"
+    "vitest.golden.config.ts",
+    "vitest.mobile.config.ts",
+    "vitest.webkit.config.ts"
   ]
 }

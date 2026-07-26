@@ -39,9 +39,31 @@ if ('encoderConfiguration' in result) {
 }
 ```
 
-当前 MP4 profile 请求 H.264 `avc1.640028` 和 AAC `mp4a.40.2`。这只是 SDK 的目标配置；浏览器是否接受当前画布、帧率和声道，以本次 preflight 结果为准。
+H.264 profile 根据当前画布与帧率，从满足 macroblock 约束的最小 AVC level 开始
+尝试 High/Main/Baseline；例如参考运行时的 1080p30 选择 `avc1.640028`，4K30
+选择 `avc1.640033`。实际选择写在 preflight 和 result 的
+`encoderConfiguration.videoCodecString` 中。
 
 AAC 不能只看 `AudioEncoder.isConfigSupported()`。SDK 还会做运行时 canary，避免浏览器声称支持但实际不能产出可用 AAC。
+
+## AV1/AAC 与 HEVC/AAC MP4
+
+调用方式与 H.264 相同，把 profile 改为 `mp4-av1-aac` 或 `mp4-hevc-aac`。这两个
+路径会提交精确的 WebCodecs configuration，并且只有 preflight 通过才开始 mux：
+
+```ts
+const options = {
+  profile: 'mp4-av1-aac' as const,
+  sink: sink.writable,
+  videoBitrate: 6_000_000,
+  audioBitrate: 192_000,
+};
+const report = await session.export.preflightProfile(options);
+if (report.ok) await session.export.startProfile(options);
+```
+
+不要把“profile 存在”解释为浏览器已带 encoder。unsupported 时可回退 H.264/WebM
+或使用 Remote Export；HEVC/AV1 的解码支持也要对输入另行 probe。
 
 ## VP9/Opus WebM
 

@@ -214,9 +214,9 @@ test(
   },
 );
 
-test('the final runner policy is exactly nine gates plus five evidence refreshes', () => {
-  assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 9);
-  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 72, firefox: 66 });
+test('the final runner policy is exactly thirteen gates plus five evidence refreshes', () => {
+  assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 13);
+  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 75, firefox: 67 });
   assert.deepEqual(PHASE_1_EVIDENCE_REFRESH_COMMANDS, [
     'corepack pnpm report:browser:chromium',
     'corepack pnpm report:browser:firefox',
@@ -586,6 +586,31 @@ test('tarball consumer validator checks exact package, asset and browser contrac
         timeUs: 1,
       },
       sessionFacade: {
+        revision: '3',
+        state: 'ready',
+        backend: 'webgl2',
+        width: 16,
+        height: 16,
+      },
+      explicitRuntimeAssets: {
+        compositor: {
+          backend: 'webgl2',
+          graphHash: 'hash',
+          pixel: [245, 235, 225, 255],
+          workerTimingUs: 1,
+        },
+        sharedClock: {
+          contextState: 'suspended',
+        },
+        transferableWorkletLoaded: true,
+        exportWorker: {
+          profile: 'webm-vp9-opus',
+          videoFrames: 3,
+          audioFrames: 4_800,
+          bytes: 500,
+        },
+      },
+      explicitSessionFacade: {
         revision: '3',
         state: 'ready',
         backend: 'webgl2',

@@ -62,6 +62,13 @@ export interface AelionRuntimeMaterialRegistry {
   ): WebGl2MaterialProgram | undefined;
 }
 
+export interface AelionRuntimeAssets {
+  readonly rendererWorker?: string | URL;
+  readonly exportWorker?: string | URL;
+  readonly sharedAudioWorklet?: string | URL;
+  readonly transferableAudioWorklet?: string | URL;
+}
+
 export interface AelionSessionOptions {
   /** Overrides the v1 schemas bundled with `@aelion/sdk`. */
   readonly schemas?: AelionProjectSchemas;
@@ -70,6 +77,8 @@ export interface AelionSessionOptions {
   readonly sequenceId?: string;
   readonly preferredBackend?: 'auto' | 'webgpu' | 'webgl2';
   readonly allowBackendFallback?: boolean;
+  /** Explicit runtime assets remove any dependency on a particular bundler plugin. */
+  readonly runtimeAssets?: AelionRuntimeAssets;
   /** Maximum full Preview/Player/Export frame evaluations in flight. Defaults to 2. */
   readonly maxPendingFrames?: number;
   /** Maximum retained diagnostic history entries. Defaults to 256. */
@@ -319,7 +328,7 @@ interface AelionProfileExportBaseOptions {
 
 export type AelionProfileExportOptions =
   | (AelionProfileExportBaseOptions & {
-      readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac';
+      readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac' | 'mp4-av1-aac' | 'mp4-hevc-aac';
       readonly videoBitrate?: number;
       readonly audioBitrate?: number;
     })

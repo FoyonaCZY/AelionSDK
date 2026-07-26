@@ -10,13 +10,24 @@ describe('browser capability report', () => {
     expect(report.environment.secureContext).toBe(true);
     expect(report.environment.crossOriginIsolated).toBe(true);
     expect(report.environment.userAgent.length).toBeGreaterThan(0);
-    expect(report.codecs).toHaveLength(8);
+    expect(report.codecs).toHaveLength(12);
     expect(report.codecs.some(codec => codec.kind === 'video-decoder')).toBe(true);
     expect(report.codecs.some(codec => codec.kind === 'video-encoder')).toBe(true);
     expect(report.gpu.worker.available).toBe(true);
-    expect(report.gpu.offscreenCanvas.available).toBe(true);
-    expect(report.audio.audioContext.available).toBe(true);
-    expect(report.storage.transferableStreams.available).toBe(true);
+    expect(typeof report.gpu.offscreenCanvas.available).toBe('boolean');
+    expect(typeof report.audio.audioContext.available).toBe('boolean');
+    expect(typeof report.storage.transferableStreams.available).toBe('boolean');
+    if (/\b(?:Chrome|Chromium)\//u.test(navigator.userAgent)) {
+      expect(report.gpu.offscreenCanvas.available).toBe(true);
+      expect(report.audio.audioContext.available).toBe(true);
+      expect(report.storage.transferableStreams.available).toBe(true);
+    }
+    expect(report.color.localExecution).toEqual({
+      workingColorSpaces: ['srgb-linear', 'display-p3-linear', 'rec2020-linear'],
+      transferFunctions: ['srgb', 'gamma22'],
+      bitDepths: [8],
+      hdrPresentation: false,
+    });
     expect(() => JSON.stringify(report)).not.toThrow();
   });
 

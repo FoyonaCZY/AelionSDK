@@ -66,9 +66,13 @@ export interface RendererWorkerDiagnostic {
 }
 
 export interface RendererWorkerTiming {
-  /** Worker request wall time including setup, compilation, draw and readback. */
+  /** Worker request wall time including setup, compilation, draw and bitmap transfer. */
   readonly totalWorkerUs: number;
-  /** Time spent waiting for submitted GPU work to complete (driver-inclusive proxy). */
+  /**
+   * Backend completion proxy. WebGL uses finish/readback; WebGPU covers queue
+   * submission, validation and presentation handoff without a blocking
+   * texture-to-CPU readback or queue-wide completion wait.
+   */
   readonly gpuCompletionUs: number;
 }
 

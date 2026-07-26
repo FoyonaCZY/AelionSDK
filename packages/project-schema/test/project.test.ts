@@ -230,6 +230,39 @@ describe('Aelion Project v1', () => {
     expect(validator.validate(candidate).ok).toBe(true);
   });
 
+  it('rejects pitch preservation on a non-linear audio TimeMap', () => {
+    const candidate = canonicalClone(project);
+    const item = (candidate.items as JsonObject).item_audio_a as JsonObject;
+    const audio = item.audio as JsonObject;
+    const source = item.source as JsonObject;
+    const sourceRange = source.sourceRange as JsonObject;
+    const range = item.range as JsonObject;
+    const sourceStartUs = Number(sourceRange.startUs);
+    const sourceDurationUs = Number(sourceRange.durationUs);
+    const itemDurationUs = Number(range.durationUs);
+    audio.pitchPolicy = 'preserve';
+    source.timeMapping = {
+      type: 'curve',
+      boundary: 'error',
+      points: [
+        { itemTimeUs: 0, sourceTimeUs: sourceStartUs, interpolation: 'linear' },
+        {
+          itemTimeUs: itemDurationUs,
+          sourceTimeUs: sourceStartUs + sourceDurationUs,
+          interpolation: 'linear',
+        },
+      ],
+    };
+    expect(validator.validate(candidate).diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'PROJECT_AUDIO_PITCH_POLICY_UNSUPPORTED',
+          entityId: 'item_audio_a',
+        }),
+      ]),
+    );
+  });
+
   it('rejects audio fades longer than the Item', () => {
     const broken = canonicalClone(project);
     const item = (broken.items as JsonObject).item_audio_a as JsonObject;

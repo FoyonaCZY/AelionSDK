@@ -4,7 +4,7 @@ import type { OfflineAudioRequest, OfflineFrameRequest, WebMExportResult } from 
 
 export interface ExportWorkerStartRequest {
   readonly type: 'start';
-  readonly profile: 'webm' | 'mp4';
+  readonly profile: 'webm' | 'mp4' | 'mp4-av1' | 'mp4-hevc';
   readonly config: {
     readonly durationUs: number;
     readonly width: number;
@@ -14,6 +14,8 @@ export interface ExportWorkerStartRequest {
     readonly channelCount: number;
     readonly videoBitrate: number;
     readonly audioBitrate: number;
+    readonly videoCodecString?: string;
+    readonly audioCodecString?: string;
   };
   readonly sink: WritableStream<{
     readonly type: 'write';
