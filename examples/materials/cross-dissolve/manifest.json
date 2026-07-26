@@ -11,7 +11,7 @@
     },
     "license": "MIT",
     "engines": {
-      "aelion": ">=1.0.0 <2.0.0",
+      "aelion": ">=0.1.0 <1.0.0",
       "nodeSet": "aelion.visual.nodes/1.0.0"
     },
     "trust": "declarative"

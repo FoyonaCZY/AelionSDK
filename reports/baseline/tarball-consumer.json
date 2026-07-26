@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-25T23:03:41.517Z",
+  "generatedAt": "2026-07-26T07:01:23.856Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "dfb3f6bf84c3fe7496663655ff5cb920de2838c9f1f976632bcbad4e2c391c11",
+    "packageJsonSha256": "261d82abb86af2169f409733e6943abbe666b1f0472230c306b38a5f5af2b0c3",
     "sourceSha256": "8ea374137b2ffa5475e04149e82098676dddabd758f1a845a3c7381c447df32e",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -66,7 +66,7 @@
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "75bdd3164d2691372164cd31b8b790d6ee0d6917e27036713ac45645e8a3d6bf"
+      "sha256": "95fb8ddb5450be1375e0a505c0e8b8695deb63448a4cd392af4537e65bdc428f"
     },
     {
       "name": "@aelion/capability",
@@ -106,7 +106,7 @@
     {
       "name": "@aelion/render-ir",
       "version": "0.1.0-alpha.0",
-      "sha256": "d224216bd04e7577aca44773e82c26dd8347a400da94a7044b8423112e9305c1"
+      "sha256": "d48bb45a22da8a83bc6d5b560e7018535cacce1bd354ddf052d03210e565fa5b"
     },
     {
       "name": "@aelion/renderer-worker",
@@ -116,7 +116,7 @@
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "5edd35be179adc7adda322ee463461c511094fe606ec1ee4e099f34c1fa3efde"
+      "sha256": "eb544592ae4ef3f32091a39cdfe66e3d1273200a43317ae6d914d0503fb9b9ad"
     },
     {
       "name": "@aelion/transaction",
@@ -167,7 +167,7 @@
             225,
             255
           ],
-          "workerTimingUs": 85650
+          "workerTimingUs": 84845
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -175,10 +175,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22976,
-          "playedFrames": 1024,
+          "availableReadFrames": 23488,
+          "playedFrames": 512,
           "underrunFrames": 0,
-          "timeUs": 21333
+          "timeUs": 10667
         },
         "sessionFacade": {
           "revision": "3",
@@ -203,7 +203,7 @@
             225,
             255
           ],
-          "workerTimingUs": 22480
+          "workerTimingUs": 32420
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -214,7 +214,7 @@
           "availableReadFrames": 22976,
           "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 21333
+          "timeUs": 37333
         },
         "sessionFacade": {
           "revision": "3",

@@ -24,6 +24,12 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 
 仓库还保存 Chromium、Firefox、Golden 和性能专项报告。可以重新生成的数据位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)，本页不复制容易过期的测试计数。
 
+最终发布候选由 `corepack pnpm test:phase1:final` 串行执行，并把命令结果、源身份和
+产物 postflight 写入 `reports/baseline/phase-1-gate-results.json`。当前自动化候选
+门禁已经通过，但正式发布仍要求独立人员审阅同一份源身份与产物集；
+`phase-1-blocker-review.json` 在签字前必须保持 `not-approved`。实现者不能为自己的
+候选自签，也不能因此声称 npm 1.0 已发布。
+
 ## 在哪里复核测试结果
 
 | 目标                                                    | 证据入口                                              |
@@ -74,6 +80,7 @@ corepack pnpm bench
 corepack pnpm test:pack
 corepack pnpm test:consumer
 corepack pnpm release:dry-run
+corepack pnpm test:phase1:final
 ```
 
 证据报告由脚本生成。报告生成失败、进程非零退出、浏览器崩溃或资源未释放都算失败，不能通过手工编辑 JSON 改写结论。

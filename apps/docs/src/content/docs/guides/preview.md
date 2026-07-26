@@ -65,6 +65,63 @@ await preview.render(0);
 
 Canvas 的 CSS 大小和实际 `canvas.width/height` 是两回事。Controller 会用 CSS 尺寸乘 DPR 设置 backing store。不要在创建后反复手动覆盖 Canvas 的 width/height。
 
+## 把指针坐标映射到工程画布
+
+`onPointer` 返回的 `point` 已经考虑 Canvas CSS 尺寸、DPR、`contain`/`cover`/`fill`
+和黑边，坐标单位是 Project 像素：
+
+```ts
+const preview = attachPreviewCanvas(session, canvas, {
+  fit: 'contain',
+  onPointer: event => {
+    if (!event.point.inside) return;
+    selection.handlePointer({
+      type: event.type,
+      pointerId: event.pointerId,
+      buttons: event.buttons,
+      x: event.point.x,
+      y: event.point.y,
+    });
+  },
+});
+```
+
+已有 DOM 事件也可以单独转换：
+
+```ts
+canvas.addEventListener('pointermove', event => {
+  const point = preview.toProjectPoint(event.clientX, event.clientY);
+  if (point.inside) overlay.moveTo(point.x, point.y);
+});
+```
+
+`inside: false` 表示指针位于 `contain` 产生的黑边或 Canvas 外部。Controller 只做
+坐标换算，不替产品实现命中测试、选择、拖拽约束或 Transaction。
+
+## 捕获 Canvas 视频流
+
+浏览器支持 `HTMLCanvasElement.captureStream()` 时，可以复用同一个预览 Canvas
+给实时协作、WebRTC 或临时录屏，不会建立第二条渲染链：
+
+```ts
+let stream: MediaStream;
+try {
+  stream = preview.captureStream(30);
+  await publishPreview(stream);
+} catch (error) {
+  showUnsupportedCapture(error);
+}
+
+function stopPublishing(): void {
+  for (const track of stream.getTracks()) track.stop();
+}
+```
+
+返回的流只有 Canvas 视频轨，不会自动包含 Session AudioWorklet 的声音。需要声音时
+由应用显式组合自己的音频 `MediaStreamTrack`。`captureStream()` 也不是离线导出的
+替代品：它受页面调度、预览画质和实时丢帧影响；生成交付文件仍应使用
+`session.export`。
+
 ## 实现拖动播放头
 
 简单版本可以直接在 range input 的 `input` 事件中请求画面：
