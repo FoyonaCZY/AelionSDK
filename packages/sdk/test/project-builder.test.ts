@@ -109,4 +109,110 @@ describe('ProjectBuilder', () => {
       }),
     ).toThrow(/audio Track/u);
   });
+
+  it('adds a first-class image Clip with the Project still-duration default', () => {
+    const builder = createProject();
+    builder.addAsset({
+      id: 'asset_image',
+      kind: 'image',
+      mimeType: 'image/png',
+    });
+    const visualTrack = builder.addTrack({ kind: 'visual' });
+    const itemId = builder.addImageClip({
+      assetId: 'asset_image',
+      trackId: visualTrack,
+      fit: 'cover',
+    });
+    const project = builder.build();
+
+    expect(project.items[itemId]).toMatchObject({
+      type: 'image',
+      range: { startUs: 0, durationUs: seconds(3) },
+      source: {
+        assetId: 'asset_image',
+        stream: { type: 'video', index: 0 },
+        timeMapping: { boundary: 'hold' },
+      },
+      visual: { fit: 'cover' },
+    });
+  });
+
+  it('authors text, captions, shapes, effects, masks, transitions, and keyframes', () => {
+    const builder = createProject({ width: 1280, height: 720 });
+    const visualTrack = builder.addTrack({ kind: 'visual' });
+    const captionTrack = builder.addTrack({ kind: 'caption' });
+    const from = builder.addShapeClip({
+      trackId: visualTrack,
+      kind: 'rectangle',
+      atUs: 0,
+      durationUs: seconds(3),
+      box: { x: 100, y: 100, width: 400, height: 240 },
+      fill: '#ff0000',
+    });
+    const to = builder.addShapeClip({
+      trackId: visualTrack,
+      kind: 'ellipse',
+      atUs: seconds(2),
+      durationUs: seconds(3),
+      box: { x: 640, y: 180, width: 320, height: 320 },
+      fill: [0, 0, 1, 1],
+    });
+    const text = builder.addTextClip({
+      trackId: visualTrack,
+      text: 'Aelion',
+      atUs: 0,
+      durationUs: seconds(5),
+      style: { fontSizePx: 64, fill: '#ffffff', align: 'center' },
+    });
+    const caption = builder.addCaptionClip({
+      trackId: captionTrack,
+      text: 'Portable caption',
+      atUs: seconds(1),
+      durationUs: seconds(2),
+    });
+    const material = builder.addMaterialInstance({
+      packageId: 'dev.aelion.tests',
+      packageVersion: '1.0.0',
+      packageIntegrity: `sha256:${'0'.repeat(64)}`,
+      materialId: 'cross-dissolve',
+      parameters: { curve: 'smooth' },
+    });
+    const transitionMaterial = builder.addMaterialInstance({
+      packageId: 'dev.aelion.tests',
+      packageVersion: '1.0.0',
+      packageIntegrity: `sha256:${'0'.repeat(64)}`,
+      materialId: 'cross-dissolve',
+      parameters: { curve: 'smooth' },
+    });
+    builder
+      .attachEffect(text, material)
+      .setMask(text, { sourceItemId: from, featherPx: 8 })
+      .setKeyframes(text, 'opacity', [
+        { timeUs: 0, value: 0 },
+        { timeUs: seconds(1), value: 1, interpolation: 'linear' },
+      ]);
+    const transition = builder.addTransition({
+      fromItemId: from,
+      toItemId: to,
+      materialInstanceId: transitionMaterial,
+      atUs: seconds(2),
+      durationUs: seconds(1),
+    });
+    const project = builder.build();
+
+    expect(project.items[text]).toMatchObject({
+      type: 'text',
+      materialInstanceIds: [material],
+      visual: {
+        opacity: { animation: { keyframes: [{ value: 0 }, { value: 1 }] } },
+        mask: { sourceItemId: from, featherPx: 8 },
+      },
+    });
+    expect(project.items[caption]).toMatchObject({ type: 'caption' });
+    expect(project.transitions[transition]).toMatchObject({
+      fromItemId: from,
+      toItemId: to,
+      materialInstanceId: transitionMaterial,
+    });
+  });
 });

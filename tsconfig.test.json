@@ -13,6 +13,7 @@
     "apps/*/src/**/*.test.ts",
     "examples/materials/authoring-sdk/**/*.ts",
     "benchmarks/**/*.ts",
+    "scripts/**/*.ts",
     "vitest.config.ts",
     "vitest.browser.config.ts",
     "vitest.firefox.config.ts",

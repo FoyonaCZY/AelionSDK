@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
-    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
-    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview"
+    "build": "node scripts/astro.mjs build",
+    "dev": "node scripts/astro.mjs dev",
+    "preview": "node scripts/astro.mjs preview"
   },
   "dependencies": {
     "@astrojs/starlight": "0.37.7",

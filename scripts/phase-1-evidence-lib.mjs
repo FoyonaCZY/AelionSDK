@@ -51,8 +51,8 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 59,
-  firefox: 54,
+  chromium: 72,
+  firefox: 66,
 });
 
 export const PHASE_1_ARTIFACT_CLOCK_TOLERANCE_MS = 5_000;
@@ -116,13 +116,14 @@ export const PHASE_1_BLOCKER_REVIEW_ARTIFACTS = Object.freeze([
 ]);
 
 export const WORKSPACE_IDENTITY_POLICY = Object.freeze({
-  version: '3.1.0',
+  version: '3.2.0',
   algorithm: 'sha256(stable-json(files))',
   symbolicLinks: 'reject every non-excluded symbolic link',
   specialFiles: 'reject every non-excluded non-regular filesystem entry',
   exclusions: Object.freeze([
     'root reports/** and benchmarks/reports/** evidence outputs',
     'VCS/dependency/build/cache directories: .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results',
+    'generated TypeDoc projection: apps/docs/src/content/docs/api/**',
     'browser snapshot output directories named __screenshots__',
     'generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}',
     'OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo',
@@ -155,6 +156,12 @@ export function excludedWorkspacePath(root, path) {
   const segments = relativePath.split('/');
   if (relativePath === 'reports' || relativePath.startsWith('reports/')) return true;
   if (relativePath === 'benchmarks/reports' || relativePath.startsWith('benchmarks/reports/')) {
+    return true;
+  }
+  if (
+    relativePath === 'apps/docs/src/content/docs/api' ||
+    relativePath.startsWith('apps/docs/src/content/docs/api/')
+  ) {
     return true;
   }
   if (

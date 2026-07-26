@@ -328,6 +328,36 @@ function compileClip(
       visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
     };
   }
+  if (item.type === 'shape') {
+    return {
+      ...base,
+      kind: 'shape-clip',
+      shape: jsonObject(item.shape, `item ${item.id}.shape`),
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
+  if (item.type === 'material-content') {
+    const materialInstanceId = string(
+      item.materialInstanceId,
+      `item ${item.id}.materialInstanceId`,
+    );
+    const contentMaterial = materials[materialInstanceId];
+    if (contentMaterial === undefined) {
+      throw new ReferenceError(
+        `item ${item.id} references missing MaterialInstance ${materialInstanceId}`,
+      );
+    }
+    const materialInstanceIds = [...new Set([...base.materialInstanceIds, materialInstanceId])];
+    return {
+      ...base,
+      materialInstanceIds,
+      dependencyEntityIds: [...new Set([...base.dependencyEntityIds, materialInstanceId])],
+      fingerprint: `${base.fingerprint}|${materialFingerprint(contentMaterial)}`,
+      kind: 'material-content-clip',
+      materialInstanceId,
+      visual: object(item.visual, `item ${item.id}.visual`) as unknown as IrVisualProperties,
+    };
+  }
   if (item.type === 'adjustment') {
     return {
       ...base,
@@ -471,9 +501,11 @@ export class IncrementalRenderCompiler {
             item.type !== 'caption' &&
             item.type !== 'nested-sequence' &&
             item.type !== 'generator' &&
+            item.type !== 'shape' &&
+            item.type !== 'material-content' &&
             item.type !== 'adjustment'
           )
-            return [];
+            throw new TypeError(`Render IR cannot compile item type ${item.type}`);
           const previous = previousClips.get(itemId);
           if (
             canReuseByEntity &&
@@ -587,7 +619,10 @@ export class IncrementalRenderCompiler {
         durationUs:
           duration.mode === 'fixed'
             ? number(duration.durationUs, 'duration.durationUs')
-            : contentDuration(project, sequence.trackIds),
+            : Math.max(
+                contentDuration(project, sequence.trackIds),
+                ...transitions.map(value => value.range.startUs + value.range.durationUs),
+              ),
         tracks,
         transitions,
         materials,

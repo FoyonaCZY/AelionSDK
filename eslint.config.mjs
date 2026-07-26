@@ -48,9 +48,12 @@ export default tseslint.config(
   {
     files: [
       'scripts/**/*.mjs',
+      'apps/docs/scripts/**/*.mjs',
       'packages/*/check-*.mjs',
       'packages/*/test/**/*.mjs',
       'packages/*/test/fixtures/**/*.js',
+      'apps/docs/src/content.config.ts',
+      'scripts/competitor-benchmark-entry.ts',
       'eslint.config.mjs',
     ],
     extends: [tseslint.configs.disableTypeChecked],

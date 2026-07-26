@@ -155,6 +155,18 @@ export interface IrGeneratorClip extends IrBaseClip {
   readonly visual: IrVisualProperties;
 }
 
+export interface IrShapeClip extends IrBaseClip {
+  readonly kind: 'shape-clip';
+  readonly shape: JsonObject;
+  readonly visual: IrVisualProperties;
+}
+
+export interface IrMaterialContentClip extends IrBaseClip {
+  readonly kind: 'material-content-clip';
+  readonly materialInstanceId: string;
+  readonly visual: IrVisualProperties;
+}
+
 export interface IrAdjustmentClip extends IrBaseClip {
   readonly kind: 'adjustment-clip';
   readonly visual: IrVisualProperties;
@@ -171,6 +183,8 @@ export type IrClip =
   | IrTextClip
   | IrNestedSequenceClip
   | IrGeneratorClip
+  | IrShapeClip
+  | IrMaterialContentClip
   | IrAdjustmentClip
   | IrAudioClip;
 
@@ -243,6 +257,8 @@ export interface ActiveVisualState {
       | IrTextClip
       | IrNestedSequenceClip
       | IrGeneratorClip
+      | IrShapeClip
+      | IrMaterialContentClip
       | IrAdjustmentClip;
     readonly sourceTimeUs: number | null;
     readonly materials: readonly IrMaterialInstance[];

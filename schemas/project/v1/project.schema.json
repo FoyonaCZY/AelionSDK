@@ -841,21 +841,49 @@
       ],
       "unevaluatedProperties": false
     },
-    "genericItem": {
+    "shapeItem": {
       "type": "object",
       "allOf": [
         { "$ref": "#/$defs/baseItem" },
         {
           "type": "object",
-          "maxProperties": 4096,
-          "additionalProperties": true,
+          "required": ["shape", "visual"],
           "properties": {
-            "type": {
-              "enum": ["shape"]
-            }
+            "type": { "const": "shape" },
+            "shape": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "box", "fill"],
+              "properties": {
+                "kind": { "enum": ["rectangle", "ellipse", "polygon"] },
+                "box": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["x", "y", "width", "height"],
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" },
+                    "width": { "type": "number", "exclusiveMinimum": 0 },
+                    "height": { "type": "number", "exclusiveMinimum": 0 }
+                  }
+                },
+                "fill": { "$ref": "#/$defs/color" },
+                "stroke": { "$ref": "#/$defs/color" },
+                "strokeWidthPx": { "type": "number", "minimum": 0, "maximum": 4096 },
+                "cornerRadiusPx": { "type": "number", "minimum": 0, "maximum": 32768 },
+                "points": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 1024,
+                  "items": { "$ref": "#/$defs/vec2" }
+                }
+              }
+            },
+            "visual": { "$ref": "#/$defs/visual" }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "materialContentItem": {
       "type": "object",
@@ -863,10 +891,11 @@
         { "$ref": "#/$defs/baseItem" },
         {
           "type": "object",
-          "required": ["materialInstanceId"],
+          "required": ["materialInstanceId", "visual"],
           "properties": {
             "type": { "const": "material-content" },
-            "materialInstanceId": { "$ref": "#/$defs/entityId" }
+            "materialInstanceId": { "$ref": "#/$defs/entityId" },
+            "visual": { "$ref": "#/$defs/visual" }
           }
         }
       ],
@@ -883,7 +912,7 @@
         { "$ref": "#/$defs/generatorItem" },
         { "$ref": "#/$defs/adjustmentItem" },
         { "$ref": "#/$defs/materialContentItem" },
-        { "$ref": "#/$defs/genericItem" }
+        { "$ref": "#/$defs/shapeItem" }
       ]
     },
     "itemMap": {

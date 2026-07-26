@@ -32,6 +32,7 @@ import {
   validateGateRunDocument,
   validatePhase1PostflightAgainstArtifacts,
 } from './phase-1-evidence-lib.mjs';
+import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
 
 const execFileAsync = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -140,7 +141,7 @@ async function environment() {
     process.platform === 'darwin' ? await commandOutput('sw_vers', ['-productVersion']) : null;
   return {
     node: process.version,
-    pnpm: await commandOutput('corepack', ['pnpm', '--version']),
+    pnpm: await commandOutput(corepackExecutable, corepackArguments(['pnpm', '--version'])),
     expectedPackageManager: packageManifest.packageManager ?? null,
     os: {
       platform: process.platform,

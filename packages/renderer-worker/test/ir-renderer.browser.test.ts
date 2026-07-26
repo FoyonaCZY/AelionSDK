@@ -248,6 +248,67 @@ const source: IrFrameSource = {
 };
 
 describe('Project → Render IR → Material Graph → Worker renderer', () => {
+  it('renders schema-declared Shape content instead of silently dropping it', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (sequence === undefined || visual === undefined) throw new Error('Fixture is incomplete');
+    sequence.transitionIds = [];
+    visual.itemIds = ['shape'];
+    value.items = {
+      shape: {
+        id: 'shape',
+        trackId: 'visual',
+        type: 'shape',
+        enabled: true,
+        range: { startUs: 0, durationUs: 1_000_000 },
+        shape: {
+          kind: 'rectangle',
+          box: { x: 1, y: 1, width: 6, height: 6 },
+          fill: { space: 'srgb-linear', rgba: [1, 0, 0, 1] },
+          cornerRadiusPx: 1,
+        },
+        visual: {
+          fit: 'fill',
+          transform: {
+            positionPx: { x: 4, y: 4 },
+            anchor: { x: 0.5, y: 0.5 },
+            scale: { x: 1, y: 1 },
+            rotationDeg: 0,
+            skewDeg: { x: 0, y: 0 },
+          },
+          crop: { left: 0, top: 0, right: 0, bottom: 0 },
+          opacity: 1,
+          blendMode: 'normal',
+        },
+        materialInstanceIds: [],
+      } as unknown as ItemEntity,
+    };
+    value.materialInstances = {};
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const result = await renderer.render({
+        ir,
+        timeUs: 0,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+      });
+      try {
+        const rgba = pixel(result.bitmap);
+        expect(rgba[0]).toBeGreaterThan(240);
+        expect(rgba[1]).toBeLessThan(16);
+        expect(rgba[2]).toBeLessThan(16);
+        expect(rgba[3]).toBe(255);
+      } finally {
+        result.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
   it('rasterizes explicit text spacing through the portable glyph layout', async () => {
     const value = project();
     const sequence = value.sequences.sequence;

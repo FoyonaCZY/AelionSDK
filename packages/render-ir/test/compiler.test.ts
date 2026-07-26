@@ -505,7 +505,7 @@ describe('Project to Render IR', () => {
     );
   });
 
-  it('compiles image adapters, generators and adjustment layers as visual IR', () => {
+  it('compiles every declared visual content type without silently dropping Items', () => {
     const changed = structuredClone(project);
     const visualTrack = changed.tracks.track_video_main;
     const titleTrack = changed.tracks.track_title;
@@ -546,18 +546,110 @@ describe('Project to Render IR', () => {
       range: { startUs: 6_000_000, durationUs: 1_000_000 },
       materialInstanceIds: ['mat_warm_film'],
     };
+    changed.items.item_shape = {
+      ...structuredClone(title),
+      id: 'item_shape',
+      type: 'shape',
+      range: { startUs: 6_000_000, durationUs: 1_000_000 },
+      shape: {
+        kind: 'rectangle',
+        box: { x: 10, y: 20, width: 320, height: 180 },
+        fill: { space: 'srgb-linear', rgba: [1, 0, 0, 1] },
+        cornerRadiusPx: 12,
+      },
+    };
+    changed.items.item_material_content = {
+      ...structuredClone(title),
+      id: 'item_material_content',
+      type: 'material-content',
+      range: { startUs: 6_000_000, durationUs: 1_000_000 },
+      materialInstanceIds: [],
+      materialInstanceId: 'mat_warm_film',
+    };
     visualTrack.itemIds.push('item_image');
-    titleTrack.itemIds.push('item_generator', 'item_adjustment');
+    titleTrack.itemIds.push(
+      'item_generator',
+      'item_adjustment',
+      'item_shape',
+      'item_material_content',
+    );
     const ir = new IncrementalRenderCompiler().compile(changed, 'seq_main', 0n).ir;
     expect(ir.tracks.flatMap(track => track.clips).map(clip => [clip.id, clip.kind])).toEqual(
       expect.arrayContaining([
         ['item_image', 'visual-clip'],
         ['item_generator', 'generator-clip'],
         ['item_adjustment', 'adjustment-clip'],
+        ['item_shape', 'shape-clip'],
+        ['item_material_content', 'material-content-clip'],
       ]),
     );
     expect(evaluateVisualState(ir, 6_500_000).clips.map(value => value.clip.id)).toEqual(
-      expect.arrayContaining(['item_image', 'item_generator', 'item_adjustment']),
+      expect.arrayContaining([
+        'item_image',
+        'item_generator',
+        'item_adjustment',
+        'item_shape',
+        'item_material_content',
+      ]),
+    );
+    expect(
+      evaluateVisualState(ir, 6_500_000)
+        .clips.find(value => value.clip.id === 'item_material_content')
+        ?.materials.map(value => value.id),
+    ).toContain('mat_warm_film');
+  });
+
+  it('holds adjacent transition inputs outside their Item ranges', () => {
+    const changed = structuredClone(project);
+    const first = changed.items.item_video_a;
+    const second = changed.items.item_video_b;
+    if (first?.type !== 'video' || second?.type !== 'video') {
+      throw new Error('Expected video fixtures');
+    }
+    first.range = { startUs: 0, durationUs: 1_000_000 };
+    second.range = { startUs: 1_000_000, durationUs: 1_000_000 };
+    (first.source as JsonObject).sourceRange = {
+      startUs: 1_000_000,
+      durationUs: 1_000_000,
+    };
+    (second.source as JsonObject).sourceRange = {
+      startUs: 0,
+      durationUs: 1_000_000,
+    };
+    const transition = changed.transitions.transition_ab;
+    if (transition === undefined) throw new Error('Expected transition fixture');
+    transition.range = { startUs: 750_000, durationUs: 500_000 };
+    const ir = new IncrementalRenderCompiler().compile(changed, 'seq_main', 1n).ir;
+
+    const beforeBoundary = evaluateVisualState(ir, 800_000);
+    const afterBoundary = evaluateVisualState(ir, 1_200_000);
+    expect(beforeBoundary.clips.map(value => value.clip.id)).toEqual(
+      expect.arrayContaining(['item_video_a', 'item_video_b']),
+    );
+    expect(afterBoundary.clips.map(value => value.clip.id)).toEqual(
+      expect.arrayContaining(['item_video_a', 'item_video_b']),
+    );
+    expect(beforeBoundary.clips.find(value => value.clip.id === 'item_video_b')?.sourceTimeUs).toBe(
+      0,
+    );
+    expect(afterBoundary.clips.find(value => value.clip.id === 'item_video_a')?.sourceTimeUs).toBe(
+      1_999_999,
+    );
+  });
+
+  it('throws for an unknown Item type instead of silently removing timeline content', () => {
+    const changed = structuredClone(project);
+    const track = changed.tracks.track_title;
+    const title = changed.items.item_title;
+    if (track === undefined || title === undefined) throw new Error('Fixture title is missing');
+    changed.items.item_unknown = {
+      ...structuredClone(title),
+      id: 'item_unknown',
+      type: 'future-unknown-type',
+    };
+    track.itemIds.push('item_unknown');
+    expect(() => new IncrementalRenderCompiler().compile(changed, 'seq_main', 0n)).toThrow(
+      'Render IR cannot compile item type future-unknown-type',
     );
   });
 });

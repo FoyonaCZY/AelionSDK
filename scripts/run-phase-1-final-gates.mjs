@@ -26,6 +26,7 @@ import {
   sourceIdentitiesEqual,
   sourceIdentity,
 } from './phase-1-evidence-lib.mjs';
+import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const defaultResults = resolve(root, 'reports', 'baseline', 'phase-1-gate-results.json');
@@ -33,20 +34,40 @@ const lockPath = resolve(root, 'reports', 'baseline', 'phase-1-final-gates.lock'
 const maximumSummaryCharacters = 12_000;
 
 const gates = [
-  ['corepack pnpm run ci', 'corepack', ['pnpm', 'run', 'ci']],
-  ['corepack pnpm test:browser', 'corepack', ['pnpm', 'test:browser']],
-  ['corepack pnpm test:browser:firefox', 'corepack', ['pnpm', 'test:browser:firefox']],
-  ['corepack pnpm test:golden', 'corepack', ['pnpm', 'test:golden']],
-  ['corepack pnpm bench', 'corepack', ['pnpm', 'bench']],
-  ['corepack pnpm test:pack', 'corepack', ['pnpm', 'test:pack']],
-  ['corepack pnpm test:consumer', 'corepack', ['pnpm', 'test:consumer']],
-  ['corepack pnpm release:dry-run', 'corepack', ['pnpm', 'release:dry-run']],
-  ['corepack pnpm format:check', 'corepack', ['pnpm', 'format:check']],
-  ['corepack pnpm report:browser:chromium', 'corepack', ['pnpm', 'report:browser:chromium']],
-  ['corepack pnpm report:browser:firefox', 'corepack', ['pnpm', 'report:browser:firefox']],
-  ['corepack pnpm report:seek', 'corepack', ['pnpm', 'report:seek']],
-  ['corepack pnpm report:performance', 'corepack', ['pnpm', 'report:performance']],
-  ['corepack pnpm report:alpha', 'corepack', ['pnpm', 'report:alpha']],
+  ['corepack pnpm run ci', corepackExecutable, corepackArguments(['pnpm', 'run', 'ci'])],
+  ['corepack pnpm test:browser', corepackExecutable, corepackArguments(['pnpm', 'test:browser'])],
+  [
+    'corepack pnpm test:browser:firefox',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'test:browser:firefox']),
+  ],
+  ['corepack pnpm test:golden', corepackExecutable, corepackArguments(['pnpm', 'test:golden'])],
+  ['corepack pnpm bench', corepackExecutable, corepackArguments(['pnpm', 'bench'])],
+  ['corepack pnpm test:pack', corepackExecutable, corepackArguments(['pnpm', 'test:pack'])],
+  ['corepack pnpm test:consumer', corepackExecutable, corepackArguments(['pnpm', 'test:consumer'])],
+  [
+    'corepack pnpm release:dry-run',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'release:dry-run']),
+  ],
+  ['corepack pnpm format:check', corepackExecutable, corepackArguments(['pnpm', 'format:check'])],
+  [
+    'corepack pnpm report:browser:chromium',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:browser:chromium']),
+  ],
+  [
+    'corepack pnpm report:browser:firefox',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:browser:firefox']),
+  ],
+  ['corepack pnpm report:seek', corepackExecutable, corepackArguments(['pnpm', 'report:seek'])],
+  [
+    'corepack pnpm report:performance',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:performance']),
+  ],
+  ['corepack pnpm report:alpha', corepackExecutable, corepackArguments(['pnpm', 'report:alpha'])],
 ];
 
 const configuredCommands = gates.map(([command]) => command);

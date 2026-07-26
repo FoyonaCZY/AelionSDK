@@ -6,7 +6,9 @@ import {
   MemoryCacheStore,
   PageMediaResourceGovernor,
   createSampleIndexFromReader,
+  createVideoFrameDecodeSessionFromReader,
   decodeAudioPcmRangeFromReader,
+  decodeStillImageFromReader,
   decodeVideoFrameAtFromReader,
   proxyPresentationTimeUs,
   selectAssetRepresentation,
@@ -16,6 +18,7 @@ import {
   type MediaResourceGovernorSnapshot,
   type RangeReader,
   type SampleIndex,
+  type VideoFrameDecodeSession,
 } from '@aelion/media';
 
 import type { AelionMediaProvider, AelionMediaRequest } from './types.js';
@@ -34,6 +37,9 @@ export interface ProductionMediaRepresentationOptions {
   /** Optional lowercase SHA-256. Enables content-addressed persistent SampleIndex reuse. */
   readonly contentHash?: string;
   readonly sourceStartUs?: number;
+  /** Explicitly marks a range-backed representation as a still image. */
+  readonly kind?: 'media' | 'image';
+  readonly mimeType?: string;
 }
 
 export interface ProductionMediaUrlOptions
@@ -47,6 +53,13 @@ export interface ProductionMediaProviderOptions {
   readonly governor?: PageMediaResourceGovernor;
   readonly maxCachedIndexes?: number;
   readonly maxCachedIndexBytes?: number;
+  readonly maxDecodeSessions?: number;
+  readonly maxCachedVideoFramesPerSession?: number;
+  readonly maxCachedVideoBytesPerSession?: number;
+  readonly maxSequentialDecodeGapUs?: number;
+  readonly maxCachedImages?: number;
+  readonly maxCachedImageBytes?: number;
+  readonly maxImageDecodeBytes?: number;
   readonly maxConcurrentOperations?: number;
   readonly maxPendingOperations?: number;
 }
@@ -70,6 +83,25 @@ export interface ProductionMediaProviderSnapshot {
   readonly cachedIndexBytes: number;
   readonly maxCachedIndexes: number;
   readonly maxCachedIndexBytes: number;
+  readonly decodeSessions: number;
+  readonly activeDecodeSessions: number;
+  readonly maxDecodeSessions: number;
+  readonly cachedVideoFrames: number;
+  readonly cachedVideoBytes: number;
+  readonly maxCachedVideoFramesPerSession: number;
+  readonly maxCachedVideoBytesPerSession: number;
+  readonly maxSequentialDecodeGapUs: number;
+  readonly decodeCacheHits: number;
+  readonly decodeCacheMisses: number;
+  readonly decodeSeeks: number;
+  readonly sequentialDecodedFrames: number;
+  readonly cachedImages: number;
+  readonly cachedImageBytes: number;
+  readonly maxCachedImages: number;
+  readonly maxCachedImageBytes: number;
+  readonly maxImageDecodeBytes: number;
+  readonly imageCacheHits: number;
+  readonly imageCacheMisses: number;
   readonly activeOperations: number;
   readonly pendingOperations: number;
   readonly maxConcurrentOperations: number;
@@ -83,6 +115,8 @@ interface RegisteredRepresentation {
   readonly id: string;
   readonly role: ProductionMediaRole;
   readonly reader: RangeReader;
+  readonly kind: 'media' | 'image';
+  readonly mimeType?: string;
   readonly contentHash?: string;
   durationUs?: number;
   width?: number;
@@ -96,6 +130,18 @@ interface RegisteredAsset {
 
 interface ResidentIndex {
   readonly index: SampleIndex;
+  readonly byteLength: number;
+  access: number;
+}
+
+interface ResidentDecodeSession {
+  readonly session: VideoFrameDecodeSession;
+  access: number;
+  active: number;
+}
+
+interface ResidentImage {
+  readonly frame: VideoFrame;
   readonly byteLength: number;
   access: number;
 }
@@ -224,17 +270,29 @@ function awaitWithSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<
 export class ProductionMediaProvider implements AelionMediaProvider {
   readonly #assets = new Map<string, RegisteredAsset>();
   readonly #residentIndexes = new Map<string, ResidentIndex>();
+  readonly #decodeSessions = new Map<string, ResidentDecodeSession>();
+  readonly #residentImages = new Map<string, ResidentImage>();
   readonly #indexOperations = new Map<string, Promise<SampleIndex>>();
   readonly #cache: CacheStore;
   readonly #governor: PageMediaResourceGovernor;
   readonly #ownsGovernor: boolean;
   readonly #maxCachedIndexes: number;
   readonly #maxCachedIndexBytes: number;
+  readonly #maxDecodeSessions: number;
+  readonly #maxCachedVideoFramesPerSession: number;
+  readonly #maxCachedVideoBytesPerSession: number;
+  readonly #maxSequentialDecodeGapUs: number;
+  readonly #maxCachedImages: number;
+  readonly #maxCachedImageBytes: number;
+  readonly #maxImageDecodeBytes: number;
   readonly #maxConcurrentOperations: number;
   readonly #maxPendingOperations: number;
   readonly #waiters: OperationWaiter[] = [];
   readonly #lifecycle = new AbortController();
   #cachedIndexBytes = 0;
+  #cachedImageBytes = 0;
+  #imageCacheHits = 0;
+  #imageCacheMisses = 0;
   #clock = 0;
   #activeOperations = 0;
   #operationSequence = 0;
@@ -254,6 +312,31 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#maxPendingOperations = nonNegativeSafeInteger(
       options.maxPendingOperations ?? 64,
       'maxPendingOperations',
+    );
+    this.#maxDecodeSessions = positiveSafeInteger(
+      options.maxDecodeSessions ?? this.#maxConcurrentOperations,
+      'maxDecodeSessions',
+    );
+    this.#maxCachedVideoFramesPerSession = positiveSafeInteger(
+      options.maxCachedVideoFramesPerSession ?? 24,
+      'maxCachedVideoFramesPerSession',
+    );
+    this.#maxCachedVideoBytesPerSession = positiveSafeInteger(
+      options.maxCachedVideoBytesPerSession ?? 96 * 1_024 * 1_024,
+      'maxCachedVideoBytesPerSession',
+    );
+    this.#maxSequentialDecodeGapUs = positiveSafeInteger(
+      options.maxSequentialDecodeGapUs ?? 3_000_000,
+      'maxSequentialDecodeGapUs',
+    );
+    this.#maxCachedImages = positiveSafeInteger(options.maxCachedImages ?? 16, 'maxCachedImages');
+    this.#maxCachedImageBytes = positiveSafeInteger(
+      options.maxCachedImageBytes ?? 256 * 1_024 * 1_024,
+      'maxCachedImageBytes',
+    );
+    this.#maxImageDecodeBytes = positiveSafeInteger(
+      options.maxImageDecodeBytes ?? 64 * 1_024 * 1_024,
+      'maxImageDecodeBytes',
     );
     this.#cache = options.cache ?? new MemoryCacheStore(this.#maxCachedIndexBytes);
     this.#ownsGovernor = options.governor === undefined;
@@ -284,6 +367,9 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     assertOptionalTime(options.sourceStartUs, 'sourceStartUs', true);
     assertOptionalDimension(options.width, 'width');
     assertOptionalDimension(options.height, 'height');
+    if (options.mimeType !== undefined && options.mimeType.trim().length === 0) {
+      throw new TypeError('mimeType must be a non-empty string');
+    }
     if (options.contentHash !== undefined && !/^[0-9a-f]{64}$/u.test(options.contentHash)) {
       throw new TypeError('contentHash must be a lowercase SHA-256 value');
     }
@@ -298,6 +384,8 @@ export class ProductionMediaProvider implements AelionMediaProvider {
         if (existing.role === 'original' && existingId !== id) {
           asset.representations.delete(existingId);
           this.#dropResidentIndex(this.#indexKey(assetId, existingId));
+          this.#dropDecodeSessions(assetId, existingId);
+          this.#dropResidentImage(this.#indexKey(assetId, existingId));
         }
       }
     }
@@ -305,6 +393,8 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       id,
       role,
       reader,
+      kind: options.kind ?? 'media',
+      ...(options.mimeType === undefined ? {} : { mimeType: options.mimeType }),
       ...(options.durationUs === undefined ? {} : { durationUs: options.durationUs }),
       ...(options.width === undefined ? {} : { width: options.width }),
       ...(options.height === undefined ? {} : { height: options.height }),
@@ -313,6 +403,8 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     });
     this.#generation += 1;
     this.#dropResidentIndex(this.#indexKey(assetId, id));
+    this.#dropDecodeSessions(assetId, id);
+    this.#dropResidentImage(this.#indexKey(assetId, id));
   }
 
   public registerBlob(
@@ -322,7 +414,13 @@ export class ProductionMediaProvider implements AelionMediaProvider {
   ): void {
     const role = options.role ?? 'original';
     const id = options.id ?? `${assetId}:${role}`;
-    this.registerReader(assetId, new BlobRangeReader(id, blob), { ...options, id, role });
+    this.registerReader(assetId, new BlobRangeReader(id, blob), {
+      ...options,
+      id,
+      role,
+      kind: options.kind ?? (blob.type.startsWith('image/') ? 'image' : 'media'),
+      ...(options.mimeType === undefined && blob.type.length > 0 ? { mimeType: blob.type } : {}),
+    });
   }
 
   public registerFile(
@@ -331,6 +429,26 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     options: ProductionMediaRepresentationOptions = {},
   ): void {
     this.registerBlob(assetId, file, options);
+  }
+
+  public registerImageBlob(
+    assetId: string,
+    blob: Blob,
+    options: ProductionMediaRepresentationOptions = {},
+  ): void {
+    this.registerBlob(assetId, blob, {
+      ...options,
+      kind: 'image',
+      ...(options.mimeType === undefined && blob.type.length > 0 ? { mimeType: blob.type } : {}),
+    });
+  }
+
+  public registerImageFile(
+    assetId: string,
+    file: File,
+    options: ProductionMediaRepresentationOptions = {},
+  ): void {
+    this.registerImageBlob(assetId, file, options);
   }
 
   public registerUrl(assetId: string, url: string, options: ProductionMediaUrlOptions = {}): void {
@@ -387,6 +505,10 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     for (const key of [...this.#residentIndexes.keys()]) {
       if (key.startsWith(`${assetId}\u0000`)) this.#dropResidentIndex(key);
     }
+    this.#dropDecodeSessions(assetId);
+    for (const key of [...this.#residentImages.keys()]) {
+      if (key.startsWith(`${assetId}\u0000`)) this.#dropResidentImage(key);
+    }
     return true;
   }
 
@@ -429,6 +551,12 @@ export class ProductionMediaProvider implements AelionMediaProvider {
   ): Promise<VideoFrame> {
     this.#assertActive();
     const selected = this.#select(assetId, request ?? { purpose: 'export' });
+    if (selected.representation.kind === 'image') {
+      if (streamIndex !== 0) throw new RangeError('Still images only expose stream index 0');
+      return this.#run(signal, operationSignal =>
+        this.#imageFrame(assetId, selected.representation, operationSignal),
+      );
+    }
     const index = await this.#sampleIndex(assetId, selected.representation, signal);
     const presentationTimeUs = proxyPresentationTimeUs(sourceTimeUs, {
       id: selected.representation.id,
@@ -453,21 +581,37 @@ export class ProductionMediaProvider implements AelionMediaProvider {
         operationSignal,
       );
       try {
-        const result = await decodeVideoFrameAtFromReader(
-          selected.representation.reader,
-          presentationTimeUs,
-          {
-            sampleIndex: index,
-            streamIndex,
-            signal: operationSignal,
-            maxDecodeQueueSize: 8,
-          },
+        const resident = this.#acquireDecodeSession(
+          assetId,
+          selected.representation,
+          streamIndex,
+          index,
         );
         try {
-          throwIfAborted(operationSignal, 'production media video decode');
-          return result.frame.clone();
+          const result =
+            resident === undefined
+              ? await decodeVideoFrameAtFromReader(
+                  selected.representation.reader,
+                  presentationTimeUs,
+                  {
+                    sampleIndex: index,
+                    streamIndex,
+                    signal: operationSignal,
+                    maxDecodeQueueSize: 8,
+                  },
+                )
+              : await resident.session.frameAt(presentationTimeUs, operationSignal);
+          try {
+            throwIfAborted(operationSignal, 'production media video decode');
+            return result.frame.clone();
+          } finally {
+            result.close();
+          }
         } finally {
-          result.close();
+          if (resident !== undefined) {
+            resident.active -= 1;
+            resident.access = ++this.#clock;
+          }
         }
       } finally {
         await lease.dispose();
@@ -513,9 +657,25 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#generation += 1;
     this.#residentIndexes.clear();
     this.#cachedIndexBytes = 0;
+    for (const resident of this.#decodeSessions.values()) resident.session.dispose();
+    this.#decodeSessions.clear();
+    for (const resident of this.#residentImages.values()) resident.frame.close();
+    this.#residentImages.clear();
+    this.#cachedImageBytes = 0;
+  }
+
+  public registerImageUrl(
+    assetId: string,
+    url: string,
+    options: ProductionMediaUrlOptions = {},
+  ): void {
+    this.registerUrl(assetId, url, { ...options, kind: 'image' });
   }
 
   public snapshot(): ProductionMediaProviderSnapshot {
+    const decodeSnapshots = [...this.#decodeSessions.values()].map(value =>
+      value.session.snapshot(),
+    );
     return {
       assets: this.#assets.size,
       representations: [...this.#assets.values()].reduce(
@@ -526,6 +686,29 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       cachedIndexBytes: this.#cachedIndexBytes,
       maxCachedIndexes: this.#maxCachedIndexes,
       maxCachedIndexBytes: this.#maxCachedIndexBytes,
+      decodeSessions: this.#decodeSessions.size,
+      activeDecodeSessions: [...this.#decodeSessions.values()].filter(value => value.active > 0)
+        .length,
+      maxDecodeSessions: this.#maxDecodeSessions,
+      cachedVideoFrames: decodeSnapshots.reduce((total, value) => total + value.cachedFrames, 0),
+      cachedVideoBytes: decodeSnapshots.reduce((total, value) => total + value.cachedBytes, 0),
+      maxCachedVideoFramesPerSession: this.#maxCachedVideoFramesPerSession,
+      maxCachedVideoBytesPerSession: this.#maxCachedVideoBytesPerSession,
+      maxSequentialDecodeGapUs: this.#maxSequentialDecodeGapUs,
+      decodeCacheHits: decodeSnapshots.reduce((total, value) => total + value.cacheHits, 0),
+      decodeCacheMisses: decodeSnapshots.reduce((total, value) => total + value.cacheMisses, 0),
+      decodeSeeks: decodeSnapshots.reduce((total, value) => total + value.seeks, 0),
+      sequentialDecodedFrames: decodeSnapshots.reduce(
+        (total, value) => total + value.sequentialFrames,
+        0,
+      ),
+      cachedImages: this.#residentImages.size,
+      cachedImageBytes: this.#cachedImageBytes,
+      maxCachedImages: this.#maxCachedImages,
+      maxCachedImageBytes: this.#maxCachedImageBytes,
+      maxImageDecodeBytes: this.#maxImageDecodeBytes,
+      imageCacheHits: this.#imageCacheHits,
+      imageCacheMisses: this.#imageCacheMisses,
       activeOperations: this.#activeOperations,
       pendingOperations: this.#waiters.length,
       maxConcurrentOperations: this.#maxConcurrentOperations,
@@ -547,6 +730,11 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#assets.clear();
     this.#residentIndexes.clear();
     this.#cachedIndexBytes = 0;
+    for (const resident of this.#decodeSessions.values()) resident.session.dispose();
+    this.#decodeSessions.clear();
+    for (const resident of this.#residentImages.values()) resident.frame.close();
+    this.#residentImages.clear();
+    this.#cachedImageBytes = 0;
     if (this.#ownsGovernor) this.#governor.dispose();
   }
 
@@ -679,6 +867,118 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#residentIndexes.delete(key);
   }
 
+  #acquireDecodeSession(
+    assetId: string,
+    representation: RegisteredRepresentation,
+    streamIndex: number,
+    index: SampleIndex,
+  ): ResidentDecodeSession | undefined {
+    const key = this.#decodeSessionKey(assetId, representation.id, streamIndex);
+    const existing = this.#decodeSessions.get(key);
+    if (existing !== undefined) {
+      existing.active += 1;
+      existing.access = ++this.#clock;
+      return existing;
+    }
+    while (this.#decodeSessions.size >= this.#maxDecodeSessions) {
+      const oldest = [...this.#decodeSessions.entries()]
+        .filter(([, value]) => value.active === 0)
+        .sort((left, right) => left[1].access - right[1].access)[0];
+      if (oldest === undefined) return undefined;
+      oldest[1].session.dispose();
+      this.#decodeSessions.delete(oldest[0]);
+    }
+    const resident: ResidentDecodeSession = {
+      session: createVideoFrameDecodeSessionFromReader(representation.reader, index, {
+        streamIndex,
+        maxCachedFrames: this.#maxCachedVideoFramesPerSession,
+        maxCachedBytes: this.#maxCachedVideoBytesPerSession,
+        maxSequentialGapUs: this.#maxSequentialDecodeGapUs,
+      }),
+      active: 1,
+      access: ++this.#clock,
+    };
+    this.#decodeSessions.set(key, resident);
+    return resident;
+  }
+
+  #dropDecodeSessions(assetId: string, representationId?: string): void {
+    const prefix =
+      representationId === undefined
+        ? `${assetId}\u0000`
+        : `${assetId}\u0000${representationId}\u0000`;
+    for (const [key, resident] of [...this.#decodeSessions]) {
+      if (!key.startsWith(prefix)) continue;
+      resident.session.dispose();
+      this.#decodeSessions.delete(key);
+    }
+  }
+
+  async #imageFrame(
+    assetId: string,
+    representation: RegisteredRepresentation,
+    signal: AbortSignal,
+  ): Promise<VideoFrame> {
+    const key = this.#indexKey(assetId, representation.id);
+    const resident = this.#residentImages.get(key);
+    if (resident !== undefined) {
+      resident.access = ++this.#clock;
+      this.#imageCacheHits += 1;
+      return resident.frame.clone();
+    }
+    this.#imageCacheMisses += 1;
+    const generation = this.#generation;
+    const decoded = await decodeStillImageFromReader(representation.reader, {
+      maxBytes: this.#maxImageDecodeBytes,
+      ...(representation.mimeType === undefined ? {} : { mimeType: representation.mimeType }),
+      signal,
+    });
+    const byteLength = (() => {
+      try {
+        return decoded.frame.allocationSize();
+      } catch {
+        return decoded.width * decoded.height * 4;
+      }
+    })();
+    const value: ResidentImage = {
+      frame: decoded.frame,
+      byteLength,
+      access: ++this.#clock,
+    };
+    if (generation === this.#generation && byteLength <= this.#maxCachedImageBytes) {
+      this.#rememberImage(key, value);
+    }
+    try {
+      return value.frame.clone();
+    } finally {
+      if (this.#residentImages.get(key) !== value) value.frame.close();
+    }
+  }
+
+  #rememberImage(key: string, image: ResidentImage): void {
+    this.#dropResidentImage(key);
+    this.#residentImages.set(key, image);
+    this.#cachedImageBytes += image.byteLength;
+    while (
+      this.#residentImages.size > this.#maxCachedImages ||
+      this.#cachedImageBytes > this.#maxCachedImageBytes
+    ) {
+      const oldest = [...this.#residentImages.entries()].sort(
+        (left, right) => left[1].access - right[1].access,
+      )[0];
+      if (oldest === undefined) break;
+      this.#dropResidentImage(oldest[0]);
+    }
+  }
+
+  #dropResidentImage(key: string): void {
+    const resident = this.#residentImages.get(key);
+    if (resident === undefined) return;
+    this.#residentImages.delete(key);
+    this.#cachedImageBytes -= resident.byteLength;
+    resident.frame.close();
+  }
+
   #cacheAddress(representation: RegisteredRepresentation): CacheAddress | undefined {
     return representation.contentHash === undefined
       ? undefined
@@ -692,6 +992,10 @@ export class ProductionMediaProvider implements AelionMediaProvider {
 
   #indexKey(assetId: string, representationId: string): string {
     return `${assetId}\u0000${representationId}`;
+  }
+
+  #decodeSessionKey(assetId: string, representationId: string, streamIndex: number): string {
+    return `${assetId}\u0000${representationId}\u0000${streamIndex.toString()}`;
   }
 
   async #run<T>(

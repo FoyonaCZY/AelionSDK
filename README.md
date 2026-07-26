@@ -55,7 +55,7 @@ corepack pnpm dev:quickstart
 corepack pnpm dev:editor
 ```
 
-它包含本地素材导入、时间线、播放头拖动、音视频联动编辑、撤销/重做，以及 WebM 和 H.264 MP4 导出。两个示例都只使用公开包入口，没有调用仓库内部实现。
+它包含本地素材导入、时间线、播放头拖动、音视频联动编辑、撤销/重做、IndexedDB 自动保存与恢复，以及 WebM 和 H.264 MP4 导出。两个示例都只使用公开包入口，没有调用仓库内部实现。
 
 ## 最小接入
 
@@ -127,7 +127,9 @@ async function openVideo(file: File, canvas: HTMLCanvasElement) {
 | 音频       | 多轨混音、gain/pan/fade、mute/solo、声道矩阵、ducking、waveform、响度、true peak 和 limiter            |
 | 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算              |
 | 导出       | H.264/AAC MP4、VP9/Opus WebM、PNG、JPEG、WebP、GIF、WAV/RF64，以及 Memory、OPFS 和自定义 Writable Sink |
-| 扩展       | 自定义 Material、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测                              |
+| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                            |
+| 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                         |
+| 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测             |
 
 编辑操作通过 Transaction 提交。每次成功提交都会产生新的 revision，并可以 Undo/Redo；拖拽或滑块等连续交互可以实时更新，同时只占用一条撤销记录。
 
@@ -153,6 +155,8 @@ MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，�
 - [从本地视频到 MP4](https://foyonaczy.github.io/AelionSDK/start/getting-started/)：第一次接入建议从这里开始；
 - [Project 和时间线](https://foyonaczy.github.io/AelionSDK/concepts/project-timeline/)：理解保存格式、轨道、片段和素材引用；
 - [把 SDK 接进剪辑器 UI](https://foyonaczy.github.io/AelionSDK/guides/editor-ui/)：连接状态管理、时间线、Inspector 和自动保存；
+- [从 WebAV 与 Diffusion Studio 迁移](https://foyonaczy.github.io/AelionSDK/guides/migration/)：严格转换源工程并处理无法等价表达的能力；
+- [Revision 持久化与扩展隔离](https://foyonaczy.github.io/AelionSDK/guides/durability-extensions/)：接入自动恢复和受限 Worker RPC；
 - [导出 MP4 和 WebM](https://foyonaczy.github.io/AelionSDK/export/video/)：选择 Profile、Sink、码率并处理 preflight；
 - [包和公开入口](https://foyonaczy.github.io/AelionSDK/reference/packages/)：决定应用需要依赖哪些包；
 - [API Reference](https://foyonaczy.github.io/AelionSDK/api/overview/)：查看所有公开类型和方法。
@@ -181,6 +185,19 @@ corepack pnpm test:browser:firefox
 `pnpm run ci` 会检查格式、文档链接、Schema、类型、单元测试、应用构建和 API Snapshot；浏览器测试分别使用 Chromium 和 Firefox。
 
 贡献代码前请阅读[贡献指南](CONTRIBUTING.md)。开发命令、包验证和发布流程见[维护仓库与准备发布](https://foyonaczy.github.io/AelionSDK/project/development/)。
+
+## 最新验证状态
+
+2026-07-26 在 Windows 参考机上完成了与源清单
+`7cef4917e5671187b5214de44bb23e8ee7ad7772fde70220a83515da0a4b2525`
+绑定的串行最终门禁：14/14 个命令通过，门禁前后源清单一致，产物 postflight
+语义校验通过。Chromium 72 项和 Firefox 66 项浏览器测试均为零失败、零跳过；
+13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、golden、
+benchmark、1080p30 性能、seek 与 60 秒导出外部 FFmpeg readback 均通过。
+
+完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态投影见
+`docs/status.md`。这些结果证明当前提交候选满足仓库的自动化发布门禁，但不代表
+npm 已发布，也不替代仓库策略要求的独立人工 blocker review。
 
 ## License
 

@@ -1,5 +1,5 @@
 import { access, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const mode = process.argv[2];
@@ -10,7 +10,12 @@ if (mode !== 'stage' && mode !== 'clean') {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const packageDirectory = resolve(process.cwd());
 const packagesRoot = resolve(root, 'packages');
-if (!packageDirectory.startsWith(`${packagesRoot}/`)) {
+const relativePackageDirectory = relative(packagesRoot, packageDirectory);
+if (
+  relativePackageDirectory.length === 0 ||
+  relativePackageDirectory.startsWith('..') ||
+  isAbsolute(relativePackageDirectory)
+) {
   throw new Error('Package artifacts may only be staged below packages/');
 }
 

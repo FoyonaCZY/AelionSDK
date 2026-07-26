@@ -131,7 +131,9 @@ describe('fixed 30-second Project vertical slice', () => {
         expect(openingFrame.materialIds).toEqual(['mat_warm']);
         expect(transitionFrame.materialIds).toEqual(['mat_warm', 'mat_dissolve']);
         expect(closingFrame.materialIds).toEqual([]);
-        expect(transitionFrame.backend).toBe(preferredBackend);
+        expect(transitionFrame.backend, JSON.stringify(transitionFrame.diagnostics)).toBe(
+          preferredBackend,
+        );
         expect(openingFrame.bitmap.width).toBe(320);
         expect(closingFrame.bitmap.height).toBe(180);
         expect(audio).toHaveLength(9_600);

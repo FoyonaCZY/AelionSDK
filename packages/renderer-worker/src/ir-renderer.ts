@@ -1,4 +1,4 @@
-import { AelionError, type Disposable, throwIfAborted } from '@aelion/core';
+import { AelionError, type Disposable, type JsonValue, throwIfAborted } from '@aelion/core';
 import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
 import {
   evaluateMaterialInstance,
@@ -8,13 +8,23 @@ import {
   LOCAL_RGBA8_COLOR_CAPABILITY,
   preflightColorPipeline,
   type IrMaterialInstance,
+  type IrShapeClip,
   type IrTextClip,
   type PortableTextStyle,
   type RenderIr,
 } from '@aelion/render-ir';
 
-import { WorkerCompositor, type ComposeOptions, type WorkerCompositorSnapshot } from './client.js';
-import type { ComposeSuccess } from './protocol.js';
+import {
+  WorkerCompositor,
+  type ComposeFrameGraphOptions,
+  type WorkerCompositorSnapshot,
+} from './client.js';
+import type {
+  ComposeSuccess,
+  FrameGraphInput,
+  FrameGraphNode,
+  RendererWorkerDiagnostic,
+} from './protocol.js';
 
 export type RenderMode = 'preview' | 'export';
 
@@ -38,7 +48,7 @@ export interface RenderIrFrameOptions {
   readonly timeUs: number;
   readonly source: IrFrameSource;
   readonly mode: RenderMode;
-  readonly preferredBackend?: 'webgpu' | 'webgl2';
+  readonly preferredBackend?: 'auto' | 'webgpu' | 'webgl2';
   readonly allowFallback?: boolean;
   /** Preview-only output scale. Export always renders at full Project resolution. */
   readonly renderScale?: number;
@@ -48,6 +58,7 @@ export interface RenderIrFrameOptions {
 export interface RenderIrFrameResult {
   readonly bitmap: ImageBitmap;
   readonly backend: 'webgpu' | 'webgl2';
+  readonly diagnostics?: readonly RendererWorkerDiagnostic[];
   readonly materialIds: readonly string[];
   readonly width: number;
   readonly height: number;
@@ -63,7 +74,17 @@ export interface RenderIrFrameRendererSnapshot {
   readonly disposed: boolean;
   readonly pendingFrames: number;
   readonly maxPendingFrames: number;
+  readonly adaptiveBackend: AdaptiveBackendSnapshot;
   readonly worker: WorkerCompositorSnapshot;
+}
+
+export interface AdaptiveBackendSnapshot {
+  readonly selected: 'webgpu' | 'webgl2';
+  readonly webgpuSamples: number;
+  readonly webgl2Samples: number;
+  readonly webgpuP95Us: number | null;
+  readonly webgl2P95Us: number | null;
+  readonly webgpuCooldownFrames: number;
 }
 
 interface LinkedAbortSignal {
@@ -89,6 +110,59 @@ function linkAbortSignals(first: AbortSignal | undefined, second: AbortSignal): 
       second.removeEventListener('abort', abortFromSecond);
     },
   };
+}
+
+function percentile95(values: readonly number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((left, right) => left - right);
+  return sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * 0.95) - 1)] ?? null;
+}
+
+class AdaptiveBackendSelector {
+  readonly #samples: Record<'webgpu' | 'webgl2', number[]> = {
+    webgpu: [],
+    webgl2: [],
+  };
+  #selectionCount = 0;
+  #webgpuCooldownUntil = 0;
+
+  public select(requested: RenderIrFrameOptions['preferredBackend'] = 'auto'): 'webgpu' | 'webgl2' {
+    if (requested !== 'auto') return requested;
+    this.#selectionCount += 1;
+    return this.#selected();
+  }
+
+  public record(
+    requested: 'webgpu' | 'webgl2',
+    result: Pick<ComposeSuccess, 'backend' | 'diagnostics' | 'timing'>,
+  ): void {
+    const samples = this.#samples[result.backend];
+    samples.push(result.timing.totalWorkerUs);
+    if (samples.length > 32) samples.shift();
+    if (requested === 'webgpu' && result.backend !== 'webgpu') {
+      this.#webgpuCooldownUntil = this.#selectionCount + 60;
+    }
+  }
+
+  public snapshot(): AdaptiveBackendSnapshot {
+    return {
+      selected: this.#selected(),
+      webgpuSamples: this.#samples.webgpu.length,
+      webgl2Samples: this.#samples.webgl2.length,
+      webgpuP95Us: percentile95(this.#samples.webgpu),
+      webgl2P95Us: percentile95(this.#samples.webgl2),
+      webgpuCooldownFrames: Math.max(0, this.#webgpuCooldownUntil - this.#selectionCount),
+    };
+  }
+
+  #selected(): 'webgpu' | 'webgl2' {
+    if (this.#selectionCount < this.#webgpuCooldownUntil) return 'webgl2';
+    if (this.#samples.webgl2.length < 3) return 'webgl2';
+    if (this.#samples.webgpu.length < 3) return 'webgpu';
+    const webgpuP95 = percentile95(this.#samples.webgpu) ?? Number.POSITIVE_INFINITY;
+    const webgl2P95 = percentile95(this.#samples.webgl2) ?? Number.POSITIVE_INFINITY;
+    return webgpuP95 < webgl2P95 ? 'webgpu' : 'webgl2';
+  }
 }
 
 function requiredProgram(material: IrMaterialInstance, mode: RenderMode) {
@@ -197,6 +271,134 @@ void main() {
     out_color = texture(u_input_source, sourceUv) * u_parameter_opacity;
   }
 }`,
+  webgpu: {
+    backend: 'webgpu',
+    nodeSet: 'aelion.visual.builtin/1.0.0',
+    graphHash: 'builtin-visual-transform-v1',
+    inputPorts: ['source'],
+    uniforms: [
+      'positionX',
+      'positionY',
+      'anchorX',
+      'anchorY',
+      'scaleX',
+      'scaleY',
+      'rotationRad',
+      'opacity',
+      'outputWidth',
+      'outputHeight',
+      'cropLeft',
+      'cropTop',
+      'cropRight',
+      'cropBottom',
+    ].map(id => ({
+      name: `u_parameter_${id}`,
+      type: 'float' as const,
+      source: { kind: 'parameter' as const, id },
+    })),
+    executionPlan: {
+      passes: [
+        {
+          id: 'builtin-visual-transform',
+          kind: 'draw',
+          nodes: ['builtin-visual-transform'],
+          estimatedTextureSamples: 1,
+        },
+      ],
+      intermediateTextureCount: 0,
+    },
+    shader: `
+struct Uniforms { values: array<vec4f, 14> };
+@group(0) @binding(0) var source_sampler: sampler;
+@group(0) @binding(1) var input_source: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> uniforms: Uniforms;
+struct VertexOut { @builtin(position) position: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) index: u32) -> VertexOut {
+  var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var uvs = array<vec2f, 3>(vec2f(0.0, 1.0), vec2f(2.0, 1.0), vec2f(0.0, -1.0));
+  return VertexOut(vec4f(positions[index], 0.0, 1.0), uvs[index]);
+}
+
+@fragment fn fs(vertex: VertexOut) -> @location(0) vec4f {
+  let position = vec2f(
+    uniforms.values[0].x / uniforms.values[8].x,
+    uniforms.values[1].x / uniforms.values[9].x
+  );
+  let offset = vertex.uv - position;
+  let c = cos(-uniforms.values[6].x);
+  let s = sin(-uniforms.values[6].x);
+  let rotated = mat2x2f(c, -s, s, c) * offset;
+  let source_uv = rotated / vec2f(uniforms.values[4].x, uniforms.values[5].x)
+    + vec2f(uniforms.values[2].x, uniforms.values[3].x);
+  let crop_min = vec2f(uniforms.values[10].x, uniforms.values[11].x);
+  let crop_max = vec2f(1.0 - uniforms.values[12].x, 1.0 - uniforms.values[13].x);
+  let sampled = textureSample(input_source, source_sampler, source_uv);
+  if (any(source_uv < crop_min) || any(source_uv > crop_max)) {
+    return vec4f(0.0);
+  }
+  return sampled * uniforms.values[7].x;
+}`,
+  },
+};
+
+const COPY_PROGRAM: WebGl2MaterialProgram = {
+  backend: 'webgl2',
+  nodeSet: 'aelion.visual.builtin/1.0.0',
+  graphHash: 'builtin-copy-v1',
+  inputPorts: ['source'],
+  uniforms: [],
+  executionPlan: {
+    passes: [
+      {
+        id: 'builtin-copy',
+        kind: 'draw',
+        nodes: ['builtin-copy'],
+        estimatedTextureSamples: 1,
+      },
+    ],
+    intermediateTextureCount: 0,
+  },
+  fragmentShader: `#version 300 es
+precision highp float;
+uniform sampler2D u_input_source;
+in vec2 v_uv;
+out vec4 out_color;
+void main() {
+  out_color = texture(u_input_source, v_uv);
+}`,
+  webgpu: {
+    backend: 'webgpu',
+    nodeSet: 'aelion.visual.builtin/1.0.0',
+    graphHash: 'builtin-copy-v1',
+    inputPorts: ['source'],
+    uniforms: [],
+    executionPlan: {
+      passes: [
+        {
+          id: 'builtin-copy',
+          kind: 'draw',
+          nodes: ['builtin-copy'],
+          estimatedTextureSamples: 1,
+        },
+      ],
+      intermediateTextureCount: 0,
+    },
+    shader: `
+struct Uniforms { values: array<vec4f, 1> };
+@group(0) @binding(0) var source_sampler: sampler;
+@group(0) @binding(1) var input_source: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> uniforms: Uniforms;
+struct VertexOut { @builtin(position) position: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) index: u32) -> VertexOut {
+  var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var uvs = array<vec2f, 3>(vec2f(0.0, 1.0), vec2f(2.0, 1.0), vec2f(0.0, -1.0));
+  return VertexOut(vec4f(positions[index], 0.0, 1.0), uvs[index]);
+}
+@fragment fn fs(vertex: VertexOut) -> @location(0) vec4f {
+  return textureSample(input_source, source_sampler, vertex.uv)
+    + vec4f(uniforms.values[0].x * 0.0);
+}`,
+  },
 };
 
 const BLEND_PROGRAM: WebGl2MaterialProgram = {
@@ -390,6 +592,60 @@ void main() {
   if (u_parameter_invert > 0.5) amount = 1.0 - amount;
   out_color = texture(u_input_source, v_uv) * clamp(amount, 0.0, 1.0);
 }`,
+  webgpu: {
+    backend: 'webgpu',
+    nodeSet: 'aelion.visual.builtin/1.0.0',
+    graphHash: 'builtin-mask-v1',
+    inputPorts: ['source', 'mask'],
+    uniforms: ['maskMode', 'invert', 'featherUvX', 'featherUvY'].map(id => ({
+      name: `u_parameter_${id}`,
+      type: 'float' as const,
+      source: { kind: 'parameter' as const, id },
+    })),
+    executionPlan: {
+      passes: [
+        {
+          id: 'builtin-mask',
+          kind: 'draw',
+          nodes: ['builtin-mask'],
+          estimatedTextureSamples: 10,
+        },
+      ],
+      intermediateTextureCount: 0,
+    },
+    shader: `
+struct Uniforms { values: array<vec4f, 4> };
+@group(0) @binding(0) var source_sampler: sampler;
+@group(0) @binding(1) var input_source: texture_2d<f32>;
+@group(0) @binding(2) var input_mask: texture_2d<f32>;
+@group(0) @binding(3) var<uniform> uniforms: Uniforms;
+struct VertexOut { @builtin(position) position: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) index: u32) -> VertexOut {
+  var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var uvs = array<vec2f, 3>(vec2f(0.0, 1.0), vec2f(2.0, 1.0), vec2f(0.0, -1.0));
+  return VertexOut(vec4f(positions[index], 0.0, 1.0), uvs[index]);
+}
+fn mask_value(uv: vec2f) -> f32 {
+  let value = textureSample(input_mask, source_sampler, uv);
+  let luma = dot(value.rgb, vec3f(0.2126, 0.7152, 0.0722));
+  return select(luma, value.a, uniforms.values[0].x < 0.5);
+}
+@fragment fn fs(vertex: VertexOut) -> @location(0) vec4f {
+  let radius = vec2f(uniforms.values[2].x, uniforms.values[3].x);
+  var amount = mask_value(vertex.uv);
+  amount += mask_value(vertex.uv + vec2f(radius.x, 0.0));
+  amount += mask_value(vertex.uv - vec2f(radius.x, 0.0));
+  amount += mask_value(vertex.uv + vec2f(0.0, radius.y));
+  amount += mask_value(vertex.uv - vec2f(0.0, radius.y));
+  amount += mask_value(vertex.uv + radius);
+  amount += mask_value(vertex.uv - radius);
+  amount += mask_value(vertex.uv + vec2f(radius.x, -radius.y));
+  amount += mask_value(vertex.uv + vec2f(-radius.x, radius.y));
+  amount /= 9.0;
+  let masked = select(amount, 1.0 - amount, uniforms.values[1].x > 0.5);
+  return textureSample(input_source, source_sampler, vertex.uv) * clamp(masked, 0.0, 1.0);
+}`,
+  },
 };
 
 function blendModeCode(mode: string): number {
@@ -588,8 +844,89 @@ function rasterGeneratorFrame(
   return new VideoFrame(canvas, { timestamp: timestampUs });
 }
 
+function roundedRectanglePath(
+  context: OffscreenCanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+): void {
+  const clamped = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.moveTo(x + clamped, y);
+  context.lineTo(x + width - clamped, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + clamped);
+  context.lineTo(x + width, y + height - clamped);
+  context.quadraticCurveTo(x + width, y + height, x + width - clamped, y + height);
+  context.lineTo(x + clamped, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - clamped);
+  context.lineTo(x, y + clamped);
+  context.quadraticCurveTo(x, y, x + clamped, y);
+}
+
+function rasterShapeFrame(
+  clip: IrShapeClip,
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
+  timestampUs: number,
+): VideoFrame {
+  const canvas = new OffscreenCanvas(outputWidth, outputHeight);
+  const context = canvas.getContext('2d');
+  if (context === null) throw new Error('SHAPE_CANVAS_UNAVAILABLE');
+  const shape = record(clip.shape);
+  const box = record(shape.box);
+  const x = finite(box.x, 0);
+  const y = finite(box.y, 0);
+  const width = Math.max(0, finite(box.width, 0));
+  const height = Math.max(0, finite(box.height, 0));
+  if (width === 0 || height === 0) throw new RangeError(`SHAPE_BOX_INVALID: ${clip.id}`);
+  context.save();
+  context.scale(outputWidth / projectWidth, outputHeight / projectHeight);
+  context.beginPath();
+  if (shape.kind === 'ellipse') {
+    context.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
+  } else if (shape.kind === 'polygon') {
+    const points = Array.isArray(shape.points) ? shape.points.map(value => record(value)) : [];
+    if (points.length < 3) throw new RangeError(`SHAPE_POLYGON_POINTS_INVALID: ${clip.id}`);
+    points.forEach((point, index) => {
+      const pointX = x + finite(point.x, 0) * width;
+      const pointY = y + finite(point.y, 0) * height;
+      if (index === 0) context.moveTo(pointX, pointY);
+      else context.lineTo(pointX, pointY);
+    });
+    context.closePath();
+  } else {
+    roundedRectanglePath(
+      context,
+      x,
+      y,
+      width,
+      height,
+      Math.max(0, finite(shape.cornerRadiusPx, 0)),
+    );
+    context.closePath();
+  }
+  context.fillStyle = canvasColor(shape.fill);
+  context.fill();
+  const strokeWidthPx = Math.max(0, finite(shape.strokeWidthPx, 0));
+  if (shape.stroke !== undefined && strokeWidthPx > 0) {
+    context.strokeStyle = canvasColor(shape.stroke);
+    context.lineWidth = strokeWidthPx;
+    context.stroke();
+  }
+  context.restore();
+  return new VideoFrame(canvas, { timestamp: timestampUs });
+}
+
+function rasterTransparentFrame(width: number, height: number, timestampUs: number): VideoFrame {
+  return new VideoFrame(new OffscreenCanvas(width, height), { timestamp: timestampUs });
+}
+
 export class RenderIrFrameRenderer implements Disposable {
   readonly #compositor = new WorkerCompositor();
+  readonly #adaptiveBackend = new AdaptiveBackendSelector();
   readonly #disposeController = new AbortController();
   readonly #maxPendingFrames: number;
   readonly #renderTasks = new Map<symbol, Promise<RenderIrFrameResult>>();
@@ -612,6 +949,7 @@ export class RenderIrFrameRenderer implements Disposable {
       disposed: this.disposed,
       pendingFrames: this.#pendingFrames,
       maxPendingFrames: this.#maxPendingFrames,
+      adaptiveBackend: this.#adaptiveBackend.snapshot(),
       worker: this.#compositor.snapshot(),
     };
   }
@@ -658,10 +996,34 @@ export class RenderIrFrameRenderer implements Disposable {
     if (!color.ok) throw new AelionError(color.issues);
     const state = evaluateVisualState(options.ir, options.timeUs);
     const backgroundId = '__aelion_background__';
-    const rendered = new Map<string, VideoFrame>([
-      [backgroundId, rasterBackgroundFrame(options.ir, width, height, options.timeUs)],
-    ]);
+    const externalFrames = new Map<string, VideoFrame>();
+    const rendered = new Map<string, FrameGraphInput>();
+    const nodes: FrameGraphNode[] = [];
     const appliedMaterialIds: string[] = [];
+    let nextExternalId = 0;
+    let nextNodeId = 0;
+    let inputsTransferred = false;
+
+    const addExternal = (frame: VideoFrame, label: string): FrameGraphInput => {
+      const id = `external:${(nextExternalId++).toString()}:${label}`;
+      externalFrames.set(id, frame);
+      return { kind: 'external', id };
+    };
+    const addNode = (
+      label: string,
+      inputs: Readonly<Record<string, FrameGraphInput>>,
+      program: WebGl2MaterialProgram,
+      parameters: Readonly<Record<string, JsonValue>> = {},
+      systems: Readonly<Record<string, number>> = {},
+    ): FrameGraphInput => {
+      const id = `node:${(nextNodeId++).toString()}:${label}`;
+      nodes.push({ id, inputs, program, parameters, systems });
+      return { kind: 'node', id };
+    };
+    rendered.set(
+      backgroundId,
+      addExternal(rasterBackgroundFrame(options.ir, width, height, options.timeUs), 'background'),
+    );
     try {
       for (const active of state.clips) {
         if (active.clip.kind === 'adjustment-clip') continue;
@@ -686,6 +1048,17 @@ export class RenderIrFrameRenderer implements Disposable {
           );
         } else if (active.clip.kind === 'generator-clip') {
           frame = rasterGeneratorFrame(active.clip.generator, width, height, options.timeUs);
+        } else if (active.clip.kind === 'shape-clip') {
+          frame = rasterShapeFrame(
+            active.clip,
+            options.ir.width,
+            options.ir.height,
+            width,
+            height,
+            options.timeUs,
+          );
+        } else if (active.clip.kind === 'material-content-clip') {
+          frame = rasterTransparentFrame(width, height, options.timeUs);
         } else {
           if (active.sourceTimeUs === null) continue;
           const subgraph = options.ir.subgraphs?.[active.clip.source.sequenceId];
@@ -702,6 +1075,8 @@ export class RenderIrFrameRenderer implements Disposable {
         }
         try {
           throwIfAborted(options.signal, 'Render IR media decode');
+          let reference = addExternal(frame, active.clip.id);
+          frame = undefined;
           const baseParameters = visualParameters(
             active.clip.visual,
             options.ir.width,
@@ -712,21 +1087,12 @@ export class RenderIrFrameRenderer implements Disposable {
             active.clip.range.startUs,
           );
           if (requiresBaseVisualPass(baseParameters, width, height)) {
-            const input = frame;
-            // WorkerCompositor owns every input once compose() is invoked,
-            // including its rejected/aborted admission paths.
-            frame = undefined;
-            const base = await this.#composeOwned({
-              inputs: { source: input },
-              program: BASE_VISUAL_PROGRAM,
-              parameters: baseParameters,
-              width,
-              height,
-              preferredBackend: 'webgl2',
-              allowFallback: false,
-              ...(options.signal === undefined ? {} : { signal: options.signal }),
-            });
-            frame = takeBitmapFrame(base.bitmap, options.timeUs);
+            reference = addNode(
+              `${active.clip.id}:visual`,
+              { source: reference },
+              BASE_VISUAL_PROGRAM,
+              baseParameters,
+            );
           }
           for (const material of active.materials) {
             const program = requiredProgram(material, options.mode);
@@ -736,26 +1102,16 @@ export class RenderIrFrameRenderer implements Disposable {
               options.timeUs,
               active.clip.range.startUs,
             );
-            const input = frame;
-            frame = undefined;
-            const result = await this.#composeOwned({
-              inputs: { source: input },
+            reference = addNode(
+              `${active.clip.id}:material:${material.id}`,
+              { source: reference },
               program,
-              parameters: evaluated.parameters,
-              systems: { qualityScale: renderScale },
-              width,
-              height,
-              preferredBackend: options.preferredBackend ?? 'webgpu',
-              allowFallback: options.allowFallback ?? true,
-              ...(options.signal === undefined ? {} : { signal: options.signal }),
-            });
-            frame = takeBitmapFrame(result.bitmap, options.timeUs);
+              evaluated.parameters,
+              { qualityScale: renderScale },
+            );
             appliedMaterialIds.push(material.id);
           }
-          const previous = rendered.get(active.clip.id);
-          if (previous !== undefined) previous.close();
-          rendered.set(active.clip.id, frame);
-          frame = undefined;
+          rendered.set(active.clip.id, reference);
         } finally {
           frame?.close();
         }
@@ -773,8 +1129,7 @@ export class RenderIrFrameRenderer implements Disposable {
             `MASK_SOURCE_MISSING: ${active.clip.id} -> ${mask.sourceItemId}`,
           );
         }
-        rendered.delete(active.clip.id);
-        let ownedMask = maskSource.clone();
+        let maskReference = maskSource;
         if (mask.space === 'source') {
           const targetSpace = visualParameters(
             active.clip.visual,
@@ -786,44 +1141,26 @@ export class RenderIrFrameRenderer implements Disposable {
             active.clip.range.startUs,
           );
           if (requiresBaseVisualPass(targetSpace, width, height)) {
-            try {
-              const aligned = await this.#composeOwned({
-                inputs: { source: ownedMask },
-                program: BASE_VISUAL_PROGRAM,
-                parameters: targetSpace,
-                width,
-                height,
-                preferredBackend: 'webgl2',
-                allowFallback: false,
-                ...(options.signal === undefined ? {} : { signal: options.signal }),
-              });
-              ownedMask = takeBitmapFrame(aligned.bitmap, options.timeUs);
-            } catch (error) {
-              target.close();
-              throw error;
-            }
+            maskReference = addNode(
+              `${active.clip.id}:source-mask-space`,
+              { source: maskReference },
+              BASE_VISUAL_PROGRAM,
+              targetSpace,
+            );
           }
         }
-        const result = await this.#composeOwned({
-          inputs: { source: target, mask: ownedMask },
-          program: MASK_PROGRAM,
-          parameters: {
+        rendered.set(
+          active.clip.id,
+          addNode(`${active.clip.id}:mask`, { source: target, mask: maskReference }, MASK_PROGRAM, {
             maskMode: mask.channel === 'luma' ? 1 : 0,
             invert: mask.invert ? 1 : 0,
             featherUvX: mask.featherPx / options.ir.width,
             featherUvY: mask.featherPx / options.ir.height,
-          },
-          width,
-          height,
-          preferredBackend: 'webgl2',
-          allowFallback: false,
-          ...(options.signal === undefined ? {} : { signal: options.signal }),
-        });
-        rendered.set(active.clip.id, takeBitmapFrame(result.bitmap, options.timeUs));
+          }),
+        );
         if (mask.consumeSource) consumedMaskIds.add(mask.sourceItemId);
       }
 
-      let transitionBackend: ComposeSuccess['backend'] | undefined;
       let transitionLayerId: string | undefined;
       const layerIds = [
         backgroundId,
@@ -847,21 +1184,13 @@ export class RenderIrFrameRenderer implements Disposable {
           state.transition.transition.range.startUs,
         );
         transitionLayerId = `transition:${state.transition.transition.id}`;
-        rendered.delete(state.transition.transition.fromItemId);
-        rendered.delete(state.transition.transition.toItemId);
-        const transitionResult = await this.#composeOwned({
-          inputs: { from, to },
-          program,
-          parameters: evaluated.parameters,
-          systems: { transitionProgress: state.transition.progress, qualityScale: renderScale },
-          width,
-          height,
-          preferredBackend: options.preferredBackend ?? 'webgpu',
-          allowFallback: options.allowFallback ?? true,
-          ...(options.signal === undefined ? {} : { signal: options.signal }),
-        });
-        transitionBackend = transitionResult.backend;
-        rendered.set(transitionLayerId, takeBitmapFrame(transitionResult.bitmap, options.timeUs));
+        rendered.set(
+          transitionLayerId,
+          addNode(transitionLayerId, { from, to }, program, evaluated.parameters, {
+            transitionProgress: state.transition.progress,
+            qualityScale: renderScale,
+          }),
+        );
         blendModes.set(transitionLayerId, 'normal');
         appliedMaterialIds.push(state.transition.material.id);
         const fromIndex = layerIds.indexOf(state.transition.transition.fromItemId);
@@ -886,115 +1215,96 @@ export class RenderIrFrameRenderer implements Disposable {
 
       const firstLayer = layers[0];
       if (firstLayer === undefined) throw new Error('No base visual frame is active');
-      let composite: VideoFrame | undefined = firstLayer.frame;
-      let compositeBackend = transitionBackend ?? 'webgl2';
-      rendered.delete(firstLayer.id);
+      let composite = firstLayer.frame;
+      for (let index = 1; index < layers.length; index += 1) {
+        const layer = layers[index];
+        if (layer === undefined) continue;
+        composite = addNode(
+          `blend:${layer.id}`,
+          { base: composite, overlay: layer.frame },
+          BLEND_PROGRAM,
+          { blendMode: blendModeCode(layer.blendMode) },
+        );
+      }
+
+      for (const active of state.clips) {
+        if (active.clip.kind !== 'adjustment-clip' || active.materials.length === 0) continue;
+        const original = composite;
+        for (const material of active.materials) {
+          const program = requiredProgram(material, options.mode);
+          if (program === undefined) continue;
+          const evaluated = evaluateMaterialInstance(
+            material,
+            options.timeUs,
+            active.clip.range.startUs,
+          );
+          composite = addNode(
+            `${active.clip.id}:adjustment:${material.id}`,
+            { source: composite },
+            program,
+            evaluated.parameters,
+            { qualityScale: renderScale },
+          );
+          appliedMaterialIds.push(material.id);
+        }
+        const adjustmentParameters = visualParameters(
+          active.clip.visual,
+          options.ir.width,
+          options.ir.height,
+          width,
+          height,
+          options.timeUs,
+          active.clip.range.startUs,
+        );
+        if (requiresBaseVisualPass(adjustmentParameters, width, height)) {
+          composite = addNode(
+            `${active.clip.id}:adjustment-visual`,
+            { source: composite },
+            BASE_VISUAL_PROGRAM,
+            adjustmentParameters,
+          );
+          composite = addNode(
+            `${active.clip.id}:adjustment-blend`,
+            { base: original, overlay: composite },
+            BLEND_PROGRAM,
+            { blendMode: 0 },
+          );
+        }
+      }
+
+      if (composite.kind === 'external') {
+        composite = addNode('final-copy', { source: composite }, COPY_PROGRAM);
+      }
+      throwIfAborted(options.signal, 'Render IR frame graph');
+      const preferredBackend = this.#adaptiveBackend.select(options.preferredBackend ?? 'auto');
+      inputsTransferred = true;
+      const result = await this.#composeFrameGraphOwned({
+        inputs: Object.fromEntries(externalFrames),
+        nodes,
+        outputNodeId: composite.id,
+        width,
+        height,
+        preferredBackend,
+        allowFallback: options.allowFallback ?? true,
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+      });
+      this.#adaptiveBackend.record(preferredBackend, result);
+      const outputFrame = takeBitmapFrame(result.bitmap, options.timeUs);
       try {
-        for (let index = 1; index < layers.length; index += 1) {
-          const layer = layers[index];
-          if (layer === undefined) continue;
-          rendered.delete(layer.id);
-          const base = composite;
-          composite = undefined;
-          const result = await this.#composeOwned({
-            inputs: { base, overlay: layer.frame },
-            program: BLEND_PROGRAM,
-            parameters: { blendMode: blendModeCode(layer.blendMode) },
-            width,
-            height,
-            preferredBackend: options.preferredBackend ?? 'webgpu',
-            allowFallback: options.allowFallback ?? true,
-            ...(options.signal === undefined ? {} : { signal: options.signal }),
-          });
-          composite = takeBitmapFrame(result.bitmap, options.timeUs);
-          compositeBackend = result.backend;
-        }
-
-        for (const active of state.clips) {
-          if (active.clip.kind !== 'adjustment-clip' || active.materials.length === 0) continue;
-          let original: VideoFrame | undefined = composite.clone();
-          try {
-            for (const material of active.materials) {
-              const program = requiredProgram(material, options.mode);
-              if (program === undefined) continue;
-              const evaluated = evaluateMaterialInstance(
-                material,
-                options.timeUs,
-                active.clip.range.startUs,
-              );
-              const input = composite;
-              composite = undefined;
-              const result = await this.#composeOwned({
-                inputs: { source: input },
-                program,
-                parameters: evaluated.parameters,
-                systems: { qualityScale: renderScale },
-                width,
-                height,
-                preferredBackend: options.preferredBackend ?? 'webgpu',
-                allowFallback: options.allowFallback ?? true,
-                ...(options.signal === undefined ? {} : { signal: options.signal }),
-              });
-              composite = takeBitmapFrame(result.bitmap, options.timeUs);
-              compositeBackend = result.backend;
-              appliedMaterialIds.push(material.id);
-            }
-            const adjustmentParameters = visualParameters(
-              active.clip.visual,
-              options.ir.width,
-              options.ir.height,
-              width,
-              height,
-              options.timeUs,
-              active.clip.range.startUs,
-            );
-            if (requiresBaseVisualPass(adjustmentParameters, width, height)) {
-              const adjustedInput = composite;
-              composite = undefined;
-              const adjusted = await this.#composeOwned({
-                inputs: { source: adjustedInput },
-                program: BASE_VISUAL_PROGRAM,
-                parameters: adjustmentParameters,
-                width,
-                height,
-                preferredBackend: 'webgl2',
-                allowFallback: false,
-                ...(options.signal === undefined ? {} : { signal: options.signal }),
-              });
-              const overlay = takeBitmapFrame(adjusted.bitmap, options.timeUs);
-              const base = original;
-              original = undefined;
-              const blended = await this.#composeOwned({
-                inputs: { base, overlay },
-                program: BLEND_PROGRAM,
-                parameters: { blendMode: 0 },
-                width,
-                height,
-                preferredBackend: options.preferredBackend ?? 'webgpu',
-                allowFallback: options.allowFallback ?? true,
-                ...(options.signal === undefined ? {} : { signal: options.signal }),
-              });
-              composite = takeBitmapFrame(blended.bitmap, options.timeUs);
-              compositeBackend = blended.backend;
-            }
-          } finally {
-            original?.close();
-          }
-        }
-
         return {
-          bitmap: await presentationBitmap(composite, options.signal),
-          backend: compositeBackend,
+          bitmap: await presentationBitmap(outputFrame, options.signal),
+          backend: result.backend,
+          diagnostics: result.diagnostics,
           materialIds: appliedMaterialIds,
           width,
           height,
           renderScale,
         };
       } finally {
-        composite?.close();
+        outputFrame.close();
       }
     } finally {
-      rendered.forEach(frame => frame.close());
+      if (!inputsTransferred) externalFrames.forEach(frame => frame.close());
     }
   }
 
@@ -1009,15 +1319,15 @@ export class RenderIrFrameRenderer implements Disposable {
     return this.#disposeTask;
   }
 
-  async #composeOwned(options: ComposeOptions): Promise<ComposeSuccess> {
-    // No asynchronous code can interleave this state check with compose()'s
+  async #composeFrameGraphOwned(options: ComposeFrameGraphOptions): Promise<ComposeSuccess> {
+    // No asynchronous code can interleave this state check with composeFrameGraph()'s
     // synchronous admission. Once admitted, WorkerCompositor closes or transfers
     // every input; only this already-disposed path retains local ownership.
     if (this.#compositor.disposed) {
       new Set(Object.values(options.inputs)).forEach(frame => frame.close());
       throw new ReferenceError('WorkerCompositor is disposed');
     }
-    const result = await this.#compositor.compose(options);
+    const result = await this.#compositor.composeFrameGraph(options);
     try {
       throwIfAborted(options.signal, 'Render IR composition');
       return result;

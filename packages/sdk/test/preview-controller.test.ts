@@ -2,6 +2,7 @@ import type { RenderIrFrameResult } from '@aelion/renderer-worker';
 import { describe, expect, it, vi } from 'vitest';
 
 import { attachPreviewCanvas } from '../src/preview-controller.js';
+import type { PreviewCanvasPointerEvent } from '../src/preview-controller.js';
 import type { AelionPlayerFrame, AelionSessionApi } from '../src/types.js';
 
 interface Deferred<T> {
@@ -143,5 +144,57 @@ describe('PreviewCanvasController', () => {
     expect(fake.quality).toHaveBeenLastCalledWith({ quality: 'draft', renderScale: 0.75 });
     controller.dispose();
     expect(fake.playerListener()).toBeUndefined();
+  });
+
+  it('maps pointer coordinates and exposes captureStream without a second render path', () => {
+    const fake = session(() => Promise.reject(new Error('not used')));
+    const target = canvas();
+    const listeners = new Map<string, EventListener>();
+    const stream = {} as MediaStream;
+    const captureStream = vi.fn(() => stream);
+    Object.assign(target.element, {
+      getBoundingClientRect: () => ({
+        left: 10,
+        top: 20,
+        width: 320,
+        height: 180,
+        right: 330,
+        bottom: 200,
+        x: 10,
+        y: 20,
+        toJSON: () => ({}),
+      }),
+      addEventListener: (type: string, listener: EventListener) => listeners.set(type, listener),
+      removeEventListener: (type: string) => listeners.delete(type),
+      captureStream,
+    });
+    const onPointer = vi.fn<(event: PreviewCanvasPointerEvent) => void>();
+    const controller = attachPreviewCanvas(fake.api, target.element, {
+      subscribePlayer: false,
+      pixelRatio: 1,
+      onPointer,
+    });
+
+    expect(controller.toProjectPoint(170, 110)).toMatchObject({
+      x: 160,
+      y: 90,
+      inside: true,
+    });
+    listeners.get('pointerdown')?.({
+      type: 'pointerdown',
+      clientX: 170,
+      clientY: 110,
+      pointerId: 7,
+      buttons: 1,
+    } as PointerEvent);
+    expect(onPointer.mock.calls[0]?.[0]).toMatchObject({
+      type: 'down',
+      pointerId: 7,
+      point: { x: 160, y: 90, inside: true },
+    });
+    expect(controller.captureStream(60)).toBe(stream);
+    expect(captureStream).toHaveBeenCalledWith(60);
+    controller.dispose();
+    expect(listeners.size).toBe(0);
   });
 });

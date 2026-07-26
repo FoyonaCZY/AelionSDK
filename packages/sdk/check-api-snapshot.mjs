@@ -1,12 +1,20 @@
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const packageDirectory = dirname(fileURLToPath(import.meta.url));
 const snapshotPath = join(packageDirectory, 'api-snapshot.md');
 const entrypoint = 'dist/index.d.ts';
 const update = process.argv.includes('--update');
+
+function canonicalDeclarationSource(source) {
+  return source.replace(/\r\n?/gu, '\n');
+}
+
+function canonicalDeclarationPath(path) {
+  return relative(packageDirectory, path).split(sep).join('/');
+}
 
 function imports(source) {
   return [...source.matchAll(/(?:from\s+|import\s*)['"](\.\.?\/[^'"]+)['"]/gu)].map(
@@ -60,7 +68,7 @@ async function collect(path, files, exports, publicModules, isPublicModule) {
   if (files.has(path)) source = await readFile(path, 'utf8');
   else {
     source = await readFile(path, 'utf8');
-    files.set(path, createHash('sha256').update(source).digest('hex'));
+    files.set(path, createHash('sha256').update(canonicalDeclarationSource(source)).digest('hex'));
   }
   if (isPublicModule && !publicModules.has(path)) {
     publicModules.add(path);
@@ -92,7 +100,7 @@ const actual = {
   entrypoint,
   files: Object.fromEntries(
     [...files]
-      .map(([path, hash]) => [relative(packageDirectory, path), hash])
+      .map(([path, hash]) => [canonicalDeclarationPath(path), hash])
       .sort(([left], [right]) => left.localeCompare(right)),
   ),
   exports: [...exports].sort(),

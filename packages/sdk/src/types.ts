@@ -1,14 +1,21 @@
-import type { PcmSourceBlock } from '@aelion/audio';
+import type {
+  LoudnessReport,
+  PcmSourceBlock,
+  SilenceDetectionResult,
+  WaveformPeakResult,
+} from '@aelion/audio';
 import type { CapabilityReport } from '@aelion/capability';
 import type { Diagnostic, JsonObject, JsonValue } from '@aelion/core';
 import type {
   ExportProfileId,
+  ExportProfileSelection,
   ExportPreflightReport,
   GifExportResult,
   RemoteExportAuthorizer,
   RemoteExportProvider,
   RemoteExportResult,
   StillImageExportResult,
+  SelectExportProfileOptions,
   WavExportResult,
   WebMExportOptions,
   WebMExportResult,
@@ -61,12 +68,78 @@ export interface AelionSessionOptions {
   readonly media?: AelionMediaProvider;
   readonly materials?: AelionRuntimeMaterialRegistry;
   readonly sequenceId?: string;
-  readonly preferredBackend?: 'webgpu' | 'webgl2';
+  readonly preferredBackend?: 'auto' | 'webgpu' | 'webgl2';
   readonly allowBackendFallback?: boolean;
   /** Maximum full Preview/Player/Export frame evaluations in flight. Defaults to 2. */
   readonly maxPendingFrames?: number;
   /** Maximum retained diagnostic history entries. Defaults to 256. */
   readonly maxDiagnostics?: number;
+}
+
+export interface AelionAudioSelection {
+  readonly trackIds?: readonly string[];
+  readonly itemIds?: readonly string[];
+  readonly signal?: AbortSignal;
+  readonly onProgress?: (progress: number) => void;
+}
+
+export interface AelionAudioAnalysisOptions extends AelionAudioSelection {
+  readonly blockFrames?: number;
+}
+
+export interface AelionAudioWaveformOptions extends AelionAudioSelection {
+  readonly windowFrames?: number;
+  readonly maxPoints?: number;
+}
+
+export interface AelionAudioRemoveSilenceOptions {
+  readonly itemId: string;
+  readonly thresholdDb?: number;
+  readonly minimumSilenceUs?: number;
+  readonly paddingUs?: number;
+  readonly windowFrames?: number;
+  readonly signal?: AbortSignal;
+  readonly onProgress?: (progress: number) => void;
+}
+
+export interface AelionAudioDuckingOptions {
+  readonly programTrackIds: readonly string[];
+  readonly sidechainTrackIds: readonly string[];
+  readonly thresholdDb?: number;
+  readonly reductionDb?: number;
+  readonly attackUs?: number;
+  readonly releaseUs?: number;
+  /** Defaults to zero during export to avoid changing timeline duration. */
+  readonly lookaheadUs?: number;
+}
+
+export interface AelionAudioMasteringOptions {
+  readonly targetLufs?: number;
+  readonly maximumGainDb?: number;
+  readonly limiter?:
+    | false
+    | {
+        readonly ceilingDbtp?: number;
+        readonly releaseUs?: number;
+        readonly lookaheadUs?: number;
+      };
+  readonly ducking?: readonly AelionAudioDuckingOptions[];
+}
+
+export interface AelionAudioRemoveSilenceResult {
+  readonly commit: TransactionCommit;
+  readonly detection: SilenceDetectionResult;
+  readonly itemIds: readonly string[];
+  readonly removedUs: number;
+}
+
+export interface AelionAudioApi {
+  analyze(options?: AelionAudioAnalysisOptions): Promise<LoudnessReport>;
+  waveform(options?: AelionAudioWaveformOptions): Promise<WaveformPeakResult>;
+  detectSilence(options: AelionAudioRemoveSilenceOptions): Promise<SilenceDetectionResult>;
+  removeSilence(options: AelionAudioRemoveSilenceOptions): Promise<AelionAudioRemoveSilenceResult>;
+  configureMastering(options: AelionAudioMasteringOptions): TransactionCommit;
+  getMastering(): AelionAudioMasteringOptions | undefined;
 }
 
 export type AelionSessionState = 'empty' | 'ready' | 'disposed';
@@ -203,11 +276,20 @@ export interface AelionExportOptions {
   readonly signal?: AbortSignal;
   readonly cleanupSink?: (reason: unknown) => void | Promise<void>;
   readonly onProgress?: (progress: number) => void;
+  /** Overrides revisioned Project mastering settings for this export. */
+  readonly audioProcessing?: AelionAudioMasteringOptions;
 }
 
 export interface AelionExportApi {
   preflight(options: AelionExportOptions): Promise<ExportPreflightReport>;
   preflightProfile(options: AelionProfileExportOptions): Promise<ExportPreflightReport>;
+  /** Negotiates exact local codec support against the loaded Sequence format. */
+  negotiate(
+    options: Pick<
+      SelectExportProfileOptions,
+      'preferred' | 'fallbacks' | 'remoteAvailable' | 'videoBitrate' | 'audioBitrate'
+    >,
+  ): Promise<ExportProfileSelection>;
   /** Starts one frozen-revision export. The returned job remains await-compatible. */
   start(options: AelionExportOptions): AelionExportJob;
   /** Starts a non-default production export profile from the same frozen Render IR. */
@@ -232,6 +314,7 @@ interface AelionProfileExportBaseOptions {
   readonly signal?: AbortSignal;
   readonly cleanupSink?: (reason: unknown) => void | Promise<void>;
   readonly onProgress?: (progress: number) => void;
+  readonly audioProcessing?: AelionAudioMasteringOptions;
 }
 
 export type AelionProfileExportOptions =
@@ -357,6 +440,7 @@ export interface AelionSessionApi {
   readonly player: AelionPlayerApi;
   readonly preview: AelionPreviewApi;
   readonly export: AelionExportApi;
+  readonly audio: AelionAudioApi;
   loadProject(project: unknown): Promise<void>;
   /** @deprecated Use `session.preview.renderFrame()` for new integrations. */
   renderFrame(options: AelionPreviewOptions): Promise<RenderIrFrameResult>;

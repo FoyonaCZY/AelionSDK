@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import {
@@ -15,7 +15,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { promisify } from 'node:util';
@@ -23,6 +23,7 @@ import { promisify } from 'node:util';
 import { chromium, firefox } from 'playwright';
 
 import { validateTarballConsumer } from './phase-1-evidence-lib.mjs';
+import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
 
 const execFileAsync = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,6 +46,38 @@ async function run(command, args, cwd) {
     env: { ...process.env, COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' },
     maxBuffer: 16 * 1024 * 1024,
   });
+}
+
+function deferTemporaryCleanup(directory) {
+  const source = `
+    import { rm } from 'node:fs/promises';
+    const [directory, parentPidText] = process.argv.slice(1);
+    const parentPid = Number(parentPidText);
+    while (true) {
+      try {
+        process.kill(parentPid, 0);
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch {
+        break;
+      }
+    }
+    await rm(directory, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 100,
+    });
+  `;
+  const cleanup = spawn(
+    process.execPath,
+    ['--input-type=module', '--eval', source, directory, process.pid.toString()],
+    {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    },
+  );
+  cleanup.unref();
 }
 
 async function walk(directory) {
@@ -255,8 +288,8 @@ async function localThirdPartyTarballs() {
   const tarballs = {};
   for (const [name, entry] of [...packages].sort(([left], [right]) => left.localeCompare(right))) {
     const packed = await run(
-      'corepack',
-      [
+      corepackExecutable,
+      corepackArguments([
         'pnpm',
         '--config.ignore-scripts=true',
         '--dir',
@@ -264,7 +297,7 @@ async function localThirdPartyTarballs() {
         'pack',
         '--pack-destination',
         tarballDirectory,
-      ],
+      ]),
       root,
     );
     const tarballPath = `${packed.stdout}\n${packed.stderr}`
@@ -291,13 +324,18 @@ async function runBrowserConsumer() {
     join(canonicalConsumerDirectory, 'node_modules', 'esbuild'),
   );
   const esbuildRequire = createRequire(join(esbuildPackageRoot, 'package.json'));
-  const esbuildBinaryPath = esbuildRequire.resolve(
-    `@esbuild/${process.platform}-${process.arch}/bin/esbuild`,
+  const esbuildPlatformPackage = `@esbuild/${process.platform}-${process.arch}`;
+  const esbuildPlatformRoot = dirname(
+    esbuildRequire.resolve(`${esbuildPlatformPackage}/package.json`),
   );
+  const esbuildBinaryPath =
+    process.platform === 'win32'
+      ? join(esbuildPlatformRoot, 'esbuild.exe')
+      : join(esbuildPlatformRoot, 'bin', 'esbuild');
   // Repacking the already-installed platform package with pnpm loses the
-  // native binary's executable bit. Restore it only in this script-disabled,
-  // hermetic fixture before Vite starts esbuild.
-  await chmod(esbuildBinaryPath, 0o755);
+  // native binary's executable bit on POSIX. Restore it only in this
+  // script-disabled, hermetic fixture before Vite starts esbuild.
+  if (process.platform !== 'win32') await chmod(esbuildBinaryPath, 0o755);
   const browserConsumerEnvironment = {
     ...process.env,
     COREPACK_ENABLE_DOWNLOAD_PROMPT: '0',
@@ -335,6 +373,9 @@ export default defineConfig({
     pathToFileURL(
       join(canonicalConsumerDirectory, 'node_modules', 'vite', 'dist', 'node', 'index.js'),
     ).href
+  );
+  const installedEsbuild = await import(
+    pathToFileURL(join(esbuildPackageRoot, 'lib', 'main.js')).href
   );
   const previousEsbuildBinaryPath = process.env.ESBUILD_BINARY_PATH;
   process.env.ESBUILD_BINARY_PATH = esbuildBinaryPath;
@@ -449,6 +490,7 @@ export default defineConfig({
     };
   } finally {
     await server.close();
+    installedEsbuild.stop();
   }
 }
 
@@ -479,8 +521,8 @@ try {
   const tarballs = [];
   for (const entry of publicPackages) {
     const result = await run(
-      'corepack',
-      ['pnpm', 'pack', '--pack-destination', tarballDirectory],
+      corepackExecutable,
+      corepackArguments(['pnpm', 'pack', '--pack-destination', tarballDirectory]),
       entry.directory,
     );
     const output = `${result.stdout}\n${result.stderr}`;
@@ -509,7 +551,7 @@ try {
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([name, specifier]) => [
         name,
-        specifier.startsWith('file:') ? specifier.slice(specifier.lastIndexOf('/') + 1) : specifier,
+        specifier.startsWith('file:') ? basename(specifier.slice('file:'.length)) : specifier,
       ]),
   );
   await writeFile(
@@ -528,8 +570,8 @@ try {
     )}\n`,
   );
   await run(
-    'corepack',
-    ['pnpm', 'install', '--offline', '--ignore-scripts', '--lockfile=false'],
+    corepackExecutable,
+    corepackArguments(['pnpm', 'install', '--offline', '--ignore-scripts', '--lockfile=false']),
     consumerDirectory,
   );
 
@@ -670,6 +712,24 @@ export const contract: UserConfig = config;
   if (keepTemporaryDirectory) {
     process.stderr.write(`Preserved consumer fixture at ${temporaryDirectory}\n`);
   } else {
-    await rm(temporaryDirectory, { recursive: true, force: true });
+    try {
+      await rm(temporaryDirectory, {
+        recursive: true,
+        force: true,
+        maxRetries: 1,
+        retryDelay: 50,
+      });
+    } catch (error) {
+      if (process.platform === 'win32' && (error?.code === 'EPERM' || error?.code === 'EBUSY')) {
+        deferTemporaryCleanup(temporaryDirectory);
+      } else {
+        process.stderr.write(
+          `Unable to remove consumer fixture: ${
+            error instanceof Error ? error.message : String(error)
+          }\n`,
+        );
+        process.exitCode = 1;
+      }
+    }
   }
 }

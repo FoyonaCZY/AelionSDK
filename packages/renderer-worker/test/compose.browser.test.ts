@@ -183,6 +183,68 @@ async function waitForWorkerRequestsToDrain(
 }
 
 describe('Worker WebGL2 compositor', () => {
+  it('executes a complete frame graph with GPU-resident intermediates and one final result', async () => {
+    const compositor = new WorkerCompositor();
+    const result = await compositor.composeFrameGraph({
+      inputs: {
+        red: solidFrame(255, 0, 0),
+        blue: solidFrame(0, 0, 255),
+      },
+      nodes: [
+        {
+          id: 'select-red',
+          inputs: {
+            from: { kind: 'external', id: 'red' },
+            to: { kind: 'external', id: 'blue' },
+          },
+          program: crossDissolve,
+          parameters: {},
+          systems: { transitionProgress: 0 },
+        },
+        {
+          id: 'mix-final',
+          inputs: {
+            from: { kind: 'node', id: 'select-red' },
+            to: { kind: 'external', id: 'blue' },
+          },
+          program: crossDissolve,
+          parameters: {},
+          systems: { transitionProgress: 0.5 },
+        },
+      ],
+      outputNodeId: 'mix-final',
+      preferredBackend: 'webgl2',
+      width: 8,
+      height: 8,
+    });
+    try {
+      expect(result.backend).toBe('webgl2');
+      expect(result.graphHash).toContain('select-red');
+      expect(result.graphHash).toContain('mix-final');
+      const actual = pixel(result.bitmap);
+      expect(Math.abs((actual[0] ?? 0) - 128)).toBeLessThanOrEqual(1);
+      expect(actual[1]).toBe(0);
+      expect(Math.abs((actual[2] ?? 0) - 128)).toBeLessThanOrEqual(1);
+      expect(actual[3]).toBe(255);
+      expect(result.resources).toEqual({
+        activeRequests: 0,
+        cancelledRequests: 0,
+        webgpuDevices: 0,
+        webgpuPipelines: 0,
+        webgpuBuffers: 0,
+        webgpuTextures: 0,
+        webgl2Contexts: 0,
+        webgl2Programs: 0,
+        webgl2Buffers: 0,
+        webgl2Textures: 0,
+        inputFrames: 0,
+      });
+    } finally {
+      result.bitmap.close();
+      compositor.dispose();
+    }
+  });
+
   it.each([
     [0, [255, 0, 0, 255]],
     [0.25, [215, 0, 40, 255]],

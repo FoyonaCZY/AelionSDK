@@ -11,6 +11,7 @@ import {
   preflightProfileExport,
   preflightWebMExport,
   runRemoteExport,
+  selectExportProfile,
   type FrozenWebMExportOptions,
 } from '@aelion/export';
 import { canonicalStringify, ProjectValidator, type AelionProject } from '@aelion/project-schema';
@@ -24,17 +25,22 @@ import {
   type TransactionCommit,
 } from '@aelion/transaction';
 
+import { SessionAudioController, projectAudioMastering } from './audio-controller.js';
+import { createMasteredAudioRenderer } from './audio-mastering.js';
 import { AelionPlayer } from './player.js';
 import { normalizePreviewQuality } from './preview-quality.js';
 import { defaultSchemas } from './default-schemas.js';
 import { ExportJob } from './export-job.js';
 import type {
+  AelionAudioApi,
+  AelionAudioMasteringOptions,
   AelionExportApi,
   AelionExportJob,
   AelionExportJobSnapshot,
   AelionExportOptions,
   AelionInteractiveEdit,
   AelionInteractiveEditOptions,
+  AelionMediaProvider,
   AelionProfileExportJob,
   AelionProfileExportOptions,
   AelionProfileExportResult,
@@ -122,6 +128,7 @@ export class AelionSession implements AelionSessionApi {
   #nextInteractiveEditId = 1;
 
   public readonly player: AelionPlayer;
+  public readonly audio: AelionAudioApi;
   public readonly transaction: AelionTransactionApi;
   public readonly preview: AelionPreviewApi;
   public readonly export: AelionExportApi;
@@ -140,6 +147,21 @@ export class AelionSession implements AelionSessionApi {
       materialInstanceSchema: (options.schemas ?? defaultSchemas).materialInstance,
     });
     this.player = new AelionPlayer(this, (error: unknown) => this.#acceptPlayerError(error));
+    this.audio = new SessionAudioController({
+      ir: () => this.requireIr(),
+      project: () => {
+        const value = this.#engine?.getSnapshot();
+        if (value === undefined) throw unloaded();
+        return value;
+      },
+      media: () => this.requireMedia(),
+      revision: () => {
+        const value = this.revision;
+        if (value === null) throw unloaded();
+        return value;
+      },
+      edit: (label, callback) => this.#edit(callback, { label }),
+    });
     this.preview = {
       renderFrame: options => this.#renderPreviewFrame(options),
     };
@@ -165,6 +187,7 @@ export class AelionSession implements AelionSessionApi {
     this.export = {
       preflight: options => this.#preflight(options),
       preflightProfile: options => this.#preflightProfile(options),
+      negotiate: options => this.#negotiateExport(options),
       start: options => this.#startExport(options),
       startProfile: options => this.#startProfileExport(options),
       startRemote: options => this.#startRemoteExport(options),
@@ -313,7 +336,7 @@ export class AelionSession implements AelionSessionApi {
         timeUs: options.timeUs,
         source: media,
         mode: 'preview',
-        preferredBackend: this.#options.preferredBackend ?? 'webgl2',
+        preferredBackend: this.#options.preferredBackend ?? 'auto',
         allowFallback: this.#options.allowBackendFallback ?? true,
         renderScale: previewQuality.renderScale,
         ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -692,9 +715,21 @@ export class AelionSession implements AelionSessionApi {
     options: AelionExportOptions,
     signal = options.signal,
     onProgress = options.onProgress,
+    masteredRenderAudio?: (
+      request: {
+        readonly startFrame: number;
+        readonly frameCount: number;
+        readonly channelCount: number;
+      },
+      signal?: AbortSignal,
+    ) => Promise<Float32Array>,
+    frozen?: {
+      readonly ir: RenderIr;
+      readonly media: AelionMediaProvider;
+    },
   ): FrozenWebMExportOptions {
-    const ir = this.requireIr();
-    const media = this.requireMedia();
+    const ir = frozen?.ir ?? this.requireIr();
+    const media = frozen?.media ?? this.requireMedia();
     return {
       ir,
       projectRevision: ir.revision,
@@ -707,7 +742,7 @@ export class AelionSession implements AelionSessionApi {
           timeUs: request.timestampUs,
           source: media,
           mode: 'export',
-          preferredBackend: this.#options.preferredBackend ?? 'webgl2',
+          preferredBackend: this.#options.preferredBackend ?? 'auto',
           allowFallback: this.#options.allowBackendFallback ?? true,
           ...(signal === undefined ? {} : { signal }),
         });
@@ -720,15 +755,17 @@ export class AelionSession implements AelionSessionApi {
           rendered.bitmap.close();
         }
       },
-      renderAudio: request =>
-        renderIrAudio({
-          ir,
-          startFrame: request.startFrame,
-          frameCount: request.frameCount,
-          channelCount: request.channelCount,
-          source: media,
-          ...(signal === undefined ? {} : { signal }),
-        }),
+      renderAudio:
+        masteredRenderAudio ??
+        (request =>
+          renderIrAudio({
+            ir,
+            startFrame: request.startFrame,
+            frameCount: request.frameCount,
+            channelCount: request.channelCount,
+            source: media,
+            ...(signal === undefined ? {} : { signal }),
+          })),
       ...(signal === undefined ? {} : { signal }),
       ...(options.cleanupSink === undefined ? {} : { cleanupSink: options.cleanupSink }),
       ...(onProgress === undefined ? {} : { onProgress }),
@@ -739,6 +776,20 @@ export class AelionSession implements AelionSessionApi {
     const report = await preflightWebMExport(this.#frozenExportOptions(options));
     for (const diagnostic of report.issues) this.#recordDiagnostic(diagnostic);
     return report;
+  }
+
+  async #createExportAudioRenderer(
+    ir: RenderIr,
+    source: AelionMediaProvider,
+    processing: AelionAudioMasteringOptions | undefined,
+    signal: AbortSignal,
+  ) {
+    return createMasteredAudioRenderer({
+      ir,
+      source,
+      ...(processing === undefined ? {} : { processing }),
+      signal,
+    });
   }
 
   async #preflightProfile(options: AelionProfileExportOptions) {
@@ -755,6 +806,18 @@ export class AelionSession implements AelionSessionApi {
     return report;
   }
 
+  async #negotiateExport(options: Parameters<typeof selectExportProfile>[0]) {
+    const ir = this.requireIr();
+    return selectExportProfile({
+      ...options,
+      width: ir.width,
+      height: ir.height,
+      framerate: ir.frameRate.numerator / ir.frameRate.denominator,
+      sampleRate: ir.sampleRate,
+      numberOfChannels: channelCountForLayout(ir.channelLayout),
+    });
+  }
+
   #startExport(options: AelionExportOptions): AelionExportJob {
     this.#assertActive();
     if (this.#activeExportJob?.state === 'running') {
@@ -769,6 +832,14 @@ export class AelionSession implements AelionSessionApi {
       for (const diagnostic of diagnostics) this.#recordDiagnostic(diagnostic);
       throw new AelionError(diagnostics);
     }
+    const ir = this.requireIr();
+    const media = this.requireMedia();
+    const project = this.#engine?.getSnapshot();
+    if (project === undefined) throw unloaded();
+    const configuredProcessing =
+      options.audioProcessing ?? projectAudioMastering(project, ir.sequenceId);
+    const processing =
+      configuredProcessing === undefined ? undefined : structuredClone(configuredProcessing);
     const id = `export-${this.#nextExportJobId.toString()}`;
     this.#nextExportJobId += 1;
     this.#exportJobsStarted += 1;
@@ -777,11 +848,18 @@ export class AelionSession implements AelionSessionApi {
       ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
       run: async (signal, updateProgress) => {
         try {
+          const mastering = await this.#createExportAudioRenderer(ir, media, processing, signal);
           return await exportFrozenRenderIrWebM(
-            this.#frozenExportOptions(options, signal, progress => {
-              updateProgress(progress);
-              options.onProgress?.(progress);
-            }),
+            this.#frozenExportOptions(
+              options,
+              signal,
+              progress => {
+                updateProgress(progress);
+                options.onProgress?.(progress);
+              },
+              mastering.render,
+              { ir, media },
+            ),
           );
         } catch (error) {
           // Publish structured export diagnostics before the await-compatible
@@ -815,6 +893,12 @@ export class AelionSession implements AelionSessionApi {
     }
     const ir = this.requireIr();
     const media = this.requireMedia();
+    const project = this.#engine?.getSnapshot();
+    if (project === undefined) throw unloaded();
+    const configuredProcessing =
+      options.audioProcessing ?? projectAudioMastering(project, ir.sequenceId);
+    const processing =
+      configuredProcessing === undefined ? undefined : structuredClone(configuredProcessing);
     const id = `export-${this.#nextExportJobId.toString()}`;
     this.#nextExportJobId += 1;
     this.#exportJobsStarted += 1;
@@ -836,7 +920,7 @@ export class AelionSession implements AelionSessionApi {
             timeUs: request.timestampUs,
             source: media,
             mode: 'export',
-            preferredBackend: this.#options.preferredBackend ?? 'webgl2',
+            preferredBackend: this.#options.preferredBackend ?? 'auto',
             allowFallback: this.#options.allowBackendFallback ?? true,
             signal,
           });
@@ -849,19 +933,16 @@ export class AelionSession implements AelionSessionApi {
             rendered.bitmap.close();
           }
         };
-        const renderAudio = (request: {
+        let mastering: Awaited<ReturnType<typeof createMasteredAudioRenderer>> | undefined;
+        const requireMastering = async () => {
+          mastering ??= await this.#createExportAudioRenderer(ir, media, processing, signal);
+          return mastering;
+        };
+        const renderAudio = async (request: {
           readonly startFrame: number;
           readonly frameCount: number;
           readonly channelCount: number;
-        }) =>
-          renderIrAudio({
-            ir,
-            startFrame: request.startFrame,
-            frameCount: request.frameCount,
-            channelCount: request.channelCount,
-            source: media,
-            signal,
-          });
+        }) => (await requireMastering()).render(request, signal);
         try {
           if (options.profile === 'webm-vp9-opus' || options.profile === 'mp4-h264-aac') {
             const frozen = this.#frozenExportOptions(
@@ -874,9 +955,14 @@ export class AelionSession implements AelionSessionApi {
                   ? {}
                   : { audioBitrate: options.audioBitrate }),
                 ...(cleanup === undefined ? {} : { cleanupSink: cleanup }),
+                ...(options.audioProcessing === undefined
+                  ? {}
+                  : { audioProcessing: options.audioProcessing }),
               },
               signal,
               onProgress,
+              (await requireMastering()).render,
+              { ir, media },
             );
             return options.profile === 'mp4-h264-aac'
               ? await exportFrozenRenderIrMp4(frozen)
