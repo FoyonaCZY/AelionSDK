@@ -2,7 +2,7 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/project/development.md#版本与迁移)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
 
-## [Unreleased]
+## Unreleased
 
 ### Changed
 
@@ -13,6 +13,22 @@
 
 ### Added
 
+- Added the product-level `Composition` / `Layer` / `Clip` authoring API for
+  images, video, audio, text, captions, shapes, reusable Materials, effects,
+  masks, keyframes and transitions, while preserving the same validated
+  Project v1 output and a `ProjectBuilder` escape hatch.
+- Added strict WebAV Sprite and Diffusion Studio Core checkpoint migration,
+  including explicit asset rebinding, entity maps, renderable migration
+  Materials and fail-closed diagnostics for semantics that cannot be
+  represented without loss.
+- Added persistent sequential/GOP WebCodecs decode sessions, bounded frame and
+  image caches, first-class still-image decoding and whole-frame adaptive
+  WebGL2/WebGPU frame graphs.
+- Added Session-level waveform, loudness, true-peak, silence removal, ducking
+  and limiter APIs; revision-bound IndexedDB persistence; isolated Worker
+  extension RPC; Canvas pointer mapping and `captureStream()`.
+- Added same-machine WebAV/Diffusion/Aelion benchmarks, browser/package
+  consumers, release evidence binding and cross-platform API snapshots.
 - Added the public `ProductionMediaProvider` for File/Blob, HTTP Range, OPFS and custom readers, including proxy-aware preview selection, content-addressed SampleIndex reuse, bounded resident indexes, decoder admission and deterministic disposal.
 - Added a type-safe Project Builder with media probing/import, linked A/V clip creation and exact seconds/milliseconds/frame helpers, plus a latest-wins Preview Canvas Controller with bitmap ownership, DPR/resize handling, visibility lifecycle and adaptive quality.
 - Added a production-built reference editor that imports only public packages and demonstrates import, scrub/playback, linked split/move, undo/redo and WebM or H.264 MP4 export. Its complete TypeScript integration example is compiled in CI.
@@ -42,9 +58,11 @@
 - Render IR presentation normalizes the public `ImageBitmap` to straight alpha, avoiding double premultiplication on Linux headless Chromium/ANGLE paths.
 - Browser CI follows the certified platform boundary: Chromium runs on Ubuntu, while Firefox 54/54 and the two-browser tarball consumer run on macOS Intel where Worker WebGL2, H.264/AAC and the null audio backend are available.
 
-## [0.1.0-alpha.0] - 2026-07-13
+## 0.1.0-alpha.0 candidate baseline — 2026-07-13
 
-> 状态：release candidate。只有 Phase 1 最终门禁与 Exit Review Accepted 后才创建对应 npm/Git release；本条记录候选内容，不声称远端 tag 或包已经发布。
+> 这是 2026-07-13 的历史候选快照，不是 npm、Tag 或 GitHub Release。下面的
+> Compatibility 与 Known limitations 记录当时基线，已由上方 Unreleased 变更和
+> 当前状态页取代，不能当作当前能力表。
 
 ### Added
 
@@ -103,6 +121,3 @@
 - Safari/iOS/Android、其他 OS/GPU、长视频/4K/HDR 和移动端本地导出尚未认证。
 - npm provenance 尚未由真实 publish 证明。
 - Vite 应用必须显式启用公开 `@aelion/vite-plugin`；其他 bundler 尚无认证适配器。
-
-[Unreleased]: https://github.com/FoyonaCZY/AelionSDK/compare/v0.1.0-alpha.0...HEAD
-[0.1.0-alpha.0]: https://github.com/FoyonaCZY/AelionSDK/releases/tag/v0.1.0-alpha.0

@@ -14,10 +14,13 @@ description: 查询 13 个 @aelion 包的职责、主要导出和使用对象。
 大多数业务代码的入口：
 
 - `Aelion.createSession()`；
+- `createComposition()`、`Composition`、`Layer`、`Clip`；
 - `createProject()`、`ProjectBuilder`；
 - `seconds()`、`milliseconds()`、`frames()`；
 - `ProductionMediaProvider`、`ByteMediaProvider`；
 - `attachPreviewCanvas()`；
+- `session.audio` 的分析、波形、静音移除与母带；
+- revision 持久化、WebAV/Diffusion 迁移和隔离 Worker 扩展；
 - Session、Player、Transaction、Preview、Export 的公开类型；
 - `RuntimeMaterialRegistry` 和默认 Schema。
 
@@ -26,10 +29,13 @@ import {
   Aelion,
   ProductionMediaProvider,
   attachPreviewCanvas,
-  createProject,
+  createComposition,
   seconds,
 } from '@aelion/sdk';
 ```
+
+`createComposition()` 是产品级创作入口；`createProject()` 是媒体导入和 Schema
+级操作使用的 Builder 入口。两者不是两套工程格式。
 
 ### `@aelion/export`
 

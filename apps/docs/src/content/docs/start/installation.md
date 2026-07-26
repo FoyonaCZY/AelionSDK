@@ -7,7 +7,7 @@ AelionSDK 还没有发布到 npm。现在最稳妥的接入方式是克隆仓库
 
 ## 环境要求
 
-- Node.js `20.19.x`；
+- Node.js `>=20.19 <21`；仓库的 `.node-version` 和 `.nvmrc` 固定为 `20.20.2`；
 - Corepack；
 - pnpm `10.13.1`，版本已经写在根目录 `packageManager` 中；
 - 支持 WebCodecs、WebGL2 和 AudioWorklet 的桌面浏览器。
@@ -19,7 +19,9 @@ node --version
 corepack pnpm --version
 ```
 
-Node.js 21、22 或更高版本不在当前仓库的验证范围内。安装依赖时也不要改用 npm 或 yarn，否则会产生另一份锁文件。
+Node.js 21 或更高版本不在当前仓库的验证范围内。复现 CI 时优先使用仓库固定的
+`20.20.2`；其他满足 engines 的 Node 20 版本属于兼容范围，但不等同于当前参考环境。
+安装依赖时也不要改用 npm 或 yarn，否则会产生另一份锁文件。
 
 ## 先运行仓库里的最小示例
 

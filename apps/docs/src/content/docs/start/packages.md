@@ -30,8 +30,18 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 业务组件里大部分导入都应该来自 `@aelion/sdk`：
 
 ```ts
-import { Aelion, ProductionMediaProvider, attachPreviewCanvas, createProject } from '@aelion/sdk';
+import {
+  Aelion,
+  ProductionMediaProvider,
+  attachPreviewCanvas,
+  createComposition,
+  createProject,
+} from '@aelion/sdk';
 ```
+
+模板和程序化成片优先使用 `createComposition()`；需要探测并导入真实媒体或操作
+Schema 级实体时使用 `createProject()`。两者生成相同的 Project v1 文档，可以加载到
+同一个 Session。
 
 只有创建导出落盘目标时，才会直接使用 `@aelion/export`：
 
@@ -83,4 +93,5 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelion/export';
 - alpha 升级时审阅 API Snapshot 和 CHANGELOG；
 - 升级后至少重新跑一次媒体导入、预览、编辑和目标导出格式。
 
+高层创作从[使用 Composition API 创作](/AelionSDK/guides/composition-api/)开始。
 每个包的主要导出见[包与入口参考](/AelionSDK/reference/packages/)，单个函数和类型签名见侧栏中的 API Reference。

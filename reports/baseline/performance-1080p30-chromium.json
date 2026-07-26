@@ -12,18 +12,18 @@
       "passCount": 1,
       "intermediateTextureCount": 0,
       "wall": {
-        "p50Ms": 4.4849999994039536,
-        "p95Ms": 27.62999999523163
+        "p50Ms": 4.319999992847443,
+        "p95Ms": 27.844999998807907
       },
       "worker": {
-        "p50Us": 4230,
-        "p95Us": 27270
+        "p50Us": 3940,
+        "p95Us": 27545
       },
       "gpuCompletion": {
-        "p50Us": 2055,
-        "p95Us": 21320
+        "p50Us": 1945,
+        "p95Us": 22055
       },
-      "throughputFps": 222.96544038637632,
+      "throughputFps": 231.4814818647418,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -44,7 +44,7 @@
           "totalJsHeapBytes": 8445306
         },
         "after": {
-          "usedJsHeapBytes": 7442774,
+          "usedJsHeapBytes": 7442786,
           "totalJsHeapBytes": 9002618
         }
       }
@@ -59,18 +59,18 @@
       "passCount": 1,
       "intermediateTextureCount": 0,
       "wall": {
-        "p50Ms": 0.25999999046325684,
-        "p95Ms": 0.6099999994039536
+        "p50Ms": 0.25,
+        "p95Ms": 0.6700000166893005
       },
       "worker": {
-        "p50Us": 90,
-        "p95Us": 215
+        "p50Us": 80,
+        "p95Us": 165
       },
       "gpuCompletion": {
         "p50Us": 5,
         "p95Us": 10
       },
-      "throughputFps": 3846.1539872299336,
+      "throughputFps": 4000,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -87,11 +87,11 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 7490322,
+          "usedJsHeapBytes": 7490334,
           "totalJsHeapBytes": 9002618
         },
         "after": {
-          "usedJsHeapBytes": 7230486,
+          "usedJsHeapBytes": 7201866,
           "totalJsHeapBytes": 9789050
         }
       }
@@ -106,18 +106,18 @@
       "passCount": 4,
       "intermediateTextureCount": 3,
       "wall": {
-        "p50Ms": 0.4000000059604645,
-        "p95Ms": 42.46000000834465
+        "p50Ms": 0.3850000202655792,
+        "p95Ms": 40.88499999046326
       },
       "worker": {
-        "p50Us": 195,
-        "p95Us": 35385
+        "p50Us": 210,
+        "p95Us": 33905
       },
       "gpuCompletion": {
-        "p50Us": 20,
-        "p95Us": 60
+        "p50Us": 25,
+        "p95Us": 70
       },
-      "throughputFps": 2499.9999627470975,
+      "throughputFps": 2597.4024606808694,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -134,11 +134,11 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 7255698,
+          "usedJsHeapBytes": 7227078,
           "totalJsHeapBytes": 9789050
         },
         "after": {
-          "usedJsHeapBytes": 7284210,
+          "usedJsHeapBytes": 7255550,
           "totalJsHeapBytes": 9789050
         }
       }
@@ -153,18 +153,18 @@
       "passCount": 1,
       "intermediateTextureCount": 0,
       "wall": {
-        "p50Ms": 0.33500000834465027,
-        "p95Ms": 21.734999999403954
+        "p50Ms": 0.3499999940395355,
+        "p95Ms": 19.444999992847443
       },
       "worker": {
-        "p50Us": 105,
-        "p95Us": 15705
+        "p50Us": 125,
+        "p95Us": 14185
       },
       "gpuCompletion": {
-        "p50Us": 10,
+        "p50Us": 5,
         "p95Us": 20
       },
-      "throughputFps": 2985.0745525092443,
+      "throughputFps": 2857.1429057997107,
       "resourcesBeforeDispose": {
         "disposed": false,
         "pendingRequests": 0,
@@ -181,11 +181,11 @@
       },
       "memory": {
         "before": {
-          "usedJsHeapBytes": 7946770,
+          "usedJsHeapBytes": 7303222,
           "totalJsHeapBytes": 9789050
         },
         "after": {
-          "usedJsHeapBytes": 7348506,
+          "usedJsHeapBytes": 7319846,
           "totalJsHeapBytes": 9789050
         }
       }
@@ -202,8 +202,8 @@
     "durationUs": 5000000,
     "videoFrames": 150,
     "audioFrames": 240000,
-    "elapsedMs": 910.0399999916553,
-    "realtimeMultiple": 5.4942639884464946,
+    "elapsedMs": 908.7450000047684,
+    "realtimeMultiple": 5.502093546565608,
     "bytes": 806462,
     "sink": {
       "writes": 20,
@@ -217,27 +217,27 @@
       "contract": "worker encoder/mux orchestration; host frame production disclosed; steady-state begins at the second video frame",
       "initialization": {
         "supported": true,
-        "startedAtMs": 1597.315000012517,
-        "completedAtMs": 2018.440000012517,
-        "elapsedMs": 421.125,
+        "startedAtMs": 1532.155000001192,
+        "completedAtMs": 1978.8949999809265,
+        "elapsedMs": 446.7399999797344,
         "tasks": [],
         "longTasksOver50Ms": 0,
         "maxLongTaskMs": 0
       },
       "steady": {
         "supported": true,
-        "startedAtMs": 2018.440000012517,
-        "completedAtMs": 2507.3550000041723,
-        "elapsedMs": 488.91499999165535,
+        "startedAtMs": 1978.8949999809265,
+        "completedAtMs": 2440.9000000059605,
+        "elapsedMs": 462.00500002503395,
         "tasks": [],
         "longTasksOver50Ms": 0,
         "maxLongTaskMs": 0
       },
       "overall": {
         "supported": true,
-        "startedAtMs": 1597.315000012517,
-        "completedAtMs": 2507.3550000041723,
-        "elapsedMs": 910.0399999916553,
+        "startedAtMs": 1532.155000001192,
+        "completedAtMs": 2440.9000000059605,
+        "elapsedMs": 908.7450000047684,
         "tasks": [],
         "longTasksOver50Ms": 0,
         "maxLongTaskMs": 0
@@ -246,51 +246,51 @@
     "phases": [
       {
         "name": "export-call",
-        "atMs": 1597.3500000089407
+        "atMs": 1532.1899999976158
       },
       {
         "name": "first-video-render-start",
-        "atMs": 1628.955000013113
+        "atMs": 1562.4449999928474
       },
       {
         "name": "first-video-render-end",
-        "atMs": 1629.1150000095367
+        "atMs": 1562.6200000047684
       },
       {
         "name": "second-video-render-start",
-        "atMs": 2018.440000012517
+        "atMs": 1978.8949999809265
       },
       {
         "name": "video-complete",
-        "atMs": 2460.2100000083447
+        "atMs": 2394.5399999916553
       },
       {
         "name": "first-audio-render-start",
-        "atMs": 2460.4500000029802
+        "atMs": 2394.8199999928474
       },
       {
         "name": "first-audio-render-end",
-        "atMs": 2460.4950000047684
+        "atMs": 2394.859999984503
       },
       {
         "name": "export-complete",
-        "atMs": 2507.3500000089407
+        "atMs": 2440.8949999809265
       }
     ],
     "memory": {
       "before": {
-        "usedJsHeapBytes": 7356370,
+        "usedJsHeapBytes": 7327710,
         "totalJsHeapBytes": 9789050
       },
       "after": {
-        "usedJsHeapBytes": 12070857,
-        "totalJsHeapBytes": 14619349
+        "usedJsHeapBytes": 9129913,
+        "totalJsHeapBytes": 11940565
       }
     }
   },
   "longTimeline": {
     "simulatedDurationUs": 600000000,
-    "elapsedMs": 358.92499999701977,
+    "elapsedMs": 340.15000000596046,
     "pcm": {
       "capacityFrames": 4096,
       "availableReadFrames": 0,
@@ -303,59 +303,59 @@
     "heapSamples": [
       {
         "equivalentMinute": 1,
-        "usedJsHeapBytes": 13717465
+        "usedJsHeapBytes": 10709013
       },
       {
         "equivalentMinute": 2,
-        "usedJsHeapBytes": 12492465
+        "usedJsHeapBytes": 9470285
       },
       {
         "equivalentMinute": 3,
-        "usedJsHeapBytes": 13251801
+        "usedJsHeapBytes": 10229765
       },
       {
         "equivalentMinute": 4,
-        "usedJsHeapBytes": 13971865
+        "usedJsHeapBytes": 10949845
       },
       {
         "equivalentMinute": 5,
-        "usedJsHeapBytes": 10030099
+        "usedJsHeapBytes": 8684347
       },
       {
         "equivalentMinute": 6,
-        "usedJsHeapBytes": 10750179
+        "usedJsHeapBytes": 9404427
       },
       {
         "equivalentMinute": 7,
-        "usedJsHeapBytes": 9374863
+        "usedJsHeapBytes": 10124491
       },
       {
         "equivalentMinute": 8,
-        "usedJsHeapBytes": 10094935
+        "usedJsHeapBytes": 8749199
       },
       {
         "equivalentMinute": 9,
-        "usedJsHeapBytes": 10814999
+        "usedJsHeapBytes": 9469279
       },
       {
         "equivalentMinute": 10,
-        "usedJsHeapBytes": 9438155
+        "usedJsHeapBytes": 10189359
       }
     ],
     "memory": {
       "before": {
-        "usedJsHeapBytes": 12332185,
-        "totalJsHeapBytes": 14621397
+        "usedJsHeapBytes": 9391253,
+        "totalJsHeapBytes": 11942613
       },
       "after": {
-        "usedJsHeapBytes": 10442159,
-        "totalJsHeapBytes": 15057047
+        "usedJsHeapBytes": 9156519,
+        "totalJsHeapBytes": 14155927
       }
     }
   },
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:performance",
-  "generatedAt": "2026-07-25T23:05:10.605Z",
+  "generatedAt": "2026-07-26T07:02:56.175Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",

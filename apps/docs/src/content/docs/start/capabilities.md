@@ -94,7 +94,9 @@ File / URL / OPFS
 - EBU-style gated LUFS、4× true-peak estimate 和 lookahead limiter；
 - 音频设备切换、interruption 和恢复状态机。
 
-基础播放通过 Session Player 使用；音频分析和底层处理接口位于 `@aelion/audio`。
+基础播放通过 Session Player 使用；产品层的分析、波形、静音移除和母带通过
+`session.audio` 使用。只有自定义音频宿主或处理链时才需要直接依赖
+`@aelion/audio`。
 
 ## 媒体输入和缓存
 

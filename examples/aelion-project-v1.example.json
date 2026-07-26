@@ -579,7 +579,7 @@
       "definition": {
         "packageId": "dev.aelion.examples.filters",
         "packageVersion": "1.0.0",
-        "packageIntegrity": "sha256:f6c5dbb1edea12d3d328853679dd7b01f5b1465851305cd3310677d541cee24a",
+        "packageIntegrity": "sha256:feec1bf13a45aed7620c4333cd1155a1a2cc7620db3e9bbdd71ff5de9380cbf6",
         "materialId": "warm-film"
       },
       "name": "Warm film opening",
@@ -594,7 +594,7 @@
       "definition": {
         "packageId": "dev.aelion.examples.effects",
         "packageVersion": "1.0.0",
-        "packageIntegrity": "sha256:92f6ce10dacbcf313a41dc0f0eab934848d4729bf54cabce857fe3e3392e57dc",
+        "packageIntegrity": "sha256:ca0c3ae43f093adc530649ea9dba570bdc8d216eb3898347017d105cda62b144",
         "materialId": "soft-glow"
       },
       "name": "Title glow",
@@ -611,7 +611,7 @@
       "definition": {
         "packageId": "dev.aelion.examples.transitions",
         "packageVersion": "1.0.0",
-        "packageIntegrity": "sha256:dd2c34233a9999702b486a4e84e8123dc0e949b9b231f922cb2525677715a491",
+        "packageIntegrity": "sha256:696c5c9cfcb409893d8cc4fa86de53c97848f7991fe4737dc24d6e3676ff764f",
         "materialId": "cross-dissolve"
       },
       "name": "Cross dissolve",

@@ -72,6 +72,7 @@ export default defineConfig({
         {
           label: '构建剪辑器',
           items: [
+            { label: '使用 Composition API 创作', slug: 'guides/composition-api' },
             { label: '导入与管理媒体', slug: 'guides/media-import' },
             { label: '时间线编辑', slug: 'guides/timeline-editing' },
             { label: '实时预览与拖动播放头', slug: 'guides/preview' },

@@ -18,8 +18,9 @@ AelionSDK 是一个运行在浏览器里的视频编辑与渲染引擎。它提�
 
 你可以用它开发在线剪辑器、模板成片工具、营销素材编辑器，或者任何需要在网页中读取、编辑和导出视频的产品。React、Vue、Svelte 和原生 DOM 都可以接入。
 
-SDK 中最重要的四个对象是：
+SDK 中最重要的五个对象是：
 
+- `Composition`：用 Layer 和 Clip 以产品级 API 创建图片、文字、形状、字幕、效果、遮罩、关键帧和转场；
 - `Project`：一份可保存、可迁移的 JSON，记录素材、轨道、片段、效果和输出规格；
 - `ProductionMediaProvider`：把 Project 中的素材 ID 绑定到 File、URL、OPFS 或自定义数据源；
 - `Session`：加载 Project，提供编辑、预览、播放、导出、事件和诊断接口；
@@ -35,6 +36,10 @@ Project JSON ──────────→ Session
 ```
 
 Project 只描述“剪什么”，Media Provider 负责“去哪里读取素材”，Session 则执行编辑和渲染。预览与导出消费同一份 Project 和 Render IR，时间映射、Material 与音频规则不会各维护一套实现。
+
+以代码生成模板或成片时，从 `createComposition()` 开始；导入真实媒体、编辑已有
+Project 或使用 Marker/嵌套 Sequence 等底层能力时，使用 `ProjectBuilder` 与
+Session Transaction Commands。
 
 ## 先跑起来
 
@@ -153,6 +158,7 @@ MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，�
 ## 从哪里继续读
 
 - [从本地视频到 MP4](https://foyonaczy.github.io/AelionSDK/start/getting-started/)：第一次接入建议从这里开始；
+- [使用 Composition API 创作](https://foyonaczy.github.io/AelionSDK/guides/composition-api/)：用 Layer 和 Clip 创建图片、文字、形状、效果、遮罩、关键帧和转场；
 - [Project 和时间线](https://foyonaczy.github.io/AelionSDK/concepts/project-timeline/)：理解保存格式、轨道、片段和素材引用；
 - [把 SDK 接进剪辑器 UI](https://foyonaczy.github.io/AelionSDK/guides/editor-ui/)：连接状态管理、时间线、Inspector 和自动保存；
 - [从 WebAV 与 Diffusion Studio 迁移](https://foyonaczy.github.io/AelionSDK/guides/migration/)：严格转换源工程并处理无法等价表达的能力；
@@ -189,7 +195,7 @@ corepack pnpm test:browser:firefox
 ## 最新验证状态
 
 2026-07-26 在 Windows 参考机上完成了与源清单
-`7cef4917e5671187b5214de44bb23e8ee7ad7772fde70220a83515da0a4b2525`
+`127b0dd076b5152b3797b366bfb1cd418b902177d1b03c97d21480600ec9865f`
 绑定的串行最终门禁：14/14 个命令通过，门禁前后源清单一致，产物 postflight
 语义校验通过。Chromium 72 项和 Firefox 66 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、golden、
