@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 29972000,
+    "currentTimeUs": 30001333,
     "emittedFrames": 10,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 29966666
+    "lastTimestampUs": 30000000
   },
   "preview": {
     "width": 320,
@@ -55,7 +55,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-2c07d207-bf05-40e6-911f-f0635d949259.webm",
+    "fileName": "aelion-alpha-a557ee35-68de-4f4f-81bc-ce6873deedfa.webm",
     "writes": 135,
     "bytesWritten": 4740540,
     "maxInFlightWrites": 1,
@@ -4889,18 +4889,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 16243591,
-      "totalJsHeapBytes": 19308843
+      "usedJsHeapBytes": 16283003,
+      "totalJsHeapBytes": 19308835
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 42083995,
-      "totalJsHeapBytes": 82718691
+      "usedJsHeapBytes": 46195568,
+      "totalJsHeapBytes": 87298108
     }
   },
-  "elapsedMs": 15866.109999984503,
+  "elapsedMs": 16514.734999984503,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-07-26T07:03:32.592Z",
+  "generatedAt": "2026-07-26T16:19:38.282Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
@@ -4930,10 +4930,10 @@
     "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8"
   },
   "externalReadback": {
-    "implementation": "ffmpeg version 20.5.0-f2bcd19d3f Copyright (c) 2000-2024 the FFmpeg developers",
+    "implementation": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "e6ae4056cf1ae74649e31aa4946796b5603abacbad84e5bfb824b492b00fc49c",
+    "videoFrameMd5DocumentSha256": "a0bc631b163adf2cbac04b602d22369b81f1d8f1d1cdfa5a001a3766f508527b",
     "audioPcmMd5": "MD5=a0781de6f5258ebb546fc79a536ac803"
   }
 }

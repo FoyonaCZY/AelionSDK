@@ -1293,6 +1293,342 @@ function validateExportMainThread(exported, reasons) {
   }
 }
 
+function validateComprehensiveTiming(name, value, expectedCount, reasons) {
+  const samples = Array.isArray(value?.samplesMs) ? value.samplesMs : [];
+  if (
+    value?.count !== expectedCount ||
+    samples.length !== expectedCount ||
+    samples.some(sample => !finiteNonNegative(sample)) ||
+    !approximatelyEqual(value?.p50Ms, percentile(samples, 0.5)) ||
+    !approximatelyEqual(value?.p95Ms, percentile(samples, 0.95)) ||
+    !approximatelyEqual(value?.maximumMs, Math.max(0, ...samples)) ||
+    !approximatelyEqual(
+      value?.meanMs,
+      samples.reduce((sum, sample) => sum + sample, 0) / Math.max(1, samples.length),
+    )
+  ) {
+    reasons.push(`${name} timing summary differs from its disclosed samples`);
+  }
+}
+
+function validateComprehensivePerformance(report, reasons) {
+  if (report?.benchmarkSuiteVersion !== '2.0.0') {
+    reasons.push('comprehensive performance benchmarkSuiteVersion must be 2.0.0');
+    return;
+  }
+  const methodology = report?.methodology;
+  if (
+    !nonEmptyString(methodology?.environment) ||
+    !nonEmptyString(methodology?.clock) ||
+    !nonEmptyString(methodology?.percentiles) ||
+    !nonEmptyString(methodology?.warmup) ||
+    !nonEmptyString(methodology?.correctness) ||
+    !Array.isArray(methodology?.limitations) ||
+    methodology.limitations.length < 5 ||
+    methodology.limitations.some(value => !nonEmptyString(value))
+  ) {
+    reasons.push('comprehensive performance methodology disclosure is incomplete');
+  }
+
+  const runtime = report?.runtime;
+  if (
+    runtime?.crossOriginIsolated !== true ||
+    !positiveSafeIntegerValue(runtime?.hardwareConcurrency) ||
+    runtime?.offscreenCanvas !== true ||
+    runtime?.webCodecs?.videoEncoder !== true ||
+    runtime?.webCodecs?.audioEncoder !== true ||
+    typeof runtime?.webGpu?.apiAvailable !== 'boolean' ||
+    typeof runtime?.webGpu?.adapterAvailable !== 'boolean'
+  ) {
+    reasons.push('comprehensive runtime capability snapshot is invalid');
+  }
+  for (const name of [
+    'h264_1080p30',
+    'h264_4k30',
+    'vp9_1080p30',
+    'vp9_4k30',
+    'aacStereo',
+    'opusStereo',
+  ]) {
+    if (![true, false, null].includes(runtime?.webCodecs?.[name])) {
+      reasons.push(`comprehensive runtime codec probe ${name} is invalid`);
+    }
+  }
+
+  validateCompositorBenchmark(
+    report?.material?.warmFilm720pWebGl2,
+    {
+      name: 'Warm Film 720p WebGL2',
+      frames: 30,
+      passes: 1,
+      resolution: { width: 1_280, height: 720 },
+    },
+    reasons,
+  );
+
+  const compilationCases = Array.isArray(report?.compilation?.cases)
+    ? report.compilation.cases
+    : [];
+  const expectedCompilation = [
+    { clipCount: 10, trackCount: 2, coldRuns: 20, warmRuns: 50 },
+    { clipCount: 100, trackCount: 8, coldRuns: 12, warmRuns: 30 },
+    { clipCount: 1_000, trackCount: 32, coldRuns: 7, warmRuns: 20 },
+  ];
+  if (
+    stableJson(
+      compilationCases.map(value => ({
+        clipCount: value?.clipCount,
+        trackCount: value?.trackCount,
+      })),
+    ) !==
+    stableJson(
+      expectedCompilation.map(value => ({
+        clipCount: value.clipCount,
+        trackCount: value.trackCount,
+      })),
+    )
+  ) {
+    reasons.push('comprehensive compilation case matrix differs');
+  }
+  for (const expected of expectedCompilation) {
+    const value = compilationCases.find(
+      entry => entry?.clipCount === expected.clipCount && entry?.trackCount === expected.trackCount,
+    );
+    if (!positiveSafeIntegerValue(value?.projectJsonBytes) || !finiteNonNegative(value?.buildMs)) {
+      reasons.push(`${expected.clipCount.toString()}-clip project build metrics are invalid`);
+    }
+    validateComprehensiveTiming(
+      `${expected.clipCount.toString()}-clip cold compile`,
+      value?.cold,
+      expected.coldRuns,
+      reasons,
+    );
+    validateComprehensiveTiming(
+      `${expected.clipCount.toString()}-clip warm compile`,
+      value?.warmIncremental,
+      expected.warmRuns,
+      reasons,
+    );
+  }
+
+  const preflightCases = Array.isArray(report?.profilePreflight?.cases)
+    ? report.profilePreflight.cases
+    : [];
+  if (
+    stableJson(preflightCases.map(value => value?.profile)) !==
+    stableJson(['webm-vp9-opus', 'mp4-h264-aac'])
+  ) {
+    reasons.push('comprehensive public profile preflight matrix differs');
+  }
+  for (const value of preflightCases) {
+    const issues = Array.isArray(value?.issues) ? value.issues : [];
+    if (
+      !finiteNonNegative(value?.elapsedMs) ||
+      typeof value?.ok !== 'boolean' ||
+      (value.ok && issues.length !== 0) ||
+      (!value.ok && issues.length === 0) ||
+      issues.some(
+        issue =>
+          !nonEmptyString(issue?.code) ||
+          !nonEmptyString(issue?.severity) ||
+          !nonEmptyString(issue?.message) ||
+          typeof issue?.recoverable !== 'boolean',
+      )
+    ) {
+      reasons.push(`${value?.profile ?? 'unknown'} public profile preflight result is invalid`);
+    }
+  }
+
+  const audio = report?.audio;
+  if (
+    audio?.sampleRate !== 48_000 ||
+    audio?.channelCount !== 2 ||
+    audio?.blockFrames !== 1_024 ||
+    audio?.iterations !== 120 ||
+    !finiteNonNegative(audio?.elapsedMs) ||
+    audio.elapsedMs <= 0 ||
+    !finiteNonNegative(audio?.realtimeMultiple) ||
+    audio.realtimeMultiple <= 0 ||
+    !positiveSafeIntegerValue(audio?.audioTrackCount) ||
+    !positiveSafeIntegerValue(audio?.audioClipCount)
+  ) {
+    reasons.push('comprehensive audio benchmark contract differs');
+  }
+  validateComprehensiveTiming(
+    'comprehensive audio block latency',
+    audio?.blockLatency,
+    120,
+    reasons,
+  );
+
+  const exportCases = Array.isArray(report?.exportMatrix?.cases) ? report.exportMatrix.cases : [];
+  const expectedExports = [
+    {
+      id: 'webm-720p30',
+      profile: 'webm-vp9-opus',
+      width: 1_280,
+      height: 720,
+      durationUs: 3_000_000,
+      trialCount: 2,
+    },
+    {
+      id: 'webm-1080p30',
+      profile: 'webm-vp9-opus',
+      width: 1_920,
+      height: 1_080,
+      durationUs: 3_000_000,
+      trialCount: 2,
+    },
+    {
+      id: 'mp4-1080p30',
+      profile: 'mp4-h264-aac',
+      width: 1_920,
+      height: 1_080,
+      durationUs: 3_000_000,
+      trialCount: 2,
+    },
+    {
+      id: 'webm-4k30',
+      profile: 'webm-vp9-opus',
+      width: 3_840,
+      height: 2_160,
+      durationUs: 1_000_000,
+      trialCount: 1,
+    },
+    {
+      id: 'mp4-4k30',
+      profile: 'mp4-h264-aac',
+      width: 3_840,
+      height: 2_160,
+      durationUs: 1_000_000,
+      trialCount: 1,
+    },
+  ];
+  if (stableJson(report?.exportMatrix?.order) !== stableJson(expectedExports.map(x => x.id))) {
+    reasons.push('comprehensive export execution order differs');
+  }
+  for (const expected of expectedExports) {
+    const value = exportCases.find(entry => entry?.id === expected.id);
+    const trials = Array.isArray(value?.trials) ? value.trials : [];
+    if (
+      value?.profile !== expected.profile ||
+      value?.width !== expected.width ||
+      value?.height !== expected.height ||
+      value?.durationUs !== expected.durationUs ||
+      value?.trialCount !== expected.trialCount ||
+      trials.length !== expected.trialCount
+    ) {
+      reasons.push(`${expected.id} export definition differs`);
+      continue;
+    }
+    const completed = trials.filter(trial => trial?.status === 'completed');
+    const failed = trials.filter(trial => trial?.status === 'unsupported-or-failed');
+    if (completed.length + failed.length !== expected.trialCount) {
+      reasons.push(`${expected.id} contains an unrecognized trial status`);
+    }
+    for (const trial of completed) {
+      const expectedVideoFrames = Math.ceil((expected.durationUs * 30) / 1_000_000);
+      const expectedAudioFrames = Math.floor((expected.durationUs * 48_000) / 1_000_000);
+      if (
+        !finiteNonNegative(trial?.elapsedMs) ||
+        trial.elapsedMs <= 0 ||
+        !approximatelyEqual(
+          trial?.realtimeMultiple,
+          expected.durationUs / 1_000 / trial.elapsedMs,
+        ) ||
+        trial?.videoFrames !== expectedVideoFrames ||
+        trial?.audioFrames !== expectedAudioFrames ||
+        !positiveSafeIntegerValue(trial?.bytes) ||
+        trial?.headerValid !== true ||
+        trial?.sink?.closed !== true ||
+        trial?.sink?.aborted !== false ||
+        trial?.sink?.finalSize !== trial?.bytes
+      ) {
+        reasons.push(`${expected.id} completed export trial is invalid`);
+      }
+      validateLongTaskWindow(`${expected.id} main thread`, trial?.mainThread, reasons);
+    }
+    if (failed.some(trial => !nonEmptyString(trial?.error?.message))) {
+      reasons.push(`${expected.id} failed trial does not disclose an error`);
+    }
+    if (
+      expected.id !== 'mp4-4k30' &&
+      runtime?.webCodecs?.[
+        expected.profile === 'mp4-h264-aac'
+          ? 'h264_1080p30'
+          : expected.width === 3_840
+            ? 'vp9_4k30'
+            : 'vp9_1080p30'
+      ] === true &&
+      completed.length !== expected.trialCount
+    ) {
+      reasons.push(`${expected.id} did not complete despite declared codec support`);
+    }
+    if (value?.completedTrials !== completed.length) {
+      reasons.push(`${expected.id} completedTrials differs from trial statuses`);
+    }
+    if (completed.length > 0) {
+      validateComprehensiveTiming(
+        `${expected.id} aggregate`,
+        value?.timing,
+        completed.length,
+        reasons,
+      );
+    } else if (value?.timing !== null) {
+      reasons.push(`${expected.id} timing must be null without completed trials`);
+    }
+  }
+
+  const storageCases = Array.isArray(report?.storage?.cases) ? report.storage.cases : [];
+  if (stableJson(storageCases.map(value => value?.kind)) !== stableJson(['memory', 'opfs'])) {
+    reasons.push('comprehensive storage sink matrix differs');
+  }
+  for (const value of storageCases) {
+    if (
+      value?.totalBytes !== 16 * 1_024 * 1_024 ||
+      value?.chunkBytes !== 1 * 1_024 * 1_024 ||
+      value?.finalBytes !== value.totalBytes ||
+      !finiteNonNegative(value?.elapsedMs) ||
+      value.elapsedMs <= 0 ||
+      !finiteNonNegative(value?.throughputMiBPerSecond) ||
+      value.throughputMiBPerSecond <= 0 ||
+      value?.snapshot?.closed !== true ||
+      value?.snapshot?.aborted !== false
+    ) {
+      reasons.push(`${value?.kind ?? 'unknown'} storage benchmark is invalid`);
+    }
+  }
+
+  const soak = report?.compositorSoak;
+  if (
+    soak?.resolution?.width !== 1_920 ||
+    soak?.resolution?.height !== 1_080 ||
+    soak?.backend !== 'webgl2' ||
+    soak?.warmupFrames !== 5 ||
+    soak?.frames !== 180 ||
+    !finiteNonNegative(soak?.firstHalfP95Ms) ||
+    !finiteNonNegative(soak?.secondHalfP95Ms) ||
+    soak?.resourcesBeforeDispose?.disposed !== false ||
+    soak?.resourcesBeforeDispose?.pendingRequests !== 0 ||
+    soak?.resourcesAfterDispose?.disposed !== true ||
+    soak?.resourcesAfterDispose?.pendingRequests !== 0
+  ) {
+    reasons.push('comprehensive compositor soak contract differs');
+  }
+  validateComprehensiveTiming('comprehensive compositor soak', soak?.overall, 180, reasons);
+  const heapSamples = Array.isArray(soak?.heapSamples) ? soak.heapSamples : [];
+  if (
+    heapSamples.length !== 6 ||
+    heapSamples.some(
+      (sample, index) =>
+        sample?.frame !== (index + 1) * 30 ||
+        (sample?.usedJsHeapBytes !== null && !finiteNonNegative(sample?.usedJsHeapBytes)),
+    )
+  ) {
+    reasons.push('comprehensive compositor soak heap samples differ');
+  }
+}
+
 /** Strict fixed-environment Phase 1 1080p30/resource evidence contract. */
 export function validatePerformanceEvidence(report) {
   const reasons = [];
@@ -1432,6 +1768,9 @@ export function validatePerformanceEvidence(report) {
     ) {
       reasons.push(`ten-minute ${name} heap snapshot is invalid or unbounded`);
     }
+  }
+  if (report?.benchmarkSuiteVersion !== undefined) {
+    validateComprehensivePerformance(report, reasons);
   }
   return {
     passed: reasons.length === 0,
