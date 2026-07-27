@@ -9,10 +9,12 @@ import { aelion } from '../dist/index.js';
 const fixtureRoot = fileURLToPath(new URL('./fixtures/app', import.meta.url));
 const audioDist = fileURLToPath(new URL('../../audio/dist', import.meta.url));
 const rendererDist = fileURLToPath(new URL('../../renderer-worker/dist', import.meta.url));
+const exportDist = fileURLToPath(new URL('../../export/dist', import.meta.url));
 
 function fixtureAlias() {
   return {
     '@aelion/audio': resolve(audioDist, 'index.js'),
+    '@aelion/export': resolve(exportDist, 'index.js'),
     '@aelion/renderer-worker': resolve(rendererDist, 'index.js'),
   };
 }
@@ -35,6 +37,7 @@ async function testProductionBuild() {
   assert(fileNames.some(name => name.includes('aelion-audio-pcm-player.worklet.js')));
   assert(fileNames.some(name => name.includes('aelion-audio-pcm-message-player.worklet.js')));
   assert(fileNames.some(name => name.includes('aelion-renderer-worker-webgl2-worker.js')));
+  assert(fileNames.some(name => name.includes('aelion-export-mux-export-worker.js')));
   const applicationCode = chunks
     .filter(chunk => chunk.isEntry && !chunk.fileName.includes('aelion-'))
     .map(chunk => chunk.code)
@@ -42,6 +45,7 @@ async function testProductionBuild() {
   assert(!applicationCode.includes("new URL('./pcm-player.worklet.js'"));
   assert(!applicationCode.includes("new URL('./pcm-message-player.worklet.js'"));
   assert(!applicationCode.includes("new URL('./webgl2-worker.js'"));
+  assert(!applicationCode.includes("new URL('./mux-export-worker.js'"));
 }
 
 async function testDevelopmentServer() {
@@ -64,6 +68,7 @@ async function testDevelopmentServer() {
       '/@aelion/vite-plugin/runtime-assets/audio/pcm-player.worklet.js',
       '/@aelion/vite-plugin/runtime-assets/audio/pcm-message-player.worklet.js',
       '/@aelion/vite-plugin/runtime-assets/renderer-worker/webgl2-worker.js',
+      '/@aelion/vite-plugin/runtime-assets/export/mux-export-worker.js',
     ]) {
       const response = await fetch(`${origin}${path}`);
       assert.equal(response.status, 200);
@@ -80,4 +85,7 @@ async function testDevelopmentServer() {
 
 await testProductionBuild();
 await testDevelopmentServer();
-process.stdout.write('@aelion/vite-plugin tests passed: production build, development server\n');
+process.stdout.write(
+  '@aelion/vite-plugin tests passed: production build, development server\n',
+  () => process.exit(0),
+);

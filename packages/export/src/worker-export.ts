@@ -10,7 +10,8 @@ import type {
 } from './worker-protocol.js';
 
 export interface WorkerMuxedExportOptions extends WebMExportOptions {
-  readonly profile: 'webm' | 'mp4';
+  readonly profile: 'webm' | 'mp4' | 'mp4-av1' | 'mp4-hevc';
+  readonly workerUrl?: string | URL;
 }
 
 export interface WorkerMuxedExporterSnapshot {
@@ -19,7 +20,8 @@ export interface WorkerMuxedExporterSnapshot {
   readonly pendingHostRequests: number;
 }
 
-interface WorkerMuxedExporterInternalOptions {
+export interface WorkerMuxedExporterOptions {
+  readonly workerUrl?: string | URL;
   readonly workerFactory?: () => Worker;
 }
 
@@ -35,10 +37,10 @@ export class WorkerMuxedExporter implements Disposable {
   #disposed = false;
   #running = false;
 
-  public constructor(options: WorkerMuxedExporterInternalOptions = {}) {
+  public constructor(options: WorkerMuxedExporterOptions = {}) {
     this.#worker =
       options.workerFactory?.() ??
-      new Worker(new URL('./mux-export-worker.js', import.meta.url), {
+      new Worker(options.workerUrl ?? new URL('./mux-export-worker.js', import.meta.url), {
         type: 'module',
         name: 'aelion-export-mux',
       });
@@ -204,6 +206,12 @@ export class WorkerMuxedExporter implements Disposable {
           channelCount: options.channelCount,
           videoBitrate: options.videoBitrate,
           audioBitrate: options.audioBitrate,
+          ...(options.videoCodecString === undefined
+            ? {}
+            : { videoCodecString: options.videoCodecString }),
+          ...(options.audioCodecString === undefined
+            ? {}
+            : { audioCodecString: options.audioCodecString }),
         },
         sink: sinkBarrier.writable,
       };
@@ -227,7 +235,9 @@ export class WorkerMuxedExporter implements Disposable {
 export async function exportMuxedInWorker(
   options: WorkerMuxedExportOptions,
 ): Promise<WebMExportResult> {
-  const exporter = new WorkerMuxedExporter();
+  const exporter = new WorkerMuxedExporter({
+    ...(options.workerUrl === undefined ? {} : { workerUrl: options.workerUrl }),
+  });
   try {
     return await exporter.run(options);
   } finally {

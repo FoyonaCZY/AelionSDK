@@ -40,6 +40,62 @@ export class MemoryExportCheckpointStore implements ExportCheckpointStore {
   }
 }
 
+/**
+ * Durable browser checkpoint store. A new instance with the same namespace
+ * resumes committed units after a page reload; callers may inject sessionStorage
+ * or a test double instead of localStorage.
+ */
+export class BrowserStorageExportCheckpointStore implements ExportCheckpointStore {
+  readonly #storage: Storage;
+  readonly #namespace: string;
+
+  public constructor(options: { readonly storage?: Storage; readonly namespace?: string } = {}) {
+    const storage = options.storage ?? globalThis.localStorage;
+    this.#storage = storage;
+    this.#namespace = options.namespace ?? 'aelion-export-checkpoint';
+  }
+
+  public load(key: string, signal?: AbortSignal): Promise<ExportCheckpoint | undefined> {
+    throwIfAborted(signal, 'Load export checkpoint');
+    const value = this.#storage.getItem(this.#key(key));
+    if (value === null) return Promise.resolve(undefined);
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (
+        parsed === null ||
+        typeof parsed !== 'object' ||
+        Reflect.get(parsed, 'version') !== 1 ||
+        typeof Reflect.get(parsed, 'contentId') !== 'string' ||
+        typeof Reflect.get(parsed, 'profileId') !== 'string'
+      ) {
+        this.#storage.removeItem(this.#key(key));
+        return Promise.resolve(undefined);
+      }
+      return Promise.resolve(parsed as ExportCheckpoint);
+    } catch {
+      this.#storage.removeItem(this.#key(key));
+      return Promise.resolve(undefined);
+    }
+  }
+
+  public save(key: string, checkpoint: ExportCheckpoint, signal?: AbortSignal): Promise<void> {
+    throwIfAborted(signal, 'Save export checkpoint');
+    this.#storage.setItem(this.#key(key), JSON.stringify(checkpoint));
+    return Promise.resolve();
+  }
+
+  public delete(key: string, signal?: AbortSignal): Promise<void> {
+    throwIfAborted(signal, 'Delete export checkpoint');
+    this.#storage.removeItem(this.#key(key));
+    return Promise.resolve();
+  }
+
+  #key(key: string): string {
+    if (key.length === 0) throw new TypeError('Checkpoint key must not be empty');
+    return `${this.#namespace}:${encodeURIComponent(key)}`;
+  }
+}
+
 export interface CheckpointedExportUnitResult {
   readonly outputBytes: number;
   readonly state?: ExportCheckpoint['state'];

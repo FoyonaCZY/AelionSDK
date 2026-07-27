@@ -7,15 +7,17 @@ Profile ID 是稳定的格式选择，不是浏览器自动协商结果。产品
 
 ## Profile 表
 
-| ID              | Kind           | MIME         | 扩展名  | Video           | Audio       | 失败后继续方式     |
-| --------------- | -------------- | ------------ | ------- | --------------- | ----------- | ------------------ |
-| `webm-vp9-opus` | muxed-av       | `video/webm` | `.webm` | `vp09.00.10.08` | `opus`      | 本地从头重启       |
-| `mp4-h264-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | `avc1.640028`   | `mp4a.40.2` | 本地从头重启       |
-| `still-png`     | still          | `image/png`  | `.png`  | —               | —           | 可作为独立单元重做 |
-| `still-jpeg`    | still          | `image/jpeg` | `.jpg`  | —               | —           | 可作为独立单元重做 |
-| `still-webp`    | still          | `image/webp` | `.webp` | —               | —           | 可作为独立单元重做 |
-| `animated-gif`  | animated-image | `image/gif`  | `.gif`  | —               | —           | 可作为独立单元重做 |
-| `audio-wav`     | audio-only     | `audio/wav`  | `.wav`  | —               | PCM         | 可作为独立单元重做 |
+| ID              | Kind           | MIME         | 扩展名  | Video             | Audio       | 失败后继续方式     |
+| --------------- | -------------- | ------------ | ------- | ----------------- | ----------- | ------------------ |
+| `webm-vp9-opus` | muxed-av       | `video/webm` | `.webm` | `vp09.00.10.08`   | `opus`      | 本地从头重启       |
+| `mp4-h264-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | 自动协商 `avc1.*` | `mp4a.40.2` | 本地从头重启       |
+| `mp4-av1-aac`   | muxed-av       | `video/mp4`  | `.mp4`  | `av01.0.*M.08`    | `mp4a.40.2` | 本地从头重启       |
+| `mp4-hevc-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | `hvc1.1.6.L*.B0`  | `mp4a.40.2` | 本地从头重启       |
+| `still-png`     | still          | `image/png`  | `.png`  | —                 | —           | 可作为独立单元重做 |
+| `still-jpeg`    | still          | `image/jpeg` | `.jpg`  | —                 | —           | 可作为独立单元重做 |
+| `still-webp`    | still          | `image/webp` | `.webp` | —                 | —           | 可作为独立单元重做 |
+| `animated-gif`  | animated-image | `image/gif`  | `.gif`  | —                 | —           | 可作为独立单元重做 |
+| `audio-wav`     | audio-only     | `audio/wav`  | `.wav`  | —                 | PCM         | 可作为独立单元重做 |
 
 `EXPORT_PROFILES` 导出同一份机器可读元数据。`resumability` 说明协议类型，不代表当前 Session 能从任意 MP4/WebM 中断点自动继续。
 
@@ -59,6 +61,9 @@ const generic = await probeExportProfiles();
 const exact = await session.export.preflightProfile(options);
 ```
 
-`probeExportProfiles()` 用固定配置粗略查看 codec/Canvas 能力。`preflightProfile()` 还检查当前 Project 的尺寸、帧率、声道、色彩、Material 和 Sink，是开始任务前的最终依据。
+`probeExportProfiles()` 用请求的尺寸/帧率探测精确 codec/Canvas 配置。
+`preflightProfile()` 还检查当前 Project 的声道、色彩、Material、Sink，并对 AAC
+执行真实 encode/flush canary，是开始任务前的最终依据。AV1/HEVC profile 出现在
+公共 API 中不代表当前设备一定支持；unsupported 是正常、可观测的协商结果。
 
 完整调用见[选择导出格式](/AelionSDK/export/overview/)和[导出任务、进度和文件写入](/AelionSDK/export/jobs-sinks/)。

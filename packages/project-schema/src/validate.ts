@@ -685,7 +685,15 @@ function validateTimeMappingSemantics(project: AelionProject, diagnostics: Diagn
 function validateAudioSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
   for (const item of Object.values(project.items)) {
     if (item.type !== 'audio') continue;
-    const audio = (item as { readonly audio?: { fadeInUs?: unknown; fadeOutUs?: unknown } }).audio;
+    const typedItem = item as {
+      readonly audio?: {
+        readonly fadeInUs?: unknown;
+        readonly fadeOutUs?: unknown;
+        readonly pitchPolicy?: unknown;
+      };
+      readonly source?: { readonly timeMapping?: { readonly type?: unknown } };
+    };
+    const audio = typedItem.audio;
     for (const property of ['fadeInUs', 'fadeOutUs'] as const) {
       const durationUs = audio?.[property];
       if (typeof durationUs !== 'number' || durationUs <= item.range.durationUs) continue;
@@ -694,6 +702,16 @@ function validateAudioSemantics(project: AelionProject, diagnostics: DiagnosticS
           'PROJECT_AUDIO_FADE_OUT_OF_RANGE',
           `${property} for audio item ${item.id} cannot exceed the Item duration`,
           ['items', item.id, 'audio', property],
+          item.id,
+        ),
+      );
+    }
+    if (audio?.pitchPolicy === 'preserve' && typedItem.source?.timeMapping?.type !== 'linear') {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_AUDIO_PITCH_POLICY_UNSUPPORTED',
+          `Pitch-preserving stretch for audio item ${item.id} requires a linear TimeMap`,
+          ['items', item.id, 'audio', 'pitchPolicy'],
           item.id,
         ),
       );

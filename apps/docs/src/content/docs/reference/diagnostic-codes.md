@@ -67,24 +67,25 @@ interface Diagnostic {
 
 ## Project
 
-| Code                                    | 含义与建议                                                                                                                                                        |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PROJECT_SCHEMA_INVALID`                | Project 不符合 v1 JSON Schema；查看 `path` 和校验 details                                                                                                         |
-| `PROJECT_INPUT_INVALID`                 | Project 在 Schema 前包含非纯 JSON/不安全结构，例如 accessor、稀疏数组、symbol、循环/对象别名或非 canonical number；SDK 不调用 getter/iterator，并返回一条有界诊断 |
-| `PROJECT_INPUT_LIMIT_EXCEEDED`          | Project 在 Schema 前超过 Alpha 不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                               |
-| `PROJECT_ENTITY_KEY_MISMATCH`           | normalized map key 与实体 `id` 不一致                                                                                                                             |
-| `PROJECT_REFERENCE_MISSING`             | ID 引用的实体不存在；不可用“忽略”修复编辑语义                                                                                                                     |
-| `PROJECT_DUPLICATE_REFERENCE`           | 有序 ID list 含重复引用                                                                                                                                           |
-| `PROJECT_HOST_MISMATCH`                 | Track/Item 等实体被错误的 Sequence/Track 列表持有                                                                                                                 |
-| `PROJECT_MATERIAL_MULTIPLE_OWNERS`      | 同一 MaterialInstance 被多个 host 拥有                                                                                                                            |
-| `PROJECT_MATERIAL_ORPHAN`               | MaterialInstance 没有合法 owner                                                                                                                                   |
-| `PROJECT_VISUAL_TRANSITION_OVERLAP`     | 同一 Sequence 的 visual Transition 时间区间重叠；拆分或调整区间，避免运行时选择歧义                                                                               |
-| `PROJECT_TIME_MAPPING_ENDPOINT_INVALID` | curve TimeMap 未覆盖 Item/source 端点或端点越界                                                                                                                   |
-| `PROJECT_TIME_MAPPING_ORDER_INVALID`    | curve point 时间顺序无效，无法形成确定单调段                                                                                                                      |
-| `PROJECT_NESTED_SEQUENCE_CYCLE`         | Nested Sequence 引用形成循环                                                                                                                                      |
-| `PROJECT_MASK_SOURCE_INVALID`           | Mask/Matte source 不存在、跨 Sequence 或自引用                                                                                                                    |
-| `PROJECT_AUDIO_FADE_OUT_OF_RANGE`       | fade 长于 Item duration                                                                                                                                           |
-| `PROJECT_HDR_FORMAT_INVALID`            | PQ/HLG 未同时使用 Rec.2020 linear 与 10-bit contract                                                                                                              |
+| Code                                     | 含义与建议                                                                                                                                                        |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PROJECT_SCHEMA_INVALID`                 | Project 不符合 v1 JSON Schema；查看 `path` 和校验 details                                                                                                         |
+| `PROJECT_INPUT_INVALID`                  | Project 在 Schema 前包含非纯 JSON/不安全结构，例如 accessor、稀疏数组、symbol、循环/对象别名或非 canonical number；SDK 不调用 getter/iterator，并返回一条有界诊断 |
+| `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过 Alpha 不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                               |
+| `PROJECT_ENTITY_KEY_MISMATCH`            | normalized map key 与实体 `id` 不一致                                                                                                                             |
+| `PROJECT_REFERENCE_MISSING`              | ID 引用的实体不存在；不可用“忽略”修复编辑语义                                                                                                                     |
+| `PROJECT_DUPLICATE_REFERENCE`            | 有序 ID list 含重复引用                                                                                                                                           |
+| `PROJECT_HOST_MISMATCH`                  | Track/Item 等实体被错误的 Sequence/Track 列表持有                                                                                                                 |
+| `PROJECT_MATERIAL_MULTIPLE_OWNERS`       | 同一 MaterialInstance 被多个 host 拥有                                                                                                                            |
+| `PROJECT_MATERIAL_ORPHAN`                | MaterialInstance 没有合法 owner                                                                                                                                   |
+| `PROJECT_VISUAL_TRANSITION_OVERLAP`      | 同一 Sequence 的 visual Transition 时间区间重叠；拆分或调整区间，避免运行时选择歧义                                                                               |
+| `PROJECT_TIME_MAPPING_ENDPOINT_INVALID`  | curve TimeMap 未覆盖 Item/source 端点或端点越界                                                                                                                   |
+| `PROJECT_TIME_MAPPING_ORDER_INVALID`     | curve point 时间顺序无效，无法形成确定单调段                                                                                                                      |
+| `PROJECT_NESTED_SEQUENCE_CYCLE`          | Nested Sequence 引用形成循环                                                                                                                                      |
+| `PROJECT_MASK_SOURCE_INVALID`            | Mask/Matte source 不存在、跨 Sequence 或自引用                                                                                                                    |
+| `PROJECT_AUDIO_FADE_OUT_OF_RANGE`        | fade 长于 Item duration                                                                                                                                           |
+| `PROJECT_AUDIO_PITCH_POLICY_UNSUPPORTED` | `pitchPolicy: preserve` 当前只接受 linear TimeMap；改用线性 rate、varispeed 或离线烘焙                                                                            |
+| `PROJECT_HDR_FORMAT_INVALID`             | PQ/HLG 未同时使用 Rec.2020 linear 与 10-bit contract                                                                                                              |
 
 ## Transaction、History 与编辑命令
 
@@ -180,6 +181,10 @@ Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_
 | `CAPABILITY_FILE_SYSTEM_ACCESS_UNAVAILABLE`         | save picker 不可用；不影响 OPFS/自定义 Sink                   |
 | `CAPABILITY_TRANSFERABLE_STREAMS_UNAVAILABLE`       | 必要 Web Streams primitive 不可用                             |
 | `CAPABILITY_WEBASSEMBLY_UNAVAILABLE`                | WebAssembly 不可用                                            |
+| `CAPABILITY_MEDIA_QUERY_UNAVAILABLE`                | 无法探测 display gamut/dynamic range                          |
+| `CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE`           | 当前显示目标未声明 P3 gamut                                   |
+| `CAPABILITY_HDR_DISPLAY_UNAVAILABLE`                | 当前显示目标未声明 high dynamic range                         |
+| `CAPABILITY_COLOR_PROBE_FAILED`                     | display color media query 探测失败                            |
 
 `COMPATIBILITY_RUNTIME_BLOCKED` 是仓库 evidence runner 的环境阻塞码，不是 SDK runtime capability。它不能被解释为浏览器通过或不支持。
 

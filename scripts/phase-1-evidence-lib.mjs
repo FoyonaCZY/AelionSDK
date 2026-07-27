@@ -10,7 +10,11 @@ export const PHASE_1_REQUIRED_GATE_COMMANDS = Object.freeze([
   'corepack pnpm run ci',
   'corepack pnpm test:browser',
   'corepack pnpm test:browser:firefox',
+  'corepack pnpm test:browser:webkit',
+  'corepack pnpm test:browser:mobile',
   'corepack pnpm test:golden',
+  'corepack pnpm test:security',
+  'corepack pnpm test:soak',
   'corepack pnpm bench',
   'corepack pnpm test:pack',
   'corepack pnpm test:consumer',
@@ -43,6 +47,7 @@ export const PHASE_1_EXPECTED_PUBLIC_PACKAGES = Object.freeze([
 ]);
 
 export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
+  'mux-export-worker',
   'pcm-message-player-worklet',
   'pcm-player-worklet',
   'webgl2-worker',
@@ -51,8 +56,8 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 72,
-  firefox: 66,
+  chromium: 75,
+  firefox: 67,
 });
 
 export const PHASE_1_ARTIFACT_CLOCK_TOLERANCE_MS = 5_000;
@@ -1316,6 +1321,17 @@ function validateComprehensivePerformance(report, reasons) {
     reasons.push('comprehensive performance benchmarkSuiteVersion must be 2.0.0');
     return;
   }
+  if (
+    !nonEmptyString(report?.externalMp4Readback?.implementation) ||
+    !positiveSafeIntegerValue(report?.externalMp4Readback?.bytes) ||
+    report?.externalMp4Readback?.videoDecode !== 'passed' ||
+    report?.externalMp4Readback?.audioDecode !== 'passed' ||
+    report?.externalMp4Readback?.videoFrames !== 30 ||
+    !isSha256(report?.externalMp4Readback?.videoFrameMd5DocumentSha256) ||
+    !/^MD5=[0-9a-f]{32}$/u.test(report?.externalMp4Readback?.audioPcmMd5 ?? '')
+  ) {
+    reasons.push('Session MP4 external FFmpeg readback is missing or invalid');
+  }
   const methodology = report?.methodology;
   if (
     !nonEmptyString(methodology?.environment) ||
@@ -1347,6 +1363,8 @@ function validateComprehensivePerformance(report, reasons) {
     'h264_4k30',
     'vp9_1080p30',
     'vp9_4k30',
+    'av1_1080p30',
+    'hevc_1080p30',
     'aacStereo',
     'opusStereo',
   ]) {
@@ -1365,6 +1383,14 @@ function validateComprehensivePerformance(report, reasons) {
     },
     reasons,
   );
+  const webGpuP95 = report?.material?.warmFilmWebGpu?.wall?.p95Ms;
+  const webGl2P95 = report?.material?.warmFilmWebGl2?.wall?.p95Ms;
+  if (
+    runtime?.webGpu?.adapterAvailable === true &&
+    (!finiteNonNegative(webGpuP95) || !finiteNonNegative(webGl2P95) || webGpuP95 > webGl2P95 * 2)
+  ) {
+    reasons.push('1080p single-pass WebGPU p95 exceeds 2x WebGL2 p95');
+  }
 
   const compilationCases = Array.isArray(report?.compilation?.cases)
     ? report.compilation.cases
@@ -1409,6 +1435,14 @@ function validateComprehensivePerformance(report, reasons) {
       expected.warmRuns,
       reasons,
     );
+    if (
+      expected.clipCount === 1_000 &&
+      (!finiteNonNegative(value?.warmIncremental?.p95Ms) ||
+        !finiteNonNegative(value?.cold?.p95Ms) ||
+        value.warmIncremental.p95Ms > value.cold.p95Ms * 0.5)
+    ) {
+      reasons.push('1,000-clip warm incremental p95 exceeds 50% of cold p95');
+    }
   }
 
   const preflightCases = Array.isArray(report?.profilePreflight?.cases)
@@ -1416,7 +1450,7 @@ function validateComprehensivePerformance(report, reasons) {
     : [];
   if (
     stableJson(preflightCases.map(value => value?.profile)) !==
-    stableJson(['webm-vp9-opus', 'mp4-h264-aac'])
+    stableJson(['webm-vp9-opus', 'mp4-h264-aac', 'mp4-av1-aac', 'mp4-hevc-aac'])
   ) {
     reasons.push('comprehensive public profile preflight matrix differs');
   }
@@ -1436,6 +1470,23 @@ function validateComprehensivePerformance(report, reasons) {
       )
     ) {
       reasons.push(`${value?.profile ?? 'unknown'} public profile preflight result is invalid`);
+    }
+  }
+  const requiredProfileSupport = new Map([
+    ['mp4-h264-aac', runtime?.webCodecs?.h264_1080p30 === true],
+    ['mp4-av1-aac', runtime?.webCodecs?.av1_1080p30 === true],
+    ['mp4-hevc-aac', runtime?.webCodecs?.hevc_1080p30 === true],
+  ]);
+  for (const [profile, videoSupported] of requiredProfileSupport) {
+    const value = preflightCases.find(entry => entry?.profile === profile);
+    if (
+      videoSupported &&
+      runtime?.webCodecs?.aacStereo === true &&
+      (value?.ok !== true ||
+        !nonEmptyString(value?.encoderConfiguration?.videoCodecString) ||
+        value?.encoderConfiguration?.audioCodecString !== 'mp4a.40.2')
+    ) {
+      reasons.push(`${profile} did not pass public preflight despite declared codec support`);
     }
   }
 
@@ -1552,10 +1603,11 @@ function validateComprehensivePerformance(report, reasons) {
       reasons.push(`${expected.id} failed trial does not disclose an error`);
     }
     if (
-      expected.id !== 'mp4-4k30' &&
       runtime?.webCodecs?.[
         expected.profile === 'mp4-h264-aac'
-          ? 'h264_1080p30'
+          ? expected.width === 3_840
+            ? 'h264_4k30'
+            : 'h264_1080p30'
           : expected.width === 3_840
             ? 'vp9_4k30'
             : 'vp9_1080p30'
@@ -1576,6 +1628,50 @@ function validateComprehensivePerformance(report, reasons) {
       );
     } else if (value?.timing !== null) {
       reasons.push(`${expected.id} timing must be null without completed trials`);
+    }
+  }
+
+  const realMediaCases = Array.isArray(report?.realMediaPipeline?.cases)
+    ? report.realMediaPipeline.cases
+    : [];
+  const expectedRealMedia = [
+    { id: 'real-mp4-1080p30', width: 1_920, height: 1_080 },
+    { id: 'real-mp4-4k30', width: 3_840, height: 2_160 },
+  ];
+  if (
+    stableJson(realMediaCases.map(value => value?.id)) !==
+    stableJson(expectedRealMedia.map(value => value.id))
+  ) {
+    reasons.push('real-media pipeline matrix differs');
+  }
+  for (const expected of expectedRealMedia) {
+    const value = realMediaCases.find(entry => entry?.id === expected.id);
+    if (value?.width !== expected.width || value?.height !== expected.height) {
+      reasons.push(`${expected.id} real-media definition differs`);
+      continue;
+    }
+    const supportName = expected.width === 3_840 ? 'h264_4k30' : 'h264_1080p30';
+    if (
+      runtime?.webCodecs?.[supportName] === true &&
+      runtime?.webCodecs?.aacStereo === true &&
+      (value?.status !== 'completed' ||
+        stableJson(value?.stages) !==
+          stableJson(['decode', 'render', 'audio', 'encode', 'mux', 'sink']) ||
+        value?.output?.container !== 'mp4' ||
+        value?.output?.videoCodec !== 'avc' ||
+        value?.output?.audioCodec !== 'aac' ||
+        !positiveSafeIntegerValue(value?.output?.videoSamples) ||
+        !positiveSafeIntegerValue(value?.output?.audioSamples) ||
+        !positiveSafeIntegerValue(value?.outputBytes) ||
+        !finiteNonNegative(value?.elapsedMs) ||
+        value.elapsedMs <= 0)
+    ) {
+      reasons.push(`${expected.id} real-media full chain did not complete correctly`);
+    }
+    if (value?.status === 'completed') {
+      validateLongTaskWindow(`${expected.id} main thread`, value?.mainThread, reasons);
+    } else if (!['unsupported', 'failed'].includes(value?.status)) {
+      reasons.push(`${expected.id} real-media status is invalid`);
     }
   }
 
@@ -1835,6 +1931,28 @@ function validateTarballBrowser(entry, reasons) {
     session?.height !== 16
   ) {
     reasons.push(`${browser} Session consumer contract differs`);
+  }
+  const explicit = report?.explicitRuntimeAssets;
+  if (
+    explicit?.compositor?.backend !== 'webgl2' ||
+    explicit?.sharedClock?.contextState !== 'suspended' ||
+    explicit?.transferableWorkletLoaded !== true ||
+    explicit?.exportWorker?.profile !== 'webm-vp9-opus' ||
+    explicit?.exportWorker?.videoFrames !== 3 ||
+    explicit?.exportWorker?.audioFrames !== 4_800 ||
+    !positiveSafeIntegerValue(explicit?.exportWorker?.bytes)
+  ) {
+    reasons.push(`${browser} explicit non-Vite runtime-assets contract differs`);
+  }
+  const explicitSession = report?.explicitSessionFacade;
+  if (
+    explicitSession?.revision !== '3' ||
+    explicitSession?.state !== 'ready' ||
+    explicitSession?.backend !== 'webgl2' ||
+    explicitSession?.width !== 16 ||
+    explicitSession?.height !== 16
+  ) {
+    reasons.push(`${browser} explicit runtime-assets Session contract differs`);
   }
 }
 

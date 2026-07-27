@@ -12,9 +12,6 @@ import type {
 
 interface GpuBuffer {
   destroy(): void;
-  getMappedRange(): ArrayBuffer;
-  mapAsync(mode: number): Promise<void>;
-  unmap(): void;
 }
 
 interface GpuTexture {
@@ -22,15 +19,20 @@ interface GpuTexture {
   destroy(): void;
 }
 
+interface GpuCanvasContext {
+  configure(descriptor: {
+    readonly device: GpuDevice;
+    readonly format: 'rgba8unorm';
+    readonly usage: number;
+    readonly alphaMode: 'premultiplied';
+  }): void;
+  getCurrentTexture(): GpuTexture;
+  unconfigure?(): void;
+}
+
 interface GpuQueue {
-  copyExternalImageToTexture(
-    source: { source: VideoFrame },
-    destination: { texture: GpuTexture },
-    copySize: [number, number],
-  ): void;
   submit(commands: readonly unknown[]): void;
   writeBuffer(buffer: GpuBuffer, offset: number, data: BufferSource): void;
-  onSubmittedWorkDone(): Promise<void>;
 }
 
 interface GpuPipeline {
@@ -49,10 +51,11 @@ interface GpuDevice {
       setBindGroup(index: number, bindGroup: unknown): void;
       setPipeline(pipeline: unknown): void;
     };
-    copyTextureToBuffer(source: object, destination: object, size: object): void;
+    copyTextureToTexture(source: object, destination: object, size: object): void;
     finish(): unknown;
   };
   createRenderPipeline(descriptor: object): GpuPipeline;
+  importExternalTexture(descriptor: { readonly source: VideoFrame }): unknown;
   createSampler(descriptor: object): unknown;
   createShaderModule(descriptor: object): unknown;
   createTexture(descriptor: object): GpuTexture;
@@ -108,7 +111,6 @@ interface MutableWorkerTiming {
 
 const GPU_BUFFER_USAGE = {
   COPY_DST: 0x0008,
-  MAP_READ: 0x0001,
   UNIFORM: 0x0040,
 };
 const GPU_TEXTURE_USAGE = {
@@ -124,6 +126,71 @@ const persistentGpuPipelines = new Map<string, GpuPipeline>();
 const persistentGpuTextures = new Map<string, GpuTexture[]>();
 const MAX_POOLED_GPU_TEXTURE_BYTES = 256 * 1_024 * 1_024;
 let pooledGpuTextureBytes = 0;
+
+class WebGpuCanvasRuntime {
+  readonly canvas: OffscreenCanvas;
+  readonly context: GpuCanvasContext;
+
+  public constructor(
+    public readonly device: GpuDevice,
+    public readonly width: number,
+    public readonly height: number,
+  ) {
+    this.canvas = new OffscreenCanvas(width, height);
+    const context = this.canvas.getContext('webgpu') as unknown as GpuCanvasContext | null;
+    if (context === null) throw new Error('Worker WebGPU canvas context is unavailable');
+    context.configure({
+      device,
+      format: 'rgba8unorm',
+      usage: GPU_TEXTURE_USAGE.RENDER_ATTACHMENT | GPU_TEXTURE_USAGE.COPY_DST,
+      alphaMode: 'premultiplied',
+    });
+    this.context = context;
+  }
+
+  public dispose(): void {
+    this.context.unconfigure?.();
+  }
+}
+
+const MAX_WEBGPU_CANVAS_RUNTIMES = 2;
+const webGpuCanvasRuntimes = new Map<string, WebGpuCanvasRuntime>();
+let webGpuCanvasRuntimeClock = 0;
+const webGpuCanvasAccess = new Map<string, number>();
+
+function webGpuCanvasRuntime(
+  device: GpuDevice,
+  width: number,
+  height: number,
+): WebGpuCanvasRuntime {
+  const key = `${width.toString()}x${height.toString()}`;
+  let runtime = webGpuCanvasRuntimes.get(key);
+  if (runtime !== undefined && runtime.device !== device) {
+    runtime.dispose();
+    webGpuCanvasRuntimes.delete(key);
+    webGpuCanvasAccess.delete(key);
+    runtime = undefined;
+  }
+  if (runtime === undefined) {
+    runtime = new WebGpuCanvasRuntime(device, width, height);
+    webGpuCanvasRuntimes.set(key, runtime);
+  }
+  webGpuCanvasAccess.set(key, ++webGpuCanvasRuntimeClock);
+  while (webGpuCanvasRuntimes.size > MAX_WEBGPU_CANVAS_RUNTIMES) {
+    const oldest = [...webGpuCanvasAccess.entries()].sort((left, right) => left[1] - right[1])[0];
+    if (oldest === undefined) break;
+    webGpuCanvasRuntimes.get(oldest[0])?.dispose();
+    webGpuCanvasRuntimes.delete(oldest[0]);
+    webGpuCanvasAccess.delete(oldest[0]);
+  }
+  return runtime;
+}
+
+function clearWebGpuCanvasRuntimes(): void {
+  webGpuCanvasRuntimes.forEach(runtime => runtime.dispose());
+  webGpuCanvasRuntimes.clear();
+  webGpuCanvasAccess.clear();
+}
 
 interface AcquiredGpuTexture {
   readonly texture: GpuTexture;
@@ -178,6 +245,24 @@ function clearGpuTexturePool(): void {
   pooledGpuTextureBytes = 0;
 }
 
+function shaderIdentifier(value: string): string {
+  return value.replaceAll(/[^a-zA-Z0-9_]/gu, '_');
+}
+
+function shaderWithExternalInputs(shader: string, ports: readonly string[]): string {
+  let output = shader;
+  for (const port of ports) {
+    const name = `input_${shaderIdentifier(port)}`;
+    output = output
+      .replace(`var ${name}: texture_2d<f32>;`, `var ${name}: texture_external;`)
+      .replaceAll(
+        `textureSample(${name}, source_sampler,`,
+        `textureSampleBaseClampToEdge(${name}, source_sampler,`,
+      );
+  }
+  return output;
+}
+
 async function gpuDevice(): Promise<GpuDevice> {
   if (persistentGpuDevice !== undefined) return persistentGpuDevice;
   persistentGpuDeviceTask ??= (async () => {
@@ -192,6 +277,7 @@ async function gpuDevice(): Promise<GpuDevice> {
         persistentGpuDevice = undefined;
         persistentGpuDeviceTask = undefined;
         persistentGpuPipelines.clear();
+        clearWebGpuCanvasRuntimes();
         clearGpuTexturePool();
       }
     });
@@ -204,6 +290,7 @@ async function gpuDevice(): Promise<GpuDevice> {
 }
 
 function disposeGpuRuntime(): void {
+  clearWebGpuCanvasRuntimes();
   clearGpuTexturePool();
   persistentGpuDevice?.destroy();
   persistentGpuDevice = undefined;
@@ -226,21 +313,12 @@ async function composeWebGpu(
   const device = await gpuDevice();
   (resources as { webgpuDevices: number }).webgpuDevices += 1;
   device.pushErrorScope('validation');
-  const textures: AcquiredGpuTexture[] = [];
   let uniformBuffer: GpuBuffer | undefined;
-  let readback: GpuBuffer | undefined;
   try {
-    const inputUsage =
-      GPU_TEXTURE_USAGE.TEXTURE_BINDING |
-      GPU_TEXTURE_USAGE.COPY_DST |
-      GPU_TEXTURE_USAGE.RENDER_ATTACHMENT;
-    const outputUsage = GPU_TEXTURE_USAGE.RENDER_ATTACHMENT | GPU_TEXTURE_USAGE.COPY_SRC;
-    const inputTextures = frames.map(() =>
-      acquireGpuTexture(device, request.width, request.height, inputUsage),
-    );
-    const outputTexture = acquireGpuTexture(device, request.width, request.height, outputUsage);
-    textures.push(...inputTextures, outputTexture);
-    (resources as { webgpuTextures: number }).webgpuTextures += textures.length;
+    const presentation = webGpuCanvasRuntime(device, request.width, request.height);
+    const outputTexture = presentation.context.getCurrentTexture();
+    const inputTextures = frames.map(frame => device.importExternalTexture({ source: frame }));
+    (resources as { webgpuTextures: number }).webgpuTextures += inputTextures.length;
     if (request.debugSimulateLoss === 'webgpu-device') {
       disposeGpuRuntime();
       throw new RendererBackendError(
@@ -248,14 +326,6 @@ async function composeWebGpu(
         'WebGPU device was lost during composition',
       );
     }
-    inputTextures.forEach((texture, index) => {
-      const frame = frames[index];
-      if (frame === undefined) throw new Error('WebGPU input frame is missing');
-      device.queue.copyExternalImageToTexture({ source: frame }, { texture: texture.texture }, [
-        request.width,
-        request.height,
-      ]);
-    });
     const uniformData = new Float32Array(Math.max(1, webgpu.uniforms.length) * 4);
     webgpu.uniforms.forEach((uniform, index) => {
       const value =
@@ -273,10 +343,11 @@ async function composeWebGpu(
     });
     (resources as { webgpuBuffers: number }).webgpuBuffers += 1;
     device.queue.writeBuffer(uniformBuffer, 0, uniformData);
-    const pipelineKey = `${request.program.graphHash}:${webgpu.shader}`;
+    const shader = shaderWithExternalInputs(webgpu.shader, webgpu.inputPorts);
+    const pipelineKey = `${request.program.graphHash}:external:${webgpu.inputPorts.join(',')}:${shader}`;
     let pipeline = persistentGpuPipelines.get(pipelineKey);
     if (pipeline === undefined) {
-      const module = device.createShaderModule({ code: webgpu.shader });
+      const module = device.createShaderModule({ code: shader });
       pipeline = device.createRenderPipeline({
         layout: 'auto',
         vertex: { module, entryPoint: 'vs' },
@@ -295,22 +366,16 @@ async function composeWebGpu(
         },
         ...inputTextures.map((texture, index) => ({
           binding: index + 1,
-          resource: texture.texture.createView(),
+          resource: texture,
         })),
         { binding: inputTextures.length + 1, resource: { buffer: uniformBuffer } },
       ],
     });
-    const bytesPerRow = Math.ceil((request.width * 4) / 256) * 256;
-    readback = device.createBuffer({
-      size: bytesPerRow * request.height,
-      usage: GPU_BUFFER_USAGE.COPY_DST | GPU_BUFFER_USAGE.MAP_READ,
-    });
-    (resources as { webgpuBuffers: number }).webgpuBuffers += 1;
     const encoder = device.createCommandEncoder();
     const pass = encoder.beginRenderPass({
       colorAttachments: [
         {
-          view: outputTexture.texture.createView(),
+          view: outputTexture.createView(),
           clearValue: { r: 0, g: 0, b: 0, a: 0 },
           loadOp: 'clear',
           storeOp: 'store',
@@ -321,47 +386,16 @@ async function composeWebGpu(
     pass.setBindGroup(0, bindGroup);
     pass.draw(3);
     pass.end();
-    encoder.copyTextureToBuffer(
-      { texture: outputTexture.texture },
-      { buffer: readback, bytesPerRow, rowsPerImage: request.height },
-      { width: request.width, height: request.height },
-    );
-    device.queue.submit([encoder.finish()]);
     const gpuStartedAt = performance.now();
-    await Promise.race([
-      device.queue.onSubmittedWorkDone(),
-      device.lost.then(info => {
-        throw new RendererBackendError(
-          'RENDERER_WEBGPU_DEVICE_LOST',
-          `WebGPU device was lost (${info.reason}): ${info.message}`,
-        );
-      }),
-    ]);
-    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
+    device.queue.submit([encoder.finish()]);
     const validationError = await device.popErrorScope();
+    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
     if (validationError !== null) {
       throw new Error(`WebGPU validation failed: ${validationError.message}`);
     }
-    await readback.mapAsync(1);
-    const mapped = new Uint8Array(readback.getMappedRange());
-    const pixels = new Uint8ClampedArray(request.width * request.height * 4);
-    for (let row = 0; row < request.height; row += 1) {
-      const start = row * bytesPerRow;
-      pixels.set(mapped.subarray(start, start + request.width * 4), row * request.width * 4);
-    }
-    readback.unmap();
-    const canvas = new OffscreenCanvas(request.width, request.height);
-    const context = canvas.getContext('2d');
-    if (context === null) throw new Error('WebGPU readback canvas is unavailable');
-    context.putImageData(new ImageData(pixels, request.width, request.height), 0, 0);
-    return canvas.transferToImageBitmap();
+    return presentation.canvas.transferToImageBitmap();
   } finally {
     uniformBuffer?.destroy();
-    readback?.destroy();
-    textures.forEach(texture => {
-      if (persistentGpuDevice === device) releaseGpuTexture(texture);
-      else texture.texture.destroy();
-    });
     (resources as { webgpuDevices: number }).webgpuDevices = 0;
     (resources as { webgpuPipelines: number }).webgpuPipelines = 0;
     (resources as { webgpuBuffers: number }).webgpuBuffers = 0;
@@ -370,26 +404,38 @@ async function composeWebGpu(
 }
 
 function frameGraphWebGpuInput(
+  device: GpuDevice,
   node: FrameGraphNode,
   port: string,
-  externalTextures: ReadonlyMap<string, AcquiredGpuTexture>,
+  externalFrames: ReadonlyMap<string, VideoFrame>,
+  importedExternalTextures: Map<string, unknown>,
   nodeTextures: ReadonlyMap<string, AcquiredGpuTexture>,
-): AcquiredGpuTexture {
+): { readonly external: boolean; readonly resource: unknown } {
   const reference = node.inputs[port];
   if (reference === undefined) {
     throw new RangeError(`Frame graph node ${node.id} is missing input ${port}`);
   }
-  const texture =
-    reference.kind === 'external'
-      ? externalTextures.get(reference.id)
-      : nodeTextures.get(reference.id);
+  if (reference.kind === 'external') {
+    const frame = externalFrames.get(reference.id);
+    if (frame === undefined) {
+      throw new RangeError(
+        `Frame graph node ${node.id} references unknown external input ${reference.id}`,
+      );
+    }
+    let texture = importedExternalTextures.get(reference.id);
+    if (texture === undefined) {
+      texture = device.importExternalTexture({ source: frame });
+      importedExternalTextures.set(reference.id, texture);
+    }
+    return { external: true, resource: texture };
+  }
+  const texture = nodeTextures.get(reference.id);
   if (texture === undefined) {
-    const sourceKind = reference.kind === 'external' ? 'external input' : 'prior node';
     throw new RangeError(
-      `Frame graph node ${node.id} references unknown ${sourceKind} ${reference.id}`,
+      `Frame graph node ${node.id} references unknown prior node ${reference.id}`,
     );
   }
-  return texture;
+  return { external: false, resource: texture.texture.createView() };
 }
 
 async function composeWebGpuFrameGraph(
@@ -415,27 +461,13 @@ async function composeWebGpuFrameGraph(
     GPU_TEXTURE_USAGE.RENDER_ATTACHMENT;
   const allocatedTextures: AcquiredGpuTexture[] = [];
   const uniformBuffers: GpuBuffer[] = [];
-  const externalTextures = new Map<string, AcquiredGpuTexture>();
+  const externalFrames = new Map(Object.entries(request.inputs));
+  const importedExternalTextures = new Map<string, unknown>();
   const nodeTextures = new Map<string, AcquiredGpuTexture>();
-  let readback: GpuBuffer | undefined;
   let errorScopeOpen = false;
   try {
     device.pushErrorScope('validation');
     errorScopeOpen = true;
-    for (const [id, frame] of Object.entries(request.inputs)) {
-      const texture = acquireGpuTexture(
-        device,
-        Math.max(1, frame.displayWidth),
-        Math.max(1, frame.displayHeight),
-        textureUsage,
-      );
-      allocatedTextures.push(texture);
-      externalTextures.set(id, texture);
-      device.queue.copyExternalImageToTexture({ source: frame }, { texture: texture.texture }, [
-        Math.max(1, frame.displayWidth),
-        Math.max(1, frame.displayHeight),
-      ]);
-    }
     const encoder = device.createCommandEncoder();
     for (const node of request.nodes) {
       if (cancelledRequestIds.has(request.id)) {
@@ -452,7 +484,14 @@ async function composeWebGpuFrameGraph(
         );
       }
       const inputs = webgpu.inputPorts.map(port =>
-        frameGraphWebGpuInput(node, port, externalTextures, nodeTextures),
+        frameGraphWebGpuInput(
+          device,
+          node,
+          port,
+          externalFrames,
+          importedExternalTextures,
+          nodeTextures,
+        ),
       );
       const output = acquireGpuTexture(device, request.width, request.height, textureUsage);
       allocatedTextures.push(output);
@@ -467,10 +506,14 @@ async function composeWebGpuFrameGraph(
       });
       uniformBuffers.push(uniformBuffer);
       device.queue.writeBuffer(uniformBuffer, 0, uniformData);
-      const pipelineKey = `${node.program.graphHash}:${webgpu.shader}`;
+      const externalPorts = webgpu.inputPorts.filter(
+        (_port, index) => inputs[index]?.external === true,
+      );
+      const shader = shaderWithExternalInputs(webgpu.shader, externalPorts);
+      const pipelineKey = `${node.program.graphHash}:external:${externalPorts.join(',')}:${shader}`;
       let pipeline = persistentGpuPipelines.get(pipelineKey);
       if (pipeline === undefined) {
-        const module = device.createShaderModule({ code: webgpu.shader });
+        const module = device.createShaderModule({ code: shader });
         pipeline = device.createRenderPipeline({
           layout: 'auto',
           vertex: { module, entryPoint: 'vs' },
@@ -488,7 +531,7 @@ async function composeWebGpuFrameGraph(
           },
           ...inputs.map((texture, index) => ({
             binding: index + 1,
-            resource: texture.texture.createView(),
+            resource: texture.resource,
           })),
           { binding: inputs.length + 1, resource: { buffer: uniformBuffer } },
         ],
@@ -512,32 +555,21 @@ async function composeWebGpuFrameGraph(
     if (output === undefined) {
       throw new RangeError(`Frame graph output node ${request.outputNodeId} is missing`);
     }
-    const bytesPerRow = Math.ceil((request.width * 4) / 256) * 256;
-    readback = device.createBuffer({
-      size: bytesPerRow * request.height,
-      usage: GPU_BUFFER_USAGE.COPY_DST | GPU_BUFFER_USAGE.MAP_READ,
-    });
-    encoder.copyTextureToBuffer(
+    const presentation = webGpuCanvasRuntime(device, request.width, request.height);
+    const presentationTexture = presentation.context.getCurrentTexture();
+    encoder.copyTextureToTexture(
       { texture: output.texture },
-      { buffer: readback, bytesPerRow, rowsPerImage: request.height },
+      { texture: presentationTexture },
       { width: request.width, height: request.height },
     );
-    (resources as { webgpuTextures: number }).webgpuTextures = allocatedTextures.length;
-    (resources as { webgpuBuffers: number }).webgpuBuffers = uniformBuffers.length + 1;
+    (resources as { webgpuTextures: number }).webgpuTextures =
+      allocatedTextures.length + importedExternalTextures.size;
+    (resources as { webgpuBuffers: number }).webgpuBuffers = uniformBuffers.length;
     (resources as { webgpuPipelines: number }).webgpuPipelines = request.nodes.length;
-    device.queue.submit([encoder.finish()]);
     const gpuStartedAt = performance.now();
-    await Promise.race([
-      device.queue.onSubmittedWorkDone(),
-      device.lost.then(info => {
-        throw new RendererBackendError(
-          'RENDERER_WEBGPU_DEVICE_LOST',
-          `WebGPU device was lost (${info.reason}): ${info.message}`,
-        );
-      }),
-    ]);
-    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
+    device.queue.submit([encoder.finish()]);
     const validationError = await device.popErrorScope();
+    timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
     errorScopeOpen = false;
     if (validationError !== null) {
       throw new RendererBackendError(
@@ -545,22 +577,9 @@ async function composeWebGpuFrameGraph(
         `WebGPU validation failed: ${validationError.message}`,
       );
     }
-    await readback.mapAsync(1);
-    const mapped = new Uint8Array(readback.getMappedRange());
-    const pixels = new Uint8ClampedArray(request.width * request.height * 4);
-    for (let row = 0; row < request.height; row += 1) {
-      const start = row * bytesPerRow;
-      pixels.set(mapped.subarray(start, start + request.width * 4), row * request.width * 4);
-    }
-    readback.unmap();
-    const canvas = new OffscreenCanvas(request.width, request.height);
-    const context = canvas.getContext('2d');
-    if (context === null) throw new Error('WebGPU frame graph readback canvas is unavailable');
-    context.putImageData(new ImageData(pixels, request.width, request.height), 0, 0);
-    return canvas.transferToImageBitmap();
+    return presentation.canvas.transferToImageBitmap();
   } finally {
     if (errorScopeOpen) void device.popErrorScope();
-    readback?.destroy();
     uniformBuffers.forEach(buffer => buffer.destroy());
     allocatedTextures.forEach(texture => {
       if (persistentGpuDevice === device) releaseGpuTexture(texture);

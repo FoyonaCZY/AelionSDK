@@ -63,7 +63,8 @@ import { aelion } from '@aelion/vite-plugin';
 export default defineConfig({ plugins: [aelion()] });
 ```
 
-它负责 Renderer Worker 和 AudioWorklet 构建入口。
+它负责 Renderer Worker、Export Worker 和 AudioWorklet 构建入口。非 Vite 宿主
+不依赖这个包，改用 `AelionSessionOptions.runtimeAssets` 显式传入部署 URL。
 
 ### `@aelion/material-sdk`
 
@@ -95,7 +96,7 @@ export default defineConfig({ plugins: [aelion()] });
 Application
   ├─ @aelion/sdk
   ├─ @aelion/export        只为 Sink/Remote 类型
-  └─ @aelion/vite-plugin   只在构建配置
+  └─ @aelion/vite-plugin   可选，仅 Vite 构建配置
 
 @aelion/sdk
   → project-schema / transaction / render-ir

@@ -143,6 +143,10 @@ async function inspectRuntimeAssets(distDirectory) {
       id: 'webgl2-worker',
       marker: 'aelion-renderer-worker-webgl2-worker.js',
     },
+    {
+      id: 'mux-export-worker',
+      marker: 'aelion-export-mux-export-worker.js',
+    },
   ];
   const files = await walk(distDirectory);
   const applicationSources = await Promise.all(
@@ -153,6 +157,7 @@ async function inspectRuntimeAssets(distDirectory) {
     './pcm-player.worklet.js',
     './pcm-message-player.worklet.js',
     './webgl2-worker.js',
+    './mux-export-worker.js',
   ]) {
     if (applicationSource.includes(sourceReference)) {
       throw new Error(`Production build retained source-relative runtime URL ${sourceReference}`);
@@ -332,6 +337,9 @@ async function runBrowserConsumer() {
     process.platform === 'win32'
       ? join(esbuildPlatformRoot, 'esbuild.exe')
       : join(esbuildPlatformRoot, 'bin', 'esbuild');
+  const installedEsbuild = await import(
+    pathToFileURL(join(esbuildPackageRoot, 'lib', 'main.js')).href
+  );
   // Repacking the already-installed platform package with pnpm loses the
   // native binary's executable bit on POSIX. Restore it only in this
   // script-disabled, hermetic fixture before Vite starts esbuild.
@@ -341,6 +349,51 @@ async function runBrowserConsumer() {
     COREPACK_ENABLE_DOWNLOAD_PROMPT: '0',
     ESBUILD_BINARY_PATH: esbuildBinaryPath,
   };
+  const explicitRuntimeDirectory = join(canonicalConsumerDirectory, 'public', 'runtime');
+  await mkdir(explicitRuntimeDirectory, { recursive: true });
+  await installedEsbuild.build({
+    entryPoints: {
+      'pcm-player.worklet': join(
+        canonicalConsumerDirectory,
+        'node_modules',
+        '@aelion',
+        'audio',
+        'dist',
+        'pcm-player.worklet.js',
+      ),
+      'pcm-message-player.worklet': join(
+        canonicalConsumerDirectory,
+        'node_modules',
+        '@aelion',
+        'audio',
+        'dist',
+        'pcm-message-player.worklet.js',
+      ),
+      'webgl2-worker': join(
+        canonicalConsumerDirectory,
+        'node_modules',
+        '@aelion',
+        'renderer-worker',
+        'dist',
+        'webgl2-worker.js',
+      ),
+      'mux-export-worker': join(
+        canonicalConsumerDirectory,
+        'node_modules',
+        '@aelion',
+        'export',
+        'dist',
+        'mux-export-worker.js',
+      ),
+    },
+    bundle: true,
+    entryNames: '[name]',
+    format: 'esm',
+    logLevel: 'silent',
+    outdir: explicitRuntimeDirectory,
+    platform: 'browser',
+    target: 'es2023',
+  });
   const viteConfigPath = join(canonicalConsumerDirectory, 'vite.config.mjs');
   await writeFile(
     viteConfigPath,
@@ -373,9 +426,6 @@ export default defineConfig({
     pathToFileURL(
       join(canonicalConsumerDirectory, 'node_modules', 'vite', 'dist', 'node', 'index.js'),
     ).href
-  );
-  const installedEsbuild = await import(
-    pathToFileURL(join(esbuildPackageRoot, 'lib', 'main.js')).href
   );
   const previousEsbuildBinaryPath = process.env.ESBUILD_BINARY_PATH;
   process.env.ESBUILD_BINARY_PATH = esbuildBinaryPath;
@@ -622,7 +672,11 @@ try {
 import { aelion, type AelionVitePluginOptions } from '@aelion/vite-plugin';
 import { defineConfig, type UserConfig } from 'vite';
 
-const pluginOptions = { audioWorklets: true, rendererWorker: true } satisfies AelionVitePluginOptions;
+const pluginOptions = {
+  audioWorklets: true,
+  rendererWorker: true,
+  exportWorker: true,
+} satisfies AelionVitePluginOptions;
 const config = defineConfig({ plugins: [aelion(pluginOptions)] });
 const sessionOptions = { preferredBackend: 'webgl2' } satisfies AelionSessionOptions;
 const session = await Aelion.createSession(sessionOptions);
@@ -680,7 +734,7 @@ export const contract: UserConfig = config;
         zeroConfigVite: false,
         configuration: "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
         viteConfigSha256: browserConsumer.viteConfigSha256,
-        note: 'The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. No repository path aliases or private test transforms are used.',
+        note: 'The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. Renderer Worker, Export Worker and both AudioWorklets are served from production chunks; no repository path aliases or private test transforms are used.',
       },
       consumerContract: {
         typecheck: 'node node_modules/typescript/bin/tsc --noEmit',

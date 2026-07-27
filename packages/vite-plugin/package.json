@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@aelion/audio": "workspace:*",
+    "@aelion/export": "workspace:*",
     "@aelion/renderer-worker": "workspace:*"
   },
   "peerDependencies": {

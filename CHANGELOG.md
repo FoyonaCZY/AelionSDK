@@ -6,6 +6,16 @@
 
 ### Changed
 
+- MP4/H.264 preflight now negotiates the smallest viable AVC level/profile for
+  the actual dimensions and frame rate; the selected string is carried
+  unchanged through Session, Worker/inline export, result metadata and
+  external FFmpeg readback.
+- WebGPU presentation keeps VideoFrame inputs and intermediate graph textures
+  on the GPU and renders directly into an OffscreenCanvas presentation
+  context, removing the former texture-to-buffer-to-CPU-to-Canvas hot path.
+- The official Vite plugin now emits the Export Worker in addition to the
+  Renderer Worker and both AudioWorklets; standard ESM/CDN hosts can provide
+  all four URLs through `AelionSessionOptions.runtimeAssets`.
 - Reorganized product documentation around getting started, capabilities, architecture, Material, compatibility, development and current status; retired duplicated phase goals, backlogs, exit reviews and ADR files from the active documentation set.
 - Bound untrusted Project v1 input to 16,384 array entries and 4,096 properties per object before schema and semantic validation. The bundled Project schema now exposes the same Alpha safety budgets instead of advertising larger collections that the SDK cannot admit.
 - Relicensed AelionSDK-owned code and all 13 public packages from Apache-2.0 to MIT and replaced placeholder repository metadata with `FoyonaCZY/AelionSDK`.
@@ -13,6 +23,19 @@
 
 ### Added
 
+- Added capability-negotiated `mp4-av1-aac` and `mp4-hevc-aac` profiles across
+  probe, preflight, inline/Worker export and the public Session facade.
+- Added deterministic WSOLA-style pitch-preserving linear time-stretch via
+  `pitchPolicy: 'preserve'`, with fail-closed validation for non-linear
+  TimeMaps.
+- Added display color/HDR capability reporting while retaining an explicit
+  RGBA8 SDR local execution contract, plus a durable browser checkpoint store
+  for independently committable export units.
+- Added real-media 1080p/4K Session performance cases covering
+  decode→render→audio→encode→mux→sink, strict WebGPU/incremental thresholds,
+  MP4 FFmpeg readback, WebKit target smoke and a 390×844 touch/DPR smoke.
+- Added a tarball consumer path that bundles runtime entries independently
+  with esbuild and executes them through explicit non-Vite URLs.
 - Added the product-level `Composition` / `Layer` / `Clip` authoring API for
   images, video, audio, text, captions, shapes, reusable Materials, effects,
   masks, keyframes and transitions, while preserving the same validated

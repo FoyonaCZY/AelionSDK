@@ -54,7 +54,9 @@ File / URL / OPFS
 - 曲线区间外支持 hold、cycle 和 ping-pong；
 - Nested Sequence 会检查循环引用。
 
-音频变速目前是 varispeed：速度改变时音高也改变。当前没有“保持音高”的 time-stretch，这一点不能只靠 UI 参数补上。
+线性 TimeMap 默认仍是 varispeed；音频 Clip 可以设置
+`pitchPolicy: 'preserve'`，使用确定性的 WSOLA overlap-add 保持音高。非线性
+TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段拒绝该策略。
 
 ## 画面合成、文字和颜色
 
@@ -116,12 +118,18 @@ File / URL / OPFS
 | ---- | --------------- | ------------------------------------------ |
 | 视频 | VP9/Opus WebM   | Worker/inline，流式 mux                    |
 | 视频 | H.264/AAC MP4   | 必须通过 codec 检查和 AAC runtime canary   |
+| 视频 | AV1/AAC MP4     | capability/preflight 支持时启用            |
+| 视频 | HEVC/AAC MP4    | capability/preflight 支持时启用            |
 | 静帧 | PNG、JPEG、WebP | 指定时间点                                 |
 | 动图 | GIF             | 当前按完整 Sequence                        |
 | 音频 | PCM WAV、RF64   | s16/f32，大文件用 OPFS                     |
 | 远程 | 自定义 Provider | canonical manifest、幂等、鉴权、进度、取消 |
 
-导出支持 preflight、冻结 revision、进度、取消、背压和半成品清理。连续 MP4/WebM 文件中途失败后从 profile 起点重启；当前不声称能从任意容器位置继续。
+H.264 会按尺寸/帧率自动协商 AVC profile/level；AV1 与 HEVC 也使用精确 codec
+configuration 做能力门控。导出支持 preflight、冻结 revision、进度、取消、背压和
+半成品清理。连续 MP4/WebM 中途失败后从 profile 起点重启；可独立提交的输出单元可用
+`BrowserStorageExportCheckpointStore` 跨刷新恢复，远程 Provider 通过 content ID 与
+idempotency key 恢复/去重。
 
 ## Material
 
@@ -133,11 +141,12 @@ Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者
 
 ## 当前不能直接承诺的范围
 
-- 目前自动化重点是桌面 Chromium 和 Firefox；Safari、iOS、Android 未认证；
+- 自动化覆盖 Chromium、Firefox、Playwright WebKit 公共合约和移动触控目标；
+  Safari、iOS、Android 实体设备仍未认证；
 - 4K 可以离线探测和导出，但没有跨设备 4K30 实时预览保证；
 - HDR/10-bit 尚未实现；
-- 音频变速不保音高；
-- 非 Vite bundler 还没有官方适配和认证；
+- 保音高策略只支持线性 TimeMap；
+- 非 Vite bundler 需要宿主显式部署并传入 runtime assets，尚无逐 bundler 认证；
 - 公开包尚未发布 npm，版本仍是 alpha；
 - API 可能变化，Project/Material 协议变化必须配迁移。
 

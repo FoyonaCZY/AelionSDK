@@ -1,15 +1,15 @@
 # AelionSDK release-candidate status
 
-Updated: 2026-07-26 (Asia/Shanghai)
+Updated: 2026-07-27 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `127b0dd076b5152b3797b366bfb1cd418b902177d1b03c97d21480600ec9865f`
-- Result: 14 of 14 serial commands passed.
+  `c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578`
+- Result: 18 of 18 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: passed.
-- Browser conformance: Chromium 72/72 and Firefox 66/66, with zero failed,
+- Browser conformance: Chromium 75/75 and Firefox 67/67, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, and release dry-run checks.
@@ -28,16 +28,19 @@ freshness window.
 ## Implemented candidate scope
 
 - Persistent sequential/GOP WebCodecs decoding and bounded frame/image caches.
-- Whole-frame WebGL2/WebGPU frame graphs, adaptive backend selection, masks,
+- Whole-frame WebGL2/WebGPU frame graphs with direct WebGPU presentation,
+  adaptive backend selection, masks,
   effects, transitions, text, captions, shapes, generators, and all declared
   content types without silent drops.
 - Public Composition/Layer/Clip APIs, canvas interaction and capture stream,
   plus strict WebAV and Diffusion Studio migration adapters.
 - Silence removal transactions, waveform analysis, loudness/true-peak
-  measurement, limiting, ducking, and capability-negotiated export profiles.
+  measurement, limiting, ducking, deterministic pitch-preserving time-stretch,
+  and capability-negotiated AVC/AV1/HEVC export profiles.
 - Revision-bound persistence/recovery, isolated Worker extension RPC, reference
-  editor autosave/restore, competitor benchmarks, migration guides, and public
-  API snapshots.
+  editor autosave/restore, durable local export checkpoints, explicit
+  non-Vite runtime assets, HDR/10-bit fail-closed execution contracts,
+  competitor benchmarks, migration guides, and public API snapshots.
 
 ## Remaining release authority
 

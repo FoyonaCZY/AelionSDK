@@ -25,7 +25,10 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 | --------------------- | -------------------------------------------------------------------- |
 | `@aelion/sdk`         | 创建 Project 和 Session，注册素材，连接 Canvas，播放，编辑和启动导出 |
 | `@aelion/export`      | 创建内存或 OPFS Sink；定义远程导出适配器                             |
-| `@aelion/vite-plugin` | 让 Vite 正确打包 Renderer Worker 和 AudioWorklet                     |
+| `@aelion/vite-plugin` | 可选；让 Vite 正确打包 Renderer/Export Worker 和 AudioWorklet        |
+
+非 Vite 宿主只安装 runtime 依赖，并按[安装与工程配置](/AelionSDK/start/installation/)
+显式部署 `runtimeAssets`；不需要安装或模拟 Vite 插件。
 
 业务组件里大部分导入都应该来自 `@aelion/sdk`：
 

@@ -16,6 +16,12 @@ import {
   WebMOutputFormat,
 } from 'mediabunny';
 
+import {
+  av1CodecString,
+  hevcCodecString,
+  negotiateAvcCodecString,
+  preferredAvcCodecString,
+} from './profiles.js';
 import { createSinkCompletionBarrier } from './sink-completion.js';
 
 export interface OfflineFrameRequest {
@@ -42,6 +48,10 @@ export interface WebMExportOptions {
   readonly channelCount: number;
   readonly videoBitrate: number;
   readonly audioBitrate: number;
+  /** Exact codec string selected by preflight. Defaults to the profile baseline. */
+  readonly videoCodecString?: string;
+  /** Exact audio codec string selected by preflight. */
+  readonly audioCodecString?: string;
   readonly sink: WritableStream<{
     readonly type: 'write';
     readonly data: Uint8Array<ArrayBuffer>;
@@ -71,7 +81,7 @@ export interface WebMExportResult {
 }
 
 export interface MuxedEncoderConfiguration {
-  readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac';
+  readonly profile: 'webm-vp9-opus' | 'mp4-h264-aac' | 'mp4-av1-aac' | 'mp4-hevc-aac';
   readonly video: {
     readonly codec: string;
     readonly codecString: string;
@@ -97,7 +107,7 @@ interface MuxedExportProfile {
   readonly id: MuxedEncoderConfiguration['profile'];
   readonly operationName: string;
   readonly format: WebMOutputFormat | Mp4OutputFormat;
-  readonly videoCodec: 'vp9' | 'avc';
+  readonly videoCodec: 'vp9' | 'avc' | 'av1' | 'hevc';
   readonly fullVideoCodecString: string;
   readonly audioCodec: 'opus' | 'aac';
 }
@@ -198,7 +208,7 @@ async function exportMuxed(
     });
     const videoSource = new VideoSampleSource({
       codec: profile.videoCodec,
-      fullCodecString: profile.fullVideoCodecString,
+      fullCodecString: options.videoCodecString ?? profile.fullVideoCodecString,
       bitrate: options.videoBitrate,
       bitrateMode: 'variable',
       keyFrameInterval: 1,
@@ -207,6 +217,9 @@ async function exportMuxed(
     });
     const audioSource = new AudioSampleSource({
       codec: profile.audioCodec,
+      ...(options.audioCodecString === undefined
+        ? {}
+        : { fullCodecString: options.audioCodecString }),
       bitrate: options.audioBitrate,
       bitrateMode: 'variable',
     });
@@ -303,7 +316,7 @@ async function exportMuxed(
         profile: profile.id,
         video: {
           codec: profile.videoCodec,
-          codecString: profile.fullVideoCodecString,
+          codecString: options.videoCodecString ?? profile.fullVideoCodecString,
           width: options.width,
           height: options.height,
           frameRate: options.frameRate.numerator / options.frameRate.denominator,
@@ -350,13 +363,76 @@ export function exportWebM(options: WebMExportOptions): Promise<WebMExportResult
   });
 }
 
-export function exportMp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
-  return exportMuxed(options, {
-    id: 'mp4-h264-aac',
-    operationName: 'MP4 export',
-    format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
-    videoCodec: 'avc',
-    fullVideoCodecString: 'avc1.640028',
-    audioCodec: 'aac',
-  });
+export async function exportMp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
+  const framerate = options.frameRate.numerator / options.frameRate.denominator;
+  const negotiated =
+    options.videoCodecString === undefined
+      ? await negotiateAvcCodecString({
+          width: options.width,
+          height: options.height,
+          framerate,
+          bitrate: options.videoBitrate,
+        })
+      : undefined;
+  const videoCodecString =
+    options.videoCodecString ??
+    negotiated?.selected ??
+    preferredAvcCodecString(options.width, options.height, framerate);
+  return exportMuxed(
+    {
+      ...options,
+      videoCodecString,
+      audioCodecString: options.audioCodecString ?? 'mp4a.40.2',
+    },
+    {
+      id: 'mp4-h264-aac',
+      operationName: 'MP4 export',
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      videoCodec: 'avc',
+      fullVideoCodecString: videoCodecString,
+      audioCodec: 'aac',
+    },
+  );
+}
+
+export function exportAv1Mp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
+  const framerate = options.frameRate.numerator / options.frameRate.denominator;
+  const videoCodecString =
+    options.videoCodecString ?? av1CodecString(options.width, options.height, framerate);
+  return exportMuxed(
+    {
+      ...options,
+      videoCodecString,
+      audioCodecString: options.audioCodecString ?? 'mp4a.40.2',
+    },
+    {
+      id: 'mp4-av1-aac',
+      operationName: 'AV1 MP4 export',
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      videoCodec: 'av1',
+      fullVideoCodecString: videoCodecString,
+      audioCodec: 'aac',
+    },
+  );
+}
+
+export function exportHevcMp4(options: Mp4ExportOptions): Promise<Mp4ExportResult> {
+  const framerate = options.frameRate.numerator / options.frameRate.denominator;
+  const videoCodecString =
+    options.videoCodecString ?? hevcCodecString(options.width, options.height, framerate);
+  return exportMuxed(
+    {
+      ...options,
+      videoCodecString,
+      audioCodecString: options.audioCodecString ?? 'mp4a.40.2',
+    },
+    {
+      id: 'mp4-hevc-aac',
+      operationName: 'HEVC MP4 export',
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      videoCodec: 'hevc',
+      fullVideoCodecString: videoCodecString,
+      audioCodec: 'aac',
+    },
+  );
 }

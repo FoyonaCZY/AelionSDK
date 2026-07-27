@@ -6,6 +6,8 @@ import {
 } from '@aelion/render-ir';
 
 import {
+  exportAv1Mp4,
+  exportHevcMp4,
   exportMp4,
   exportWebM,
   type Mp4ExportResult,
@@ -13,7 +15,12 @@ import {
   type WebMExportResult,
 } from './webm-export.js';
 import { exportMuxedInWorker } from './worker-export.js';
-import type { ExportProfileId } from './profiles.js';
+import {
+  av1CodecString,
+  hevcCodecString,
+  negotiateAvcCodecString,
+  type ExportProfileId,
+} from './profiles.js';
 
 export type ExportPreflightIssue = Diagnostic;
 
@@ -21,6 +28,10 @@ export interface ExportPreflightReport {
   readonly ok: boolean;
   readonly revision: bigint;
   readonly issues: readonly ExportPreflightIssue[];
+  readonly encoderConfiguration?: {
+    readonly videoCodecString?: string;
+    readonly audioCodecString?: string;
+  };
 }
 
 export interface FrozenWebMExportOptions
@@ -39,6 +50,8 @@ export interface FrozenWebMExportOptions
    * advertises AAC in DedicatedWorker but fails during encode; `worker` remains opt-in.
    */
   readonly execution?: 'worker' | 'inline';
+  /** Host-resolved Export Worker URL for non-Vite or CDN deployments. */
+  readonly workerUrl?: string | URL;
 }
 
 export type FrozenMp4ExportOptions = FrozenWebMExportOptions;
@@ -59,6 +72,8 @@ interface MuxedPreflightProfile {
   readonly videoName: string;
   readonly audioName: string;
   readonly verifyAudioRuntime?: boolean;
+  readonly negotiateAvc?: boolean;
+  readonly hevc?: boolean;
 }
 
 const audioRuntimeSupport = new Map<string, Promise<boolean>>();
@@ -87,18 +102,24 @@ function verifyAudioEncoderRuntime(config: AudioEncoderConfig): Promise<boolean>
       });
       encoder.configure(config);
       const frameCount = 1_024;
-      const audio = new AudioData({
-        format: 'f32',
-        sampleRate: config.sampleRate,
-        numberOfFrames: frameCount,
-        numberOfChannels: config.numberOfChannels,
-        timestamp: 0,
-        data: new Float32Array(frameCount * config.numberOfChannels),
-      });
-      try {
-        encoder.encode(audio);
-      } finally {
-        audio.close();
+      // Some AAC implementations need several access units before flush can
+      // drain encoder priming. Probe the same 1,024-frame cadence used by the
+      // real muxed export instead of treating a single priming block as proof
+      // that the runtime rejected AAC.
+      for (let block = 0; block < 4; block += 1) {
+        const audio = new AudioData({
+          format: 'f32',
+          sampleRate: config.sampleRate,
+          numberOfFrames: frameCount,
+          numberOfChannels: config.numberOfChannels,
+          timestamp: Math.round((block * frameCount * 1_000_000) / config.sampleRate),
+          data: new Float32Array(frameCount * config.numberOfChannels),
+        });
+        try {
+          encoder.encode(audio);
+        } finally {
+          audio.close();
+        }
       }
       void encoder.flush().then(
         () => finish(true),
@@ -163,14 +184,26 @@ async function preflightMuxedExport(
     width: options.ir.width,
     height: options.ir.height,
     bitrate: options.videoBitrate,
+    bitrateMode: 'variable',
     framerate: options.ir.frameRate.numerator / options.ir.frameRate.denominator,
+    latencyMode: 'quality',
+    alpha: 'discard',
+    ...(profile.hevc === true ? { hevc: { format: 'hevc' as const } } : {}),
   };
   const audioConfig: AudioEncoderConfig = {
     codec: profile.audioCodec,
     sampleRate: options.ir.sampleRate,
     numberOfChannels: channelCount(options.ir.channelLayout) ?? 0,
     bitrate: options.audioBitrate,
+    bitrateMode: 'variable',
+    ...(profile.audioCodec === 'mp4a.40.2'
+      ? { aac: { format: 'aac' as const } }
+      : profile.audioCodec === 'opus'
+        ? { opus: { format: 'opus' as const } }
+        : {}),
   };
+  let selectedVideoCodec: string | undefined;
+  let selectedAudioCodec: string | undefined;
   if (typeof VideoEncoder !== 'function') {
     issues.push({
       code: 'EXPORT_VIDEO_ENCODER_UNAVAILABLE',
@@ -178,13 +211,46 @@ async function preflightMuxedExport(
       message: 'VideoEncoder is unavailable',
       recoverable: false,
     });
-  } else if (!(await VideoEncoder.isConfigSupported(videoConfig)).supported) {
-    issues.push({
-      code: 'EXPORT_VIDEO_CONFIG_UNSUPPORTED',
-      severity: 'error',
-      message: `${profile.videoName} export config is unsupported`,
-      recoverable: false,
-    });
+  } else {
+    try {
+      if (profile.negotiateAvc === true) {
+        const negotiation = await negotiateAvcCodecString({
+          width: options.ir.width,
+          height: options.ir.height,
+          framerate: options.ir.frameRate.numerator / options.ir.frameRate.denominator,
+          bitrate: options.videoBitrate,
+        });
+        selectedVideoCodec = negotiation.selected;
+        if (selectedVideoCodec === undefined) {
+          issues.push({
+            code: 'EXPORT_VIDEO_CONFIG_UNSUPPORTED',
+            severity: 'error',
+            message: `${profile.videoName} export config is unsupported`,
+            recoverable: false,
+            details: {
+              attemptedCodecStrings: negotiation.attempts.map(attempt => attempt.codec),
+            },
+          });
+        }
+      } else if ((await VideoEncoder.isConfigSupported(videoConfig)).supported) {
+        selectedVideoCodec = profile.videoCodec;
+      } else {
+        issues.push({
+          code: 'EXPORT_VIDEO_CONFIG_UNSUPPORTED',
+          severity: 'error',
+          message: `${profile.videoName} export config is unsupported`,
+          recoverable: false,
+        });
+      }
+    } catch (cause) {
+      issues.push({
+        code: 'EXPORT_VIDEO_CONFIG_PROBE_FAILED',
+        severity: 'error',
+        message: `${profile.videoName} export config probe failed`,
+        recoverable: true,
+        cause,
+      });
+    }
   }
   if (typeof AudioEncoder !== 'function') {
     issues.push({
@@ -194,12 +260,25 @@ async function preflightMuxedExport(
       recoverable: false,
     });
   } else {
-    const declaredSupported = (await AudioEncoder.isConfigSupported(audioConfig)).supported;
-    const runtimeSupported =
-      declaredSupported && profile.verifyAudioRuntime === true
-        ? await verifyAudioEncoderRuntime(audioConfig)
-        : declaredSupported;
-    if (!runtimeSupported) {
+    let runtimeSupported = false;
+    try {
+      const declaredSupported =
+        (await AudioEncoder.isConfigSupported(audioConfig)).supported === true;
+      runtimeSupported =
+        declaredSupported && profile.verifyAudioRuntime === true
+          ? await verifyAudioEncoderRuntime(audioConfig)
+          : declaredSupported;
+    } catch (cause) {
+      issues.push({
+        code: 'EXPORT_AUDIO_CONFIG_PROBE_FAILED',
+        severity: 'error',
+        message: `${profile.audioName} export config probe failed`,
+        recoverable: true,
+        cause,
+      });
+    }
+    if (runtimeSupported) selectedAudioCodec = profile.audioCodec;
+    else if (!issues.some(issue => issue.code === 'EXPORT_AUDIO_CONFIG_PROBE_FAILED')) {
       issues.push({
         code: 'EXPORT_AUDIO_CONFIG_UNSUPPORTED',
         severity: 'error',
@@ -222,7 +301,19 @@ async function preflightMuxedExport(
       });
     }
   }
-  return { ok: issues.length === 0, revision: options.ir.revision, issues };
+  return {
+    ok: issues.length === 0,
+    revision: options.ir.revision,
+    issues,
+    ...(selectedVideoCodec === undefined && selectedAudioCodec === undefined
+      ? {}
+      : {
+          encoderConfiguration: {
+            ...(selectedVideoCodec === undefined ? {} : { videoCodecString: selectedVideoCodec }),
+            ...(selectedAudioCodec === undefined ? {} : { audioCodecString: selectedAudioCodec }),
+          },
+        }),
+  };
 }
 
 export function preflightWebMExport(
@@ -245,6 +336,40 @@ export function preflightMp4Export(
     videoName: 'H.264',
     audioName: 'AAC',
     verifyAudioRuntime: true,
+    negotiateAvc: true,
+  });
+}
+
+export function preflightAv1Mp4Export(
+  options: FrozenMp4ExportOptions,
+): Promise<ExportPreflightReport> {
+  return preflightMuxedExport(options, {
+    videoCodec: av1CodecString(
+      options.ir.width,
+      options.ir.height,
+      options.ir.frameRate.numerator / options.ir.frameRate.denominator,
+    ),
+    audioCodec: 'mp4a.40.2',
+    videoName: 'AV1',
+    audioName: 'AAC',
+    verifyAudioRuntime: true,
+  });
+}
+
+export function preflightHevcMp4Export(
+  options: FrozenMp4ExportOptions,
+): Promise<ExportPreflightReport> {
+  return preflightMuxedExport(options, {
+    videoCodec: hevcCodecString(
+      options.ir.width,
+      options.ir.height,
+      options.ir.frameRate.numerator / options.ir.frameRate.denominator,
+    ),
+    audioCodec: 'mp4a.40.2',
+    videoName: 'HEVC',
+    audioName: 'AAC',
+    verifyAudioRuntime: true,
+    hevc: true,
   });
 }
 
@@ -252,7 +377,12 @@ export function preflightMp4Export(
 export async function preflightProfileExport(
   options: FrozenProfilePreflightOptions,
 ): Promise<ExportPreflightReport> {
-  if (options.profile === 'webm-vp9-opus' || options.profile === 'mp4-h264-aac') {
+  if (
+    options.profile === 'webm-vp9-opus' ||
+    options.profile === 'mp4-h264-aac' ||
+    options.profile === 'mp4-av1-aac' ||
+    options.profile === 'mp4-hevc-aac'
+  ) {
     const muxed = {
       ir: options.ir,
       projectRevision: options.projectRevision,
@@ -265,9 +395,10 @@ export async function preflightProfileExport(
         ? {}
         : { materialBackendAvailable: options.materialBackendAvailable }),
     } satisfies FrozenWebMExportOptions;
-    return options.profile === 'mp4-h264-aac'
-      ? preflightMp4Export(muxed)
-      : preflightWebMExport(muxed);
+    if (options.profile === 'mp4-h264-aac') return preflightMp4Export(muxed);
+    if (options.profile === 'mp4-av1-aac') return preflightAv1Mp4Export(muxed);
+    if (options.profile === 'mp4-hevc-aac') return preflightHevcMp4Export(muxed);
+    return preflightWebMExport(muxed);
   }
 
   const issues: ExportPreflightIssue[] = [];
@@ -346,6 +477,12 @@ export async function exportFrozenRenderIrWebM(
     channelCount: channelCount(options.ir.channelLayout) ?? 0,
     videoBitrate: options.videoBitrate,
     audioBitrate: options.audioBitrate,
+    ...(report.encoderConfiguration?.videoCodecString === undefined
+      ? {}
+      : { videoCodecString: report.encoderConfiguration.videoCodecString }),
+    ...(report.encoderConfiguration?.audioCodecString === undefined
+      ? {}
+      : { audioCodecString: report.encoderConfiguration.audioCodecString }),
     sink: options.sink,
     ...(options.cleanupSink === undefined ? {} : { cleanupSink: options.cleanupSink }),
     renderFrame: options.renderFrame,
@@ -355,7 +492,11 @@ export async function exportFrozenRenderIrWebM(
   };
   return options.execution === 'inline'
     ? exportWebM(exportOptions)
-    : exportMuxedInWorker({ ...exportOptions, profile: 'webm' });
+    : exportMuxedInWorker({
+        ...exportOptions,
+        profile: 'webm',
+        ...(options.workerUrl === undefined ? {} : { workerUrl: options.workerUrl }),
+      });
 }
 
 export async function exportFrozenRenderIrMp4(
@@ -372,6 +513,12 @@ export async function exportFrozenRenderIrMp4(
     channelCount: channelCount(options.ir.channelLayout) ?? 0,
     videoBitrate: options.videoBitrate,
     audioBitrate: options.audioBitrate,
+    ...(report.encoderConfiguration?.videoCodecString === undefined
+      ? {}
+      : { videoCodecString: report.encoderConfiguration.videoCodecString }),
+    ...(report.encoderConfiguration?.audioCodecString === undefined
+      ? {}
+      : { audioCodecString: report.encoderConfiguration.audioCodecString }),
     sink: options.sink,
     ...(options.cleanupSink === undefined ? {} : { cleanupSink: options.cleanupSink }),
     renderFrame: options.renderFrame,
@@ -380,6 +527,63 @@ export async function exportFrozenRenderIrMp4(
     ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
   };
   return options.execution === 'worker'
-    ? exportMuxedInWorker({ ...exportOptions, profile: 'mp4' })
+    ? exportMuxedInWorker({
+        ...exportOptions,
+        profile: 'mp4',
+        ...(options.workerUrl === undefined ? {} : { workerUrl: options.workerUrl }),
+      })
     : exportMp4(exportOptions);
+}
+
+async function exportFrozenRenderIrAlternativeMp4(
+  options: FrozenMp4ExportOptions,
+  profile: 'mp4-av1' | 'mp4-hevc',
+): Promise<Mp4ExportResult> {
+  const report =
+    profile === 'mp4-av1'
+      ? await preflightAv1Mp4Export(options)
+      : await preflightHevcMp4Export(options);
+  if (!report.ok) throw new AelionError(report.issues);
+  const exportOptions: WebMExportOptions = {
+    durationUs: options.ir.durationUs,
+    width: options.ir.width,
+    height: options.ir.height,
+    frameRate: options.ir.frameRate,
+    sampleRate: options.ir.sampleRate,
+    channelCount: channelCount(options.ir.channelLayout) ?? 0,
+    videoBitrate: options.videoBitrate,
+    audioBitrate: options.audioBitrate,
+    ...(report.encoderConfiguration?.videoCodecString === undefined
+      ? {}
+      : { videoCodecString: report.encoderConfiguration.videoCodecString }),
+    ...(report.encoderConfiguration?.audioCodecString === undefined
+      ? {}
+      : { audioCodecString: report.encoderConfiguration.audioCodecString }),
+    sink: options.sink,
+    ...(options.cleanupSink === undefined ? {} : { cleanupSink: options.cleanupSink }),
+    renderFrame: options.renderFrame,
+    renderAudio: options.renderAudio,
+    ...(options.signal === undefined ? {} : { signal: options.signal }),
+    ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
+  };
+  if (options.execution === 'worker') {
+    return exportMuxedInWorker({
+      ...exportOptions,
+      profile,
+      ...(options.workerUrl === undefined ? {} : { workerUrl: options.workerUrl }),
+    });
+  }
+  return profile === 'mp4-av1' ? exportAv1Mp4(exportOptions) : exportHevcMp4(exportOptions);
+}
+
+export function exportFrozenRenderIrAv1Mp4(
+  options: FrozenMp4ExportOptions,
+): Promise<Mp4ExportResult> {
+  return exportFrozenRenderIrAlternativeMp4(options, 'mp4-av1');
+}
+
+export function exportFrozenRenderIrHevcMp4(
+  options: FrozenMp4ExportOptions,
+): Promise<Mp4ExportResult> {
+  return exportFrozenRenderIrAlternativeMp4(options, 'mp4-hevc');
 }

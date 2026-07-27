@@ -105,6 +105,27 @@ export default defineConfig({
 aelion({ rendererWorker: true, audioWorklets: false });
 ```
 
+## 非 Vite / CDN 宿主
+
+Webpack、Rspack、Rollup、自研 ESM loader 或纯 CDN 页面不需要伪装成 Vite。把构建
+后的四个入口部署到同源静态目录，并由宿主显式给出最终 URL：
+
+```ts
+const session = await Aelion.createSession({
+  media,
+  runtimeAssets: {
+    rendererWorker: '/aelion/webgl2-worker.js',
+    exportWorker: '/aelion/mux-export-worker.js',
+    sharedAudioWorklet: '/aelion/pcm-player.worklet.js',
+    transferableAudioWorklet: '/aelion/pcm-message-player.worklet.js',
+  },
+});
+```
+
+URL 可以是 `string` 或 `URL`，必须指向部署后真正可访问的 ESM 文件。若只设置部分
+字段，未设置的入口仍使用包内 `import.meta.url` 默认值。上线前用 Network 面板验证
+四个入口的 200 响应、JavaScript MIME、CSP 与版本一致性。
+
 ## TypeScript 配置
 
 SDK 是 ESM，并使用浏览器 API。应用的 TypeScript 配置至少应包含 DOM 类型和 Bundler 模块解析：

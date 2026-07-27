@@ -16,6 +16,7 @@ import type {
   AelionPlayerStats,
   AelionPlayerResourceStats,
   AelionPlayerState,
+  AelionRuntimeAssets,
 } from './types.js';
 
 type Clock = AudioWorkletClock | TransferableAudioWorkletClock;
@@ -40,6 +41,7 @@ function runtimeErrorCode(error: unknown): string {
 export class AelionPlayer implements AelionPlayerApi {
   readonly #session: AelionSession;
   readonly #onRuntimeError: RuntimeErrorListener | undefined;
+  readonly #runtimeAssets: AelionRuntimeAssets | undefined;
   readonly #listeners = new Set<(frame: AelionPlayerFrame) => void>();
   #state: AelionPlayerState = 'idle';
   #clock: Clock | undefined;
@@ -62,9 +64,14 @@ export class AelionPlayer implements AelionPlayerApi {
   #previewQuality: NormalizedPreviewQuality = normalizePreviewQuality();
   #lastDisposedRuntime: AelionPlayerResourceStats['lastDisposedRuntime'] = null;
 
-  public constructor(session: AelionSession, onRuntimeError?: RuntimeErrorListener) {
+  public constructor(
+    session: AelionSession,
+    onRuntimeError?: RuntimeErrorListener,
+    runtimeAssets?: AelionRuntimeAssets,
+  ) {
     this.#session = session;
     this.#onRuntimeError = onRuntimeError;
+    this.#runtimeAssets = runtimeAssets;
   }
 
   public get state(): AelionPlayerState {
@@ -291,11 +298,17 @@ export class AelionPlayer implements AelionPlayerApi {
             capacityFrames: ir.sampleRate * 2,
             channelCount: ir.channelLayout === 'mono' ? 1 : 2,
             sampleRate: ir.sampleRate,
+            ...(this.#runtimeAssets?.sharedAudioWorklet === undefined
+              ? {}
+              : { moduleUrl: this.#runtimeAssets.sharedAudioWorklet }),
           })
         : new TransferableAudioWorkletClock({
             capacityFrames: ir.sampleRate * 2,
             channelCount: ir.channelLayout === 'mono' ? 1 : 2,
             sampleRate: ir.sampleRate,
+            ...(this.#runtimeAssets?.transferableAudioWorklet === undefined
+              ? {}
+              : { moduleUrl: this.#runtimeAssets.transferableAudioWorklet }),
           });
     this.#clock = clock;
     if (clock.context.sampleRate !== ir.sampleRate) {

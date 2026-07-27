@@ -42,6 +42,18 @@ export interface StorageCapability {
   readonly transferableStreams: CapabilityProbe;
 }
 
+export interface ColorCapability {
+  readonly displayP3Gamut: CapabilityProbe;
+  readonly highDynamicRange: CapabilityProbe;
+  /** The color contract implemented by the current local renderer/exporter. */
+  readonly localExecution: {
+    readonly workingColorSpaces: readonly string[];
+    readonly transferFunctions: readonly ('srgb' | 'gamma22' | 'pq' | 'hlg')[];
+    readonly bitDepths: readonly (8 | 10)[];
+    readonly hdrPresentation: boolean;
+  };
+}
+
 export interface CapabilityEnvironment {
   readonly userAgent: string;
   readonly platform: string;
@@ -62,6 +74,7 @@ export interface CapabilityReport {
   readonly gpu: GpuCapability;
   readonly audio: AudioCapability;
   readonly storage: StorageCapability;
+  readonly color: ColorCapability;
   readonly wasm: {
     readonly available: CapabilityProbe;
   };

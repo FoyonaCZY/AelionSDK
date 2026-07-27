@@ -21,6 +21,7 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 - 真实 tarball Node consumer 与 13 包 release dry-run；
 - Chromium source browser suite；
 - Firefox source browser suite 与真实 tarball browser consumer。
+- Playwright WebKit 公共合约 smoke 与 390×844、3× DPR、触控移动目标 smoke。
 
 仓库还保存 Chromium、Firefox、Golden 和性能专项报告。可以重新生成的数据位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)，本页不复制容易过期的测试计数。
 
@@ -47,12 +48,14 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 
 ## 已知边界
 
-- 桌面 Chromium/Firefox 是当前自动化范围；Safari、iOS、Android 未认证。
+- Chromium/Firefox、Playwright WebKit 公共合约和移动触控目标进入自动化；
+  Safari、iOS、Android 实体设备仍未认证。
 - Windows、Linux 发行版和不同 GPU/driver 没有独立产品认证。
 - 当前本地颜色执行是 RGBA8 SDR；HDR/PQ/HLG/10-bit 不会静默降级。
 - 4K 有离线 compositor probe，没有跨设备 4K30 实时 SLA。
 - `ByteMediaProvider` 适合短媒体；长视频使用内置 `ProductionMediaProvider`，并根据部署注入 cache/proxy 和共享资源预算。
-- MP4/H.264/AAC 导出由具体环境 capability 和 AAC runtime canary 决定。
+- H.264/AV1/HEVC MP4 导出由精确 codec capability、尺寸协商和 AAC runtime
+  canary 决定。
 - trusted Shader/WASM 默认拒绝，签名不能替代宿主执行授权。
 - Alpha 公共 API 仍可能按迁移规则变化。
 
@@ -63,7 +66,7 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 - npm trusted publishing、provenance、正式版本号、Tag 和 GitHub Release；
 - Safari、iOS、Android 以及更广 OS/GPU 矩阵；
 - 1.0 API/SLA、长期兼容承诺和商业支持策略；
-- 非 Vite bundler 的官方适配与认证；
+- 非 Vite 宿主已有显式 runtime-assets 合约，但逐 bundler 产品认证仍未完成；
 - 真实业务部署后的设备分层和多租户运行数据积累。仓库内已有加速 soak、资源预算与可复现性能采集，运行数据不作为缺失的引擎实现项。
 
 ## 本地复核命令
@@ -73,6 +76,8 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm run ci
 corepack pnpm test:browser
 corepack pnpm test:browser:firefox
+corepack pnpm test:browser:webkit
+corepack pnpm test:browser:mobile
 corepack pnpm test:golden
 corepack pnpm test:security
 corepack pnpm test:soak

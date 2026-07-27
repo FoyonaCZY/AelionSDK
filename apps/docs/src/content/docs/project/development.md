@@ -26,6 +26,8 @@ corepack pnpm run ci
 | `corepack pnpm run docs:typecheck`   | 编译文档引用的完整 TypeScript 集成示例                     |
 | `corepack pnpm test:browser`         | Chromium source browser suite                              |
 | `corepack pnpm test:browser:firefox` | Firefox source browser suite                               |
+| `corepack pnpm test:browser:webkit`  | WebKit capability/profile 公共合约 smoke                   |
+| `corepack pnpm test:browser:mobile`  | 390×844、3× DPR、touch 目标 smoke                          |
 | `corepack pnpm test:golden`          | 确定性像素 Golden                                          |
 | `corepack pnpm test:security`        | Project/媒体 fuzz、Package trust 与资源预算                |
 | `corepack pnpm test:soak`            | 十分钟音频模拟和大工程增量编译/长时间线求值                |

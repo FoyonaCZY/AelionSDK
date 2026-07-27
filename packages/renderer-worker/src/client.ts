@@ -49,10 +49,9 @@ export interface WorkerCompositorSnapshot {
 
 export interface WorkerCompositorOptions {
   readonly maxPendingRequests?: number;
-}
-
-/** @internal Conformance-only constructor options. */
-interface WorkerCompositorInternalOptions extends WorkerCompositorOptions {
+  /** Host-resolved Worker URL for standard ESM/CDN deployments. */
+  readonly workerUrl?: string | URL;
+  /** Advanced host integration and deterministic tests. */
   readonly workerFactory?: () => Worker;
 }
 
@@ -89,15 +88,14 @@ export class WorkerCompositor implements Disposable {
   readonly #maxPendingRequests: number;
 
   public constructor(options: WorkerCompositorOptions = {}) {
-    const internalOptions = options as WorkerCompositorInternalOptions;
     const maxPendingRequests = options.maxPendingRequests ?? 8;
     if (!Number.isSafeInteger(maxPendingRequests) || maxPendingRequests <= 0) {
       throw new RangeError('maxPendingRequests must be a positive safe integer');
     }
     this.#maxPendingRequests = maxPendingRequests;
     this.#worker =
-      internalOptions.workerFactory?.() ??
-      new Worker(new URL('./webgl2-worker.js', import.meta.url), {
+      options.workerFactory?.() ??
+      new Worker(options.workerUrl ?? new URL('./webgl2-worker.js', import.meta.url), {
         type: 'module',
         name: 'aelion-renderer-webgl2',
       });

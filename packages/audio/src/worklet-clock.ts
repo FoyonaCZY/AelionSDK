@@ -17,6 +17,8 @@ export type AudioClockEvent =
 
 export interface AudioClockOptions {
   readonly context?: AudioContext;
+  /** Host-resolved module URL for non-Vite or CDN deployments. */
+  readonly moduleUrl?: string | URL;
   /** Requested hardware context rate when the clock owns its AudioContext. */
   readonly sampleRate?: number;
   readonly capacityFrames?: number;
@@ -69,6 +71,7 @@ export class AudioWorkletClock implements Disposable {
   #generation = 0;
   #lastContextState: AudioContextRuntimeState;
   readonly #listeners = new Set<(event: AudioClockEvent) => void>();
+  readonly #moduleUrl: string | URL;
   readonly #onStateChange = (): void => {
     if (this.#disposed) return;
     const current = this.context.state as AudioContextRuntimeState;
@@ -78,6 +81,7 @@ export class AudioWorkletClock implements Disposable {
   };
 
   public constructor(options: AudioClockOptions = {}) {
+    this.#moduleUrl = options.moduleUrl ?? new URL('./pcm-player.worklet.js', import.meta.url);
     this.context =
       options.context ??
       new AudioContext({
@@ -125,7 +129,7 @@ export class AudioWorkletClock implements Disposable {
 
   async #initialize(reportEveryFrames: number, generation: number): Promise<void> {
     await withTimeout(
-      this.context.audioWorklet.addModule(new URL('./pcm-player.worklet.js', import.meta.url)),
+      this.context.audioWorklet.addModule(this.#moduleUrl),
       5_000,
       'AudioWorklet module initialization',
     );

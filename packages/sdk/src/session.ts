@@ -3,6 +3,8 @@ import { probeCapabilities } from '@aelion/capability';
 import { AelionError, type Diagnostic } from '@aelion/core';
 import {
   createRemoteExportContentId,
+  exportFrozenRenderIrAv1Mp4,
+  exportFrozenRenderIrHevcMp4,
   exportFrozenRenderIrMp4,
   exportFrozenRenderIrWebM,
   exportGif,
@@ -146,7 +148,11 @@ export class AelionSession implements AelionSessionApi {
       projectSchema: (options.schemas ?? defaultSchemas).project,
       materialInstanceSchema: (options.schemas ?? defaultSchemas).materialInstance,
     });
-    this.player = new AelionPlayer(this, (error: unknown) => this.#acceptPlayerError(error));
+    this.player = new AelionPlayer(
+      this,
+      (error: unknown) => this.#acceptPlayerError(error),
+      options.runtimeAssets,
+    );
     this.audio = new SessionAudioController({
       ir: () => this.requireIr(),
       project: () => {
@@ -735,6 +741,9 @@ export class AelionSession implements AelionSessionApi {
       projectRevision: ir.revision,
       videoBitrate: options.videoBitrate ?? 8_000_000,
       audioBitrate: options.audioBitrate ?? 192_000,
+      ...(this.#options.runtimeAssets?.exportWorker === undefined
+        ? {}
+        : { workerUrl: this.#options.runtimeAssets.exportWorker }),
       sink: options.sink,
       renderFrame: async request => {
         const rendered = await this.#requireRenderer().render({
@@ -944,7 +953,12 @@ export class AelionSession implements AelionSessionApi {
           readonly channelCount: number;
         }) => (await requireMastering()).render(request, signal);
         try {
-          if (options.profile === 'webm-vp9-opus' || options.profile === 'mp4-h264-aac') {
+          if (
+            options.profile === 'webm-vp9-opus' ||
+            options.profile === 'mp4-h264-aac' ||
+            options.profile === 'mp4-av1-aac' ||
+            options.profile === 'mp4-hevc-aac'
+          ) {
             const frozen = this.#frozenExportOptions(
               {
                 sink: options.sink,
@@ -964,9 +978,16 @@ export class AelionSession implements AelionSessionApi {
               (await requireMastering()).render,
               { ir, media },
             );
-            return options.profile === 'mp4-h264-aac'
-              ? await exportFrozenRenderIrMp4(frozen)
-              : await exportFrozenRenderIrWebM(frozen);
+            if (options.profile === 'mp4-h264-aac') {
+              return await exportFrozenRenderIrMp4(frozen);
+            }
+            if (options.profile === 'mp4-av1-aac') {
+              return await exportFrozenRenderIrAv1Mp4(frozen);
+            }
+            if (options.profile === 'mp4-hevc-aac') {
+              return await exportFrozenRenderIrHevcMp4(frozen);
+            }
+            return await exportFrozenRenderIrWebM(frozen);
           }
           if (options.profile === 'audio-wav') {
             return await exportWav({
@@ -1189,6 +1210,9 @@ export class AelionSession implements AelionSessionApi {
       ...(this.#options.maxPendingFrames === undefined
         ? {}
         : { maxPendingFrames: this.#options.maxPendingFrames }),
+      ...(this.#options.runtimeAssets?.rendererWorker === undefined
+        ? {}
+        : { workerUrl: this.#options.runtimeAssets.rendererWorker }),
     });
     return this.#renderer;
   }

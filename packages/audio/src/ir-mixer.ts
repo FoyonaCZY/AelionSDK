@@ -6,6 +6,8 @@ import {
   type RenderIr,
 } from '@aelion/render-ir';
 
+import { pitchPreservingTimeStretch } from './time-stretch.js';
+
 export interface PcmSourceBlock {
   readonly sampleRate: number;
   readonly channelCount: number;
@@ -224,7 +226,24 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
           throw new Error('Phase 0 mixer requires source PCM at the sequence sample rate');
         }
         if (block.frameCount < 1) continue;
-        for (const mapped of segment.frames) {
+        const linearMapping =
+          active.clip.source.timeMapping?.type === 'linear'
+            ? active.clip.source.timeMapping
+            : undefined;
+        const preservePitch =
+          clipAudio.pitchPolicy === 'preserve' &&
+          linearMapping !== undefined &&
+          linearMapping.rate.numerator !== linearMapping.rate.denominator;
+        const stretched = preservePitch
+          ? pitchPreservingTimeStretch({
+              input: block.interleaved,
+              inputFrames: block.frameCount,
+              outputFrames: segment.frames.length,
+              channelCount: block.channelCount,
+              reverse: linearMapping.reverse,
+            })
+          : undefined;
+        for (const [segmentFrame, mapped] of segment.frames.entries()) {
           const targetFrame = options.startFrame + mapped.outputOffset;
           const sequenceTimeUs = sampleBoundaryUs(targetFrame, options.ir.sampleRate);
           const gainDb =
@@ -263,11 +282,12 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
           );
           const nextSourceFrame = Math.min(block.frameCount - 1, sourceFrame + 1);
           const fraction = Math.max(0, Math.min(1, sourcePosition - sourceFrame));
-          const sourceLeft = interpolatedChannel(block, sourceFrame, nextSourceFrame, fraction, 0);
-          const sourceRight =
-            block.channelCount === 1
-              ? sourceLeft
-              : interpolatedChannel(block, sourceFrame, nextSourceFrame, fraction, 1);
+          const channelSample = (channel: number): number =>
+            stretched === undefined
+              ? interpolatedChannel(block, sourceFrame, nextSourceFrame, fraction, channel)
+              : (stretched[segmentFrame * block.channelCount + channel] ?? 0);
+          const sourceLeft = channelSample(0);
+          const sourceRight = block.channelCount === 1 ? sourceLeft : channelSample(1);
           const target = mapped.outputOffset * options.channelCount;
           const channelMap = Array.isArray(clipAudio.channelMap) ? clipAudio.channelMap : undefined;
           if (channelMap !== undefined) {
@@ -288,9 +308,7 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
               const row = channelMap[outputChannel] as readonly number[];
               let sample = 0;
               for (let inputChannel = 0; inputChannel < block.channelCount; inputChannel += 1) {
-                sample +=
-                  interpolatedChannel(block, sourceFrame, nextSourceFrame, fraction, inputChannel) *
-                  (row[inputChannel] ?? 0);
+                sample += channelSample(inputChannel) * (row[inputChannel] ?? 0);
               }
               const channelGain =
                 outputChannel === 0 ? leftGain : outputChannel === 1 ? rightGain : masterGain;
@@ -308,7 +326,7 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
             for (let channel = 0; channel < options.channelCount; channel += 1) {
               const sourceSample =
                 channel < block.channelCount
-                  ? interpolatedChannel(block, sourceFrame, nextSourceFrame, fraction, channel)
+                  ? channelSample(channel)
                   : channel < 2
                     ? sourceLeft
                     : 0;

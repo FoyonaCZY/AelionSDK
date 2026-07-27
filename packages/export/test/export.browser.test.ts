@@ -6,11 +6,15 @@ import type { RenderIr } from '@aelion/render-ir';
 
 import {
   exportGif,
+  exportFrozenRenderIrAv1Mp4,
+  exportFrozenRenderIrHevcMp4,
   exportFrozenRenderIrMp4,
   exportFrozenRenderIrWebM,
   exportStillImage,
   exportWebM,
   OpfsSeekableSink,
+  preflightAv1Mp4Export,
+  preflightHevcMp4Export,
   preflightMp4Export,
   preflightWebMExport,
   SeekableMemorySink,
@@ -121,14 +125,71 @@ describe('offline WebCodecs + streaming WebM export', () => {
     expect(result.mimeType).toContain('video/mp4');
     expect(result.encoderConfiguration).toMatchObject({
       profile: 'mp4-h264-aac',
-      video: { codec: 'avc', codecString: 'avc1.640028', targetBitrate: 500_000 },
+      video: { codec: 'avc', targetBitrate: 500_000 },
       audio: { codec: 'aac', targetBitrate: 64_000 },
     });
+    expect(result.encoderConfiguration.video.codecString).toBe(
+      preflight.encoderConfiguration?.videoCodecString,
+    );
+    expect(result.encoderConfiguration.video.codecString).toMatch(/^avc1\./u);
     expect(bytes.byteLength).toBeGreaterThan(1_000);
     const index = await createSampleIndex(bytes);
     expect(index.container).toBe('mp4');
     expect(index.tracks.find(track => track.kind === 'video')?.codecFamily).toBe('avc');
     expect(index.tracks.find(track => track.kind === 'audio')?.codecFamily).toBe('aac');
+  });
+
+  it('capability-gates AV1 and HEVC MP4 paths and muxes supported codecs', async () => {
+    const definitions = [
+      {
+        family: 'av1',
+        preflight: preflightAv1Mp4Export,
+        run: exportFrozenRenderIrAv1Mp4,
+      },
+      {
+        family: 'hevc',
+        preflight: preflightHevcMp4Export,
+        run: exportFrozenRenderIrHevcMp4,
+      },
+    ] as const;
+    for (const definition of definitions) {
+      const sink = new SeekableMemorySink();
+      const options = {
+        ir: frozenIr(),
+        projectRevision: 7n,
+        videoBitrate: 500_000,
+        audioBitrate: 64_000,
+        sink: sink.writable,
+        renderFrame: (request: { readonly timestampUs: number; readonly durationUs: number }) => {
+          const canvas = new OffscreenCanvas(160, 90);
+          canvas.getContext('2d')?.fillRect(0, 0, 160, 90);
+          return Promise.resolve(
+            new VideoFrame(canvas, {
+              timestamp: request.timestampUs,
+              duration: request.durationUs,
+            }),
+          );
+        },
+        renderAudio: (request: { readonly frameCount: number; readonly channelCount: number }) =>
+          Promise.resolve(new Float32Array(request.frameCount * request.channelCount)),
+      } as const;
+      const preflight = await definition.preflight(options);
+      if (!preflight.ok) {
+        expect(
+          preflight.issues.some(issue =>
+            /^EXPORT_(VIDEO|AUDIO)_CONFIG_UNSUPPORTED$/u.test(issue.code),
+          ),
+        ).toBe(true);
+        continue;
+      }
+      const result = await definition.run(options);
+      const index = await createSampleIndex(sink.finalize());
+      expect(result.encoderConfiguration.video.codec).toBe(definition.family);
+      expect(index.tracks.find(track => track.kind === 'video')?.codecFamily).toBe(
+        definition.family,
+      );
+      expect(index.tracks.find(track => track.kind === 'audio')?.codecFamily).toBe('aac');
+    }
   });
 
   it('exports deterministic CFR video and sample-aligned audio with bounded writes', async () => {
