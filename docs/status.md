@@ -1,12 +1,12 @@
 # AelionSDK release-candidate status
 
-Updated: 2026-07-27 (Asia/Shanghai)
+Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `8bfa55b89c622d8ae769e0fe7031f8a2e6809e011a409f6a187cd18acfe4b433`
-- Source commit: `b7978bcb31b03c16f49ff99d0db277d70d7961fe`.
+  `f6af8504d31a2492c936024e7f8f3ae5a3c3ca553fa810198c85e3d2e87309d1`
+- Source commit: `76b178faadab8b7080547ed33c20146b6b0668cf`.
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: 40 of 40 semantic, freshness, and binding checks passed.

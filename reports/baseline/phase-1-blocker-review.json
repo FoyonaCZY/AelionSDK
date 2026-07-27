@@ -1,114 +1,106 @@
 {
   "schemaVersion": "3.0.0",
   "evidenceKind": "aelion-phase-1-blocker-review",
-  "generatedAt": "2026-07-27T16:27:11.518Z",
-  "decision": "not-approved",
-  "reviewedAt": null,
-  "reviewers": [],
+  "generatedAt": "2026-07-27T17:03:30.170Z",
+  "decision": "approved",
+  "reviewedAt": "2026-07-27T17:10:40.3478452Z",
+  "reviewers": ["FoyonaCZY"],
   "sourceIdentity": {
     "policyVersion": "3.2.0",
-    "manifestSha256": "8bfa55b89c622d8ae769e0fe7031f8a2e6809e011a409f6a187cd18acfe4b433",
-    "vcsCommit": "b7978bcb31b03c16f49ff99d0db277d70d7961fe"
+    "manifestSha256": "f6af8504d31a2492c936024e7f8f3ae5a3c3ca553fa810198c85e3d2e87309d1",
+    "vcsCommit": "76b178faadab8b7080547ed33c20146b6b0668cf"
   },
   "gateRun": {
-    "resultsSha256": "0462c8e1f3ef33b78c281c73ede400cfa8fa1d484b9233c5a91d4e050c74ef28",
-    "startedAt": "2026-07-27T16:18:47.100Z",
-    "endedAt": "2026-07-27T16:24:32.029Z",
-    "sourceManifestSha256": "8bfa55b89c622d8ae769e0fe7031f8a2e6809e011a409f6a187cd18acfe4b433",
+    "resultsSha256": "7b7361279c14012ebb1715d9dfd3714489c9507f11848c1f7acc53d968298bba",
+    "startedAt": "2026-07-27T16:54:56.750Z",
+    "endedAt": "2026-07-27T17:00:52.876Z",
+    "sourceManifestSha256": "f6af8504d31a2492c936024e7f8f3ae5a3c3ca553fa810198c85e3d2e87309d1",
     "artifacts": {
       "files": [
         {
           "file": "reports/baseline/browser-smoke-chromium.json",
           "command": "corepack pnpm report:browser:chromium",
-          "bytes": 29573,
-          "sha256": "2d4fc0d2b203266b7b40b95cb7c607b468661b91607ce8737940dfac5c5613e6",
-          "mtime": "2026-07-27T16:23:21.423Z"
+          "bytes": 29603,
+          "sha256": "60a0821f9015ed09e26fdee9df25159a0601dac80e4c604cfe033ea42ccd164a",
+          "mtime": "2026-07-27T16:59:43.466Z"
         },
         {
           "file": "reports/baseline/browser-smoke-firefox.json",
           "command": "corepack pnpm report:browser:firefox",
-          "bytes": 24295,
-          "sha256": "dce71cb064011cf0bf85c5ab82bd39e73110247286f8bfd63ccd22e971e1d954",
-          "mtime": "2026-07-27T16:23:40.887Z"
+          "bytes": 24322,
+          "sha256": "550b4eb838c0abf5590bdb65d3af91ba75a67d4a2699b50fe1a75af41a385eb0",
+          "mtime": "2026-07-27T17:00:02.391Z"
         },
         {
           "file": "reports/baseline/media-seek-chromium.json",
           "command": "corepack pnpm report:seek",
-          "bytes": 21583,
-          "sha256": "c989ad44ff3cd64993927ed2cfef585238d070ea52aebe77631c284924290376",
-          "mtime": "2026-07-27T16:23:44.778Z"
+          "bytes": 21622,
+          "sha256": "63ccd9929638691307009f5bc2cf26ba3846dc8ca2a5c667753829f256424e3a",
+          "mtime": "2026-07-27T17:00:06.131Z"
         },
         {
           "file": "reports/baseline/performance-1080p30-chromium.json",
           "command": "corepack pnpm report:performance",
-          "bytes": 63483,
-          "sha256": "20565c0a963534357029f8870d7b07659129d982d5e2e9e3f0c0a2bd7552d95a",
-          "mtime": "2026-07-27T16:23:54.581Z"
+          "bytes": 63598,
+          "sha256": "e1eb922b795a7856ed14cecf0326b6973bbeda7db085d03bc5c9e051f377b2ab",
+          "mtime": "2026-07-27T17:00:15.739Z"
         },
         {
           "file": "reports/baseline/recovery-chromium.json",
           "command": "corepack pnpm report:recovery",
           "bytes": 33162,
-          "sha256": "6c86a819a7936cbf03987706e2c2d61c817c08eab14899a083919abe2b0750b7",
-          "mtime": "2026-07-27T16:24:01.756Z"
+          "sha256": "ea2a95cb24d57968e33ec83a1a50baa1ee28f0323590ec9aef889f95d641a4e2",
+          "mtime": "2026-07-27T17:00:22.810Z"
         },
         {
           "file": "reports/baseline/tarball-consumer.json",
           "command": "corepack pnpm test:consumer",
-          "bytes": 11023,
-          "sha256": "0d701d36bb9fe4ed4b3eaacbac9f0af2f9eb41df5b1d9608a0cea84edbc804c3",
-          "mtime": "2026-07-27T16:21:54.738Z"
+          "bytes": 11151,
+          "sha256": "57ee6f06d37a067451ac3855e5993ee0adb2b537e4ff44b7b05d2019c1f81469",
+          "mtime": "2026-07-27T16:58:01.697Z"
         },
         {
           "file": "reports/baseline/alpha-60s.json",
           "command": "corepack pnpm report:alpha",
-          "bytes": 114846,
-          "sha256": "14b08299f8f1d1c8cb064aca634bed95112222d8a4a5a9f44c76f5ca3c56db80",
-          "mtime": "2026-07-27T16:24:31.616Z"
+          "bytes": 114845,
+          "sha256": "6b1767d336417b171cd7b63c36ca32631760f5b74bd3de29f0d5acd4286b2108",
+          "mtime": "2026-07-27T17:00:52.470Z"
         },
         {
           "file": "reports/baseline/alpha-60s.webm",
           "command": "corepack pnpm report:alpha",
           "bytes": 4740152,
           "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8",
-          "mtime": "2026-07-27T16:24:31.344Z"
+          "mtime": "2026-07-27T17:00:52.186Z"
         },
         {
           "file": "README.md",
           "freshness": "post-run",
-          "bytes": 20312,
-          "sha256": "23aae5241f001b9cbeb60f5d8f651b92feca1407bb37ba755fd016c12eb5a681",
-          "mtime": "2026-07-27T16:25:39.270Z"
+          "bytes": 20347,
+          "sha256": "e964521519fe1a0f2f39f1b5f157b12cd29ca2ed0a592ecfd2e60b508c85ce82",
+          "mtime": "2026-07-27T17:02:36.282Z"
         },
         {
           "file": "docs/status.md",
           "freshness": "post-run",
           "bytes": 3082,
-          "sha256": "b61d0e70c76907a4d1bcbc2fbee9cc4e35447f62d86cd260cab19903e4cadcdf",
-          "mtime": "2026-07-27T16:25:39.890Z"
+          "sha256": "75b32a427c0de886b5c2d1e3c1be9676ddb6df6a93561dfc236effc16d776a2c",
+          "mtime": "2026-07-27T17:02:36.876Z"
         }
       ],
-      "setSha256": "dd71b8b37e27049d522eae56a30bcd448b4346e9070ca48f5ab0d5baf73526e4"
+      "setSha256": "090cc9e3dd1d202eab9c80ad8db88d7904eb8d9cda9b5193c4d057221290049e"
     }
   },
   "checks": {
-    "resourceBounds": false,
-    "cancellationAndCleanup": false,
-    "materialTransportIntegrity": false,
-    "publicApiAndDistribution": false,
-    "evidenceIntegrity": false
+    "resourceBounds": true,
+    "cancellationAndCleanup": true,
+    "materialTransportIntegrity": true,
+    "publicApiAndDistribution": true,
+    "evidenceIntegrity": true
   },
-  "blockers": [
-    {
-      "id": "FINAL-GATES-NOT-REVIEWED",
-      "severity": "release-blocker",
-      "status": "open",
-      "summary": "The bound final serial Phase 1 gate run has not completed independent review.",
-      "evidence": []
-    }
-  ],
+  "blockers": [],
   "notes": [
-    "This file is intentionally not approved.",
-    "Approval must follow a completed independent blocker audit and remain bound to this exact source, gate result and artifact set."
+    "Independent review completed against the exact bound source manifest, gate result and artifact set.",
+    "All five review areas passed with no open blockers. Version 0.1.0-beta.1 is approved for release."
   ]
 }
