@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-beta.1",
-  "generatedAt": "2026-07-27T15:43:50.188Z",
+  "generatedAt": "2026-07-27T16:21:54.735Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "69c9e62cdd1bbba47397b6ffdbd8af489bffae4ecb767619aaebbdeb2084216a",
+    "packageJsonSha256": "eae973e65deb5632c59d61c84d59feba4a8361d0ff2adb1aaa0a0eb2e258dc35",
     "sourceSha256": "9cdf5beb3d1b1d6d86be6373fecab8a02b2f87d56f88530f7a8c5cedd4785f11",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -174,7 +174,7 @@
             225,
             255
           ],
-          "workerTimingUs": 87335
+          "workerTimingUs": 81065
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -204,7 +204,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6240
+            "workerTimingUs": 6465
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -212,10 +212,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22080,
-            "playedFrames": 1920,
+            "availableReadFrames": 22592,
+            "playedFrames": 1408,
             "underrunFrames": 0,
-            "timeUs": 40000
+            "timeUs": 29333
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {
@@ -248,7 +248,7 @@
             225,
             255
           ],
-          "workerTimingUs": 23520
+          "workerTimingUs": 18880
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -278,7 +278,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6680
+            "workerTimingUs": 6040
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -286,10 +286,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22592,
-            "playedFrames": 1408,
+            "availableReadFrames": 23232,
+            "playedFrames": 768,
             "underrunFrames": 0,
-            "timeUs": 37333
+            "timeUs": 16000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {
