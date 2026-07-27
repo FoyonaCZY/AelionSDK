@@ -40,6 +40,6 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*"
+    "@aelion/core": "0.1.0-beta.1"
   }
 }

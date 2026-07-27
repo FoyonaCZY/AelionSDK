@@ -40,9 +40,9 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
-    "@aelion/media": "workspace:*",
-    "@aelion/render-ir": "workspace:*",
+    "@aelion/core": "0.1.0-beta.1",
+    "@aelion/media": "0.1.0-beta.1",
+    "@aelion/render-ir": "0.1.0-beta.1",
     "mediabunny": "1.50.8"
   }
 }

@@ -46,9 +46,9 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/audio": "workspace:*",
-    "@aelion/export": "workspace:*",
-    "@aelion/renderer-worker": "workspace:*"
+    "@aelion/audio": "0.1.0-beta.1",
+    "@aelion/export": "0.1.0-beta.1",
+    "@aelion/renderer-worker": "0.1.0-beta.1"
   },
   "peerDependencies": {
     "vite": "^7.0.0"

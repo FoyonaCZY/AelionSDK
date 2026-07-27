@@ -40,8 +40,8 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
-    "@aelion/material-compiler": "workspace:*",
-    "@aelion/render-ir": "workspace:*"
+    "@aelion/core": "0.1.0-beta.1",
+    "@aelion/material-compiler": "0.1.0-beta.1",
+    "@aelion/render-ir": "0.1.0-beta.1"
   }
 }

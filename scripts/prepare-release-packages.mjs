@@ -76,6 +76,21 @@ const packageNames = entries.map(entry => entry.manifest.name).sort();
 if (JSON.stringify(packageNames) !== JSON.stringify([...PHASE_1_EXPECTED_PUBLIC_PACKAGES].sort())) {
   throw new Error('Public package set differs from the reviewed release contract');
 }
+const publicPackageNames = new Set(packageNames);
+for (const entry of entries) {
+  for (const section of ['dependencies', 'optionalDependencies', 'peerDependencies']) {
+    for (const [name, range] of Object.entries(entry.manifest[section] ?? {})) {
+      if (String(range).startsWith('workspace:')) {
+        throw new Error(`${entry.manifest.name} ${section}.${name} uses a workspace protocol`);
+      }
+      if (publicPackageNames.has(name) && range !== version) {
+        throw new Error(
+          `${entry.manifest.name} ${section}.${name} must pin the release version ${version}`,
+        );
+      }
+    }
+  }
+}
 
 const pending = new Map(entries.map(entry => [entry.manifest.name, entry]));
 const ordered = [];

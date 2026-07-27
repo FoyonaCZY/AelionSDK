@@ -48,15 +48,15 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/audio": "workspace:*",
-    "@aelion/capability": "workspace:*",
-    "@aelion/core": "workspace:*",
-    "@aelion/export": "workspace:*",
-    "@aelion/material-compiler": "workspace:*",
-    "@aelion/media": "workspace:*",
-    "@aelion/project-schema": "workspace:*",
-    "@aelion/render-ir": "workspace:*",
-    "@aelion/renderer-worker": "workspace:*",
-    "@aelion/transaction": "workspace:*"
+    "@aelion/audio": "0.1.0-beta.1",
+    "@aelion/capability": "0.1.0-beta.1",
+    "@aelion/core": "0.1.0-beta.1",
+    "@aelion/export": "0.1.0-beta.1",
+    "@aelion/material-compiler": "0.1.0-beta.1",
+    "@aelion/media": "0.1.0-beta.1",
+    "@aelion/project-schema": "0.1.0-beta.1",
+    "@aelion/render-ir": "0.1.0-beta.1",
+    "@aelion/renderer-worker": "0.1.0-beta.1",
+    "@aelion/transaction": "0.1.0-beta.1"
   }
 }
