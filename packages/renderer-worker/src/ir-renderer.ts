@@ -797,19 +797,98 @@ function canvasColor(value: unknown, fallback = 'rgba(0, 0, 0, 0)'): string {
   return `rgba(${Math.round(linearChannelToSrgb(red) * 255).toString()}, ${Math.round(linearChannelToSrgb(green) * 255).toString()}, ${Math.round(linearChannelToSrgb(blue) * 255).toString()}, ${Math.max(0, Math.min(1, alpha)).toString()})`;
 }
 
-function rasterBackgroundFrame(
-  ir: RenderIr,
-  width: number,
-  height: number,
-  timestampUs: number,
-): VideoFrame {
-  const canvas = new OffscreenCanvas(width, height);
-  const context = canvas.getContext('2d');
-  if (context === null) throw new Error('BACKGROUND_CANVAS_UNAVAILABLE');
-  context.fillStyle = canvasColor(ir.backgroundColor);
-  context.fillRect(0, 0, width, height);
-  return new VideoFrame(canvas, { timestamp: timestampUs });
+function backgroundParameters(
+  value: unknown,
+): Readonly<Record<string, import('@aelion/core').JsonValue>> {
+  const rgba = record(value).rgba;
+  const components =
+    Array.isArray(rgba) && rgba.length === 4
+      ? rgba.map(component => finite(component, 0))
+      : [0, 0, 0, 0];
+  return {
+    red: linearChannelToSrgb(components[0] ?? 0),
+    green: linearChannelToSrgb(components[1] ?? 0),
+    blue: linearChannelToSrgb(components[2] ?? 0),
+    alpha: Math.max(0, Math.min(1, components[3] ?? 0)),
+  };
 }
+
+const BACKGROUND_PROGRAM: WebGl2MaterialProgram = {
+  backend: 'webgl2',
+  nodeSet: 'aelion.visual.builtin/1.0.0',
+  graphHash: 'builtin-background-v1',
+  inputPorts: [],
+  uniforms: ['red', 'green', 'blue', 'alpha'].map(id => ({
+    name: `u_parameter_${id}`,
+    type: 'float' as const,
+    source: { kind: 'parameter' as const, id },
+  })),
+  executionPlan: {
+    passes: [
+      {
+        id: 'builtin-background',
+        kind: 'draw',
+        nodes: ['builtin-background'],
+        estimatedTextureSamples: 0,
+      },
+    ],
+    intermediateTextureCount: 0,
+  },
+  fragmentShader: `#version 300 es
+precision highp float;
+uniform float u_parameter_red;
+uniform float u_parameter_green;
+uniform float u_parameter_blue;
+uniform float u_parameter_alpha;
+out vec4 out_color;
+void main() {
+  out_color = vec4(
+    u_parameter_red,
+    u_parameter_green,
+    u_parameter_blue,
+    u_parameter_alpha
+  );
+}`,
+  webgpu: {
+    backend: 'webgpu',
+    nodeSet: 'aelion.visual.builtin/1.0.0',
+    graphHash: 'builtin-background-v1',
+    inputPorts: [],
+    uniforms: ['red', 'green', 'blue', 'alpha'].map(id => ({
+      name: `u_parameter_${id}`,
+      type: 'float' as const,
+      source: { kind: 'parameter' as const, id },
+    })),
+    executionPlan: {
+      passes: [
+        {
+          id: 'builtin-background',
+          kind: 'draw',
+          nodes: ['builtin-background'],
+          estimatedTextureSamples: 0,
+        },
+      ],
+      intermediateTextureCount: 0,
+    },
+    shader: `
+struct Uniforms { values: array<vec4f, 4> };
+@group(0) @binding(0) var unused_sampler: sampler;
+@group(0) @binding(1) var<uniform> uniforms: Uniforms;
+struct VertexOut { @builtin(position) position: vec4f };
+@vertex fn vs(@builtin(vertex_index) index: u32) -> VertexOut {
+  var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  return VertexOut(vec4f(positions[index], 0.0, 1.0));
+}
+@fragment fn fs() -> @location(0) vec4f {
+  return vec4f(
+    uniforms.values[0].x,
+    uniforms.values[1].x,
+    uniforms.values[2].x,
+    uniforms.values[3].x
+  );
+}`,
+  },
+};
 
 function rasterGeneratorFrame(
   generator: object,
@@ -1027,7 +1106,12 @@ export class RenderIrFrameRenderer implements Disposable {
     };
     rendered.set(
       backgroundId,
-      addExternal(rasterBackgroundFrame(options.ir, width, height, options.timeUs), 'background'),
+      addNode(
+        'background',
+        {},
+        BACKGROUND_PROGRAM,
+        backgroundParameters(options.ir.backgroundColor),
+      ),
     );
     try {
       for (const active of state.clips) {

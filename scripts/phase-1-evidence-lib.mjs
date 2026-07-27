@@ -1670,6 +1670,18 @@ function validateComprehensivePerformance(report, reasons) {
     }
     if (value?.status === 'completed') {
       validateLongTaskWindow(`${expected.id} main thread`, value?.mainThread, reasons);
+      if (value?.mainThread?.longTasksOver50Ms !== 0) {
+        reasons.push(`${expected.id} observed a >50 ms main-thread Long Task`);
+      }
+      if (
+        !finiteNonNegative(value?.realtimeMultiple) ||
+        !approximatelyEqual(value.realtimeMultiple, 1_000 / value.elapsedMs)
+      ) {
+        reasons.push(`${expected.id} real-time multiple is invalid`);
+      }
+      if (expected.width === 3_840 && value?.realtimeMultiple < 1.5) {
+        reasons.push('real-mp4-4k30 did not reach the 1.5x real-time floor');
+      }
     } else if (!['unsupported', 'failed'].includes(value?.status)) {
       reasons.push(`${expected.id} real-media status is invalid`);
     }
@@ -1880,6 +1892,143 @@ export function validatePerformanceEvidence(report) {
       pcm: timeline?.pcm ?? null,
     },
   };
+}
+
+/** Strict Phase 3 persistent checkpoint and FFmpeg semantic-readback contract. */
+export function validateRecoveryEvidence(report) {
+  const reasons = [];
+  if (report?.evidenceVersion !== '1.0.0') {
+    reasons.push('recovery evidenceVersion must be 1.0.0');
+  }
+  if (report?.command !== 'corepack pnpm report:recovery') {
+    reasons.push('recovery command differs');
+  }
+  if (report?.fixture !== 'Aelion deterministic segmented A/V') {
+    reasons.push('recovery fixture differs');
+  }
+  if (
+    report?.durationUs !== 2_000_000 ||
+    report?.sampleRate !== 48_000 ||
+    report?.channelCount !== 2 ||
+    report?.videoFrames !== 60 ||
+    report?.audioFrames !== 96_000
+  ) {
+    reasons.push('recovery fixture timing differs');
+  }
+  validateReferenceDevice(report, 'recovery', reasons);
+  if (!nonEmptyString(report?.externalDecoder)) {
+    reasons.push('recovery external decoder is missing');
+  }
+  if (
+    report?.methodology?.checkpointStore !==
+      'IndexedDB recreated between interrupted and resumed runs' ||
+    stableJson(report?.methodology?.interruptionFractions) !== stableJson([0.25, 0.5, 0.9]) ||
+    report?.methodology?.semanticComparison !==
+      'FFmpeg per-frame decoded MD5 sequence plus SHA-256 of decoded float32 PCM' ||
+    report?.methodology?.codecTailPolicy !==
+      'PCM SHA-256 includes complete codec packet tails; logical A/V end uses the requested PCM frame count, while codecPacketEndUs and codecTailFrames disclose packet quantization separately' ||
+    report?.methodology?.avEndDriftLimitUs !== 1_000
+  ) {
+    reasons.push('recovery methodology differs');
+  }
+
+  const profiles = Array.isArray(report?.profiles) ? report.profiles : [];
+  const expectedProfiles = ['webm-vp9-opus', 'mp4-h264-aac'];
+  if (stableJson(profiles.map(value => value?.profile)) !== stableJson(expectedProfiles)) {
+    reasons.push('recovery profile matrix differs');
+  }
+  const expectedFractions = [0.25, 0.5, 0.9];
+  for (const profile of expectedProfiles) {
+    const value = profiles.find(entry => entry?.profile === profile);
+    const reference = value?.reference;
+    validateRecoveryReadback(`${profile} reference`, reference?.readback, report, reasons);
+    if (
+      reference?.totalUnits !== 10 ||
+      reference?.reusedUnits !== 0 ||
+      reference?.encodedUnits !== 10 ||
+      !positiveSafeIntegerValue(reference?.bytes) ||
+      !/^[0-9a-f]{64}$/u.test(reference?.artifactSha256 ?? '')
+    ) {
+      reasons.push(`${profile} reference export statistics differ`);
+    }
+
+    const recoveries = Array.isArray(value?.recoveries) ? value.recoveries : [];
+    if (
+      stableJson(recoveries.map(entry => entry?.interruptionFraction)) !==
+      stableJson(expectedFractions)
+    ) {
+      reasons.push(`${profile} interruption matrix differs`);
+    }
+    for (const fraction of expectedFractions) {
+      const recovery = recoveries.find(entry => entry?.interruptionFraction === fraction);
+      const expectedCommitted = Math.ceil(10 * fraction);
+      const expectedFirstFrame = expectedCommitted * 6;
+      if (
+        recovery?.firstRunCommittedUnits !== expectedCommitted ||
+        recovery?.totalUnits !== 10 ||
+        recovery?.reusedUnits !== expectedCommitted ||
+        recovery?.encodedUnits !== 10 - expectedCommitted ||
+        recovery?.rerenderedCommittedFrames !== 0 ||
+        recovery?.firstRenderedFrame !== expectedFirstFrame ||
+        recovery?.renderedFrameCount !== 60 - expectedFirstFrame ||
+        !positiveSafeIntegerValue(recovery?.bytes) ||
+        !/^[0-9a-f]{64}$/u.test(recovery?.artifactSha256 ?? '')
+      ) {
+        reasons.push(`${profile} ${fraction.toString()} recovery statistics differ`);
+      }
+      validateRecoveryReadback(
+        `${profile} ${fraction.toString()} recovery`,
+        recovery?.readback,
+        report,
+        reasons,
+      );
+      if (
+        reference?.readback !== undefined &&
+        recovery?.readback !== undefined &&
+        (stableJson(recovery.readback.videoFrameMd5) !==
+          stableJson(reference.readback.videoFrameMd5) ||
+          recovery.readback.audioPcmSha256 !== reference.readback.audioPcmSha256 ||
+          recovery.readback.decodedPcmFrames !== reference.readback.decodedPcmFrames ||
+          recovery.readback.videoEndUs !== reference.readback.videoEndUs ||
+          recovery.readback.audioEndUs !== reference.readback.audioEndUs ||
+          recovery.readback.codecPacketEndUs !== reference.readback.codecPacketEndUs)
+      ) {
+        reasons.push(`${profile} ${fraction.toString()} FFmpeg semantic hashes differ`);
+      }
+    }
+  }
+  return {
+    passed: reasons.length === 0,
+    reasons,
+    details: {
+      profiles: profiles.map(value => ({
+        profile: value?.profile ?? null,
+        recoveries: Array.isArray(value?.recoveries) ? value.recoveries.length : 0,
+        avEndDriftUs: value?.reference?.readback?.avEndDriftUs ?? null,
+      })),
+    },
+  };
+}
+
+function validateRecoveryReadback(label, readback, report, reasons) {
+  if (
+    readback?.videoFrames !== report?.videoFrames ||
+    !Array.isArray(readback?.videoFrameMd5) ||
+    readback.videoFrameMd5.length !== report?.videoFrames ||
+    readback.videoFrameMd5.some(value => !/^[0-9a-f]{32}$/u.test(value)) ||
+    !Number.isSafeInteger(readback?.decodedPcmFrames) ||
+    readback.decodedPcmFrames < report?.audioFrames ||
+    !/^[0-9a-f]{64}$/u.test(readback?.audioPcmSha256 ?? '') ||
+    !Number.isSafeInteger(readback?.videoEndUs) ||
+    !Number.isSafeInteger(readback?.audioEndUs) ||
+    !Number.isSafeInteger(readback?.codecPacketEndUs) ||
+    readback.codecPacketEndUs < readback.audioEndUs ||
+    readback?.codecTailFrames !== readback.decodedPcmFrames - report?.audioFrames ||
+    !finiteNonNegative(readback?.avEndDriftUs) ||
+    readback.avEndDriftUs > 1_000
+  ) {
+    reasons.push(`${label} FFmpeg readback is invalid or exceeds 1 ms A/V drift`);
+  }
 }
 
 function validateTarballBrowser(entry, reasons) {

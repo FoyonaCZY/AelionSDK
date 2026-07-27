@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-26T18:46:50.876Z",
+  "generatedAt": "2026-07-27T14:30:34.480Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
     "package": "@aelion/vite-plugin",
     "version": "0.1.0-alpha.0",
-    "packageSha256": "6b57279abfeed281c2595b7ad9a04c8bc6183bab34fa0f7fbc096be035da6bd7",
+    "packageSha256": "acd52319aba7436070a58c795467efa407266f69de9f149db418f70dcbd4e6b7",
     "contractSha256": "0209250522bbe5cdef9eb86c3275ba0ed4ab9759b950f45796821973503658cb",
     "public": true,
     "zeroConfigVite": false,
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "192075de9f3c982bd1b565ed90081e1d2547a92c1fa94f4d14e3641e337ddc38",
+    "packageJsonSha256": "22e62da1a805aa5a270406512bed0a24b79aa90a1a5dad8c33eccd17d4c4041d",
     "sourceSha256": "9cdf5beb3d1b1d6d86be6373fecab8a02b2f87d56f88530f7a8c5cedd4785f11",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -66,7 +66,7 @@
     {
       "name": "@aelion/audio",
       "version": "0.1.0-alpha.0",
-      "sha256": "4501e203028eff37da56830fa5ccfd3fd61d17325cc47e28f9c558c58568f57e"
+      "sha256": "8d8bdfbad6dff76d62d33e82eafdc6fa481e830f07ee30804fd5a285f84d5135"
     },
     {
       "name": "@aelion/capability",
@@ -81,7 +81,7 @@
     {
       "name": "@aelion/export",
       "version": "0.1.0-alpha.0",
-      "sha256": "1dc1cea58c5721bb6b5af9b77c8f02e58ba75ff94b72b77e2456942857744b21"
+      "sha256": "169f590e04f08153b07fa8e45bd7686d4466305333e1d384213109bab91a4cea"
     },
     {
       "name": "@aelion/material-compiler",
@@ -96,7 +96,7 @@
     {
       "name": "@aelion/media",
       "version": "0.1.0-alpha.0",
-      "sha256": "fc95590cd7160f9c98c37c981ca1d3ea2c00a48db6d0d110d57759f9f59cb720"
+      "sha256": "81bee47fe6e59b737ad0b6ca852b32fbc146959a80c1be0f7cd7dd3ab19f8ca1"
     },
     {
       "name": "@aelion/project-schema",
@@ -111,12 +111,12 @@
     {
       "name": "@aelion/renderer-worker",
       "version": "0.1.0-alpha.0",
-      "sha256": "c468b74925774b41835c9e61f01de9ae8a2be3afd402ad9f1351cb24f426e001"
+      "sha256": "4e6d4f9a9c7070b1cb675cd1c9401731f4aa0033161cfaae6b26f7cadecf12c8"
     },
     {
       "name": "@aelion/sdk",
       "version": "0.1.0-alpha.0",
-      "sha256": "afb0cdca5bccca0653011c4b80405b319f30efad2562a5a1416d2ad5bda06bf9"
+      "sha256": "90ed9b8715503b2ab7830dabe27b978a84910fe5de4805578851d4ff005bb0d4"
     },
     {
       "name": "@aelion/transaction",
@@ -126,7 +126,7 @@
     {
       "name": "@aelion/vite-plugin",
       "version": "0.1.0-alpha.0",
-      "sha256": "6b57279abfeed281c2595b7ad9a04c8bc6183bab34fa0f7fbc096be035da6bd7"
+      "sha256": "acd52319aba7436070a58c795467efa407266f69de9f149db418f70dcbd4e6b7"
     }
   ],
   "runtimeAssets": [
@@ -146,17 +146,17 @@
     },
     {
       "id": "webgl2-worker",
-      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-C1Uctlto.js",
-      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-C1Uctlto.js",
-      "bytes": 22323,
-      "sha256": "0473047ac1f1a45e102327489ec7dcde7997d60e2da987e899ac27db61934ea5"
+      "publicUrl": "/assets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js",
+      "file": "dist/assets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js",
+      "bytes": 22365,
+      "sha256": "eb5e80aa028a76d36ad5012099196c93500ddc5f9e4aecc966771d9f99e3e1b3"
     },
     {
       "id": "mux-export-worker",
-      "publicUrl": "/assets/aelion-export-mux-export-worker.js-CtDSUWBF.js",
-      "file": "dist/assets/aelion-export-mux-export-worker.js-CtDSUWBF.js",
-      "bytes": 7486,
-      "sha256": "d278302dde136096ba228ef3b624f5927b71a8ab9bdaf3d900b6c2ad268b9d94"
+      "publicUrl": "/assets/aelion-export-mux-export-worker.js-Dsm9QkOw.js",
+      "file": "dist/assets/aelion-export-mux-export-worker.js-Dsm9QkOw.js",
+      "bytes": 9200,
+      "sha256": "ddcea5edb6f72ed4d7a905bcfd15c4a4978c03706194e26017861e229e337d37"
     }
   ],
   "browsers": [
@@ -174,7 +174,7 @@
             225,
             255
           ],
-          "workerTimingUs": 85585
+          "workerTimingUs": 84195
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -204,7 +204,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6690
+            "workerTimingUs": 6000
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -212,10 +212,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22080,
-            "playedFrames": 1920,
+            "availableReadFrames": 22592,
+            "playedFrames": 1408,
             "underrunFrames": 0,
-            "timeUs": 40000
+            "timeUs": 29333
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {
@@ -248,7 +248,7 @@
             225,
             255
           ],
-          "workerTimingUs": 21400
+          "workerTimingUs": 17540
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -256,10 +256,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22976,
-          "playedFrames": 1024,
+          "availableReadFrames": 23360,
+          "playedFrames": 640,
           "underrunFrames": 0,
-          "timeUs": 21333
+          "timeUs": 26667
         },
         "sessionFacade": {
           "revision": "3",
@@ -278,7 +278,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6460
+            "workerTimingUs": 5900
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -289,7 +289,7 @@
             "availableReadFrames": 22976,
             "playedFrames": 1024,
             "underrunFrames": 0,
-            "timeUs": 21333
+            "timeUs": 29333
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {

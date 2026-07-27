@@ -222,8 +222,18 @@ export async function renderIrAudio(options: RenderIrAudioOptions): Promise<Floa
           options.signal,
         );
         throwIfAborted(options.signal, 'Render IR audio');
-        if (block.sampleRate !== options.ir.sampleRate) {
-          throw new Error('Phase 0 mixer requires source PCM at the sequence sample rate');
+        if (!Number.isSafeInteger(block.sampleRate) || block.sampleRate <= 0) {
+          throw new RangeError('PCM source returned an invalid sample rate');
+        }
+        if (
+          !Number.isSafeInteger(block.channelCount) ||
+          block.channelCount < 1 ||
+          block.channelCount > 8
+        ) {
+          throw new RangeError('PCM source returned an invalid channel count');
+        }
+        if (block.interleaved.length !== block.frameCount * block.channelCount) {
+          throw new RangeError('PCM source returned an inconsistent interleaved block');
         }
         if (block.frameCount < 1) continue;
         const linearMapping =

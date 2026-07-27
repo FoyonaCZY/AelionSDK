@@ -17,7 +17,13 @@ import {
   type FrozenWebMExportOptions,
 } from '@aelion/export';
 import { canonicalStringify, ProjectValidator, type AelionProject } from '@aelion/project-schema';
-import { IncrementalRenderCompiler, type CompileStats, type RenderIr } from '@aelion/render-ir';
+import {
+  evaluateAnimatedValue,
+  evaluateVisualState,
+  IncrementalRenderCompiler,
+  type CompileStats,
+  type RenderIr,
+} from '@aelion/render-ir';
 import { RenderIrFrameRenderer, type RenderIrFrameRendererSnapshot } from '@aelion/renderer-worker';
 import {
   EditingCommands,
@@ -70,6 +76,84 @@ function channelCountForLayout(layout: string): number {
   if (layout === 'stereo') return 2;
   if (layout === '5.1') return 6;
   throw new RangeError(`Unsupported channel layout ${layout}`);
+}
+
+function objectValue(value: unknown): Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Readonly<Record<string, unknown>>)
+    : {};
+}
+
+function finiteValue(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function directOpaqueVisualSource(
+  ir: RenderIr,
+  timeUs: number,
+):
+  | {
+      readonly assetId: string;
+      readonly streamIndex: number;
+      readonly sourceTimeUs: number;
+    }
+  | undefined {
+  const state = evaluateVisualState(ir, timeUs);
+  const active = state.clips[0];
+  if (
+    state.transition !== undefined ||
+    state.clips.length !== 1 ||
+    active?.clip.kind !== 'visual-clip' ||
+    active.sourceTimeUs === null ||
+    active.materials.length !== 0
+  ) {
+    return undefined;
+  }
+  const clip = active.clip;
+  const visual = clip.visual;
+  if (
+    visual.fit !== 'fill' ||
+    visual.blendMode !== 'normal' ||
+    visual.mask !== undefined ||
+    clip.materialInstanceIds.length !== 0
+  ) {
+    return undefined;
+  }
+  const evaluate = (value: import('@aelion/core').JsonValue): unknown =>
+    evaluateAnimatedValue(value, timeUs, clip.range.startUs);
+  const transform = visual.transform;
+  const position = objectValue(evaluate(transform.positionPx as import('@aelion/core').JsonValue));
+  const anchor = objectValue(evaluate(transform.anchor as import('@aelion/core').JsonValue));
+  const scale = objectValue(evaluate(transform.scale as import('@aelion/core').JsonValue));
+  const skew = objectValue(evaluate(transform.skewDeg as import('@aelion/core').JsonValue));
+  const crop = objectValue(evaluate(visual.crop as import('@aelion/core').JsonValue));
+  if (
+    finiteValue(position.x, ir.width / 2) !== ir.width / 2 ||
+    finiteValue(position.y, ir.height / 2) !== ir.height / 2 ||
+    finiteValue(anchor.x, 0.5) !== 0.5 ||
+    finiteValue(anchor.y, 0.5) !== 0.5 ||
+    finiteValue(scale.x, 1) !== 1 ||
+    finiteValue(scale.y, 1) !== 1 ||
+    finiteValue(skew.x, 0) !== 0 ||
+    finiteValue(skew.y, 0) !== 0 ||
+    finiteValue(evaluate(transform.rotationDeg as import('@aelion/core').JsonValue), 0) !== 0 ||
+    finiteValue(evaluate(visual.opacity as import('@aelion/core').JsonValue), 1) !== 1 ||
+    finiteValue(crop.left, 0) !== 0 ||
+    finiteValue(crop.top, 0) !== 0 ||
+    finiteValue(crop.right, 0) !== 0 ||
+    finiteValue(crop.bottom, 0) !== 0
+  ) {
+    return undefined;
+  }
+  return {
+    assetId: clip.source.assetId,
+    streamIndex: clip.source.streamIndex,
+    sourceTimeUs: active.sourceTimeUs,
+  };
+}
+
+function frameHasAlpha(frame: VideoFrame): boolean {
+  return frame.format === 'I420A' || frame.format === 'RGBA' || frame.format === 'BGRA';
 }
 
 const DEFAULT_MAX_DIAGNOSTICS = 256;
@@ -744,26 +828,9 @@ export class AelionSession implements AelionSessionApi {
       ...(this.#options.runtimeAssets?.exportWorker === undefined
         ? {}
         : { workerUrl: this.#options.runtimeAssets.exportWorker }),
+      ...(options.execution === undefined ? {} : { execution: options.execution }),
       sink: options.sink,
-      renderFrame: async request => {
-        const rendered = await this.#requireRenderer().render({
-          ir,
-          timeUs: request.timestampUs,
-          source: media,
-          mode: 'export',
-          preferredBackend: this.#options.preferredBackend ?? 'auto',
-          allowFallback: this.#options.allowBackendFallback ?? true,
-          ...(signal === undefined ? {} : { signal }),
-        });
-        try {
-          return new VideoFrame(rendered.bitmap, {
-            timestamp: request.timestampUs,
-            duration: request.durationUs,
-          });
-        } finally {
-          rendered.bitmap.close();
-        }
-      },
+      renderFrame: request => this.#renderExportFrame(ir, media, request, signal),
       renderAudio:
         masteredRenderAudio ??
         (request =>
@@ -799,6 +866,51 @@ export class AelionSession implements AelionSessionApi {
       ...(processing === undefined ? {} : { processing }),
       signal,
     });
+  }
+
+  async #renderExportFrame(
+    ir: RenderIr,
+    media: AelionMediaProvider,
+    request: { readonly timestampUs: number; readonly durationUs: number },
+    signal?: AbortSignal,
+  ): Promise<VideoFrame> {
+    const direct = directOpaqueVisualSource(ir, request.timestampUs);
+    if (direct !== undefined) {
+      const source = await media.frameAt(
+        direct.assetId,
+        direct.streamIndex,
+        direct.sourceTimeUs,
+        signal,
+        { purpose: 'export', maxDimension: Math.max(ir.width, ir.height) },
+      );
+      try {
+        if (!frameHasAlpha(source)) {
+          return new VideoFrame(source, {
+            timestamp: request.timestampUs,
+            duration: request.durationUs,
+          });
+        }
+      } finally {
+        source.close();
+      }
+    }
+    const rendered = await this.#requireRenderer().render({
+      ir,
+      timeUs: request.timestampUs,
+      source: media,
+      mode: 'export',
+      preferredBackend: this.#options.preferredBackend ?? 'auto',
+      allowFallback: this.#options.allowBackendFallback ?? true,
+      ...(signal === undefined ? {} : { signal }),
+    });
+    try {
+      return new VideoFrame(rendered.bitmap, {
+        timestamp: request.timestampUs,
+        duration: request.durationUs,
+      });
+    } finally {
+      rendered.bitmap.close();
+    }
   }
 
   async #preflightProfile(options: AelionProfileExportOptions) {
@@ -920,28 +1032,10 @@ export class AelionSession implements AelionSessionApi {
           options.onProgress?.(progress);
         };
         const cleanup = options.cleanupSink;
-        const renderFrame = async (request: {
+        const renderFrame = (request: {
           readonly timestampUs: number;
           readonly durationUs: number;
-        }): Promise<VideoFrame> => {
-          const rendered = await this.#requireRenderer().render({
-            ir,
-            timeUs: request.timestampUs,
-            source: media,
-            mode: 'export',
-            preferredBackend: this.#options.preferredBackend ?? 'auto',
-            allowFallback: this.#options.allowBackendFallback ?? true,
-            signal,
-          });
-          try {
-            return new VideoFrame(rendered.bitmap, {
-              timestamp: request.timestampUs,
-              duration: request.durationUs,
-            });
-          } finally {
-            rendered.bitmap.close();
-          }
-        };
+        }): Promise<VideoFrame> => this.#renderExportFrame(ir, media, request, signal);
         let mastering: Awaited<ReturnType<typeof createMasteredAudioRenderer>> | undefined;
         const requireMastering = async () => {
           mastering ??= await this.#createExportAudioRenderer(ir, media, processing, signal);
@@ -972,6 +1066,7 @@ export class AelionSession implements AelionSessionApi {
                 ...(options.audioProcessing === undefined
                   ? {}
                   : { audioProcessing: options.audioProcessing }),
+                ...(options.execution === undefined ? {} : { execution: options.execution }),
               },
               signal,
               onProgress,

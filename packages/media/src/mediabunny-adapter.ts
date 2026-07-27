@@ -981,9 +981,8 @@ async function decodeVideoFrameAtFromInput(
       verifyKeyPackets: true,
     });
     if (startPacket === null) throw new Error('No sync packet exists at or before target');
-    if (startPacket.sequenceNumber !== decodeStartSample.sourceSequenceNumber) {
-      throw new Error('SampleIndex sync point differs from verified container sync packet');
-    }
+    const stablePacketSequence =
+      startPacket.sequenceNumber === decodeStartSample.sourceSequenceNumber;
 
     const maxDecodeQueueSize = options.maxDecodeQueueSize ?? 16;
     if (!Number.isSafeInteger(maxDecodeQueueSize) || maxDecodeQueueSize <= 0) {
@@ -994,7 +993,17 @@ async function decodeVideoFrameAtFromInput(
       await waitForDecodeCapacity(decoder, maxDecodeQueueSize, options.signal);
       decoder.decode(packet.toEncodedVideoChunk());
       decodedPackets += 1;
-      if (packet.sequenceNumber === targetSample.sourceSequenceNumber) break;
+      // Some legal segmented containers assign accessor-local sequence numbers
+      // or conservatively verify a key packet before the indexed sync point.
+      // In that case, decode through the exact target PTS rather than trusting
+      // metadata-only sequence identity.
+      if (
+        (stablePacketSequence && packet.sequenceNumber === targetSample.sourceSequenceNumber) ||
+        (!stablePacketSequence &&
+          packet.microsecondTimestamp === targetSample.presentationTimestampUs)
+      ) {
+        break;
+      }
     }
     await decoder.flush();
     if (decodeFailure !== undefined) throw decodeFailure;
@@ -1015,7 +1024,7 @@ async function decodeVideoFrameAtFromInput(
       timestampUs: selectedTimestampUs,
       durationUs: selectedDurationUs,
       decodedPackets,
-      plannedPackets: seek.samplesToDecode,
+      plannedPackets: stablePacketSequence ? seek.samplesToDecode : decodedPackets,
       decodeStartUs: seek.decodeStartUs,
       targetUs,
       close: () => {

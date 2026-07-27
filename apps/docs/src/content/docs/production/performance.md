@@ -111,6 +111,19 @@ const session = await Aelion.createSession({
 - 4K/长片超过设备预算时转 Remote Export；
 - 本地导出可以排队，不需要多个 Session 同时满载。
 
+当前 Windows 参考机的真实 H.264/AAC MP4 全链路基线（输入解码 → render →
+audio → encode → mux → sink）为：1080p30 约 3.26× 实时，4K30 约 3.49×
+实时；两个测量窗口的主线程 >50 ms Long Task 都是 0。结果来自
+`reports/baseline/performance-1080p30-chromium.json`，只用于同环境回归，
+不构成其他设备的 SLA。
+
+持久恢复由 `corepack pnpm report:recovery` 单独验证：WebM/MP4 在 25%、50%、
+90% 提交点中断后，FFmpeg 逐帧 MD5 和完整 PCM SHA-256 必须与无中断参考一致。
+PCM 哈希包含 codec packet 的完整尾部填充；逻辑 A/V 末端按请求帧数计算，报告中的
+`codecPacketEndUs` 和 `codecTailFrames` 单独披露 packet 量化。`corepack pnpm
+report:phase3:check` 会同时拒绝低于 1.5× 的 4K 结果、任何 50 ms 以上的主线程
+Long Task、重复渲染已提交帧或超过 1 ms 的逻辑 A/V 末端漂移。
+
 ## 读取 Session 统计
 
 ```ts

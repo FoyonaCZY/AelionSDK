@@ -103,7 +103,7 @@ export interface MuxedEncoderConfiguration {
 export type Mp4ExportOptions = WebMExportOptions;
 export type Mp4ExportResult = WebMExportResult;
 
-interface MuxedExportProfile {
+export interface MuxedExportProfile {
   readonly id: MuxedEncoderConfiguration['profile'];
   readonly operationName: string;
   readonly format: WebMOutputFormat | Mp4OutputFormat;
@@ -121,9 +121,73 @@ type ExportStage =
   | 'finalize';
 
 const MAIN_THREAD_YIELD_INTERVAL_MS = 16;
+const audioEncoderRuntimeSupport = new Map<string, Promise<boolean>>();
+
+export interface MuxedExportRange {
+  readonly videoStartFrame: number;
+  readonly videoEndFrameExclusive: number;
+  readonly audioStartFrame: number;
+  readonly audioEndFrameExclusive: number;
+  /**
+   * `range` restarts encoder timestamps at zero. It is intended for independently
+   * encoded container fragments whose absolute decode times are patched at commit.
+   */
+  readonly timestampBase?: 'timeline' | 'range';
+}
 
 function nextMainThreadTask(): Promise<void> {
   return new Promise(resolve => globalThis.setTimeout(resolve, 0));
+}
+
+function verifyAudioEncoderRuntime(config: AudioEncoderConfig): Promise<boolean> {
+  const key = JSON.stringify(config);
+  const existing = audioEncoderRuntimeSupport.get(key);
+  if (existing !== undefined) return existing;
+  const verification = new Promise<boolean>(resolve => {
+    let settled = false;
+    let encoder: AudioEncoder | undefined;
+    const finish = (supported: boolean): void => {
+      if (settled) return;
+      settled = true;
+      try {
+        encoder?.close();
+      } catch {
+        // A codec error can close the encoder before the error callback.
+      }
+      resolve(supported);
+    };
+    try {
+      encoder = new AudioEncoder({
+        output: () => undefined,
+        error: () => finish(false),
+      });
+      encoder.configure(config);
+      for (let block = 0; block < 4; block += 1) {
+        const frameCount = 1_024;
+        const sample = new AudioData({
+          format: 'f32',
+          sampleRate: config.sampleRate,
+          numberOfFrames: frameCount,
+          numberOfChannels: config.numberOfChannels,
+          timestamp: Math.round((block * frameCount * 1_000_000) / config.sampleRate),
+          data: new Float32Array(frameCount * config.numberOfChannels),
+        });
+        try {
+          encoder.encode(sample);
+        } finally {
+          sample.close();
+        }
+      }
+      void encoder.flush().then(
+        () => finish(true),
+        () => finish(false),
+      );
+    } catch {
+      finish(false);
+    }
+  });
+  audioEncoderRuntimeSupport.set(key, verification);
+  return verification;
 }
 
 function exportFailure(stage: ExportStage, cause: unknown): AelionError {
@@ -169,16 +233,68 @@ function assertPositiveInteger(value: number, name: string): void {
   }
 }
 
-async function exportMuxed(
+export async function exportMuxed(
   options: WebMExportOptions,
   profile: MuxedExportProfile,
+  range?: MuxedExportRange,
 ): Promise<WebMExportResult> {
   assertPositiveInteger(options.durationUs, 'durationUs');
   assertPositiveInteger(options.width, 'width');
   assertPositiveInteger(options.height, 'height');
   assertPositiveInteger(options.sampleRate, 'sampleRate');
   assertPositiveInteger(options.channelCount, 'channelCount');
+  const fullVideoFrameCount = Math.ceil(
+    (options.durationUs * options.frameRate.numerator) /
+      (1_000_000 * options.frameRate.denominator),
+  );
+  const fullAudioFrameCount = Math.floor((options.durationUs * options.sampleRate) / 1_000_000);
+  const videoStartFrame = range?.videoStartFrame ?? 0;
+  const videoEndFrameExclusive = range?.videoEndFrameExclusive ?? fullVideoFrameCount;
+  const audioStartFrame = range?.audioStartFrame ?? 0;
+  const audioEndFrameExclusive = range?.audioEndFrameExclusive ?? fullAudioFrameCount;
+  const rangeTimestampBaseUs =
+    range?.timestampBase === 'range' ? frameStartUs(videoStartFrame, options.frameRate) : 0;
+  const rangeAudioBaseFrame = range?.timestampBase === 'range' ? audioStartFrame : 0;
+  for (const [value, name] of [
+    [videoStartFrame, 'videoStartFrame'],
+    [videoEndFrameExclusive, 'videoEndFrameExclusive'],
+    [audioStartFrame, 'audioStartFrame'],
+    [audioEndFrameExclusive, 'audioEndFrameExclusive'],
+  ] as const) {
+    if (!Number.isSafeInteger(value) || value < 0) {
+      throw new RangeError(`${name} must be a non-negative safe integer`);
+    }
+  }
+  if (
+    videoStartFrame >= videoEndFrameExclusive ||
+    videoEndFrameExclusive > fullVideoFrameCount ||
+    audioStartFrame >= audioEndFrameExclusive ||
+    audioEndFrameExclusive > fullAudioFrameCount
+  ) {
+    throw new RangeError('Muxed export range must be a non-empty subset of the timeline');
+  }
   throwIfAborted(options.signal, profile.operationName);
+  if (profile.audioCodec === 'aac') {
+    const runtimeConfig: AudioEncoderConfig = {
+      codec: options.audioCodecString ?? 'mp4a.40.2',
+      sampleRate: options.sampleRate,
+      numberOfChannels: options.channelCount,
+      bitrate: options.audioBitrate,
+      bitrateMode: 'variable',
+      ...{ aac: { format: 'aac' as const } },
+    };
+    const supported = await verifyAudioEncoderRuntime(runtimeConfig);
+    if (!supported) {
+      throw new AelionError([
+        {
+          code: 'EXPORT_AUDIO_CONFIG_UNSUPPORTED',
+          severity: 'error',
+          message: 'AAC encoder configuration failed the runtime encode canary',
+          recoverable: false,
+        },
+      ]);
+    }
+  }
 
   // StreamTarget closes its writer during Output.finalize(). Some Firefox
   // builds have resolved that close before the consumer sink's close callback
@@ -189,6 +305,18 @@ async function exportMuxed(
   let videoFrames = 0;
   let audioFrames = 0;
   let stage: ExportStage = 'initialize';
+  let pendingRenderedFrame:
+    | Promise<
+        | {
+            readonly ok: true;
+            readonly frame: VideoFrame;
+          }
+        | {
+            readonly ok: false;
+            readonly error: unknown;
+          }
+      >
+    | undefined;
   let lastMainThreadYieldMs = performance.now();
   const yieldMainThreadWhenDue = async (): Promise<void> => {
     throwIfAborted(options.signal, 'WebM export');
@@ -230,11 +358,25 @@ async function exportMuxed(
 
     await output.start();
     await yieldMainThreadWhenDue();
-    const frameCount = Math.ceil(
-      (options.durationUs * options.frameRate.numerator) /
-        (1_000_000 * options.frameRate.denominator),
-    );
-    for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+    const rangedVideoFrames = videoEndFrameExclusive - videoStartFrame;
+    const beginRender = (frameIndex: number) => {
+      const timestampUs = frameStartUs(frameIndex, options.frameRate);
+      const durationUs = Math.min(
+        frameDurationUs(frameIndex, options.frameRate),
+        options.durationUs - timestampUs,
+      );
+      return Promise.resolve(
+        options.renderFrame(
+          { frameIndex, timestampUs, durationUs, width: options.width, height: options.height },
+          options.signal,
+        ),
+      ).then(
+        frame => ({ ok: true as const, frame }),
+        (error: unknown) => ({ ok: false as const, error }),
+      );
+    };
+    pendingRenderedFrame = beginRender(videoStartFrame);
+    for (let frameIndex = videoStartFrame; frameIndex < videoEndFrameExclusive; frameIndex += 1) {
       throwIfAborted(options.signal, 'WebM video export');
       const timestampUs = frameStartUs(frameIndex, options.frameRate);
       const durationUs = Math.min(
@@ -243,14 +385,17 @@ async function exportMuxed(
       );
       if (durationUs <= 0) break;
       stage = 'render-video';
-      const frame = await options.renderFrame(
-        { frameIndex, timestampUs, durationUs, width: options.width, height: options.height },
-        options.signal,
-      );
+      const renderPromise = pendingRenderedFrame;
+      if (renderPromise === undefined) throw new Error('Video render pipeline was not primed');
+      const rendered = await renderPromise;
+      pendingRenderedFrame =
+        frameIndex + 1 < videoEndFrameExclusive ? beginRender(frameIndex + 1) : undefined;
+      if (!rendered.ok) throw rendered.error;
+      const frame = rendered.frame;
       try {
         stage = 'encode-video';
         const sample = new VideoSample(frame, {
-          timestamp: timestampUs / 1_000_000,
+          timestamp: (timestampUs - rangeTimestampBaseUs) / 1_000_000,
           duration: durationUs / 1_000_000,
         });
         try {
@@ -262,12 +407,12 @@ async function exportMuxed(
         frame.close();
       }
       videoFrames += 1;
-      options.onProgress?.((timestampUs + durationUs) / options.durationUs / 2);
+      options.onProgress?.(videoFrames / rangedVideoFrames / 2);
       await yieldMainThreadWhenDue();
     }
     videoSource.close();
 
-    const totalAudioFrames = Math.floor((options.durationUs * options.sampleRate) / 1_000_000);
+    const totalAudioFrames = audioEndFrameExclusive - audioStartFrame;
     const blockFrames = 1_024;
     while (audioFrames < totalAudioFrames) {
       throwIfAborted(options.signal, 'WebM audio export');
@@ -275,7 +420,7 @@ async function exportMuxed(
       stage = 'render-audio';
       const pcm = await options.renderAudio(
         {
-          startFrame: audioFrames,
+          startFrame: audioStartFrame + audioFrames,
           frameCount,
           sampleRate: options.sampleRate,
           channelCount: options.channelCount,
@@ -290,7 +435,7 @@ async function exportMuxed(
         format: 'f32',
         numberOfChannels: options.channelCount,
         sampleRate: options.sampleRate,
-        timestamp: audioFrames / options.sampleRate,
+        timestamp: (audioStartFrame + audioFrames - rangeAudioBaseFrame) / options.sampleRate,
       });
       try {
         stage = 'encode-audio';
@@ -333,6 +478,11 @@ async function exportMuxed(
       },
     };
   } catch (error) {
+    if (pendingRenderedFrame !== undefined) {
+      const pending = await pendingRenderedFrame;
+      if (pending.ok) pending.frame.close();
+      pendingRenderedFrame = undefined;
+    }
     if (output !== undefined && output.state !== 'finalized' && output.state !== 'canceled') {
       try {
         await output.cancel();

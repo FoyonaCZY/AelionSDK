@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { pitchPreservingTimeStretch } from '../src/index.js';
+import { pitchPreservingTimeStretch, StreamingPitchPreservingTimeStretch } from '../src/index.js';
 
 function sine(frames: number, frequency: number, sampleRate: number): Float32Array {
   return Float32Array.from(
@@ -72,5 +72,30 @@ describe('pitch-preserving time stretch', () => {
     expect(first).toEqual(second);
     expect(first).toHaveLength(4_096);
     expect(first.every(Number.isFinite)).toBe(true);
+  });
+
+  it('keeps grain phase continuous across arbitrary source chunks', () => {
+    const input = sine(12_000, 440, 48_000);
+    const reference = pitchPreservingTimeStretch({
+      input,
+      inputFrames: input.length,
+      outputFrames: 8_000,
+      channelCount: 1,
+    });
+    const streaming = new StreamingPitchPreservingTimeStretch({
+      inputFrames: input.length,
+      outputFrames: 8_000,
+      channelCount: 1,
+    });
+    const boundaries = [0, 13, 1_337, 4_096, 8_101, input.length];
+    const output: number[] = [];
+    for (let index = 0; index < boundaries.length - 1; index += 1) {
+      const start = boundaries[index] ?? 0;
+      const end = boundaries[index + 1] ?? 0;
+      output.push(...streaming.push(input.subarray(start, end), index === boundaries.length - 2));
+    }
+    expect(Float32Array.from(output)).toEqual(reference);
+    expect(dominantFrequency(reference, 48_000)).toBeGreaterThanOrEqual(420);
+    expect(dominantFrequency(reference, 48_000)).toBeLessThanOrEqual(460);
   });
 });

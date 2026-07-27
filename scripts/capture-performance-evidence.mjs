@@ -146,6 +146,12 @@ try {
     userAgent: browserIdentity.userAgent,
     externalMp4Readback,
   };
+  if (process.env.AELION_PERFORMANCE_RAW_PATH) {
+    await writeFile(
+      resolve(root, process.env.AELION_PERFORMANCE_RAW_PATH),
+      JSON.stringify(report, null, 2) + '\n',
+    );
+  }
   await publishValidatedJson({
     outputPath,
     document: report,

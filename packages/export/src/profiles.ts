@@ -27,7 +27,7 @@ export const EXPORT_PROFILES: Readonly<Record<ExportProfileId, ExportProfile>> =
     extension: '.webm',
     videoCodec: 'vp09.00.10.08',
     audioCodec: 'opus',
-    resumability: 'restart-local',
+    resumability: 'checkpointed-units',
   },
   'mp4-h264-aac': {
     id: 'mp4-h264-aac',
@@ -36,7 +36,7 @@ export const EXPORT_PROFILES: Readonly<Record<ExportProfileId, ExportProfile>> =
     extension: '.mp4',
     videoCodec: 'avc1.640028',
     audioCodec: 'mp4a.40.2',
-    resumability: 'restart-local',
+    resumability: 'checkpointed-units',
   },
   'mp4-av1-aac': {
     id: 'mp4-av1-aac',
@@ -45,7 +45,7 @@ export const EXPORT_PROFILES: Readonly<Record<ExportProfileId, ExportProfile>> =
     extension: '.mp4',
     videoCodec: 'av01.0.08M.08',
     audioCodec: 'mp4a.40.2',
-    resumability: 'restart-local',
+    resumability: 'checkpointed-units',
   },
   'mp4-hevc-aac': {
     id: 'mp4-hevc-aac',
@@ -54,7 +54,7 @@ export const EXPORT_PROFILES: Readonly<Record<ExportProfileId, ExportProfile>> =
     extension: '.mp4',
     videoCodec: 'hvc1.1.6.L120.B0',
     audioCodec: 'mp4a.40.2',
-    resumability: 'restart-local',
+    resumability: 'checkpointed-units',
   },
   'still-png': {
     id: 'still-png',
@@ -234,34 +234,51 @@ export interface AvcNegotiationResult {
   }[];
 }
 
-export async function negotiateAvcCodecString(options: {
+const avcNegotiationCache = new Map<string, Promise<AvcNegotiationResult>>();
+
+export function negotiateAvcCodecString(options: {
   readonly width: number;
   readonly height: number;
   readonly framerate: number;
   readonly bitrate: number;
 }): Promise<AvcNegotiationResult> {
-  const attempts: {
-    codec: string;
-    supported: boolean;
-    error?: string;
-  }[] = [];
-  if (typeof VideoEncoder !== 'function') return { attempts };
-  for (const codec of avcCodecCandidates(options.width, options.height, options.framerate)) {
-    try {
-      const support = await VideoEncoder.isConfigSupported(
-        avcEncoderConfig(codec, options.width, options.height, options.framerate, options.bitrate),
-      );
-      attempts.push({ codec, supported: support.supported === true });
-      if (support.supported) return { selected: codec, attempts };
-    } catch (error) {
-      attempts.push({
-        codec,
-        supported: false,
-        error: error instanceof Error ? error.message : 'VideoEncoder probe failed',
-      });
-    }
+  const key = JSON.stringify(options);
+  let negotiation = avcNegotiationCache.get(key);
+  if (negotiation === undefined) {
+    negotiation = (async () => {
+      const attempts: {
+        codec: string;
+        supported: boolean;
+        error?: string;
+      }[] = [];
+      if (typeof VideoEncoder !== 'function') return { attempts };
+      for (const codec of avcCodecCandidates(options.width, options.height, options.framerate)) {
+        try {
+          const support = await VideoEncoder.isConfigSupported(
+            avcEncoderConfig(
+              codec,
+              options.width,
+              options.height,
+              options.framerate,
+              options.bitrate,
+            ),
+          );
+          attempts.push({ codec, supported: support.supported === true });
+          if (support.supported) return { selected: codec, attempts };
+        } catch (error) {
+          attempts.push({
+            codec,
+            supported: false,
+            error: error instanceof Error ? error.message : 'VideoEncoder probe failed',
+          });
+        }
+      }
+      return { attempts };
+    })();
+    avcNegotiationCache.set(key, negotiation);
+    void negotiation.catch(() => avcNegotiationCache.delete(key));
   }
-  return { attempts };
+  return negotiation;
 }
 
 async function encoderSupport(
