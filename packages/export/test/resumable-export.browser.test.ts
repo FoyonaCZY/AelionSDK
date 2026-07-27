@@ -44,6 +44,20 @@ function renderAudio(request: {
   );
 }
 
+function isRuntimeAacUnsupported(error: unknown): boolean {
+  if (error === null || typeof error !== 'object' || !('diagnostics' in error)) return false;
+  const diagnostics = Reflect.get(error, 'diagnostics');
+  return (
+    Array.isArray(diagnostics) &&
+    diagnostics.some(
+      diagnostic =>
+        diagnostic !== null &&
+        typeof diagnostic === 'object' &&
+        Reflect.get(diagnostic, 'code') === 'EXPORT_AUDIO_CONFIG_UNSUPPORTED',
+    )
+  );
+}
+
 async function semanticSignature(bytes: Uint8Array): Promise<unknown> {
   const index = await createSampleIndex(bytes);
   const video = index.tracks.find(track => track.kind === 'video');
@@ -115,26 +129,32 @@ describe('resumable muxed export', () => {
     await recreated.delete('job');
   });
 
-  it('encodes one complete fragmented MP4 unit', async () => {
+  it('encodes one complete fragmented MP4 unit or fails closed without runtime AAC', async () => {
     const sink = new SeekableMemorySink();
-    const result = await exportResumableMuxed({
-      key: 'single-mp4-unit',
-      contentId: 'single-mp4-unit',
-      profile: 'mp4-h264-aac',
-      store: new MemoryResumableMuxedExportStore(),
-      durationUs: 2_000_000,
-      segmentDurationUs: 2_000_000,
-      width: 96,
-      height: 54,
-      frameRate: { numerator: 30, denominator: 1 },
-      sampleRate: 48_000,
-      channelCount: 2,
-      videoBitrate: 300_000,
-      audioBitrate: 128_000,
-      renderFrame,
-      renderAudio,
-      sink: sink.writable,
-    });
+    let result: Awaited<ReturnType<typeof exportResumableMuxed>>;
+    try {
+      result = await exportResumableMuxed({
+        key: 'single-mp4-unit',
+        contentId: 'single-mp4-unit',
+        profile: 'mp4-h264-aac',
+        store: new MemoryResumableMuxedExportStore(),
+        durationUs: 2_000_000,
+        segmentDurationUs: 2_000_000,
+        width: 96,
+        height: 54,
+        frameRate: { numerator: 30, denominator: 1 },
+        sampleRate: 48_000,
+        channelCount: 2,
+        videoBitrate: 300_000,
+        audioBitrate: 128_000,
+        renderFrame,
+        renderAudio,
+        sink: sink.writable,
+      });
+    } catch (error) {
+      expect(isRuntimeAacUnsupported(error)).toBe(true);
+      return;
+    }
     expect(result.totalUnits).toBe(1);
     expect((await createSampleIndex(sink.finalize())).container).toBe('mp4');
   });
@@ -161,12 +181,19 @@ describe('resumable muxed export', () => {
         renderAudio,
       } as const;
       const referenceSink = new SeekableMemorySink();
-      const reference = await exportResumableMuxed({
-        ...base,
-        key: `reference-${profile}`,
-        store: new MemoryResumableMuxedExportStore(),
-        sink: referenceSink.writable,
-      });
+      let reference: Awaited<ReturnType<typeof exportResumableMuxed>>;
+      try {
+        reference = await exportResumableMuxed({
+          ...base,
+          key: `reference-${profile}`,
+          store: new MemoryResumableMuxedExportStore(),
+          sink: referenceSink.writable,
+        });
+      } catch (error) {
+        expect(profile).toBe('mp4-h264-aac');
+        expect(isRuntimeAacUnsupported(error)).toBe(true);
+        return;
+      }
       const referenceBytes = referenceSink.finalize();
       const expected = await semanticSignature(referenceBytes);
       expect((await createSampleIndex(referenceBytes)).container).toBe(container);
