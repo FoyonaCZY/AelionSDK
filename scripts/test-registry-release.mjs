@@ -47,7 +47,7 @@ try {
         type: 'module',
         dependencies: {
           ...Object.fromEntries(PHASE_1_EXPECTED_PUBLIC_PACKAGES.map(name => [name, version])),
-          vite: '7.0.6',
+          vite: '7.3.6',
         },
       },
       null,

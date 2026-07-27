@@ -30,9 +30,16 @@ export default tseslint.config(
       },
     },
     rules: {
+      // Preserve the pre-ESLint 10 policy baseline. Enable these in a dedicated
+      // lint-hardening change after the existing findings have been remediated.
+      'no-useless-assignment': 'off',
+      'preserve-caught-error': 'off',
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
       '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
       '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-type-conversion': 'off',
+      '@typescript-eslint/prefer-optional-chain': 'off',
       '@typescript-eslint/restrict-template-expressions': [
         'error',
         { allowNumber: true, allowBoolean: true },

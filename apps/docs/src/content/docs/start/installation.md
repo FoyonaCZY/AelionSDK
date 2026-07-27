@@ -77,7 +77,7 @@ apps/my-editor/
   },
   "devDependencies": {
     "@aelionsdk/vite-plugin": "workspace:*",
-    "vite": "7.0.6"
+    "vite": "7.3.6"
   },
   "scripts": {
     "dev": "vite",
