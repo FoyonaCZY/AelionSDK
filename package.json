@@ -43,6 +43,8 @@
     "report:alpha": "node scripts/capture-alpha-evidence.mjs",
     "report:seek": "node scripts/capture-seek-evidence.mjs",
     "report:performance": "node scripts/capture-performance-evidence.mjs",
+    "report:recovery": "node scripts/capture-recovery-evidence.mjs",
+    "report:phase3:check": "node scripts/check-phase-3-evidence.mjs",
     "report:phase1:gates": "node scripts/capture-phase-1-final-gates.mjs --results reports/baseline/phase-1-gate-results.json",
     "report:phase1:blocker-template": "node scripts/create-phase-1-blocker-review.mjs --results reports/baseline/phase-1-gate-results.json",
     "report:browser:chromium": "vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json",

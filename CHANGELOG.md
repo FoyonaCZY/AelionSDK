@@ -6,6 +6,13 @@
 
 ### Changed
 
+- Muxed exports can opt into Worker orchestration through the public Session
+  `execution` option; AVC negotiation is cached, sequential source decoding
+  reuses bounded decoder sessions, and semantically opaque single-source
+  frames use a zero-copy render fast path.
+- The built-in compositor background is now a GPU graph node instead of a
+  per-frame CPU canvas upload, removing measured >50 ms main-thread work from
+  the real-media export path.
 - MP4/H.264 preflight now negotiates the smallest viable AVC level/profile for
   the actual dimensions and frame rate; the selected string is carried
   unchanged through Session, Worker/inline export, result metadata and
@@ -23,6 +30,16 @@
 
 ### Added
 
+- Added atomically persisted, SHA-256-verified WebM cluster and fragmented MP4
+  checkpoints through `exportResumableMuxed()`, with IndexedDB resume from the
+  first missing unit and FFmpeg semantic evidence at 25%, 50% and 90%
+  interruption points.
+- Added deterministic streaming PCM resampling for 44.1/48/96 kHz and 1–8
+  channels, plus a stateful pitch-preserving time stretcher whose overlap state
+  survives arbitrary source block boundaries.
+- Added strict Phase 3 evidence gates requiring at least 1.5× real-time 4K30
+  decode→render→audio→encode→mux→sink, zero >50 ms main-thread Long Tasks,
+  exact recovery hashes and at most 1 ms logical A/V end drift.
 - Added capability-negotiated `mp4-av1-aac` and `mp4-hevc-aac` profiles across
   probe, preflight, inline/Worker export and the public Session facade.
 - Added deterministic WSOLA-style pitch-preserving linear time-stretch via

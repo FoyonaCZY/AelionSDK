@@ -360,10 +360,14 @@ async function composeWebGpu(
     const bindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries: [
-        {
-          binding: 0,
-          resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }),
-        },
+        ...(inputTextures.length === 0
+          ? []
+          : [
+              {
+                binding: 0,
+                resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }),
+              },
+            ]),
         ...inputTextures.map((texture, index) => ({
           binding: index + 1,
           resource: texture,
@@ -525,10 +529,17 @@ async function composeWebGpuFrameGraph(
       const bindGroup = device.createBindGroup({
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          {
-            binding: 0,
-            resource: device.createSampler({ magFilter: 'linear', minFilter: 'linear' }),
-          },
+          ...(inputs.length === 0
+            ? []
+            : [
+                {
+                  binding: 0,
+                  resource: device.createSampler({
+                    magFilter: 'linear',
+                    minFilter: 'linear',
+                  }),
+                },
+              ]),
           ...inputs.map((texture, index) => ({
             binding: index + 1,
             resource: texture.resource,

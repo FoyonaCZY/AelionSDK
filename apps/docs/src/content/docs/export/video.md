@@ -13,6 +13,7 @@ import { SeekableMemorySink } from '@aelion/export';
 const sink = new SeekableMemorySink();
 const options = {
   profile: 'mp4-h264-aac' as const,
+  execution: 'worker' as const,
   sink: sink.writable,
   videoBitrate: 8_000_000,
   audioBitrate: 192_000,
@@ -45,6 +46,10 @@ H.264 profile 根据当前画布与帧率，从满足 macroblock 约束的最小
 `encoderConfiguration.videoCodecString` 中。
 
 AAC 不能只看 `AudioEncoder.isConfigSupported()`。SDK 还会做运行时 canary，避免浏览器声称支持但实际不能产出可用 AAC。
+
+配置了 Export Worker 资源时，`execution: 'worker'` 会把 WebCodecs 编码、mux 和
+Sink 背压调度移出页面主线程；帧生产仍由宿主回调完成。未显式选择时沿用当前默认
+执行策略。
 
 ## AV1/AAC 与 HEVC/AAC MP4
 
@@ -148,6 +153,52 @@ console.log(result.mimeType, file.size);
 ```
 
 `waitUntilFinalized()` 等待 transferred stream 真正关闭。不要在 Job 完成前读取，也不要复用已经关闭或失败的 Sink。
+
+## 中断后只继续未提交分段
+
+需要跨刷新或崩溃恢复时，直接使用 `@aelion/export` 的持久分段 API：
+
+```ts
+import {
+  exportResumableMuxed,
+  IndexedDbResumableMuxedExportStore,
+  OpfsSeekableSink,
+} from '@aelion/export';
+
+const store = new IndexedDbResumableMuxedExportStore({
+  databaseName: 'my-editor-export-checkpoints',
+  namespace: currentUserId,
+});
+const sink = new OpfsSeekableSink('delivery.mp4');
+
+const result = await exportResumableMuxed({
+  key: exportJobId,
+  contentId: projectContentHash,
+  profile: 'mp4-h264-aac',
+  store,
+  segmentDurationUs: 2_000_000,
+  durationUs,
+  width,
+  height,
+  frameRate,
+  sampleRate,
+  channelCount,
+  videoBitrate: 12_000_000,
+  audioBitrate: 192_000,
+  renderFrame,
+  renderAudio,
+  sink: sink.writable,
+});
+```
+
+每个完整 WebM cluster 或 fMP4 fragment 会和前缀 manifest 在同一个 IndexedDB
+事务里提交。重启后用相同的 `key`、`contentId` 和编码配置再次调用；函数会校验
+每个单元的 SHA-256，复用已提交前缀，只从第一个缺失单元继续。恢复调用必须提供
+一个新的空 Sink；最终成片会从已验证单元顺序组装。
+
+`contentId` 必须绑定工程内容、素材版本和影响像素/PCM 的外部输入。内容或编码配置
+改变时，旧 checkpoint 会失效并重新开始。只有确认不再需要重试时才设置
+`deleteCheckpointOnSuccess: true`。
 
 ## 下载 Memory Sink 的结果
 

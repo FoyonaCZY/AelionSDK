@@ -90,11 +90,17 @@ TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段�
 - 多轨 PCM 混音；
 - Item/Track gain、equal-power pan、fade、mute/solo；
 - 最多 8 声道 channel matrix；
+- 44.1/48/96 kHz、1–8 声道的确定性流式重采样，任意 PCM 分块产生相同输出；
+- 跨 PCM 块保持 overlap 状态的线性保音高变速；
 - 与画面相同的 TimeMap 和 Automation 时间；
 - Sidechain ducking 的 lookahead、attack/release；
 - 可取消的 waveform min/max/RMS；
 - EBU-style gated LUFS、4× true-peak estimate 和 lookahead limiter；
 - 音频设备切换、interruption 和恢复状态机。
+
+`StreamingPcmResampler` 用整数相位避免长时间浮点累积；最终 flush 后，输入与输出
+时长误差小于 1 ms。`StreamingPitchPreservingTimeStretch` 保留跨块输入与
+overlap 状态，适合自定义音频宿主按小块连续拉取。
 
 基础播放通过 Session Player 使用；产品层的分析、波形、静音移除和母带通过
 `session.audio` 使用。只有自定义音频宿主或处理链时才需要直接依赖

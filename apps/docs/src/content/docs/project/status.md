@@ -41,6 +41,7 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 | Project → edit/play/preview/export/readback             | `alpha-60s.json`、`alpha-60s.webm`                    |
 | exact seek 与媒体资源归零                               | `media-seek-chromium.json`                            |
 | 1080p30、4K probe、Long Task、Export Worker、长时间资源 | `performance-1080p30-chromium.json`                   |
+| WebM/MP4 持久分段、中断恢复与 FFmpeg 语义哈希           | `recovery-chromium.json`                              |
 | 确定性像素                                              | `corepack pnpm test:golden`                           |
 | Project/媒体不可信输入与资源预算                        | `corepack pnpm test:security`                         |
 | 十分钟音频和大工程增量编译/长时间线求值                 | `corepack pnpm test:soak`                             |
@@ -56,6 +57,8 @@ description: 查看源码版本、已经验证的范围、已知限制和仍需�
 - `ByteMediaProvider` 适合短媒体；长视频使用内置 `ProductionMediaProvider`，并根据部署注入 cache/proxy 和共享资源预算。
 - H.264/AV1/HEVC MP4 导出由精确 codec capability、尺寸协商和 AAC runtime
   canary 决定。
+- WebM/MP4 可以通过 `exportResumableMuxed()` 和 IndexedDB 原子 checkpoint
+  从第一个未提交单元继续；普通 Session 导出不会自动选择业务 Job ID。
 - trusted Shader/WASM 默认拒绝，签名不能替代宿主执行授权。
 - Alpha 公共 API 仍可能按迁移规则变化。
 

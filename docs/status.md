@@ -36,9 +36,11 @@ freshness window.
   plus strict WebAV and Diffusion Studio migration adapters.
 - Silence removal transactions, waveform analysis, loudness/true-peak
   measurement, limiting, ducking, deterministic pitch-preserving time-stretch,
-  and capability-negotiated AVC/AV1/HEVC export profiles.
+  deterministic 44.1/48/96 kHz streaming resampling for 1–8 channels, and
+  capability-negotiated AVC/AV1/HEVC export profiles.
 - Revision-bound persistence/recovery, isolated Worker extension RPC, reference
-  editor autosave/restore, durable local export checkpoints, explicit
+  editor autosave/restore, durable WebM/fMP4 unit checkpoints with IndexedDB
+  resume and FFmpeg semantic readback, explicit
   non-Vite runtime assets, HDR/10-bit fail-closed execution contracts,
   competitor benchmarks, migration guides, and public API snapshots.
 

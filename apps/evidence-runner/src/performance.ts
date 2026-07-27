@@ -842,6 +842,7 @@ async function realMediaPipelineBenchmark(): Promise<Record<string, unknown>> {
       const measured = await measureLongTasksDuring(() =>
         session.export.startProfile({
           profile: 'mp4-h264-aac',
+          execution: 'worker',
           sink: sink.writable,
           videoBitrate: definition.bitrate,
           audioBitrate: 128_000,

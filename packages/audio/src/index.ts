@@ -7,3 +7,4 @@ export * from './transferable-pcm-queue.js';
 export * from './transferable-worklet-clock.js';
 export * from './device-state.js';
 export * from './time-stretch.js';
+export * from './resampler.js';

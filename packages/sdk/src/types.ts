@@ -285,6 +285,8 @@ export interface AelionExportOptions {
   readonly signal?: AbortSignal;
   readonly cleanupSink?: (reason: unknown) => void | Promise<void>;
   readonly onProgress?: (progress: number) => void;
+  /** Moves WebCodecs encode/mux work off the page main thread when supported. */
+  readonly execution?: 'worker' | 'inline';
   /** Overrides revisioned Project mastering settings for this export. */
   readonly audioProcessing?: AelionAudioMasteringOptions;
 }
@@ -323,6 +325,8 @@ interface AelionProfileExportBaseOptions {
   readonly signal?: AbortSignal;
   readonly cleanupSink?: (reason: unknown) => void | Promise<void>;
   readonly onProgress?: (progress: number) => void;
+  /** Moves muxed WebCodecs encode/mux work off the page main thread when supported. */
+  readonly execution?: 'worker' | 'inline';
   readonly audioProcessing?: AelionAudioMasteringOptions;
 }
 

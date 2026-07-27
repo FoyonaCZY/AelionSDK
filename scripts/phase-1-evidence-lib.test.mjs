@@ -30,6 +30,7 @@ import {
   validateGateRunDocument,
   validatePerformanceEvidence,
   validatePhase1PostflightRecord,
+  validateRecoveryEvidence,
   validateSeekEvidence,
   validateTarballConsumer,
 } from './phase-1-evidence-lib.mjs';
@@ -520,6 +521,111 @@ test('strict browser summaries require exact reviewed counts and zero skipped wo
   };
   assert.equal(strictVitestSummary(valid, expected).passed, true);
   assert.equal(strictVitestSummary({ ...valid, numTodoTests: 1 }, expected).passed, false);
+});
+
+test('Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes', () => {
+  const identity = browserIdentity();
+  const videoFrameMd5 = Array.from({ length: 60 }, (_, index) =>
+    index.toString(16).padStart(32, '0'),
+  );
+  const readback = {
+    videoFrames: 60,
+    videoFrameMd5,
+    videoEndUs: 2_000_000,
+    decodedPcmFrames: 96_000,
+    audioPcmSha256: hash,
+    audioEndUs: 2_000_000,
+    codecPacketEndUs: 2_000_000,
+    codecTailFrames: 0,
+    avEndDriftUs: 0,
+  };
+  const profileEvidence = profile => ({
+    profile,
+    reference: {
+      totalUnits: 10,
+      reusedUnits: 0,
+      encodedUnits: 10,
+      bytes: 1,
+      artifactSha256: hash,
+      readback,
+    },
+    recoveries: [0.25, 0.5, 0.9].map(fraction => {
+      const committed = Math.ceil(10 * fraction);
+      return {
+        interruptionFraction: fraction,
+        firstRunCommittedUnits: committed,
+        totalUnits: 10,
+        reusedUnits: committed,
+        encodedUnits: 10 - committed,
+        rerenderedCommittedFrames: 0,
+        firstRenderedFrame: committed * 6,
+        renderedFrameCount: 60 - committed * 6,
+        bytes: 1,
+        artifactSha256: hash,
+        readback,
+      };
+    }),
+  });
+  const evidence = {
+    evidenceVersion: '1.0.0',
+    command: 'corepack pnpm report:recovery',
+    fixture: 'Aelion deterministic segmented A/V',
+    durationUs: 2_000_000,
+    sampleRate: 48_000,
+    channelCount: 2,
+    videoFrames: 60,
+    audioFrames: 96_000,
+    externalDecoder: 'ffmpeg version test',
+    methodology: {
+      checkpointStore: 'IndexedDB recreated between interrupted and resumed runs',
+      interruptionFractions: [0.25, 0.5, 0.9],
+      semanticComparison:
+        'FFmpeg per-frame decoded MD5 sequence plus SHA-256 of decoded float32 PCM',
+      codecTailPolicy:
+        'PCM SHA-256 includes complete codec packet tails; logical A/V end uses the requested PCM frame count, while codecPacketEndUs and codecTailFrames disclose packet quantization separately',
+      avEndDriftLimitUs: 1_000,
+    },
+    ...identity,
+    profiles: [profileEvidence('webm-vp9-opus'), profileEvidence('mp4-h264-aac')],
+  };
+  assert.equal(validateRecoveryEvidence(evidence).passed, true);
+  assert.equal(
+    validateRecoveryEvidence({
+      ...evidence,
+      profiles: evidence.profiles.map((profile, index) =>
+        index === 0
+          ? {
+              ...profile,
+              recoveries: profile.recoveries.map((recovery, recoveryIndex) =>
+                recoveryIndex === 0 ? { ...recovery, rerenderedCommittedFrames: 1 } : recovery,
+              ),
+            }
+          : profile,
+      ),
+    }).passed,
+    false,
+  );
+  assert.equal(
+    validateRecoveryEvidence({
+      ...evidence,
+      profiles: evidence.profiles.map((profile, index) =>
+        index === 1
+          ? {
+              ...profile,
+              recoveries: profile.recoveries.map((recovery, recoveryIndex) =>
+                recoveryIndex === 2
+                  ? {
+                      ...recovery,
+                      readback: { ...recovery.readback, audioPcmSha256: 'b'.repeat(64) },
+                    }
+                  : recovery,
+              ),
+            }
+          : profile,
+      ),
+    }).passed,
+    false,
+  );
 });
 
 test('gate record must be serial and bound to one source identity', () => {

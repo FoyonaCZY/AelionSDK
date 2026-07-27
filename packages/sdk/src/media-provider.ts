@@ -2,9 +2,11 @@ import type { PcmSourceBlock } from '@aelion/audio';
 import { AelionError } from '@aelion/core';
 import {
   createSampleIndex,
+  createVideoFrameDecodeSessionFromReader,
   decodeAudioPcmRange,
-  decodeVideoFrameAt,
+  MemoryRangeReader,
   type SampleIndex,
+  type VideoFrameDecodeSession,
 } from '@aelion/media';
 
 import type { AelionMediaProvider } from './types.js';
@@ -43,6 +45,7 @@ interface CachedAsset {
   readonly byteLength: number;
   index?: SampleIndex;
   indexOperation?: SharedOperation<SampleIndex> | undefined;
+  videoSessions?: Map<number, VideoFrameDecodeSession> | undefined;
 }
 
 interface AssetLoad extends SharedOperation<CachedAsset> {
@@ -208,14 +211,21 @@ export class ByteMediaProvider implements AelionMediaProvider {
     try {
       const cached = await this.#asset(assetId, signal);
       const index = await this.#sampleIndex(cached, signal);
-      const decoded = await this.#runBounded(signal, () =>
-        decodeVideoFrameAt(cached.bytes, sourceTimeUs, {
-          sampleIndex: index,
-          streamIndex,
-          ...(signal === undefined ? {} : { signal }),
-          maxDecodeQueueSize: 8,
-        }),
-      );
+      cached.videoSessions ??= new Map();
+      let session = cached.videoSessions.get(streamIndex);
+      if (session === undefined) {
+        session = createVideoFrameDecodeSessionFromReader(
+          new MemoryRangeReader(`${assetId}:video:${streamIndex.toString()}`, cached.bytes),
+          index,
+          {
+            streamIndex,
+            maxCachedFrames: 8,
+            maxCachedBytes: 96 * 1_024 * 1_024,
+          },
+        );
+        cached.videoSessions.set(streamIndex, session);
+      }
+      const decoded = await this.#runBounded(signal, () => session.frameAt(sourceTimeUs, signal));
       try {
         if (signal?.aborted === true) throw abortReason(signal);
         return decoded.frame.clone();
@@ -252,6 +262,7 @@ export class ByteMediaProvider implements AelionMediaProvider {
 
   public clear(): void {
     this.#generation += 1;
+    for (const cached of this.#cache.values()) this.#disposeAsset(cached);
     this.#cache.clear();
     this.#cachedBytes = 0;
   }
@@ -364,6 +375,7 @@ export class ByteMediaProvider implements AelionMediaProvider {
         const oldest = this.#cache.entries().next().value;
         if (oldest === undefined) break;
         this.#cache.delete(oldest[0]);
+        this.#disposeAsset(oldest[1]);
         this.#cachedBytes -= oldest[1].byteLength;
       }
       this.#cache.set(assetId, cached);
@@ -404,6 +416,11 @@ export class ByteMediaProvider implements AelionMediaProvider {
       });
     }
     return awaitShared(operation, signal);
+  }
+
+  #disposeAsset(cached: CachedAsset): void {
+    for (const session of cached.videoSessions?.values() ?? []) session.dispose();
+    cached.videoSessions?.clear();
   }
 
   async #runBounded<T>(signal: AbortSignal | undefined, operation: () => Promise<T>): Promise<T> {

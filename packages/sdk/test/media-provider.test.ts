@@ -33,6 +33,46 @@ const media = vi.hoisted(() => ({
   decodeVideoCalls: 0,
   decodeVideoMaxActive: 0,
   decodeVideoReleases: [] as (() => void)[],
+  decodeVideo: (targetUs: number, options: import('@aelion/media').VideoDecodeOptions = {}) => {
+    media.decodeVideoCalls += 1;
+    media.decodeVideoActive += 1;
+    media.decodeVideoMaxActive = Math.max(media.decodeVideoMaxActive, media.decodeVideoActive);
+    return new Promise<import('@aelion/media').VideoDecodeResult>((resolve, reject) => {
+      let settled = false;
+      const finish = (error?: Error): void => {
+        if (settled) return;
+        settled = true;
+        options.signal?.removeEventListener('abort', onAbort);
+        media.decodeVideoActive -= 1;
+        if (error !== undefined) {
+          reject(error);
+          return;
+        }
+        const frame = {
+          clone: () => ({ close: vi.fn() }),
+          close: vi.fn(),
+        } as unknown as VideoFrame;
+        resolve({
+          frame,
+          timestampUs: targetUs,
+          durationUs: 1,
+          decodedPackets: 1,
+          plannedPackets: 1,
+          decodeStartUs: targetUs,
+          targetUs,
+          close: () => frame.close(),
+        });
+      };
+      const onAbort = (): void =>
+        finish(
+          options.signal?.reason instanceof Error
+            ? options.signal.reason
+            : new DOMException('video decode aborted', 'AbortError'),
+        );
+      options.signal?.addEventListener('abort', onAbort, { once: true });
+      media.decodeVideoReleases.push(() => finish());
+    });
+  },
   indexGates: [] as {
     readonly signal?: AbortSignal;
     readonly resolve: () => void;
@@ -126,46 +166,15 @@ vi.mock('@aelion/media', () => ({
     _bytes: Uint8Array,
     targetUs: number,
     options: import('@aelion/media').VideoDecodeOptions = {},
-  ) => {
-    media.decodeVideoCalls += 1;
-    media.decodeVideoActive += 1;
-    media.decodeVideoMaxActive = Math.max(media.decodeVideoMaxActive, media.decodeVideoActive);
-    return new Promise<import('@aelion/media').VideoDecodeResult>((resolve, reject) => {
-      let settled = false;
-      const finish = (error?: Error): void => {
-        if (settled) return;
-        settled = true;
-        options.signal?.removeEventListener('abort', onAbort);
-        media.decodeVideoActive -= 1;
-        if (error !== undefined) {
-          reject(error);
-          return;
-        }
-        const frame = {
-          clone: () => ({ close: vi.fn() }),
-          close: vi.fn(),
-        } as unknown as VideoFrame;
-        resolve({
-          frame,
-          timestampUs: targetUs,
-          durationUs: 1,
-          decodedPackets: 1,
-          plannedPackets: 1,
-          decodeStartUs: targetUs,
-          targetUs,
-          close: () => frame.close(),
-        });
-      };
-      const onAbort = (): void =>
-        finish(
-          options.signal?.reason instanceof Error
-            ? options.signal.reason
-            : new DOMException('video decode aborted', 'AbortError'),
-        );
-      options.signal?.addEventListener('abort', onAbort, { once: true });
-      media.decodeVideoReleases.push(() => finish());
-    });
+  ) => media.decodeVideo(targetUs, options),
+  MemoryRangeReader: class {
+    public readonly kind = 'memory-range-reader';
   },
+  createVideoFrameDecodeSessionFromReader: () => ({
+    frameAt: (targetUs: number, signal?: AbortSignal) =>
+      media.decodeVideo(targetUs, signal === undefined ? {} : { signal }),
+    dispose: vi.fn(),
+  }),
 }));
 
 import { ByteMediaProvider } from '../src/index.js';

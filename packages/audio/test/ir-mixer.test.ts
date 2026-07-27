@@ -74,6 +74,37 @@ describe('Render IR audio mixer and A/V oracle', () => {
     expect(output[1]).toBeCloseTo(output[0] ?? 0, 7);
   });
 
+  it.each([44_100, 96_000])(
+    'deterministically samples native %s Hz source PCM into a 48 kHz sequence',
+    async sourceRate => {
+      const render = (startFrame: number, frameCount: number) =>
+        renderIrAudio({
+          ir,
+          startFrame,
+          frameCount,
+          channelCount: 1,
+          source: {
+            pcmRange: (_assetId, _streamIndex, startUs, durationUs) => {
+              const firstFrame = Math.floor((startUs * sourceRate) / 1_000_000);
+              const frames = Math.max(2, Math.ceil((durationUs * sourceRate) / 1_000_000) + 1);
+              return Promise.resolve({
+                sampleRate: sourceRate,
+                channelCount: 1,
+                frameCount: frames,
+                interleaved: Float32Array.from({ length: frames }, (_, index) =>
+                  Math.sin(((firstFrame + index) * 2 * Math.PI * 440) / sourceRate),
+                ),
+              });
+            },
+          },
+        });
+      const whole = await render(0, 960);
+      const first = await render(0, 480);
+      const second = await render(480, 480);
+      expect(Float32Array.from([...first, ...second])).toEqual(whole);
+    },
+  );
+
   it('routes pitchPolicy preserve through deterministic time-stretch instead of varispeed', async () => {
     const render = (pitchPolicy: 'varispeed' | 'preserve') => {
       const stretched: RenderIr = {

@@ -9,17 +9,19 @@ Profile ID 是稳定的格式选择，不是浏览器自动协商结果。产品
 
 | ID              | Kind           | MIME         | 扩展名  | Video             | Audio       | 失败后继续方式     |
 | --------------- | -------------- | ------------ | ------- | ----------------- | ----------- | ------------------ |
-| `webm-vp9-opus` | muxed-av       | `video/webm` | `.webm` | `vp09.00.10.08`   | `opus`      | 本地从头重启       |
-| `mp4-h264-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | 自动协商 `avc1.*` | `mp4a.40.2` | 本地从头重启       |
-| `mp4-av1-aac`   | muxed-av       | `video/mp4`  | `.mp4`  | `av01.0.*M.08`    | `mp4a.40.2` | 本地从头重启       |
-| `mp4-hevc-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | `hvc1.1.6.L*.B0`  | `mp4a.40.2` | 本地从头重启       |
+| `webm-vp9-opus` | muxed-av       | `video/webm` | `.webm` | `vp09.00.10.08`   | `opus`      | 可持久分段恢复     |
+| `mp4-h264-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | 自动协商 `avc1.*` | `mp4a.40.2` | 可持久分段恢复     |
+| `mp4-av1-aac`   | muxed-av       | `video/mp4`  | `.mp4`  | `av01.0.*M.08`    | `mp4a.40.2` | 可持久分段恢复     |
+| `mp4-hevc-aac`  | muxed-av       | `video/mp4`  | `.mp4`  | `hvc1.1.6.L*.B0`  | `mp4a.40.2` | 可持久分段恢复     |
 | `still-png`     | still          | `image/png`  | `.png`  | —                 | —           | 可作为独立单元重做 |
 | `still-jpeg`    | still          | `image/jpeg` | `.jpg`  | —                 | —           | 可作为独立单元重做 |
 | `still-webp`    | still          | `image/webp` | `.webp` | —                 | —           | 可作为独立单元重做 |
 | `animated-gif`  | animated-image | `image/gif`  | `.gif`  | —                 | —           | 可作为独立单元重做 |
 | `audio-wav`     | audio-only     | `audio/wav`  | `.wav`  | —                 | PCM         | 可作为独立单元重做 |
 
-`EXPORT_PROFILES` 导出同一份机器可读元数据。`resumability` 说明协议类型，不代表当前 Session 能从任意 MP4/WebM 中断点自动继续。
+`EXPORT_PROFILES` 导出同一份机器可读元数据。muxed profile 的
+`checkpointed-units` 由 `@aelion/export` 的 `exportResumableMuxed()` 实现；
+Session 的普通 `startProfile()` 仍是一次性任务，不会自动接管业务 Job ID。
 
 ## 所有本地 Profile 的共同选项
 

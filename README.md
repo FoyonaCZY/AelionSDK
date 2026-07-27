@@ -139,17 +139,17 @@ async function openVideo(file: File, canvas: HTMLCanvasElement) {
 
 ## 已有能力
 
-| 模块       | 目前可以做什么                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------- |
-| 时间线     | 多轨编辑、插入、移动、裁剪、切分、替换、ripple、roll、slip、slide、音视频联动、Marker、关键帧和变速     |
-| 预览与播放 | Canvas 预览、play/pause/seek/scrub、AudioWorklet 音频时钟、自适应画质、WebGL2/WebGPU Worker 合成        |
-| 画面       | 多轨合成、12 种混合模式、mask/matte、文字与字幕、Generator、Adjustment、嵌套 Sequence 和 Material       |
-| 音频       | 多轨混音、gain/pan/fade、mute/solo、声道矩阵、保音高变速、ducking、waveform、响度、true peak 和 limiter |
-| 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算               |
-| 导出       | H.264/AV1/HEVC + AAC MP4、VP9/Opus WebM、图片、GIF、WAV/RF64，以及 Memory、OPFS 和自定义 Writable Sink  |
-| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                             |
-| 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                          |
-| 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测              |
+| 模块       | 目前可以做什么                                                                                      |
+| ---------- | --------------------------------------------------------------------------------------------------- |
+| 时间线     | 多轨编辑、插入、移动、裁剪、切分、替换、ripple、roll、slip、slide、音视频联动、Marker、关键帧和变速 |
+| 预览与播放 | Canvas 预览、play/pause/seek/scrub、AudioWorklet 音频时钟、自适应画质、WebGL2/WebGPU Worker 合成    |
+| 画面       | 多轨合成、12 种混合模式、mask/matte、文字与字幕、Generator、Adjustment、嵌套 Sequence 和 Material   |
+| 音频       | 多轨混音、1–8 声道确定性流式重采样、连续保音高变速、ducking、waveform、响度、true peak 和 limiter   |
+| 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算           |
+| 导出       | H.264/AV1/HEVC + AAC MP4、VP9/Opus WebM、持久分段恢复、图片、GIF、WAV/RF64，以及多种 Writable Sink  |
+| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                         |
+| 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                      |
+| 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测          |
 
 编辑操作通过 Transaction 提交。每次成功提交都会产生新的 revision，并可以 Undo/Redo；拖拽或滑块等连续交互可以实时更新，同时只占用一条撤销记录。
 
@@ -171,20 +171,20 @@ nearest-rank 计算。
 
 | 项目                                | 结果                                                     |
 | ----------------------------------- | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2               | 帧调用 p50 0.26 ms，p95 0.34 ms                          |
-| 1080p、单 pass、WebGL2              | 帧调用 p50 0.37 ms，p95 1.09 ms                          |
-| 1080p、单 pass、WebGPU              | 帧调用 p50 0.78 ms，p95 1.16 ms（WebGL2 的 1.05×）       |
-| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.46 ms，p95 1.16 ms                          |
-| 4K、单 pass、WebGL2                 | 帧调用 p50 1.06 ms，p95 1.16 ms                          |
-| 1,000 clips / 32 tracks 冷编译      | p50 23.59 ms，p95 35.06 ms                               |
-| 1,000 clips / 32 tracks warm 增量   | p50 2.40 ms，p95 3.28 ms（冷编译的 9.4%）                |
-| 单音轨 1,024-frame 音频块           | p95 0.64 ms，整体约 56.8× 实时                           |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 350.22 ms，平均约 8.48× 实时                |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 394.61 ms，平均约 7.33× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 523.84 ms，约 1.91× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 476.14 ms，`avc1.640033`，约 2.10× 实时                  |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.25 ms，p95 0.38 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.38 ms，p95 0.96 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.79 ms，p95 1.12 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.42 ms，p95 1.36 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 0.73 ms，p95 0.76 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 22.79 ms，p95 33.99 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 1.90 ms，p95 2.01 ms                                 |
+| 单音轨 1,024-frame 音频块           | p95 0.54 ms，整体约 62.08× 实时                          |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 252.24 ms，平均约 11.82× 实时               |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 415.06 ms，平均约 7.19× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 516.74 ms，约 1.94× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 470.52 ms，`avc1.640033`，约 2.13× 实时                  |
 | OPFS 顺序写入，16 个 1 MiB 块       | 约 475 MiB/s；Memory Sink 约 6.1 GiB/s                   |
-| 1080p WebGL2 180 帧 soak            | 前半 p95 1.24 ms，后半 p95 1.36 ms，dispose 后无 pending |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 1.05 ms，后半 p95 0.85 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
@@ -202,10 +202,18 @@ mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入�
 VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.61–6.32 ms，最慢
 cold seek p95 为 14.37 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
 
-新增的真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
-1080p30 用时 687.80 ms（约 1.45× 实时），4K30 用时 993.83 ms（约 1.01×
-实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close；
-1080p 产物还由 FFmpeg 解出 30 个视频帧并完成音频 PCM MD5 回读。
+真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
+1080p30 用时 306.98 ms（约 3.26× 实时），4K30 用时 286.13 ms（约 3.49×
+实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close，
+且主线程均没有观测到超过 50 ms 的 Long Task；1080p 产物还由 FFmpeg 解出
+30 个视频帧并完成音频 PCM MD5 回读。
+
+WebM/MP4 可恢复导出证据把 2 秒工程分成 10 个持久单元，在 25%、50% 和 90%
+提交点强制中断并重建 IndexedDB store。恢复分别复用 3/5/9 个单元，只编码
+7/5/1 个剩余单元，已提交帧的重复渲染数均为 0；恢复产物经 FFmpeg 解码后的
+60 个逐帧 MD5 和完整 float32 PCM SHA-256 与无中断参考逐项一致。PCM 哈希包含
+codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计算，报告同时公开
+`codecPacketEndUs` 与 `codecTailFrames`，避免把 packet 量化误报成时间线漂移。
 
 60 秒 Alpha 工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
@@ -232,6 +240,8 @@ cold seek p95 为 14.37 ms；测试结束后活动 decoder 和保留 VideoFrame 
 
 ```bash
 corepack pnpm report:performance
+corepack pnpm report:recovery
+corepack pnpm report:phase3:check
 corepack pnpm report:seek
 corepack pnpm report:alpha
 corepack pnpm bench:competitors -- \
@@ -239,6 +249,7 @@ corepack pnpm bench:competitors -- \
 ```
 
 - [`performance-1080p30-chromium.json`](reports/baseline/performance-1080p30-chromium.json)：codec/WebGPU 能力、分辨率与 pass 矩阵、10/100/1,000 clip 编译、真实媒体 1080p/4K 全链路与 FFmpeg 回读、Memory/OPFS、10 分钟 PCM 和 compositor soak；
+- [`recovery-chromium.json`](reports/baseline/recovery-chromium.json)：WebM/MP4 的 IndexedDB checkpoint、中断恢复、未提交单元重做计数、FFmpeg 逐帧 MD5、完整 PCM SHA-256 和 A/V 时间线末端；
 - [`media-seek-chromium.json`](reports/baseline/media-seek-chromium.json)：五种真实容器的索引、cold/warm seek、解码包数和资源归零；
 - [`alpha-60s.json`](reports/baseline/alpha-60s.json) 与 [`alpha-60s.webm`](reports/baseline/alpha-60s.webm)：60 秒端到端工程、成片 hash 和 FFmpeg 回读；
 - [`competitor-benchmark-chromium.json`](reports/baseline/competitor-benchmark-chromium.json)：三引擎同机原始样本、版本与环境。
