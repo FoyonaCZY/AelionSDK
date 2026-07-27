@@ -657,9 +657,25 @@ export function validatePhase1PostflightRecord(postflight) {
 /** Re-runs postflight semantics/freshness against the current artifact bytes. */
 export function validatePhase1PostflightAgainstArtifacts(runDocument, artifacts) {
   const expectedVersion = runDocument?.postflight?.expectedVersion;
+  const recordedFiles = Array.isArray(runDocument?.postflight?.artifacts?.files)
+    ? runDocument.postflight.artifacts.files
+    : [];
+  // Git preserves artifact bytes but not filesystem mtimes. Reuse the mtimes
+  // already bound into the gate record while rebuilding every content and
+  // semantic check from the current checkout.
+  const transportStableArtifacts = Array.isArray(artifacts)
+    ? artifacts.map((artifact, index) => {
+        const recordedMtime = recordedFiles[index]?.mtime;
+        return {
+          ...artifact,
+          mtime: recordedMtime,
+          mtimeMs: Date.parse(recordedMtime),
+        };
+      })
+    : artifacts;
   const rebuilt = buildPhase1Postflight(
     runDocument?.commands,
-    artifacts,
+    transportStableArtifacts,
     expectedVersion,
     runDocument?.postflight?.generatedAt,
   );
@@ -697,7 +713,12 @@ export async function collectBlockerReviewArtifacts(root) {
 }
 
 /** Builds the immutable binding copied into a post-gate independent review. */
-export function buildBlockerReviewGateRunBinding(runDocument, resultsSha256, artifacts) {
+export function buildBlockerReviewGateRunBinding(
+  runDocument,
+  resultsSha256,
+  artifacts,
+  recordedArtifactFiles,
+) {
   const reasons = [];
   if (!isSha256(resultsSha256)) reasons.push('gate results SHA-256 is invalid');
   if (!validTimestamp(runDocument?.startedAt)) reasons.push('gate run startedAt is invalid');
@@ -712,16 +733,26 @@ export function buildBlockerReviewGateRunBinding(runDocument, resultsSha256, art
   const commands = Array.isArray(runDocument?.commands) ? runDocument.commands : [];
   const commandsByName = new Map(commands.map(command => [command?.command, command]));
   const actualArtifacts = Array.isArray(artifacts) ? artifacts : [];
+  const recordedArtifacts = Array.isArray(recordedArtifactFiles) ? recordedArtifactFiles : null;
   if (!Array.isArray(artifacts)) reasons.push('review artifacts must be an array');
   if (actualArtifacts.length !== PHASE_1_BLOCKER_REVIEW_ARTIFACTS.length) {
     reasons.push(
       `review artifact count must equal ${PHASE_1_BLOCKER_REVIEW_ARTIFACTS.length.toString()}`,
     );
   }
+  if (
+    recordedArtifacts !== null &&
+    recordedArtifacts.length !== PHASE_1_BLOCKER_REVIEW_ARTIFACTS.length
+  ) {
+    reasons.push(
+      `recorded review artifact count must equal ${PHASE_1_BLOCKER_REVIEW_ARTIFACTS.length.toString()}`,
+    );
+  }
 
   const files = [];
   for (const [index, expected] of PHASE_1_BLOCKER_REVIEW_ARTIFACTS.entries()) {
     const actual = actualArtifacts[index];
+    const recorded = recordedArtifacts?.[index];
     if (
       actual?.file !== expected.file ||
       actual?.command !== expected.command ||
@@ -735,12 +766,35 @@ export function buildBlockerReviewGateRunBinding(runDocument, resultsSha256, art
     if (!isSha256(actual?.sha256)) {
       reasons.push(`review artifact ${expected.file} has invalid SHA-256`);
     }
-    if (!validTimestamp(actual?.mtime)) {
+    if (recordedArtifacts === null && !validTimestamp(actual?.mtime)) {
       reasons.push(`review artifact ${expected.file} has invalid mtime`);
     }
+    if (recordedArtifacts !== null) {
+      if (
+        recorded?.file !== expected.file ||
+        recorded?.command !== expected.command ||
+        recorded?.freshness !== expected.freshness
+      ) {
+        reasons.push(
+          `recorded review artifact ${index.toString()} differs from the required policy`,
+        );
+      }
+      if (recorded?.bytes !== actual?.bytes) {
+        reasons.push(`review artifact ${expected.file} bytes differ from the recorded binding`);
+      }
+      if (recorded?.sha256 !== actual?.sha256) {
+        reasons.push(`review artifact ${expected.file} SHA-256 differs from the recorded binding`);
+      }
+      if (!validTimestamp(recorded?.mtime)) {
+        reasons.push(`recorded review artifact ${expected.file} has invalid mtime`);
+      }
+    }
+    const evidenceMtime = recordedArtifacts === null ? actual?.mtime : recorded?.mtime;
+    const evidenceMtimeMs =
+      recordedArtifacts === null ? (actual?.mtimeMs ?? actual?.mtime) : Date.parse(recorded?.mtime);
     if (expected.freshness === 'post-run') {
       const mtime =
-        typeof actual?.mtimeMs === 'number' ? actual.mtimeMs : Date.parse(actual?.mtime);
+        typeof evidenceMtimeMs === 'number' ? evidenceMtimeMs : Date.parse(evidenceMtimeMs);
       const runEndedAt = Date.parse(runDocument?.endedAt);
       if (!Number.isFinite(mtime) || !Number.isFinite(runEndedAt) || mtime < runEndedAt) {
         reasons.push(`post-run document ${expected.file} predates the gate run completion`);
@@ -750,7 +804,7 @@ export function buildBlockerReviewGateRunBinding(runDocument, resultsSha256, art
       if (gate?.exitCode !== 0) {
         reasons.push(`review artifact ${expected.file} was produced by a failed command`);
       }
-      if (!timestampInGateWindow(actual?.mtimeMs ?? actual?.mtime, gate)) {
+      if (!timestampInGateWindow(evidenceMtimeMs, gate)) {
         reasons.push(`review artifact ${expected.file} is not fresh for ${expected.command}`);
       }
     }
@@ -760,7 +814,7 @@ export function buildBlockerReviewGateRunBinding(runDocument, resultsSha256, art
       ...(expected.freshness === undefined ? {} : { freshness: expected.freshness }),
       bytes: actual?.bytes ?? null,
       sha256: actual?.sha256 ?? null,
-      mtime: actual?.mtime ?? null,
+      mtime: evidenceMtime ?? null,
     });
   }
 
