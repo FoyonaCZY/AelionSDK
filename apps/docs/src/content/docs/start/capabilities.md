@@ -153,7 +153,7 @@ Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者
 - HDR/10-bit 尚未实现；
 - 保音高策略只支持线性 TimeMap；
 - 非 Vite bundler 需要宿主显式部署并传入 runtime assets，尚无逐 bundler 认证；
-- 公开包尚未发布 npm，版本仍是 alpha；
-- API 可能变化，Project/Material 协议变化必须配迁移。
+- 公开包通过 npm `next` tag 发布，版本仍是 Beta；
+- Beta API 可能变化，Project/Material 协议变化必须配迁移。
 
 浏览器和平台细节见[兼容性与部署](/AelionSDK/production/compatibility/)。

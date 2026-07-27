@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-beta.1 — 2026-07-27
+
 ### Changed
 
 - Muxed exports can opt into Worker orchestration through the public Session

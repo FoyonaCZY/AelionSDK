@@ -1,6 +1,6 @@
 {
   "name": "aelion-sdk",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "private": true,
   "description": "Browser-first real-time editing, rendering and export SDK",
   "license": "MIT",
@@ -75,6 +75,10 @@
     "api:snapshot": "corepack pnpm --filter @aelion/sdk run api:snapshot",
     "test:pack": "corepack pnpm run build && node scripts/test-package-consumer.mjs",
     "release:dry-run": "corepack pnpm run build && node scripts/release-dry-run.mjs",
+    "release:pack": "node scripts/prepare-release-packages.mjs",
+    "release:reproducibility": "node scripts/verify-release-reproducibility.mjs",
+    "release:publish": "node scripts/publish-release-packages.mjs",
+    "release:registry-smoke": "node scripts/test-registry-release.mjs",
     "test:consumer": "corepack pnpm run build && node scripts/test-package-consumer.mjs --browser",
     "test:phase1:final": "node scripts/run-phase-1-final-gates.mjs",
     "verify:environment": "node scripts/verify-clean-environment.mjs"

@@ -3,7 +3,7 @@ title: Diagnostic 错误码
 description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---
 
-本表对应源码版本 `0.1.0-alpha.0`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
+本表对应源码版本 `0.1.0-beta.1`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
 
 产品代码只依赖 `code` 和结构化字段，不解析英文 `message`：
 
@@ -45,7 +45,7 @@ interface Diagnostic {
 - `details`：可记录 codec/backend/limit 等结构化上下文；
 - `cause`：只用于日志/调试，不序列化进 Project，也不能作为稳定业务条件。
 
-结构化诊断可能出现在 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 中。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material Registry 的少量拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 alpha 阶段的临时形式，产品不要长期依赖这种字符串解析。
+结构化诊断可能出现在 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 中。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material Registry 的少量拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 Beta 阶段的临时形式，产品不要长期依赖这种字符串解析。
 
 参数/生命周期前置条件仍可能用标准 `RangeError`、`TypeError`、`ReferenceError` 表达，例如无 MediaProvider、dispose 后调用、非法 seek、重复 Player subscriber 或重复 Material runtime registration。这些不是可枚举 diagnostic code；调用方应在类型/UI 状态层预防，并按 error class 处理，不解析英文 message。
 
@@ -71,7 +71,7 @@ interface Diagnostic {
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `PROJECT_SCHEMA_INVALID`                 | Project 不符合 v1 JSON Schema；查看 `path` 和校验 details                                                                                                         |
 | `PROJECT_INPUT_INVALID`                  | Project 在 Schema 前包含非纯 JSON/不安全结构，例如 accessor、稀疏数组、symbol、循环/对象别名或非 canonical number；SDK 不调用 getter/iterator，并返回一条有界诊断 |
-| `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过 Alpha 不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                               |
+| `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过 Beta 不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                                |
 | `PROJECT_ENTITY_KEY_MISMATCH`            | normalized map key 与实体 `id` 不一致                                                                                                                             |
 | `PROJECT_REFERENCE_MISSING`              | ID 引用的实体不存在；不可用“忽略”修复编辑语义                                                                                                                     |
 | `PROJECT_DUPLICATE_REFERENCE`            | 有序 ID list 含重复引用                                                                                                                                           |
@@ -171,7 +171,7 @@ Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_
 | `CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE`           | OffscreenCanvas 不可用                                        |
 | `CAPABILITY_WEBGL2_UNAVAILABLE`                     | 无法创建 WebGL2 context                                       |
 | `CAPABILITY_WEBGL2_PROBE_FAILED`                    | WebGL2 probe 异常失败                                         |
-| `CAPABILITY_WEBGPU_UNAVAILABLE`                     | `navigator.gpu` 不可用；Alpha 默认可回退 WebGL2               |
+| `CAPABILITY_WEBGPU_UNAVAILABLE`                     | `navigator.gpu` 不可用；Beta 默认可回退 WebGL2                |
 | `CAPABILITY_WEBGPU_ADAPTER_UNAVAILABLE`             | API 存在但没有 adapter                                        |
 | `CAPABILITY_WEBGPU_PROBE_FAILED`                    | WebGPU probe 异常失败                                         |
 | `CAPABILITY_AUDIO_CONTEXT_UNAVAILABLE`              | AudioContext 不可用                                           |
@@ -245,7 +245,7 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 | `MATERIAL_MIGRATION_INVALID`          | migration 非确定、版本链不连续或输出协议无效                           |
 | `MATERIAL_EXECUTION_BUDGET_DENIED`    | Composition/Lab 的 pass/texture/quality 预算不允许执行                 |
 
-协议还保留 `MATERIAL_COMPILE_FAILED`、`MATERIAL_EXECUTION_FAILED` 等面向未来的目录项；当前源码不会稳定发出这些 code，因此本 Alpha runtime 表不把它们列为已实现事件。
+协议还保留 `MATERIAL_COMPILE_FAILED`、`MATERIAL_EXECUTION_FAILED` 等面向未来的目录项；当前源码不会稳定发出这些 code，因此本 Beta runtime 表不把它们列为已实现事件。
 
 ## 9. Export
 

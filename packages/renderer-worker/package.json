@@ -1,6 +1,6 @@
 {
   "name": "@aelion/renderer-worker",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "description": "Off-main-thread WebGL2 and WebGPU compositor for AelionSDK",
   "license": "MIT",
   "repository": {

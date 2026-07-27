@@ -3,7 +3,9 @@ title: 包和公开入口
 description: 查询 13 个 @aelion 包的职责、主要导出和使用对象。
 ---
 
-当前所有公开包版本都是 `0.1.0-alpha.0`。只有 `package.json` 的 `exports` 暴露的入口属于公共 API；`src/*`、`dist/*` 和测试 helper 不在兼容范围内。
+当前所有公开包版本都是 `0.1.0-beta.1`，通过 npm `next` tag 分发。只有
+`package.json` 的 `exports` 暴露的入口属于公共 API；`src/*`、`dist/*` 和测试
+helper 不在兼容范围内。
 
 如果你在做普通剪辑应用，先看[我需要安装哪些包](/AelionSDK/start/packages/)。本页主要供查询和底层扩展使用。
 
@@ -106,4 +108,4 @@ Application
 
 应用不应把 SDK 内部依赖关系复制成自己的横向调用网络。能从 Session 获得的功能就从 Session 使用，这样升级时只需要跟踪公共接口。
 
-每个符号的参数、返回类型和源码链接见侧栏 API Reference。Alpha 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。
+每个符号的参数、返回类型和源码链接见侧栏 API Reference。Beta 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。

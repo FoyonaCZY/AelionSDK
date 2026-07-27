@@ -62,6 +62,11 @@ const gates = [
     corepackExecutable,
     corepackArguments(['pnpm', 'release:dry-run']),
   ],
+  [
+    'corepack pnpm release:reproducibility',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'release:reproducibility']),
+  ],
   ['corepack pnpm format:check', corepackExecutable, corepackArguments(['pnpm', 'format:check'])],
   [
     'corepack pnpm report:browser:chromium',
@@ -78,6 +83,16 @@ const gates = [
     'corepack pnpm report:performance',
     corepackExecutable,
     corepackArguments(['pnpm', 'report:performance']),
+  ],
+  [
+    'corepack pnpm report:recovery',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:recovery']),
+  ],
+  [
+    'corepack pnpm report:phase3:check',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:phase3:check']),
   ],
   ['corepack pnpm report:alpha', corepackExecutable, corepackArguments(['pnpm', 'report:alpha'])],
 ];

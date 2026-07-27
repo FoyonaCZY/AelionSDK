@@ -1,6 +1,6 @@
 {
   "name": "@aelion/material-sdk",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "description": "Type-safe authoring, validation and packaging tools for Aelion materials",
   "license": "MIT",
   "repository": {

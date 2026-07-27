@@ -5,6 +5,7 @@
 用 TypeScript 在浏览器中完成时间线编辑、实时预览、播放和音视频导出。
 
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
+[![npm next](https://img.shields.io/npm/v/@aelion/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelion/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Node.js 20](https://img.shields.io/badge/node-20.19%2B-43853d.svg)](package.json)
 
@@ -43,7 +44,15 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前版本为 `0.1.0-alpha.0`，源码可以运行，但尚未发布到 npm。现阶段最直接的体验方式是启动仓库内的 Quickstart：
+当前公开 Beta 是 `0.1.0-beta.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
+导出入口和运行时资源插件：
+
+```bash
+npm install @aelion/sdk@next @aelion/export@next
+npm install --save-dev @aelion/vite-plugin@next vite
+```
+
+也可以克隆仓库并启动 Quickstart：
 
 ```bash
 git clone https://github.com/FoyonaCZY/AelionSDK.git
@@ -215,7 +224,7 @@ WebM/MP4 可恢复导出证据把 2 秒工程分成 10 个持久单元，在 25%
 codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计算，报告同时公开
 `codecPacketEndUs` 与 `codecTailFrames`，避免把 packet 量化误报成时间线漂移。
 
-60 秒 Alpha 工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
+60 秒端到端工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
 16.79 秒，即约 3.57× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
 偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
@@ -260,9 +269,10 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 
 ## 当前边界
 
-AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于 Alpha。使用前需要了解这些边界：
+AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
+Beta。使用前需要了解这些边界：
 
-- 公开包还没有发布到 npm，API 在首个稳定版本前仍可能调整；
+- 13 个公开包通过 npm `next` tag 发布；Beta API 在首个稳定版本前仍可能按迁移规则调整；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
   真机、iOS 与 Android 实体设备仍未认证；
 - 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；

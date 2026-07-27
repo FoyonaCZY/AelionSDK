@@ -10,7 +10,7 @@ description: Material Package、Definition、Graph、Instance、执行限制、�
 | 协议     | Aelion Material Protocol，简称 AMP       |
 | 版本     | 1.0.0 Draft                              |
 | 日期     | 2026-07-10                               |
-| 状态     | Alpha 实现协议；尚未形成 1.0 兼容承诺    |
+| 状态     | Beta 实现协议；尚未形成 1.0 兼容承诺     |
 | 适用范围 | 视觉滤镜、视觉特效、视觉转场、视觉生成器 |
 
 ## 整体模型
@@ -965,7 +965,8 @@ interface MaterialInstance {
 
 实例的结构 Schema 位于 `schemas/material/v1/instance.schema.json`；具体 parameters/resourceBindings/inputBindings 还必须结合其 Material Definition 做第二阶段语义校验，单独的通用 Schema 无法判断动态参数 ID 和端口类型。
 
-Project 尚未发布，因此直接冻结顶层 collection 名称为 `materialInstances`。所有滤镜、特效、转场、生成器都使用该 collection，避免任何历史 `effects` 别名。
+从首个公开 Beta 起，Project 顶层 collection 名称固定为 `materialInstances`。所有
+滤镜、特效、转场、生成器都使用该 collection，不接受历史 `effects` 别名。
 
 ### 12.2 引用方式
 
@@ -1390,4 +1391,5 @@ AMP v1 当前由 `@aelion/material-compiler`、`@aelion/material-sdk`、Project 
 - Core Node 的精确公式和 Golden 容差由 [Core Node Math 1.0](/AelionSDK/reference/core-node-math-v1/) 定义；
 - 当前实现范围、宿主注册和发布检查见 [Material 创作与接入](/AelionSDK/guides/materials/)。
 
-AMP v1 的发布级兼容承诺只会随正式版本和 release notes 生效；源码中的 Alpha 实现不自动构成 1.0 稳定性承诺。
+AMP v1 的稳定兼容承诺只会随正式版本和 release notes 生效；公开 Beta 实现不自动
+构成 1.0 稳定性承诺。

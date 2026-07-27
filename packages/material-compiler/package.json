@@ -1,6 +1,6 @@
 {
   "name": "@aelion/material-compiler",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "description": "Aelion Material Protocol graph compiler for WebGL2 and WebGPU",
   "license": "MIT",
   "repository": {

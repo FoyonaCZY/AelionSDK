@@ -10,11 +10,11 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 ```json
 {
   "dependencies": {
-    "@aelion/sdk": "workspace:*",
-    "@aelion/export": "workspace:*"
+    "@aelion/sdk": "0.1.0-beta.1",
+    "@aelion/export": "0.1.0-beta.1"
   },
   "devDependencies": {
-    "@aelion/vite-plugin": "workspace:*"
+    "@aelion/vite-plugin": "0.1.0-beta.1"
   }
 }
 ```
@@ -59,7 +59,7 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelion/export';
 ```json
 {
   "dependencies": {
-    "@aelion/material-sdk": "workspace:*"
+    "@aelion/material-sdk": "0.1.0-beta.1"
   }
 }
 ```

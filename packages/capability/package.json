@@ -1,6 +1,6 @@
 {
   "name": "@aelion/capability",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "description": "Browser media capability probing for AelionSDK",
   "license": "MIT",
   "repository": {

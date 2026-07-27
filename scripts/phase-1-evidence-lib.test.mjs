@@ -109,7 +109,7 @@ function passingPostflight(commands = gateCommands()) {
   const postflight = buildPhase1Postflight(
     commands,
     artifacts,
-    '0.1.0-alpha.0',
+    '0.1.0-beta.1',
     new Date(Date.parse(commands.at(-1).endedAt) + 1).toISOString(),
   );
   postflight.checks = postflight.checks.map(check => ({
@@ -215,14 +215,16 @@ test(
   },
 );
 
-test('the final runner policy is exactly thirteen gates plus five evidence refreshes', () => {
-  assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 13);
-  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 75, firefox: 67 });
+test('the final runner policy is exactly fourteen gates plus seven evidence refreshes', () => {
+  assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 14);
+  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 79, firefox: 67 });
   assert.deepEqual(PHASE_1_EVIDENCE_REFRESH_COMMANDS, [
     'corepack pnpm report:browser:chromium',
     'corepack pnpm report:browser:firefox',
     'corepack pnpm report:seek',
     'corepack pnpm report:performance',
+    'corepack pnpm report:recovery',
+    'corepack pnpm report:phase3:check',
     'corepack pnpm report:alpha',
   ]);
 });
@@ -650,7 +652,7 @@ test('gate record must be serial and bound to one source identity', () => {
 });
 
 test('tarball consumer validator checks exact package, asset and browser contracts', () => {
-  const version = '0.1.0-alpha.0';
+  const version = '0.1.0-beta.1';
   const packages = PHASE_1_EXPECTED_PUBLIC_PACKAGES.map((name, index) => ({
     name,
     version,
@@ -1138,8 +1140,8 @@ test('Alpha cleanup and blocker review both fail closed', () => {
 
 test('blocker review gate binding requires fresh exact artifacts from the serial run', () => {
   const startedAt = new Date(10_000).toISOString();
-  const endedAt = new Date(50_000).toISOString();
   const commands = gateCommands();
+  const endedAt = new Date(Date.parse(commands.at(-1).endedAt) + 1_000).toISOString();
   const runDocument = {
     schemaVersion: '3.0.0',
     generatedBy: 'scripts/run-phase-1-final-gates.mjs',
@@ -1164,6 +1166,10 @@ test('blocker review gate binding requires fresh exact artifacts from the serial
     {
       file: 'reports/baseline/performance-1080p30-chromium.json',
       command: 'corepack pnpm report:performance',
+    },
+    {
+      file: 'reports/baseline/recovery-chromium.json',
+      command: 'corepack pnpm report:recovery',
     },
     { file: 'reports/baseline/tarball-consumer.json', command: 'corepack pnpm test:consumer' },
     { file: 'reports/baseline/alpha-60s.json', command: 'corepack pnpm report:alpha' },
@@ -1229,7 +1235,7 @@ test('postflight fails closed on command, freshness, semantic and binding drift'
   const failed = buildPhase1Postflight(
     commands,
     artifacts,
-    '0.1.0-alpha.0',
+    '0.1.0-beta.1',
     new Date(Date.parse(commands.at(-1).endedAt) + 1).toISOString(),
   );
   assert.equal(failed.passed, false);
@@ -1253,7 +1259,7 @@ test('postflight fails closed on command, freshness, semantic and binding drift'
     buildPhase1Postflight(
       commands.map((command, index) => (index === 0 ? { ...command, exitCode: 1 } : command)),
       artifacts,
-      '0.1.0-alpha.0',
+      '0.1.0-beta.1',
     ).passed,
     false,
   );
@@ -1263,7 +1269,7 @@ test('postflight fails closed on command, freshness, semantic and binding drift'
       artifacts.map((artifact, index) =>
         index === 0 ? { ...artifact, mtimeMs: 0, mtime: new Date(0).toISOString() } : artifact,
       ),
-      '0.1.0-alpha.0',
+      '0.1.0-beta.1',
     ).passed,
     false,
   );

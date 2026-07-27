@@ -1,9 +1,18 @@
 ---
 title: 安装与工程配置
-description: 在当前 alpha 阶段获取 AelionSDK，启动 Quickstart，并配置自己的 Vite 应用。
+description: 从 npm 安装 AelionSDK Beta，启动 Quickstart，并配置自己的 Vite 应用。
 ---
 
-AelionSDK 还没有发布到 npm。现在最稳妥的接入方式是克隆仓库，在 pnpm workspace 中开发。这样使用的就是实际包入口和构建插件，不需要从源码目录做深层导入。
+AelionSDK 的公开 Beta 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
+使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
+
+```bash
+npm install @aelion/sdk@next @aelion/export@next
+npm install --save-dev @aelion/vite-plugin@next vite
+```
+
+使用 pnpm 或 yarn 时保持相同的包名与 `next` tag。不要导入源码目录或复制仓库内
+构建产物。
 
 ## 环境要求
 
@@ -23,7 +32,7 @@ Node.js 21 或更高版本不在当前仓库的验证范围内。复现 CI 时�
 `20.20.2`；其他满足 engines 的 Node 20 版本属于兼容范围，但不等同于当前参考环境。
 安装依赖时也不要改用 npm 或 yarn，否则会产生另一份锁文件。
 
-## 先运行仓库里的最小示例
+## 运行仓库里的最小示例
 
 ```bash
 git clone https://github.com/FoyonaCZY/AelionSDK.git
@@ -181,13 +190,14 @@ corepack pnpm --filter @example/my-editor build
 
 在 `dist/assets` 中应该能看到 Renderer Worker 和 AudioWorklet 文件。部署后再用 Network 面板确认它们不是 404，MIME 类型也是 JavaScript。
 
-## npm 发布后怎么安装
+## 锁定精确版本
 
-首个公开版本发布后，产品应用会使用下面的组合：
+生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 Beta：
 
 ```bash
-pnpm add @aelion/sdk @aelion/export
-pnpm add -D @aelion/vite-plugin
+pnpm add @aelion/sdk@0.1.0-beta.1 @aelion/export@0.1.0-beta.1
+pnpm add -D @aelion/vite-plugin@0.1.0-beta.1
 ```
 
-在 npm 页面真正出现版本之前，不要把这组命令当作当前可用步骤。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。
+`npm install @aelion/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
+Beta。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。

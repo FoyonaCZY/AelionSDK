@@ -19,6 +19,7 @@ export const PHASE_1_REQUIRED_GATE_COMMANDS = Object.freeze([
   'corepack pnpm test:pack',
   'corepack pnpm test:consumer',
   'corepack pnpm release:dry-run',
+  'corepack pnpm release:reproducibility',
   'corepack pnpm format:check',
 ]);
 
@@ -27,6 +28,8 @@ export const PHASE_1_EVIDENCE_REFRESH_COMMANDS = Object.freeze([
   'corepack pnpm report:browser:firefox',
   'corepack pnpm report:seek',
   'corepack pnpm report:performance',
+  'corepack pnpm report:recovery',
+  'corepack pnpm report:phase3:check',
   'corepack pnpm report:alpha',
 ]);
 
@@ -56,7 +59,7 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 75,
+  chromium: 79,
   firefox: 67,
 });
 
@@ -87,6 +90,10 @@ export const PHASE_1_RUN_ARTIFACTS = Object.freeze([
   Object.freeze({
     file: 'reports/baseline/performance-1080p30-chromium.json',
     command: 'corepack pnpm report:performance',
+  }),
+  Object.freeze({
+    file: 'reports/baseline/recovery-chromium.json',
+    command: 'corepack pnpm report:recovery',
   }),
   Object.freeze({
     file: 'reports/baseline/tarball-consumer.json',
@@ -454,6 +461,9 @@ function postflightSemanticValidation(expected, artifact, expectedVersion) {
   }
   if (expected.file === 'reports/baseline/performance-1080p30-chromium.json') {
     return validatePerformanceEvidence(artifact.document);
+  }
+  if (expected.file === 'reports/baseline/recovery-chromium.json') {
+    return validateRecoveryEvidence(artifact.document);
   }
   if (expected.file === 'reports/baseline/tarball-consumer.json') {
     return validateTarballConsumer(artifact.document, expectedVersion);

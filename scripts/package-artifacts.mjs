@@ -22,6 +22,7 @@ if (
 const markerPath = resolve(packageDirectory, '.aelion-generated-package-artifacts.json');
 const licensePath = resolve(packageDirectory, 'LICENSE');
 const readmePath = resolve(packageDirectory, 'README.md');
+const packageManifestPath = resolve(packageDirectory, 'package.json');
 
 async function exists(path) {
   try {
@@ -32,30 +33,83 @@ async function exists(path) {
   }
 }
 
-if (mode === 'stage') {
-  const manifest = JSON.parse(await readFile(resolve(packageDirectory, 'package.json'), 'utf8'));
-  const generated = (await exists(markerPath))
-    ? (JSON.parse(await readFile(markerPath, 'utf8')).generated ?? [])
-    : [];
-  if (!(await exists(licensePath))) {
-    await writeFile(licensePath, await readFile(resolve(root, 'LICENSE'), 'utf8'));
-    generated.push('LICENSE');
+async function cleanStagedArtifacts(marker) {
+  if (typeof marker.originalPackageJson === 'string') {
+    await writeFile(packageManifestPath, marker.originalPackageJson);
   }
-  if (!(await exists(readmePath))) {
-    const description = manifest.description ?? 'A package in the AelionSDK browser editing stack.';
-    await writeFile(
-      readmePath,
-      `# ${manifest.name}\n\n${description}\n\nThis package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK). The ${manifest.version} release is an alpha and its API may change. See the repository README for supported browsers, examples and deployment requirements.\n`,
-    );
-    generated.push('README.md');
-  }
-  await writeFile(markerPath, `${JSON.stringify({ generated })}\n`);
-} else if (await exists(markerPath)) {
-  const marker = JSON.parse(await readFile(markerPath, 'utf8'));
   for (const file of marker.generated ?? []) {
     if (file === 'LICENSE' || file === 'README.md') {
       await rm(resolve(packageDirectory, file), { force: true });
     }
   }
   await rm(markerPath, { force: true });
+}
+
+async function publishedWorkspaceRange(name, range) {
+  if (!name.startsWith('@aelion/')) {
+    throw new Error(`Unsupported workspace dependency outside @aelion: ${name}`);
+  }
+  const dependencyDirectory = resolve(packagesRoot, name.slice('@aelion/'.length));
+  const dependencyManifest = JSON.parse(
+    await readFile(resolve(dependencyDirectory, 'package.json'), 'utf8'),
+  );
+  if (dependencyManifest.name !== name || typeof dependencyManifest.version !== 'string') {
+    throw new Error(`Workspace dependency metadata differs for ${name}`);
+  }
+  const selector = range.slice('workspace:'.length);
+  if (selector === '*') return dependencyManifest.version;
+  if (selector === '^') return `^${dependencyManifest.version}`;
+  if (selector === '~') return `~${dependencyManifest.version}`;
+  return selector;
+}
+
+if (mode === 'stage') {
+  if (await exists(markerPath)) {
+    await cleanStagedArtifacts(JSON.parse(await readFile(markerPath, 'utf8')));
+  }
+  const originalPackageJson = await readFile(packageManifestPath, 'utf8');
+  const manifest = JSON.parse(originalPackageJson);
+  const generated = [];
+  if (!(await exists(licensePath))) {
+    generated.push('LICENSE');
+  }
+  if (!(await exists(readmePath))) {
+    generated.push('README.md');
+  }
+  const marker = { schemaVersion: '2.0.0', generated, originalPackageJson };
+  await writeFile(markerPath, `${JSON.stringify(marker)}\n`);
+
+  try {
+    for (const section of ['dependencies', 'optionalDependencies', 'peerDependencies']) {
+      if (manifest[section] === undefined) continue;
+      for (const [name, range] of Object.entries(manifest[section])) {
+        if (typeof range === 'string' && range.startsWith('workspace:')) {
+          manifest[section][name] = await publishedWorkspaceRange(name, range);
+        }
+      }
+    }
+    await writeFile(packageManifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+    if (generated.includes('LICENSE')) {
+      await writeFile(licensePath, await readFile(resolve(root, 'LICENSE'), 'utf8'));
+    }
+    if (generated.includes('README.md')) {
+      const description =
+        manifest.description ?? 'A package in the AelionSDK browser editing stack.';
+      const prerelease = manifest.version.includes('-');
+      const releaseNotice = prerelease
+        ? `Version ${manifest.version} is a prerelease and its API may change before the first stable release.`
+        : `Version ${manifest.version} follows the compatibility policy documented by AelionSDK.`;
+      const installTarget = prerelease ? `${manifest.name}@next` : manifest.name;
+      await writeFile(
+        readmePath,
+        `# ${manifest.name}\n\n${description}\n\nInstall with \`npm install ${installTarget}\`.\n\n${releaseNotice} This package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK); see the repository README for supported browsers, examples and deployment requirements.\n`,
+      );
+    }
+  } catch (error) {
+    await cleanStagedArtifacts(marker);
+    throw error;
+  }
+} else if (await exists(markerPath)) {
+  await cleanStagedArtifacts(JSON.parse(await readFile(markerPath, 'utf8')));
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aelion/sdk",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-beta.1",
   "description": "Browser-first real-time editing, preview and export SDK facade",
   "type": "module",
   "license": "MIT",
