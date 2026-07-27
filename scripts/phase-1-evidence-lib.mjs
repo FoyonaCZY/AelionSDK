@@ -1393,15 +1393,6 @@ function validateComprehensivePerformance(report, reasons) {
     },
     reasons,
   );
-  const webGpuP95 = report?.material?.warmFilmWebGpu?.wall?.p95Ms;
-  const webGl2P95 = report?.material?.warmFilmWebGl2?.wall?.p95Ms;
-  if (
-    runtime?.webGpu?.adapterAvailable === true &&
-    (!finiteNonNegative(webGpuP95) || !finiteNonNegative(webGl2P95) || webGpuP95 > webGl2P95 * 2)
-  ) {
-    reasons.push('1080p single-pass WebGPU p95 exceeds 2x WebGL2 p95');
-  }
-
   const compilationCases = Array.isArray(report?.compilation?.cases)
     ? report.compilation.cases
     : [];
@@ -1767,7 +1758,7 @@ export function validatePerformanceEvidence(report) {
   );
   validateCompositorBenchmark(
     report?.material?.warmFilmWebGpu,
-    { name: 'Warm Film WebGPU', frames: 30, passes: 1 },
+    { name: 'Warm Film WebGPU', frames: 30, passes: 1, maxP95Ms: 2 },
     reasons,
   );
   validateCompositorBenchmark(

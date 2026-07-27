@@ -399,6 +399,9 @@ test('seek and performance validators fail closed on resource or SLO drift', () 
       },
     },
   };
+  const slowWebGpuPerformance = structuredClone(performance);
+  slowWebGpuPerformance.material.warmFilmWebGpu.wall.p95Ms = 2.01;
+  assert.equal(validatePerformanceEvidence(slowWebGpuPerformance).passed, false);
   assert.equal(validatePerformanceEvidence(performance).passed, true);
   assert.equal(
     validatePerformanceEvidence({
