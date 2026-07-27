@@ -7,6 +7,7 @@ import { dirname, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
 import { PHASE_1_EXPECTED_PUBLIC_PACKAGES } from './phase-1-evidence-lib.mjs';
+import { publishWithRegistryConsistency } from './publish-release-packages-lib.mjs';
 
 const execFileAsync = promisify(execFile);
 const manifestArgument = process.argv[2];
@@ -69,6 +70,7 @@ async function publishedIntegrity(name, version) {
   }
 }
 
+const releaseEntries = [];
 for (const entry of manifest.packages) {
   if (
     entry.version !== manifest.version ||
@@ -88,30 +90,22 @@ for (const entry of manifest.packages) {
   if (sha256 !== entry.sha256 || integrity !== entry.integrity) {
     throw new Error(`${entry.name} tarball hash differs from the release manifest`);
   }
-
-  const existing = await publishedIntegrity(entry.name, entry.version);
-  if (existing !== undefined) {
-    if (existing !== entry.integrity) {
-      throw new Error(`${entry.name}@${entry.version} already exists with different bytes`);
-    }
-    process.stdout.write(`Verified existing ${entry.name}@${entry.version}\n`);
-    continue;
-  }
-
-  await npm([
-    'publish',
-    tarball,
-    '--access',
-    'public',
-    '--tag',
-    manifest.npmDistTag,
-    '--registry',
-    manifest.registry,
-    '--provenance',
-  ]);
-  const published = await publishedIntegrity(entry.name, entry.version);
-  if (published !== entry.integrity) {
-    throw new Error(`${entry.name}@${entry.version} registry integrity differs after publish`);
-  }
-  process.stdout.write(`Published ${entry.name}@${entry.version}\n`);
+  releaseEntries.push({ ...entry, tarball });
 }
+
+await publishWithRegistryConsistency({
+  entries: releaseEntries,
+  publishedIntegrity: entry => publishedIntegrity(entry.name, entry.version),
+  publish: entry =>
+    npm([
+      'publish',
+      entry.tarball,
+      '--access',
+      'public',
+      '--tag',
+      manifest.npmDistTag,
+      '--registry',
+      manifest.registry,
+      '--provenance',
+    ]),
+});
