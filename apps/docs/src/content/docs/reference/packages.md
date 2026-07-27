@@ -1,6 +1,6 @@
 ---
 title: 包和公开入口
-description: 查询 13 个 @aelion 包的职责、主要导出和使用对象。
+description: 查询 13 个 @aelionsdk 包的职责、主要导出和使用对象。
 ---
 
 当前所有公开包版本都是 `0.1.0-beta.1`，通过 npm `next` tag 分发。只有

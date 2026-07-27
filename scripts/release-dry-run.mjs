@@ -40,7 +40,7 @@ try {
     }
     const { stdout, stderr } = await execFileAsync(
       corepackExecutable,
-      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks']),
+      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks', '--tag', 'next']),
       {
         cwd: packageDirectory,
         env: {

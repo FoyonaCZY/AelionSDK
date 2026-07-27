@@ -356,7 +356,7 @@ async function runBrowserConsumer() {
       'pcm-player.worklet': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'audio',
         'dist',
         'pcm-player.worklet.js',
@@ -364,7 +364,7 @@ async function runBrowserConsumer() {
       'pcm-message-player.worklet': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'audio',
         'dist',
         'pcm-message-player.worklet.js',
@@ -372,7 +372,7 @@ async function runBrowserConsumer() {
       'webgl2-worker': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'renderer-worker',
         'dist',
         'webgl2-worker.js',
@@ -380,7 +380,7 @@ async function runBrowserConsumer() {
       'mux-export-worker': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'export',
         'dist',
         'mux-export-worker.js',
@@ -560,7 +560,7 @@ try {
       if (error?.code !== 'ENOENT') throw error;
     }
   }
-  if (publicPackages.length === 0) throw new Error('No public @aelion packages found');
+  if (publicPackages.length === 0) throw new Error('No public @aelionsdk packages found');
   if (!publicPackages.some(entry => entry.manifest.name === '@aelionsdk/sdk')) {
     throw new Error('@aelionsdk/sdk must be part of the public package set');
   }
@@ -718,7 +718,7 @@ export const contract: UserConfig = config;
     const consumerContractPath = join(consumerDirectory, 'contract.ts');
     const consumerTsconfigPath = join(consumerDirectory, 'tsconfig.json');
     const pluginPackage = packedPackages.find(entry => entry.name === '@aelionsdk/vite-plugin');
-    const pluginRoot = join(consumerDirectory, 'node_modules', '@aelion', 'vite-plugin');
+    const pluginRoot = join(consumerDirectory, 'node_modules', '@aelionsdk', 'vite-plugin');
     const evidence = {
       schemaVersion: '1.0.0',
       sdkVersion:

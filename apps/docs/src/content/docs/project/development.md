@@ -152,7 +152,7 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 3. 从官方 registry 重新安装全部包并执行 Node import 与 Vite runtime-assets build；
 4. 只有 registry smoke 成功后才创建附带 release manifest 与 tarball 的 GitHub prerelease。
 
-全新 npm 包尚不能预先配置 Trusted Publisher。首发前，`@aelion` 组织 owner 必须
+全新 npm 包尚不能预先配置 Trusted Publisher。首发前，`@aelionsdk` 组织 owner 必须
 创建仅覆盖这些包、允许发布的 granular access token，并暂存为仓库
 `NPM_TOKEN` secret；GitHub Actions 中的 `--provenance` 仍会把首发 tarball 绑定到
 本工作流。首发成功后，立即为每个包把 Trusted Publisher 精确绑定到
