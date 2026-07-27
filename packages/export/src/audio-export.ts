@@ -1,4 +1,4 @@
-import { AelionError, throwIfAborted } from '@aelion/core';
+import { AelionError, throwIfAborted } from '@aelionsdk/core';
 import type { StreamTargetChunk } from 'mediabunny';
 
 import type { OfflineAudioRequest } from './webm-export.js';

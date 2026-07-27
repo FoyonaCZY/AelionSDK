@@ -1,17 +1,17 @@
-import { renderIrAudio, SharedPcmRingBuffer } from '@aelion/audio';
+import { renderIrAudio, SharedPcmRingBuffer } from '@aelionsdk/audio';
 import {
   exportMp4,
   exportMuxedInWorker,
   OpfsSeekableSink,
   preflightProfileExport,
   SeekableMemorySink,
-} from '@aelion/export';
-import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
-import { createSampleIndex } from '@aelion/media';
-import { IncrementalRenderCompiler } from '@aelion/render-ir';
-import { WorkerCompositor } from '@aelion/renderer-worker';
-import { Aelion, ByteMediaProvider, createProject } from '@aelion/sdk';
-import type { AelionProject } from '@aelion/project-schema';
+} from '@aelionsdk/export';
+import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelionsdk/material-compiler';
+import { createSampleIndex } from '@aelionsdk/media';
+import { IncrementalRenderCompiler } from '@aelionsdk/render-ir';
+import { WorkerCompositor } from '@aelionsdk/renderer-worker';
+import { Aelion, ByteMediaProvider, createProject } from '@aelionsdk/sdk';
+import type { AelionProject } from '@aelionsdk/project-schema';
 
 import { measureLongTasksDuring, sliceLongTaskWindow } from './long-task-window.js';
 

@@ -1,4 +1,4 @@
-import { throwIfAborted } from '@aelion/core';
+import { throwIfAborted } from '@aelionsdk/core';
 
 export interface CacheAddress {
   readonly namespace: 'sample-index' | 'thumbnail' | 'waveform' | 'proxy' | 'derived';

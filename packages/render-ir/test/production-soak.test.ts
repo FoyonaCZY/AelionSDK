@@ -1,4 +1,4 @@
-import type { AelionProject, ItemEntity } from '@aelion/project-schema';
+import type { AelionProject, ItemEntity } from '@aelionsdk/project-schema';
 import { describe, expect, it } from 'vitest';
 
 import { evaluateVisualState, IncrementalRenderCompiler } from '../src/index.js';

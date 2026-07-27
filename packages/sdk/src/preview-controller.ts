@@ -1,4 +1,4 @@
-import type { RenderIrFrameResult } from '@aelion/renderer-worker';
+import type { RenderIrFrameResult } from '@aelionsdk/renderer-worker';
 
 import type { AelionPlayerFrame, AelionSessionApi } from './types.js';
 

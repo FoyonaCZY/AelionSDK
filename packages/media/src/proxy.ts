@@ -1,4 +1,4 @@
-import type { JsonObject, JsonValue } from '@aelion/core';
+import type { JsonObject, JsonValue } from '@aelionsdk/core';
 
 export interface AssetRepresentation {
   readonly id: string;

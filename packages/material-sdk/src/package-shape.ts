@@ -1,4 +1,4 @@
-import type { MaterialGraph } from '@aelion/material-compiler';
+import type { MaterialGraph } from '@aelionsdk/material-compiler';
 
 import {
   MATERIAL_DEFINITION_SCHEMA,

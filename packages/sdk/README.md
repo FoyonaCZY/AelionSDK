@@ -1,12 +1,12 @@
-# `@aelion/sdk`
+# `@aelionsdk/sdk`
 
 Browser-first video editing, preview, playback and export APIs for AelionSDK.
 
 ## Install the public Beta
 
 ```bash
-npm install @aelion/sdk@next
-npm install --save-dev @aelion/vite-plugin@next vite
+npm install @aelionsdk/sdk@next
+npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
 `next` currently resolves to `0.1.0-beta.1`. Pin the exact version after
@@ -16,7 +16,7 @@ validation instead of following a moving prerelease tag.
 
 ```ts
 // vite.config.ts
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -31,7 +31,7 @@ URLs through `AelionSessionOptions.runtimeAssets`.
 ## Start a session
 
 ```ts
-import { Aelion, ProductionMediaProvider, createProject } from '@aelion/sdk';
+import { Aelion, ProductionMediaProvider, createProject } from '@aelionsdk/sdk';
 
 const media = new ProductionMediaProvider();
 const session = await Aelion.createSession({ media });

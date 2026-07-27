@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { probeCapabilities } from '@aelion/capability';
-import { EXPORT_PROFILES } from '@aelion/export';
+import { probeCapabilities } from '@aelionsdk/capability';
+import { EXPORT_PROFILES } from '@aelionsdk/export';
 
 declare const __AELION_CONFORMANCE_TARGET__: 'webkit' | 'mobile' | undefined;
 

@@ -103,7 +103,7 @@ Content-Type: video/mp4
 
 ## Worker、AudioWorklet 和 CSP
 
-`@aelion/vite-plugin` 会在构建产物中发布 Renderer Worker、Export Worker 和
+`@aelionsdk/vite-plugin` 会在构建产物中发布 Renderer Worker、Export Worker 和
 AudioWorklet JavaScript。非 Vite 宿主通过 `AelionSessionOptions.runtimeAssets`
 传入四个最终 URL。部署后用 Network 面板确认：
 

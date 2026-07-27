@@ -197,7 +197,7 @@ async function collectApiSnapshot(expectedVersion) {
     validation: {
       passed:
         apiSnapshot.status === 'present' &&
-        apiSnapshot.package === '@aelion/sdk' &&
+        apiSnapshot.package === '@aelionsdk/sdk' &&
         apiSnapshot.version === expectedVersion &&
         isSha256(apiSnapshot.contractSha256),
     },

@@ -128,7 +128,7 @@ test('workspace identity excludes only the exact post-gate projections plus gene
   assert.equal(
     excludedWorkspacePath(
       root,
-      '/workspace/apps/docs/src/content/docs/api/@aelion/sdk/classes/Aelion.md',
+      '/workspace/apps/docs/src/content/docs/api/@aelionsdk/sdk/classes/Aelion.md',
     ),
     true,
   );
@@ -730,7 +730,7 @@ test('tarball consumer validator checks exact package, asset and browser contrac
       },
     },
   });
-  const plugin = packages.find(value => value.name === '@aelion/vite-plugin');
+  const plugin = packages.find(value => value.name === '@aelionsdk/vite-plugin');
   const report = {
     schemaVersion: '1.0.0',
     command: 'corepack pnpm test:consumer',
@@ -738,8 +738,8 @@ test('tarball consumer validator checks exact package, asset and browser contrac
     packages,
     runtimeAssets,
     bundlerAdapter: {
-      id: '@aelion/vite-plugin',
-      package: '@aelion/vite-plugin',
+      id: '@aelionsdk/vite-plugin',
+      package: '@aelionsdk/vite-plugin',
       version,
       public: true,
       zeroConfigVite: false,

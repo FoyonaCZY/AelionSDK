@@ -34,19 +34,19 @@ export const PHASE_1_EVIDENCE_REFRESH_COMMANDS = Object.freeze([
 ]);
 
 export const PHASE_1_EXPECTED_PUBLIC_PACKAGES = Object.freeze([
-  '@aelion/audio',
-  '@aelion/capability',
-  '@aelion/core',
-  '@aelion/export',
-  '@aelion/material-compiler',
-  '@aelion/material-sdk',
-  '@aelion/media',
-  '@aelion/project-schema',
-  '@aelion/render-ir',
-  '@aelion/renderer-worker',
-  '@aelion/sdk',
-  '@aelion/transaction',
-  '@aelion/vite-plugin',
+  '@aelionsdk/audio',
+  '@aelionsdk/capability',
+  '@aelionsdk/core',
+  '@aelionsdk/export',
+  '@aelionsdk/material-compiler',
+  '@aelionsdk/material-sdk',
+  '@aelionsdk/media',
+  '@aelionsdk/project-schema',
+  '@aelionsdk/render-ir',
+  '@aelionsdk/renderer-worker',
+  '@aelionsdk/sdk',
+  '@aelionsdk/transaction',
+  '@aelionsdk/vite-plugin',
 ]);
 
 export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
@@ -2163,10 +2163,10 @@ export function validateTarballConsumer(report, expectedVersion) {
   }
 
   const adapter = report?.bundlerAdapter;
-  const pluginPackage = packages.find(entry => entry?.name === '@aelion/vite-plugin');
+  const pluginPackage = packages.find(entry => entry?.name === '@aelionsdk/vite-plugin');
   if (
-    adapter?.id !== '@aelion/vite-plugin' ||
-    adapter?.package !== '@aelion/vite-plugin' ||
+    adapter?.id !== '@aelionsdk/vite-plugin' ||
+    adapter?.package !== '@aelionsdk/vite-plugin' ||
     adapter?.version !== expectedVersion ||
     adapter?.public !== true ||
     adapter?.zeroConfigVite !== false ||

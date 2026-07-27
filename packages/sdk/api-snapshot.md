@@ -1,4 +1,4 @@
-# `@aelion/sdk` public API snapshot
+# `@aelionsdk/sdk` public API snapshot
 
 Version: `0.1.0-beta.1`
 
@@ -11,27 +11,27 @@ baseline in the same change.
 ```json
 {
   "schemaVersion": "1.0.0",
-  "package": "@aelion/sdk",
+  "package": "@aelionsdk/sdk",
   "version": "0.1.0-beta.1",
   "entrypoint": "dist/index.d.ts",
   "files": {
-    "dist/audio-controller.d.ts": "c6fd37d46ca0a446f897db7756e12a05400776cbea46e56eb0f84e24b6c90731",
-    "dist/audio-mastering.d.ts": "4afbd1d89e7ce804cf559e2a428624c648936449da8e46a75fea1b743d644497",
-    "dist/composition.d.ts": "f26eecfdb6e75513df1c90f11f6bd13bad68bf7a749f0dbc02041d76d69ea9ff",
+    "dist/audio-controller.d.ts": "c7df5868c1cf972228f796d6abaea32b794921cf6b65ff0b4a545347df2a3bbf",
+    "dist/audio-mastering.d.ts": "4be6be012fb10e3b1b805b61fa3e118a4cb1f2a9af3bef0cbae3e26046b54458",
+    "dist/composition.d.ts": "1148a276594c5e66cd9e6b020aa371558488b10fc36ccdd6e84fe0e0167cda90",
     "dist/default-schemas.d.ts": "60956845e621cd1a663df4807d6073666e2062b106d2d967f529a2ac703f2ab8",
-    "dist/extension-host.d.ts": "14356d2dce19e83575eab4ff848c1d0596b7c61f97a30c7364bf08480ea4fc79",
+    "dist/extension-host.d.ts": "94034076f92e79baca0d5fd162ca334fbca6a57158ffd7221f7b0458d18fc738",
     "dist/index.d.ts": "51c2000c9dbd78444b6a90a2fea1094b16db6ab60b4fe6d4edf358475d96a0dd",
-    "dist/media-provider.d.ts": "9d16243e4d1350f9495c001fd39b5d0182eadf1860106b6f41b8d62a8960ad2a",
-    "dist/migration-materials.d.ts": "bf462a9059bc0f79b6e06a125b985e1667b2bc05fa56f2533725266c0ca72077",
-    "dist/migration.d.ts": "a023def005fef5b2c9b2bc536cc659cfe329491935ba4f0bf863d89c227ff1eb",
-    "dist/persistence.d.ts": "8f61fd2947f2e491cade7af4b37b67521b41830172721eb200c441bbeec9532d",
-    "dist/player.d.ts": "efe85655250a4397fe9c907d9cb582f001196535367c17bd20da3346b79b62ca",
+    "dist/media-provider.d.ts": "b04ac35f79eb60c9351c783d85e9c211111c0011280573919cccaa62e19557f9",
+    "dist/migration-materials.d.ts": "c8b24ea198868a5c923fe37ae7fb93bbb9d432dfe4bce66f792526a7497d2edd",
+    "dist/migration.d.ts": "600a3c29cb8cff2baca8efdaa52d262e6bd676ae9205ff8aa2f69edbf046792b",
+    "dist/persistence.d.ts": "3b0a5b79d3bc55004857a77f1087d6cdd794d24eadfa2932109de1c752b8a500",
+    "dist/player.d.ts": "d7627e6d681fd05e5b268b1be9021619af3020f121a540d0c0b9e04fefdb949e",
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
-    "dist/production-media-provider.d.ts": "faa406f96bcb9f87247ffcc2e2251cd158d4d7798d888dc5a7934e36be32dcdb",
-    "dist/project-builder.d.ts": "db214e9d62361247b1d192e65dbc1920bb9e299f211854ac300f96ed23dbcf79",
-    "dist/runtime-material-registry.d.ts": "e74c432da12a8f5384fd133d6a30a8dd8953d38ec910ed0491e8c6018bca133b",
-    "dist/session.d.ts": "64182031fd650f05eea668d56aecb83ed1ef9917ad08fa58907f9d34c4021f43",
-    "dist/types.d.ts": "f982ffecf0ae14f52150982bf2a29457281a0f4113cf4ce6d9cfcb62e520e6eb"
+    "dist/production-media-provider.d.ts": "a0d2f336c4bc39d1affac157511dcaff3b2dcb9624634732a5d7d6fed248c077",
+    "dist/project-builder.d.ts": "efa5b4f0c081c865850628762a63ab15721ea4cbbc52f23c3471a7d2d7b3f7c2",
+    "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
+    "dist/session.d.ts": "803a8e40243a0f6566e396cdaeb047e5c7b2bb1c0e4399c59c821bc3a4f41d1c",
+    "dist/types.d.ts": "3dacdb4cbf5ee5ee45a30c5f97ac6eb70715cadb837f5c6bf96c6772cd2ea1a6"
   },
   "exports": [
     "AELION_EXTENSION_PROTOCOL",

@@ -13,9 +13,9 @@ const exportDist = fileURLToPath(new URL('../../export/dist', import.meta.url));
 
 function fixtureAlias() {
   return {
-    '@aelion/audio': resolve(audioDist, 'index.js'),
-    '@aelion/export': resolve(exportDist, 'index.js'),
-    '@aelion/renderer-worker': resolve(rendererDist, 'index.js'),
+    '@aelionsdk/audio': resolve(audioDist, 'index.js'),
+    '@aelionsdk/export': resolve(exportDist, 'index.js'),
+    '@aelionsdk/renderer-worker': resolve(rendererDist, 'index.js'),
   };
 }
 
@@ -65,10 +65,10 @@ async function testDevelopmentServer() {
     }
     const origin = `http://127.0.0.1:${address.port.toString()}`;
     for (const path of [
-      '/@aelion/vite-plugin/runtime-assets/audio/pcm-player.worklet.js',
-      '/@aelion/vite-plugin/runtime-assets/audio/pcm-message-player.worklet.js',
-      '/@aelion/vite-plugin/runtime-assets/renderer-worker/webgl2-worker.js',
-      '/@aelion/vite-plugin/runtime-assets/export/mux-export-worker.js',
+      '/@aelionsdk/vite-plugin/runtime-assets/audio/pcm-player.worklet.js',
+      '/@aelionsdk/vite-plugin/runtime-assets/audio/pcm-message-player.worklet.js',
+      '/@aelionsdk/vite-plugin/runtime-assets/renderer-worker/webgl2-worker.js',
+      '/@aelionsdk/vite-plugin/runtime-assets/export/mux-export-worker.js',
     ]) {
       const response = await fetch(`${origin}${path}`);
       assert.equal(response.status, 200);
@@ -77,7 +77,9 @@ async function testDevelopmentServer() {
     }
 
     const clock = await server.transformRequest(`/@fs/${resolve(audioDist, 'worklet-clock.js')}`);
-    assert(clock?.code.includes('/@aelion/vite-plugin/runtime-assets/audio/pcm-player.worklet.js'));
+    assert(
+      clock?.code.includes('/@aelionsdk/vite-plugin/runtime-assets/audio/pcm-player.worklet.js'),
+    );
   } finally {
     await server.close();
   }
@@ -86,6 +88,6 @@ async function testDevelopmentServer() {
 await testProductionBuild();
 await testDevelopmentServer();
 process.stdout.write(
-  '@aelion/vite-plugin tests passed: production build, development server\n',
+  '@aelionsdk/vite-plugin tests passed: production build, development server\n',
   () => process.exit(0),
 );

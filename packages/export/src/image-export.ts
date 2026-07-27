@@ -4,7 +4,7 @@ import {
   frameStartUs,
   throwIfAborted,
   type Rational,
-} from '@aelion/core';
+} from '@aelionsdk/core';
 import type { StreamTargetChunk } from 'mediabunny';
 
 import type { OfflineFrameRequest } from './webm-export.js';

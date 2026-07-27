@@ -1,6 +1,6 @@
-import { renderIrAudio } from '@aelion/audio';
-import { probeCapabilities } from '@aelion/capability';
-import { AelionError, type Diagnostic } from '@aelion/core';
+import { renderIrAudio } from '@aelionsdk/audio';
+import { probeCapabilities } from '@aelionsdk/capability';
+import { AelionError, type Diagnostic } from '@aelionsdk/core';
 import {
   createRemoteExportContentId,
   exportFrozenRenderIrAv1Mp4,
@@ -15,23 +15,30 @@ import {
   runRemoteExport,
   selectExportProfile,
   type FrozenWebMExportOptions,
-} from '@aelion/export';
-import { canonicalStringify, ProjectValidator, type AelionProject } from '@aelion/project-schema';
+} from '@aelionsdk/export';
+import {
+  canonicalStringify,
+  ProjectValidator,
+  type AelionProject,
+} from '@aelionsdk/project-schema';
 import {
   evaluateAnimatedValue,
   evaluateVisualState,
   IncrementalRenderCompiler,
   type CompileStats,
   type RenderIr,
-} from '@aelion/render-ir';
-import { RenderIrFrameRenderer, type RenderIrFrameRendererSnapshot } from '@aelion/renderer-worker';
+} from '@aelionsdk/render-ir';
+import {
+  RenderIrFrameRenderer,
+  type RenderIrFrameRendererSnapshot,
+} from '@aelionsdk/renderer-worker';
 import {
   EditingCommands,
   TransactionEngine,
   TransactionHistory,
   type TransactionBuilder,
   type TransactionCommit,
-} from '@aelion/transaction';
+} from '@aelionsdk/transaction';
 
 import { SessionAudioController, projectAudioMastering } from './audio-controller.js';
 import { createMasteredAudioRenderer } from './audio-mastering.js';
@@ -119,14 +126,16 @@ function directOpaqueVisualSource(
   ) {
     return undefined;
   }
-  const evaluate = (value: import('@aelion/core').JsonValue): unknown =>
+  const evaluate = (value: import('@aelionsdk/core').JsonValue): unknown =>
     evaluateAnimatedValue(value, timeUs, clip.range.startUs);
   const transform = visual.transform;
-  const position = objectValue(evaluate(transform.positionPx as import('@aelion/core').JsonValue));
-  const anchor = objectValue(evaluate(transform.anchor as import('@aelion/core').JsonValue));
-  const scale = objectValue(evaluate(transform.scale as import('@aelion/core').JsonValue));
-  const skew = objectValue(evaluate(transform.skewDeg as import('@aelion/core').JsonValue));
-  const crop = objectValue(evaluate(visual.crop as import('@aelion/core').JsonValue));
+  const position = objectValue(
+    evaluate(transform.positionPx as import('@aelionsdk/core').JsonValue),
+  );
+  const anchor = objectValue(evaluate(transform.anchor as import('@aelionsdk/core').JsonValue));
+  const scale = objectValue(evaluate(transform.scale as import('@aelionsdk/core').JsonValue));
+  const skew = objectValue(evaluate(transform.skewDeg as import('@aelionsdk/core').JsonValue));
+  const crop = objectValue(evaluate(visual.crop as import('@aelionsdk/core').JsonValue));
   if (
     finiteValue(position.x, ir.width / 2) !== ir.width / 2 ||
     finiteValue(position.y, ir.height / 2) !== ir.height / 2 ||
@@ -136,8 +145,8 @@ function directOpaqueVisualSource(
     finiteValue(scale.y, 1) !== 1 ||
     finiteValue(skew.x, 0) !== 0 ||
     finiteValue(skew.y, 0) !== 0 ||
-    finiteValue(evaluate(transform.rotationDeg as import('@aelion/core').JsonValue), 0) !== 0 ||
-    finiteValue(evaluate(visual.opacity as import('@aelion/core').JsonValue), 1) !== 1 ||
+    finiteValue(evaluate(transform.rotationDeg as import('@aelionsdk/core').JsonValue), 0) !== 0 ||
+    finiteValue(evaluate(visual.opacity as import('@aelionsdk/core').JsonValue), 1) !== 1 ||
     finiteValue(crop.left, 0) !== 0 ||
     finiteValue(crop.top, 0) !== 0 ||
     finiteValue(crop.right, 0) !== 0 ||

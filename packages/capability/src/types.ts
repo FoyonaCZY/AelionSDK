@@ -1,4 +1,4 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
 
 export type CapabilityStatus = 'supported' | 'degraded' | 'unsupported' | 'unknown';
 export type CapabilityTier = 'a' | 'b' | 'c' | 'unsupported';

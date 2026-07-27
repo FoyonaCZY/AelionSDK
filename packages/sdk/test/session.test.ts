@@ -1,13 +1,13 @@
 import { readFile } from 'node:fs/promises';
 
-import type { JsonObject } from '@aelion/core';
+import type { JsonObject } from '@aelionsdk/core';
 import type {
   RemoteExportEvent,
   RemoteExportRequest,
   RemoteExportSession,
   WebMExportOptions,
-} from '@aelion/export';
-import { canonicalHash } from '@aelion/project-schema';
+} from '@aelionsdk/export';
+import { canonicalHash } from '@aelionsdk/project-schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Aelion, AelionSession, defaultSchemas } from '../src/index.js';
@@ -32,7 +32,7 @@ function deferred<T>(): Deferred<T> {
   return { promise, resolve };
 }
 
-describe('@aelion/sdk session facade', () => {
+describe('@aelionsdk/sdk session facade', () => {
   it('bundles the canonical v1 schemas as deeply frozen runtime data', async () => {
     const [projectSchema, materialInstanceSchema] = await Promise.all([
       json('schemas/project/v1/project.schema.json'),

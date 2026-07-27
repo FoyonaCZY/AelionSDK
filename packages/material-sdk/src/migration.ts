@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 import { canonicalMaterialBytes } from './canonical.js';
 

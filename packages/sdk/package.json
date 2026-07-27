@@ -1,5 +1,5 @@
 {
-  "name": "@aelion/sdk",
+  "name": "@aelionsdk/sdk",
   "version": "0.1.0-beta.1",
   "description": "Browser-first real-time editing, preview and export SDK facade",
   "type": "module",
@@ -48,15 +48,15 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/audio": "0.1.0-beta.1",
-    "@aelion/capability": "0.1.0-beta.1",
-    "@aelion/core": "0.1.0-beta.1",
-    "@aelion/export": "0.1.0-beta.1",
-    "@aelion/material-compiler": "0.1.0-beta.1",
-    "@aelion/media": "0.1.0-beta.1",
-    "@aelion/project-schema": "0.1.0-beta.1",
-    "@aelion/render-ir": "0.1.0-beta.1",
-    "@aelion/renderer-worker": "0.1.0-beta.1",
-    "@aelion/transaction": "0.1.0-beta.1"
+    "@aelionsdk/audio": "0.1.0-beta.1",
+    "@aelionsdk/capability": "0.1.0-beta.1",
+    "@aelionsdk/core": "0.1.0-beta.1",
+    "@aelionsdk/export": "0.1.0-beta.1",
+    "@aelionsdk/material-compiler": "0.1.0-beta.1",
+    "@aelionsdk/media": "0.1.0-beta.1",
+    "@aelionsdk/project-schema": "0.1.0-beta.1",
+    "@aelionsdk/render-ir": "0.1.0-beta.1",
+    "@aelionsdk/renderer-worker": "0.1.0-beta.1",
+    "@aelionsdk/transaction": "0.1.0-beta.1"
   }
 }

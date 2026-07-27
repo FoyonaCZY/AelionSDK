@@ -1,13 +1,13 @@
-import type { JsonObject } from '@aelion/core';
-import { renderIrAudio } from '@aelion/audio';
+import type { JsonObject } from '@aelionsdk/core';
+import { renderIrAudio } from '@aelionsdk/audio';
 import {
   compileMaterialGraphToWebGl2,
   type MaterialGraph,
   type WebGl2MaterialProgram,
-} from '@aelion/material-compiler';
-import { decodeAudioPcmRange, decodeVideoFrameAt } from '@aelion/media';
-import type { AelionProject } from '@aelion/project-schema';
-import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelion/render-ir';
+} from '@aelionsdk/material-compiler';
+import { decodeAudioPcmRange, decodeVideoFrameAt } from '@aelionsdk/media';
+import type { AelionProject } from '@aelionsdk/project-schema';
+import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 import { RenderIrFrameRenderer, type IrFrameSource } from '../src/index.js';

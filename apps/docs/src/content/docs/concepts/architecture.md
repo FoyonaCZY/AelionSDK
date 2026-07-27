@@ -11,7 +11,7 @@ description: 从 Session 的公开接口深入到 Transaction、Render IR、Work
 
 ```mermaid
 flowchart LR
-  Host["宿主应用"] --> SDK["@aelion/sdk Session"]
+  Host["宿主应用"] --> SDK["@aelionsdk/sdk Session"]
   SDK --> Project["Project v1"]
   SDK --> Tx["Transaction / History"]
   Tx --> Project

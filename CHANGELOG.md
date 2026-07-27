@@ -10,6 +10,8 @@ No changes yet.
 
 ### Changed
 
+- Renamed every public package from the unavailable `@aelion/*` namespace to
+  the project-owned `@aelionsdk/*` npm organization before the first publish.
 - Muxed exports can opt into Worker orchestration through the public Session
   `execution` option; AVC negotiation is cached, sequential source decoding
   reuses bounded decoder sessions, and semantically opaque single-source
@@ -97,7 +99,7 @@ No changes yet.
 - Export preflight no longer trusts Chromium's AAC declaration alone; a real encode/flush canary converts runtime false positives into `EXPORT_AUDIO_CONFIG_UNSUPPORTED`.
 - Browser certification files now run serially because GPU/context budgets are browser-global across tabs; same-page concurrency remains covered by explicit admission and release tests.
 - WebGL2 composition checks context loss both before and after bitmap transfer and retries bounded context admission with a stable timeout diagnostic.
-- Clean GitHub Actions browser jobs now build workspace exports before testing and resolve every `@aelion/*` test import through source aliases.
+- Clean GitHub Actions browser jobs now build workspace exports before testing and resolve every `@aelionsdk/*` test import through source aliases.
 - Hermetic tarball consumers inherit the repository's exact `pnpm@10.13.1` package-manager pin, preventing Corepack from selecting an incompatible pnpm release under Node.js 20.
 - Render IR presentation normalizes the public `ImageBitmap` to straight alpha, avoiding double premultiplication on Linux headless Chromium/ANGLE paths.
 - Browser CI follows the certified platform boundary: Chromium runs on Ubuntu, while Firefox 54/54 and the two-browser tarball consumer run on macOS Intel where Worker WebGL2, H.264/AAC and the null audio backend are available.
@@ -117,9 +119,9 @@ No changes yet.
 - AudioWorklet 主时钟、视频追随、seek generation、有界 SharedArrayBuffer/Transferable PCM、Track mute 与 loop time-mapping mixer。
 - frozen Render IR 的 WebCodecs VP9/Opus 流式 WebM 导出、preflight、进度/取消、Writable/Memory/OPFS Sink、背压与 partial cleanup。
 - Aelion Material Protocol、Core Node Graph compiler、Cross Dissolve/Warm Film/Soft Glow 示例与 Preview/Export 执行链。
-- `@aelion/material-sdk` typed Definition/Graph builders、静态校验、canonical manifest、逐文件 SHA-256、确定性 `.aelionmat` ZIP、精确 Registry/Resolver 和 trusted-code publisher allowlist。
-- `@aelion/sdk` 统一 Session facade，覆盖 Project load、Transaction/history、Player、Preview、Export、Capability、Material runtime 和有界 `ByteMediaProvider`。
-- 13 个 MIT 公开 `@aelion/*` 包具备 ESM exports、`.d.ts`、npm metadata、LICENSE/README staging；第 13 个包 `@aelion/vite-plugin` 提供公开的 Vite Worker/AudioWorklet 资源集成。
+- `@aelionsdk/material-sdk` typed Definition/Graph builders、静态校验、canonical manifest、逐文件 SHA-256、确定性 `.aelionmat` ZIP、精确 Registry/Resolver 和 trusted-code publisher allowlist。
+- `@aelionsdk/sdk` 统一 Session facade，覆盖 Project load、Transaction/history、Player、Preview、Export、Capability、Material runtime 和有界 `ByteMediaProvider`。
+- 13 个 MIT 公开 `@aelionsdk/*` 包具备 ESM exports、`.d.ts`、npm metadata、LICENSE/README staging；第 13 个包 `@aelionsdk/vite-plugin` 提供公开的 Vite Worker/AudioWorklet 资源集成。
 - Worker/AudioWorklet 生产 URL 使用随包 `.js`，tarball gate 检查其目标存在且不发布 `src`/`.tsbuildinfo`。
 - 开源治理文件、ADR-001～015、Alpha Quick Start、部署/Provider/资源/诊断/版本文档、60 秒合法 Project fixture 与 Phase 1 evidence/exit 模板。
 
@@ -164,4 +166,4 @@ No changes yet.
 - Material 公钥签名链、撤回、Marketplace 和通用 trusted Shader/WASM 沙箱未实现；当前只提供 integrity 与宿主 allowlist，且 Worker/WASM 不被视为安全沙箱。
 - Safari/iOS/Android、其他 OS/GPU、长视频/4K/HDR 和移动端本地导出尚未认证。
 - npm provenance 尚未由真实 publish 证明。
-- Vite 应用必须显式启用公开 `@aelion/vite-plugin`；其他 bundler 尚无认证适配器。
+- Vite 应用必须显式启用公开 `@aelionsdk/vite-plugin`；其他 bundler 尚无认证适配器。

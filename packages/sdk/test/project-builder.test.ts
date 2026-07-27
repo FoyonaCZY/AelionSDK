@@ -1,4 +1,4 @@
-import type { SampleIndex } from '@aelion/media';
+import type { SampleIndex } from '@aelionsdk/media';
 import { describe, expect, it } from 'vitest';
 
 import { createProject, frames, milliseconds, seconds } from '../src/project-builder.js';

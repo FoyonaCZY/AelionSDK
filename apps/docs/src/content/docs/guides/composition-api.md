@@ -14,7 +14,7 @@ Transaction Commands。
 ## 创建一份 Composition
 
 ```ts
-import { createComposition, seconds } from '@aelion/sdk';
+import { createComposition, seconds } from '@aelionsdk/sdk';
 
 const composition = createComposition({
   projectId: 'launch_card',

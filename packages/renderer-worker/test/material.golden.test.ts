@@ -1,4 +1,4 @@
-import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
+import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelionsdk/material-compiler';
 import { describe, expect, it } from 'vitest';
 
 const transition: MaterialGraph = {

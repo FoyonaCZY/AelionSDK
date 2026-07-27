@@ -1,12 +1,12 @@
-import { OpfsSeekableSink } from '@aelion/export';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 import {
   compileMaterialGraphToWebGl2,
   type MaterialGraph,
   type WebGl2MaterialProgram,
-} from '@aelion/material-compiler';
-import { createSampleIndex } from '@aelion/media';
-import type { IrMaterialDefinition } from '@aelion/render-ir';
-import { Aelion, ByteMediaProvider, RuntimeMaterialRegistry } from '@aelion/sdk';
+} from '@aelionsdk/material-compiler';
+import { createSampleIndex } from '@aelionsdk/media';
+import type { IrMaterialDefinition } from '@aelionsdk/render-ir';
+import { Aelion, ByteMediaProvider, RuntimeMaterialRegistry } from '@aelionsdk/sdk';
 
 interface AlphaEvidence {
   readonly bytes: Uint8Array;

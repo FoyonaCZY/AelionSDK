@@ -1,5 +1,5 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
-import { compileMaterialGraph, type CompileMaterialOptions } from '@aelion/material-compiler';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
+import { compileMaterialGraph, type CompileMaterialOptions } from '@aelionsdk/material-compiler';
 
 import type {
   AuthoredMaterial,

@@ -20,7 +20,7 @@ Profile ID 是稳定的格式选择，不是浏览器自动协商结果。产品
 | `audio-wav`     | audio-only     | `audio/wav`  | `.wav`  | —                 | PCM         | 可作为独立单元重做 |
 
 `EXPORT_PROFILES` 导出同一份机器可读元数据。muxed profile 的
-`checkpointed-units` 由 `@aelion/export` 的 `exportResumableMuxed()` 实现；
+`checkpointed-units` 由 `@aelionsdk/export` 的 `exportResumableMuxed()` 实现；
 Session 的普通 `startProfile()` 仍是一次性任务，不会自动接管业务 Job ID。
 
 ## 所有本地 Profile 的共同选项
@@ -57,7 +57,7 @@ Session 从当前 Render IR 填充 duration、width、height、frameRate、sampl
 ## Probe 和 Preflight 的差别
 
 ```ts
-import { probeExportProfiles } from '@aelion/export';
+import { probeExportProfiles } from '@aelionsdk/export';
 
 const generic = await probeExportProfiles();
 const exact = await session.export.preflightProfile(options);

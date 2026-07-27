@@ -1,4 +1,4 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
 
 import { VISUAL_NODE_SET_1 } from './node-registry.js';
 import type {

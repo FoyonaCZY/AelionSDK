@@ -3,7 +3,7 @@ title: 创建和安装 Material
 description: 用真实的 Material SDK builder 创建转场，分析 Graph，打包并在宿主中执行信任检查。
 ---
 
-Material 用来扩展画面处理，包括 Filter、Effect、Transition 和 Generator。如果只是在产品里使用已有素材和效果，可以先跳过本页；只有要制作自己的效果包或 Material 商店时才需要 `@aelion/material-sdk`。
+Material 用来扩展画面处理，包括 Filter、Effect、Transition 和 Generator。如果只是在产品里使用已有素材和效果，可以先跳过本页；只有要制作自己的效果包或 Material 商店时才需要 `@aelionsdk/material-sdk`。
 
 ## 四个对象分别做什么
 
@@ -26,7 +26,7 @@ import {
   materialDefinition,
   materialGraph,
   packMaterialPackage,
-} from '@aelion/material-sdk';
+} from '@aelionsdk/material-sdk';
 
 const graph = materialGraph(g => {
   const eased = g.transitionCurve(
@@ -109,7 +109,7 @@ console.log(resolved.definition.display.name);
 ## 在 Material Lab 中分析
 
 ```ts
-import { MaterialLabSession } from '@aelion/material-sdk';
+import { MaterialLabSession } from '@aelionsdk/material-sdk';
 
 const lab = new MaterialLabSession(material);
 lab.setParameter('curve', 'smooth');

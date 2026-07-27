@@ -20,7 +20,7 @@ Project 里的 Asset 只是素材记录，真正的视频字节由 `ProductionMe
 ## 一个编辑器创建一个 Provider
 
 ```ts
-import { ProductionMediaProvider } from '@aelion/sdk';
+import { ProductionMediaProvider } from '@aelionsdk/sdk';
 
 const media = new ProductionMediaProvider({
   maxCachedIndexes: 8,
@@ -37,7 +37,7 @@ const media = new ProductionMediaProvider({
 下面的函数完成注册、探测和 Project 创建。返回值中的 ID 可以直接交给时间线 UI。
 
 ```ts
-import { createProject, type ImportedMedia } from '@aelion/sdk';
+import { createProject, type ImportedMedia } from '@aelionsdk/sdk';
 
 async function createProjectFromFile(
   media: ProductionMediaProvider,

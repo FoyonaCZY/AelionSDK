@@ -1,4 +1,4 @@
-import { frameStartUs, throwIfAborted } from '@aelion/core';
+import { frameStartUs, throwIfAborted } from '@aelionsdk/core';
 import { Mp4OutputFormat, WebMOutputFormat } from 'mediabunny';
 
 import {

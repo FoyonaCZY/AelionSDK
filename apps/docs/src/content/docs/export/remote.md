@@ -20,7 +20,7 @@ Project 里的 Asset locator 应是稳定业务 key。服务端根据 key 和用
 ## 实现短期授权
 
 ```ts
-import type { RemoteExportAuthorizer } from '@aelion/export';
+import type { RemoteExportAuthorizer } from '@aelionsdk/export';
 
 const authorizer: RemoteExportAuthorizer = {
   async authorize(signal) {
@@ -39,7 +39,7 @@ Token 只在本次运行中使用，不会写入 Project、content ID 或默认�
 ## 实现 Provider
 
 ```ts
-import type { RemoteExportProvider } from '@aelion/export';
+import type { RemoteExportProvider } from '@aelionsdk/export';
 
 const provider: RemoteExportProvider = {
   id: 'my-render-service',

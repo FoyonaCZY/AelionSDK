@@ -8,7 +8,7 @@ description: 配置 H.264/AAC 或 VP9/Opus 视频导出，选择码率、分辨�
 ## H.264/AAC MP4
 
 ```ts
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 
 const sink = new SeekableMemorySink();
 const options = {
@@ -136,7 +136,7 @@ Project 可以设置 3840×2160。能否在本地完成由真实设备决定：
 ## 长视频写入 OPFS
 
 ```ts
-import { OpfsSeekableSink } from '@aelion/export';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 
 const sink = new OpfsSeekableSink('output.mp4');
 const result = await session.export.startProfile({
@@ -156,14 +156,14 @@ console.log(result.mimeType, file.size);
 
 ## 中断后只继续未提交分段
 
-需要跨刷新或崩溃恢复时，直接使用 `@aelion/export` 的持久分段 API：
+需要跨刷新或崩溃恢复时，直接使用 `@aelionsdk/export` 的持久分段 API：
 
 ```ts
 import {
   exportResumableMuxed,
   IndexedDbResumableMuxedExportStore,
   OpfsSeekableSink,
-} from '@aelion/export';
+} from '@aelionsdk/export';
 
 const store = new IndexedDbResumableMuxedExportStore({
   databaseName: 'my-editor-export-checkpoints',

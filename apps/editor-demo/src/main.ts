@@ -1,4 +1,4 @@
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 import {
   Aelion,
   IndexedDbProjectRevisionStore,
@@ -11,7 +11,7 @@ import {
   type AelionSessionApi,
   type PreviewCanvasController,
   type PreviewCanvasQuality,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 
 import './style.css';
 

@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 import {
   MATERIAL_DEFINITION_SCHEMA,
@@ -16,7 +16,7 @@ import {
   type MaterialResourceSlot,
   type MaterialScope,
 } from './types.js';
-import type { MaterialGraph } from '@aelion/material-compiler';
+import type { MaterialGraph } from '@aelionsdk/material-compiler';
 
 export interface MaterialDefinitionBuilderOptions {
   readonly id: string;

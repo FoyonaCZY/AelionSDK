@@ -26,7 +26,7 @@ profile 是能力门控选项，不是无条件 fallback。不要通过 UA 或�
 ## 一次完整的本地导出
 
 ```ts
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 
 const sink = new SeekableMemorySink();
 const options = {

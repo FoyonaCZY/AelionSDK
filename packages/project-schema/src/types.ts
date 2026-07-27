@@ -1,4 +1,4 @@
-import type { JsonObject, JsonValue, Rational } from '@aelion/core';
+import type { JsonObject, JsonValue, Rational } from '@aelionsdk/core';
 
 export type EntityId = string;
 export type CollectionName =

@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

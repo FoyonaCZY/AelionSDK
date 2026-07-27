@@ -1,8 +1,8 @@
 import Ajv2020, { type ErrorObject, type ValidateFunction } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-import type { Diagnostic, JsonObject, JsonValue, Result } from '@aelion/core';
-import { err, ok } from '@aelion/core';
+import type { Diagnostic, JsonObject, JsonValue, Result } from '@aelionsdk/core';
+import { err, ok } from '@aelionsdk/core';
 
 import { COLLECTION_NAMES, type AelionProject, type CollectionName } from './types.js';
 import { ProjectInputAdmissionError, snapshotProjectInput } from './admission.js';

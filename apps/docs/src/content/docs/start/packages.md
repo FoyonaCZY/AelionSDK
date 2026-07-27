@@ -10,27 +10,27 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 ```json
 {
   "dependencies": {
-    "@aelion/sdk": "0.1.0-beta.1",
-    "@aelion/export": "0.1.0-beta.1"
+    "@aelionsdk/sdk": "0.1.0-beta.1",
+    "@aelionsdk/export": "0.1.0-beta.1"
   },
   "devDependencies": {
-    "@aelion/vite-plugin": "0.1.0-beta.1"
+    "@aelionsdk/vite-plugin": "0.1.0-beta.1"
   }
 }
 ```
 
 它们分别解决：
 
-| 包                    | 什么时候会直接用到                                                   |
-| --------------------- | -------------------------------------------------------------------- |
-| `@aelion/sdk`         | 创建 Project 和 Session，注册素材，连接 Canvas，播放，编辑和启动导出 |
-| `@aelion/export`      | 创建内存或 OPFS Sink；定义远程导出适配器                             |
-| `@aelion/vite-plugin` | 可选；让 Vite 正确打包 Renderer/Export Worker 和 AudioWorklet        |
+| 包                       | 什么时候会直接用到                                                   |
+| ------------------------ | -------------------------------------------------------------------- |
+| `@aelionsdk/sdk`         | 创建 Project 和 Session，注册素材，连接 Canvas，播放，编辑和启动导出 |
+| `@aelionsdk/export`      | 创建内存或 OPFS Sink；定义远程导出适配器                             |
+| `@aelionsdk/vite-plugin` | 可选；让 Vite 正确打包 Renderer/Export Worker 和 AudioWorklet        |
 
 非 Vite 宿主只安装 runtime 依赖，并按[安装与工程配置](/AelionSDK/start/installation/)
 显式部署 `runtimeAssets`；不需要安装或模拟 Vite 插件。
 
-业务组件里大部分导入都应该来自 `@aelion/sdk`：
+业务组件里大部分导入都应该来自 `@aelionsdk/sdk`：
 
 ```ts
 import {
@@ -39,17 +39,17 @@ import {
   attachPreviewCanvas,
   createComposition,
   createProject,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 ```
 
 模板和程序化成片优先使用 `createComposition()`；需要探测并导入真实媒体或操作
 Schema 级实体时使用 `createProject()`。两者生成相同的 Project v1 文档，可以加载到
 同一个 Session。
 
-只有创建导出落盘目标时，才会直接使用 `@aelion/export`：
+只有创建导出落盘目标时，才会直接使用 `@aelionsdk/export`：
 
 ```ts
-import { OpfsSeekableSink, SeekableMemorySink } from '@aelion/export';
+import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 ```
 
 ## 开发 Material
@@ -59,12 +59,12 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelion/export';
 ```json
 {
   "dependencies": {
-    "@aelion/material-sdk": "0.1.0-beta.1"
+    "@aelionsdk/material-sdk": "0.1.0-beta.1"
   }
 }
 ```
 
-这个包用于定义参数、搭建声明式 Graph、校验和生成 Material package。应用在运行时仍然通过 `@aelion/sdk` 加载和使用 Material。
+这个包用于定义参数、搭建声明式 Graph、校验和生成 Material package。应用在运行时仍然通过 `@aelionsdk/sdk` 加载和使用 Material。
 
 ## 什么时候才需要底层包
 
@@ -75,23 +75,23 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelion/export';
 - 你要直接研究 Project 校验、事务或 Render IR；
 - 你在为 AelionSDK 本身贡献代码。
 
-| 包                          | 提供的底层接口                                   |
-| --------------------------- | ------------------------------------------------ |
-| `@aelion/core`              | 时间换算、Diagnostic、JSON 类型和通用错误        |
-| `@aelion/project-schema`    | Project v1 类型、Schema 校验和 canonical JSON    |
-| `@aelion/transaction`       | 编辑命令、事务、revision、undo/redo              |
-| `@aelion/render-ir`         | 把 Project 编译成渲染执行图                      |
-| `@aelion/media`             | RangeReader、MP4/WebM 索引、解码、缓存和代理选择 |
-| `@aelion/audio`             | PCM 混音、AudioWorklet 时钟和音频传输            |
-| `@aelion/renderer-worker`   | WebGL2/WebGPU 合成和 Worker 协议                 |
-| `@aelion/capability`        | GPU、codec、音频和存储能力探测                   |
-| `@aelion/material-compiler` | Material Graph 校验和 GPU 程序编译               |
+| 包                             | 提供的底层接口                                   |
+| ------------------------------ | ------------------------------------------------ |
+| `@aelionsdk/core`              | 时间换算、Diagnostic、JSON 类型和通用错误        |
+| `@aelionsdk/project-schema`    | Project v1 类型、Schema 校验和 canonical JSON    |
+| `@aelionsdk/transaction`       | 编辑命令、事务、revision、undo/redo              |
+| `@aelionsdk/render-ir`         | 把 Project 编译成渲染执行图                      |
+| `@aelionsdk/media`             | RangeReader、MP4/WebM 索引、解码、缓存和代理选择 |
+| `@aelionsdk/audio`             | PCM 混音、AudioWorklet 时钟和音频传输            |
+| `@aelionsdk/renderer-worker`   | WebGL2/WebGPU 合成和 Worker 协议                 |
+| `@aelionsdk/capability`        | GPU、codec、音频和存储能力探测                   |
+| `@aelionsdk/material-compiler` | Material Graph 校验和 GPU 程序编译               |
 
-直接依赖这些包意味着你要自己管理版本兼容和资源生命周期。能通过 Session 完成的功能，不需要绕过 `@aelion/sdk`。
+直接依赖这些包意味着你要自己管理版本兼容和资源生命周期。能通过 Session 完成的功能，不需要绕过 `@aelionsdk/sdk`。
 
 ## 版本和导入规则
 
-- 一个应用内的所有 `@aelion/*` 包使用完全相同的版本；
+- 一个应用内的所有 `@aelionsdk/*` 包使用完全相同的版本；
 - 只从 package exports 导入，不使用 `/src` 或 `/dist` 路径；
 - alpha 升级时审阅 API Snapshot 和 CHANGELOG；
 - 升级后至少重新跑一次媒体导入、预览、编辑和目标导出格式。

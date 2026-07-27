@@ -60,7 +60,7 @@ Canvas 的 CSS 尺寸只决定页面布局。`attachPreviewCanvas()` 会根据 C
 先创建 Provider，再给文件分配一个稳定的 `assetId`：
 
 ```ts
-import { ProductionMediaProvider } from '@aelion/sdk';
+import { ProductionMediaProvider } from '@aelionsdk/sdk';
 
 const media = new ProductionMediaProvider();
 media.registerFile('asset_main', file);
@@ -78,7 +78,7 @@ console.table(probe.index.tracks);
 `createProject()` 会建立一个空 Sequence。画布尺寸取素材视频轨；纯音频文件则使用 1920×1080 的默认值。
 
 ```ts
-import { createProject } from '@aelion/sdk';
+import { createProject } from '@aelionsdk/sdk';
 
 const videoTrack = probe.index.tracks.find(track => track.kind === 'video');
 const builder = createProject({
@@ -118,7 +118,7 @@ const project = builder.build();
 ## 4. 创建 Session 并显示第一帧
 
 ```ts
-import { Aelion, attachPreviewCanvas } from '@aelion/sdk';
+import { Aelion, attachPreviewCanvas } from '@aelionsdk/sdk';
 
 const session = await Aelion.createSession({ media });
 await session.loadProject(project);
@@ -172,7 +172,7 @@ scrubber.addEventListener('input', () => {
 带音频的视频应该联动移动，否则声音和画面会错开：
 
 ```ts
-import { seconds } from '@aelion/sdk';
+import { seconds } from '@aelionsdk/sdk';
 
 if (imported.linkGroupId !== undefined) {
   session.transaction.commands.moveLinkedGroup({
@@ -200,7 +200,7 @@ if (session.transaction.canRedo) session.transaction.redo();
 H.264 和 AAC 是否可用由浏览器、操作系统、硬件和当前工程共同决定，所以启动任务前要做 preflight。
 
 ```ts
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 
 const sink = new SeekableMemorySink();
 const options = {

@@ -8,7 +8,7 @@ description: 把 Sequence 混音结果写成 s16 或 f32 WAV，并处理 RF64 �
 ## 导出到 OPFS
 
 ```ts
-import { OpfsSeekableSink } from '@aelion/export';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 
 const sink = new OpfsSeekableSink('mix.wav');
 const options = {

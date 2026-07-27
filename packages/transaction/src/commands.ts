@@ -1,12 +1,12 @@
-import type { JsonObject, JsonValue } from '@aelion/core';
-import { AelionError } from '@aelion/core';
+import type { JsonObject, JsonValue } from '@aelionsdk/core';
+import { AelionError } from '@aelionsdk/core';
 import type {
   AelionProject,
   EntityId,
   ItemEntity,
   MarkerEntity,
   TrackEntity,
-} from '@aelion/project-schema';
+} from '@aelionsdk/project-schema';
 
 import type { TransactionHost } from './history.js';
 import type { EditOptions, TransactionCommit } from './types.js';
@@ -446,7 +446,7 @@ function assertRippleClosure(
   project: Readonly<AelionProject>,
   shiftedItemIds: ReadonlySet<string>,
   ignoredItemIds: ReadonlySet<string> = new Set(),
-): readonly import('@aelion/project-schema').TransitionEntity[] {
+): readonly import('@aelionsdk/project-schema').TransitionEntity[] {
   for (const id of shiftedItemIds) {
     const groupId = project.items[id]?.linkGroupId;
     if (groupId === undefined) continue;
@@ -459,7 +459,7 @@ function assertRippleClosure(
       );
     }
   }
-  const shiftedTransitions: import('@aelion/project-schema').TransitionEntity[] = [];
+  const shiftedTransitions: import('@aelionsdk/project-schema').TransitionEntity[] = [];
   for (const transition of Object.values(project.transitions)) {
     if (ignoredItemIds.has(transition.fromItemId) || ignoredItemIds.has(transition.toItemId)) {
       continue;
@@ -482,7 +482,7 @@ function appendRippleShift(
   project: Readonly<AelionProject>,
   transaction: import('./transaction.js').TransactionBuilder,
   items: readonly ItemEntity[],
-  transitions: readonly import('@aelion/project-schema').TransitionEntity[],
+  transitions: readonly import('@aelionsdk/project-schema').TransitionEntity[],
   sequenceId: string,
   markerPivotUs: number,
   deltaUs: number,

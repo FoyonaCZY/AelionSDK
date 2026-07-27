@@ -1,4 +1,4 @@
-import { frameIndexAtTime, frameStartUs, type Disposable, type Rational } from '@aelion/core';
+import { frameIndexAtTime, frameStartUs, type Disposable, type Rational } from '@aelionsdk/core';
 
 export interface PlaybackClock {
   nowUs(): number;

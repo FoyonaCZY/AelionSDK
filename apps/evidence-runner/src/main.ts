@@ -1,16 +1,16 @@
-import { renderIrAudio } from '@aelion/audio';
-import type { JsonObject } from '@aelion/core';
-import { exportFrozenRenderIrWebM, OpfsSeekableSink } from '@aelion/export';
+import { renderIrAudio } from '@aelionsdk/audio';
+import type { JsonObject } from '@aelionsdk/core';
+import { exportFrozenRenderIrWebM, OpfsSeekableSink } from '@aelionsdk/export';
 import {
   compileMaterialGraphToWebGl2,
   type MaterialGraph,
   type WebGl2MaterialProgram,
-} from '@aelion/material-compiler';
-import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelion/media';
-import { ProjectValidator } from '@aelion/project-schema';
-import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelion/render-ir';
-import { RenderIrFrameRenderer, type IrFrameSource } from '@aelion/renderer-worker';
-import { TransactionEngine } from '@aelion/transaction';
+} from '@aelionsdk/material-compiler';
+import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelionsdk/media';
+import { ProjectValidator } from '@aelionsdk/project-schema';
+import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelionsdk/render-ir';
+import { RenderIrFrameRenderer, type IrFrameSource } from '@aelionsdk/renderer-worker';
+import { TransactionEngine } from '@aelionsdk/transaction';
 
 interface VerticalSliceEvidence {
   readonly bytes: Uint8Array;

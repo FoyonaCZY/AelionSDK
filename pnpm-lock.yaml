@@ -50,7 +50,7 @@ importers:
 
   apps/capability-lab:
     dependencies:
-      '@aelion/capability':
+      '@aelionsdk/capability':
         specifier: workspace:*
         version: link:../../packages/capability
 
@@ -74,14 +74,14 @@ importers:
 
   apps/editor-demo:
     dependencies:
-      '@aelion/export':
+      '@aelionsdk/export':
         specifier: workspace:*
         version: link:../../packages/export
-      '@aelion/sdk':
+      '@aelionsdk/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
     devDependencies:
-      '@aelion/vite-plugin':
+      '@aelionsdk/vite-plugin':
         specifier: workspace:*
         version: link:../../packages/vite-plugin
       vite:
@@ -90,44 +90,44 @@ importers:
 
   apps/evidence-runner:
     dependencies:
-      '@aelion/audio':
+      '@aelionsdk/audio':
         specifier: workspace:*
         version: link:../../packages/audio
-      '@aelion/export':
+      '@aelionsdk/export':
         specifier: workspace:*
         version: link:../../packages/export
-      '@aelion/material-compiler':
+      '@aelionsdk/material-compiler':
         specifier: workspace:*
         version: link:../../packages/material-compiler
-      '@aelion/media':
+      '@aelionsdk/media':
         specifier: workspace:*
         version: link:../../packages/media
-      '@aelion/project-schema':
+      '@aelionsdk/project-schema':
         specifier: workspace:*
         version: link:../../packages/project-schema
-      '@aelion/render-ir':
+      '@aelionsdk/render-ir':
         specifier: workspace:*
         version: link:../../packages/render-ir
-      '@aelion/renderer-worker':
+      '@aelionsdk/renderer-worker':
         specifier: workspace:*
         version: link:../../packages/renderer-worker
-      '@aelion/sdk':
+      '@aelionsdk/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
-      '@aelion/transaction':
+      '@aelionsdk/transaction':
         specifier: workspace:*
         version: link:../../packages/transaction
 
   apps/quickstart:
     dependencies:
-      '@aelion/export':
+      '@aelionsdk/export':
         specifier: workspace:*
         version: link:../../packages/export
-      '@aelion/sdk':
+      '@aelionsdk/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
     devDependencies:
-      '@aelion/vite-plugin':
+      '@aelionsdk/vite-plugin':
         specifier: workspace:*
         version: link:../../packages/vite-plugin
       vite:
@@ -136,16 +136,16 @@ importers:
 
   packages/audio:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/render-ir':
+      '@aelionsdk/render-ir':
         specifier: 0.1.0-beta.1
         version: link:../render-ir
 
   packages/capability:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
 
@@ -153,13 +153,13 @@ importers:
 
   packages/export:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/media':
+      '@aelionsdk/media':
         specifier: 0.1.0-beta.1
         version: link:../media
-      '@aelion/render-ir':
+      '@aelionsdk/render-ir':
         specifier: 0.1.0-beta.1
         version: link:../render-ir
       mediabunny:
@@ -168,16 +168,16 @@ importers:
 
   packages/material-compiler:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
 
   packages/material-sdk:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/material-compiler':
+      '@aelionsdk/material-compiler':
         specifier: 0.1.0-beta.1
         version: link:../material-compiler
       ajv:
@@ -189,7 +189,7 @@ importers:
 
   packages/media:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
       mediabunny:
@@ -198,7 +198,7 @@ importers:
 
   packages/project-schema:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
       ajv:
@@ -210,79 +210,79 @@ importers:
 
   packages/render-ir:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/material-compiler':
+      '@aelionsdk/material-compiler':
         specifier: 0.1.0-beta.1
         version: link:../material-compiler
-      '@aelion/project-schema':
+      '@aelionsdk/project-schema':
         specifier: 0.1.0-beta.1
         version: link:../project-schema
 
   packages/renderer-worker:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/material-compiler':
+      '@aelionsdk/material-compiler':
         specifier: 0.1.0-beta.1
         version: link:../material-compiler
-      '@aelion/render-ir':
+      '@aelionsdk/render-ir':
         specifier: 0.1.0-beta.1
         version: link:../render-ir
 
   packages/sdk:
     dependencies:
-      '@aelion/audio':
+      '@aelionsdk/audio':
         specifier: 0.1.0-beta.1
         version: link:../audio
-      '@aelion/capability':
+      '@aelionsdk/capability':
         specifier: 0.1.0-beta.1
         version: link:../capability
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/export':
+      '@aelionsdk/export':
         specifier: 0.1.0-beta.1
         version: link:../export
-      '@aelion/material-compiler':
+      '@aelionsdk/material-compiler':
         specifier: 0.1.0-beta.1
         version: link:../material-compiler
-      '@aelion/media':
+      '@aelionsdk/media':
         specifier: 0.1.0-beta.1
         version: link:../media
-      '@aelion/project-schema':
+      '@aelionsdk/project-schema':
         specifier: 0.1.0-beta.1
         version: link:../project-schema
-      '@aelion/render-ir':
+      '@aelionsdk/render-ir':
         specifier: 0.1.0-beta.1
         version: link:../render-ir
-      '@aelion/renderer-worker':
+      '@aelionsdk/renderer-worker':
         specifier: 0.1.0-beta.1
         version: link:../renderer-worker
-      '@aelion/transaction':
+      '@aelionsdk/transaction':
         specifier: 0.1.0-beta.1
         version: link:../transaction
 
   packages/transaction:
     dependencies:
-      '@aelion/core':
+      '@aelionsdk/core':
         specifier: 0.1.0-beta.1
         version: link:../core
-      '@aelion/project-schema':
+      '@aelionsdk/project-schema':
         specifier: 0.1.0-beta.1
         version: link:../project-schema
 
   packages/vite-plugin:
     dependencies:
-      '@aelion/audio':
+      '@aelionsdk/audio':
         specifier: 0.1.0-beta.1
         version: link:../audio
-      '@aelion/export':
+      '@aelionsdk/export':
         specifier: 0.1.0-beta.1
         version: link:../export
-      '@aelion/renderer-worker':
+      '@aelionsdk/renderer-worker':
         specifier: 0.1.0-beta.1
         version: link:../renderer-worker
       vite:

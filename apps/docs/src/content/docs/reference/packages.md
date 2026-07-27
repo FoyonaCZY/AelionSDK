@@ -11,7 +11,7 @@ helper 不在兼容范围内。
 
 ## 产品应用直接依赖的包
 
-### `@aelion/sdk`
+### `@aelionsdk/sdk`
 
 大多数业务代码的入口：
 
@@ -33,13 +33,13 @@ import {
   attachPreviewCanvas,
   createComposition,
   seconds,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 ```
 
 `createComposition()` 是产品级创作入口；`createProject()` 是媒体导入和 Schema
 级操作使用的 Builder 入口。两者不是两套工程格式。
 
-### `@aelion/export`
+### `@aelionsdk/export`
 
 产品层通常直接使用 Sink 和远程导出类型：
 
@@ -50,17 +50,17 @@ import {
 - checkpoint、Worker exporter 和底层 profile 函数。
 
 ```ts
-import { OpfsSeekableSink, type RemoteExportProvider } from '@aelion/export';
+import { OpfsSeekableSink, type RemoteExportProvider } from '@aelionsdk/export';
 ```
 
 通过 Session 导出时，不需要直接调用底层 `exportMp4()` 或 `exportWebM()`。
 
-### `@aelion/vite-plugin`
+### `@aelionsdk/vite-plugin`
 
 只在 Vite 配置中使用：
 
 ```ts
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 
 export default defineConfig({ plugins: [aelion()] });
 ```
@@ -68,7 +68,7 @@ export default defineConfig({ plugins: [aelion()] });
 它负责 Renderer Worker、Export Worker 和 AudioWorklet 构建入口。非 Vite 宿主
 不依赖这个包，改用 `AelionSessionOptions.runtimeAssets` 显式传入部署 URL。
 
-### `@aelion/material-sdk`
+### `@aelionsdk/material-sdk`
 
 给 Material 作者和 Catalog/安装系统使用：
 
@@ -80,27 +80,27 @@ export default defineConfig({ plugins: [aelion()] });
 
 ## 引擎层包
 
-| 包                          | 主要内容                                                             | 谁会直接用                      |
-| --------------------------- | -------------------------------------------------------------------- | ------------------------------- |
-| `@aelion/core`              | `AelionError`、Diagnostic、时间/帧/采样换算、JSON 类型               | 错误处理、底层扩展              |
-| `@aelion/project-schema`    | Project v1 类型、`ProjectValidator`、canonical clone、输入 admission | 自定义 Project 工具、服务端校验 |
-| `@aelion/transaction`       | `EditingCommands`、Transaction Engine、History、ChangeSet            | 引擎贡献者、自定义宿主          |
-| `@aelion/render-ir`         | Project 编译、音视频求值、色彩描述、compile stats                    | 自定义 renderer/exporter        |
-| `@aelion/media`             | RangeReader、MP4/WebM 索引、seek/decode、CacheStore、proxy/governor  | 自定义媒体来源和缓存            |
-| `@aelion/audio`             | PCM 混音、AudioWorklet clock、ring/queue、视频调度                   | 自定义音频宿主和分析            |
-| `@aelion/renderer-worker`   | Worker client/protocol、WebGL2/WebGPU 合成、帧结果                   | 自定义渲染表面                  |
-| `@aelion/capability`        | GPU、codec、音频、存储和 WASM 探测                                   | 独立能力实验和宿主              |
-| `@aelion/material-compiler` | Graph 类型检查、Core Node、WebGL2/WebGPU 编译和预算                  | Material 工具和自定义宿主       |
+| 包                             | 主要内容                                                             | 谁会直接用                      |
+| ------------------------------ | -------------------------------------------------------------------- | ------------------------------- |
+| `@aelionsdk/core`              | `AelionError`、Diagnostic、时间/帧/采样换算、JSON 类型               | 错误处理、底层扩展              |
+| `@aelionsdk/project-schema`    | Project v1 类型、`ProjectValidator`、canonical clone、输入 admission | 自定义 Project 工具、服务端校验 |
+| `@aelionsdk/transaction`       | `EditingCommands`、Transaction Engine、History、ChangeSet            | 引擎贡献者、自定义宿主          |
+| `@aelionsdk/render-ir`         | Project 编译、音视频求值、色彩描述、compile stats                    | 自定义 renderer/exporter        |
+| `@aelionsdk/media`             | RangeReader、MP4/WebM 索引、seek/decode、CacheStore、proxy/governor  | 自定义媒体来源和缓存            |
+| `@aelionsdk/audio`             | PCM 混音、AudioWorklet clock、ring/queue、视频调度                   | 自定义音频宿主和分析            |
+| `@aelionsdk/renderer-worker`   | Worker client/protocol、WebGL2/WebGPU 合成、帧结果                   | 自定义渲染表面                  |
+| `@aelionsdk/capability`        | GPU、codec、音频、存储和 WASM 探测                                   | 独立能力实验和宿主              |
+| `@aelionsdk/material-compiler` | Graph 类型检查、Core Node、WebGL2/WebGPU 编译和预算                  | Material 工具和自定义宿主       |
 
 ## 依赖方向
 
 ```text
 Application
-  ├─ @aelion/sdk
-  ├─ @aelion/export        只为 Sink/Remote 类型
-  └─ @aelion/vite-plugin   可选，仅 Vite 构建配置
+  ├─ @aelionsdk/sdk
+  ├─ @aelionsdk/export        只为 Sink/Remote 类型
+  └─ @aelionsdk/vite-plugin   可选，仅 Vite 构建配置
 
-@aelion/sdk
+@aelionsdk/sdk
   → project-schema / transaction / render-ir
   → media / audio / renderer-worker / export
   → capability / material-compiler

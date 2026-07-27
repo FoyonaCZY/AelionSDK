@@ -10,7 +10,7 @@ AelionSDK 的公开时间单位是整数微秒，带时间含义的字段通常�
 使用 SDK helper 会更清楚，也能统一检查范围：
 
 ```ts
-import { frames, milliseconds, seconds } from '@aelion/sdk';
+import { frames, milliseconds, seconds } from '@aelionsdk/sdk';
 
 const introStartUs = seconds(2.5); // 2_500_000
 const fadeDurationUs = milliseconds(180); // 180_000

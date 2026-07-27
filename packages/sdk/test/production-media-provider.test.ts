@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-import { MemoryCacheStore, type RangeReader } from '@aelion/media';
+import { MemoryCacheStore, type RangeReader } from '@aelionsdk/media';
 import { describe, expect, it } from 'vitest';
 
 import { ProductionMediaProvider } from '../src/production-media-provider.js';

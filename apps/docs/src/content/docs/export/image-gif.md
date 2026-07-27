@@ -8,7 +8,7 @@ description: 从指定时间点保存 PNG、JPEG、WebP，或把 Sequence 生成
 ## 导出 JPEG
 
 ```ts
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 
 const sink = new SeekableMemorySink();
 const options = {
@@ -61,7 +61,7 @@ URL.revokeObjectURL(url);
 ## 导出 GIF
 
 ```ts
-import { OpfsSeekableSink } from '@aelion/export';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 
 const sink = new OpfsSeekableSink('preview.gif');
 const options = {

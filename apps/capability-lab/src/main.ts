@@ -1,4 +1,8 @@
-import { probeCapabilities, type CapabilityProbe, type CapabilityReport } from '@aelion/capability';
+import {
+  probeCapabilities,
+  type CapabilityProbe,
+  type CapabilityReport,
+} from '@aelionsdk/capability';
 
 import './style.css';
 

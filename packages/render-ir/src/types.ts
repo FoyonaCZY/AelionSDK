@@ -1,6 +1,6 @@
-import type { JsonObject, JsonValue, Rational } from '@aelion/core';
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
-import type { TimeRange } from '@aelion/project-schema';
+import type { JsonObject, JsonValue, Rational } from '@aelionsdk/core';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
+import type { TimeRange } from '@aelionsdk/project-schema';
 
 export interface IrMaterialDefinition {
   readonly packageId: string;

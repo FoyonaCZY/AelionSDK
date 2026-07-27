@@ -52,7 +52,7 @@ for (const directoryName of (await readdir(packagesRoot)).sort()) {
     if (error?.code === 'ENOENT') continue;
     throw error;
   }
-  if (manifest.private === true || !manifest.name?.startsWith('@aelion/')) continue;
+  if (manifest.private === true || !manifest.name?.startsWith('@aelionsdk/')) continue;
   if (manifest.version !== version) {
     throw new Error(`${manifest.name} version ${String(manifest.version)} differs from ${version}`);
   }

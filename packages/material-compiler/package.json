@@ -1,5 +1,5 @@
 {
-  "name": "@aelion/material-compiler",
+  "name": "@aelionsdk/material-compiler",
   "version": "0.1.0-beta.1",
   "description": "Aelion Material Protocol graph compiler for WebGL2 and WebGPU",
   "license": "MIT",
@@ -40,6 +40,6 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "0.1.0-beta.1"
+    "@aelionsdk/core": "0.1.0-beta.1"
   }
 }

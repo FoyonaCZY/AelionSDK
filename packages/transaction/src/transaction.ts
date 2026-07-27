@@ -1,11 +1,11 @@
-import type { JsonObject, JsonValue } from '@aelion/core';
-import { AelionError } from '@aelion/core';
+import type { JsonObject, JsonValue } from '@aelionsdk/core';
+import { AelionError } from '@aelionsdk/core';
 import {
   canonicalClone,
   type AelionProject,
   type CollectionName,
   type EntityId,
-} from '@aelion/project-schema';
+} from '@aelionsdk/project-schema';
 
 import { collectAffectedRanges } from './affected-ranges.js';
 import { applyOperations } from './operations.js';

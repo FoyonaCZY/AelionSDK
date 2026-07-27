@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 export const PROJECT_INPUT_MAX_DEPTH = 64;
 export const PROJECT_INPUT_MAX_NODES = 262_144;

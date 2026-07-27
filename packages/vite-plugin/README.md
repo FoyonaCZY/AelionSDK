@@ -1,17 +1,17 @@
-# `@aelion/vite-plugin`
+# `@aelionsdk/vite-plugin`
 
 Official Vite integration for AelionSDK's module Worker and AudioWorklet entry files.
 
 ## Install
 
 ```bash
-pnpm add @aelion/sdk@next
-pnpm add -D @aelion/vite-plugin@next vite
+pnpm add @aelionsdk/sdk@next
+pnpm add -D @aelionsdk/vite-plugin@next vite
 ```
 
 ```ts
 // vite.config.ts
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -20,8 +20,8 @@ export default defineConfig({
 ```
 
 No asset paths or workspace aliases are required. During `vite build`, the plugin emits the
-published `@aelion/renderer-worker` WebGL2 Worker, the `@aelion/export` mux Worker, and both
-published `@aelion/audio` AudioWorklet entry chunks, then rewrites the SDK package URLs to the
+published `@aelionsdk/renderer-worker` WebGL2 Worker, the `@aelionsdk/export` mux Worker, and both
+published `@aelionsdk/audio` AudioWorklet entry chunks, then rewrites the SDK package URLs to the
 generated hashed files. During `vite dev`, it exposes equivalent virtual module URLs through
 Vite's module server.
 

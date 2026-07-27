@@ -117,7 +117,7 @@ if (update) {
   const expected = snapshotJson(await readFile(snapshotPath, 'utf8'));
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
     throw new Error(
-      'Public API snapshot changed. Review semver/CHANGELOG, then run `corepack pnpm --filter @aelion/sdk api:snapshot:update`.',
+      'Public API snapshot changed. Review semver/CHANGELOG, then run `corepack pnpm --filter @aelionsdk/sdk api:snapshot:update`.',
     );
   }
 }

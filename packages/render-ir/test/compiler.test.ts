@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 
-import type { JsonObject } from '@aelion/core';
-import type { AelionProject, ItemEntity } from '@aelion/project-schema';
-import { ProjectValidator } from '@aelion/project-schema';
+import type { JsonObject } from '@aelionsdk/core';
+import type { AelionProject, ItemEntity } from '@aelionsdk/project-schema';
+import { ProjectValidator } from '@aelionsdk/project-schema';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {

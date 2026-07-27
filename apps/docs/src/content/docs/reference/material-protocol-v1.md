@@ -1043,7 +1043,7 @@ await session.materials.applyUpgrade(report, {
 ### 13.1 API 分层
 
 ```ts
-import { AelionMaterial } from '@aelion/material-sdk';
+import { AelionMaterial } from '@aelionsdk/material-sdk';
 
 const workspace = await AelionMaterial.open('./my-material');
 
@@ -1066,14 +1066,14 @@ const artifact = await workspace.pack({ signWith: publisherKey });
 
 建议工具包：
 
-| 包                         | 作用                                                     |
-| -------------------------- | -------------------------------------------------------- |
-| `@aelion/material-schema`  | Manifest/Definition/Graph JSON Schema 和 TypeScript 类型 |
-| `@aelion/material-sdk`     | 校验、编译、预览、打包和签名                             |
-| `@aelion/material-nodes`   | Core Node 定义和 Builder                                 |
-| `@aelion/material-testing` | Golden、性能、跨后端一致性测试                           |
-| `@aelion/material-cli`     | validate/build/pack/sign/test/inspect                    |
-| `@aelion/material-studio`  | 可选的可视化 Graph 编辑器组件                            |
+| 包                            | 作用                                                     |
+| ----------------------------- | -------------------------------------------------------- |
+| `@aelionsdk/material-schema`  | Manifest/Definition/Graph JSON Schema 和 TypeScript 类型 |
+| `@aelionsdk/material-sdk`     | 校验、编译、预览、打包和签名                             |
+| `@aelionsdk/material-nodes`   | Core Node 定义和 Builder                                 |
+| `@aelionsdk/material-testing` | Golden、性能、跨后端一致性测试                           |
+| `@aelionsdk/material-cli`     | validate/build/pack/sign/test/inspect                    |
+| `@aelionsdk/material-studio`  | 可选的可视化 Graph 编辑器组件                            |
 
 ### 13.2 Graph Builder
 
@@ -1379,7 +1379,7 @@ trusted-code 是“宿主允许注册的代码”，不是“获得浏览器和�
 
 ## 18. 协议状态与兼容规则
 
-AMP v1 当前由 `@aelion/material-compiler`、`@aelion/material-sdk`、Project v1 Material Instance 和 renderer runtime 共同实现。声明式 Graph 是默认、可移植路径；trusted Shader/WASM 仍由宿主执行策略控制。
+AMP v1 当前由 `@aelionsdk/material-compiler`、`@aelionsdk/material-sdk`、Project v1 Material Instance 和 renderer runtime 共同实现。声明式 Graph 是默认、可移植路径；trusted Shader/WASM 仍由宿主执行策略控制。
 
 协议演进遵守以下规则：
 

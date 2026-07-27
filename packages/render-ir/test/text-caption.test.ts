@@ -5,7 +5,7 @@ import {
   serializeSrt,
   serializeWebVtt,
   type IrTextClip,
-} from '@aelion/render-ir';
+} from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 function textClip(overrides: Partial<IrTextClip> = {}): IrTextClip {

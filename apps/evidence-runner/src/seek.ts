@@ -1,4 +1,8 @@
-import { createSampleIndex, decodeVideoFrameAt, videoDecoderResourceSnapshot } from '@aelion/media';
+import {
+  createSampleIndex,
+  decodeVideoFrameAt,
+  videoDecoderResourceSnapshot,
+} from '@aelionsdk/media';
 
 const fixtureNames = [
   'mp4-moov-head-h264-aac.mp4',

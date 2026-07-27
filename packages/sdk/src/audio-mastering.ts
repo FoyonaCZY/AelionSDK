@@ -4,9 +4,9 @@ import {
   TruePeakLimiter,
   renderIrAudio,
   type LoudnessReport,
-} from '@aelion/audio';
-import { sampleIndexAtTime, throwIfAborted } from '@aelion/core';
-import type { RenderIr } from '@aelion/render-ir';
+} from '@aelionsdk/audio';
+import { sampleIndexAtTime, throwIfAborted } from '@aelionsdk/core';
+import type { RenderIr } from '@aelionsdk/render-ir';
 
 import type { AelionAudioMasteringOptions, AelionMediaProvider } from './types.js';
 

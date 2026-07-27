@@ -13,7 +13,7 @@
 | `phase-1-final-gates.json`          | 历史修复前聚合，仅用于追溯，不是当前退出结论                                                         |
 | `phase-1-blocker-review.json`       | 历史审计模板，明确为 `not-approved`，不是当前批准文件                                                |
 | `phase-1-gate-results.json`         | 2026-07-15 诊断长跑的 exact command、时间、exit code、输出摘要与失败 postflight                      |
-| `tarball-consumer.json`             | 13 个真实 `.tgz`、公开 `@aelion/vite-plugin`、3 个 emitted runtime assets、Chromium/Firefox consumer |
+| `tarball-consumer.json`             | 13 个真实 `.tgz`、公开 `@aelionsdk/vite-plugin`、3 个 emitted runtime assets、Chromium/Firefox consumer |
 | `browser-smoke-chromium.json`       | Chromium Phase 1 source suite：59/59 tests                                                           |
 | `browser-smoke-firefox.json`        | Firefox 140 Phase 1 source suite：54/54 tests；独立重跑通过                                          |
 | `media-seek-chromium.json`          | 五类媒体 exact seek；独立重跑通过，decoder/frame 资源归零                                            |

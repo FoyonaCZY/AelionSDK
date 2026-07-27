@@ -83,7 +83,7 @@ try {
 
   await writeFile(
     join(temporaryDirectory, 'vite.config.mjs'),
-    `import { aelion } from '@aelion/vite-plugin';
+    `import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 export default defineConfig({ plugins: [aelion()] });
 `,
@@ -94,7 +94,7 @@ export default defineConfig({ plugins: [aelion()] });
   );
   await writeFile(
     join(temporaryDirectory, 'main.js'),
-    `import { createProject } from '@aelion/sdk';
+    `import { createProject } from '@aelionsdk/sdk';
 globalThis.__aelionRegistrySmoke = createProject().build().schemaVersion;
 `,
   );

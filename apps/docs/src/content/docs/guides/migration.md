@@ -3,7 +3,7 @@ title: 从 WebAV 与 Diffusion Studio 迁移
 description: 用严格迁移器把 WebAV Sprite 或 Diffusion checkpoint 转成 Aelion Project，并显式处理无法等价表达的功能。
 ---
 
-`@aelion/sdk` 提供两个数据适配器：
+`@aelionsdk/sdk` 提供两个数据适配器：
 
 - `migrateWebAvProject()` 接受可序列化的 WebAV Sprite 投影；
 - `migrateDiffusionCheckpoint()` 接受 Diffusion Studio Core 的 checkpoint 和显式素材绑定。
@@ -15,7 +15,7 @@ description: 用严格迁移器把 WebAV Sprite 或 Diffusion checkpoint 转成 
 WebAV 的 `OffscreenSprite` 不公开底层 `IClip` 字节，因此迁移端必须显式提供 Asset：
 
 ```ts
-import { migrateWebAvProject } from '@aelion/sdk';
+import { migrateWebAvProject } from '@aelionsdk/sdk';
 
 const result = migrateWebAvProject({
   width: 1920,
@@ -50,7 +50,7 @@ await session.loadProject(result.project);
 Diffusion checkpoint 只存 Source ID，不存浏览器里的 `File`、URL 或凭据。迁移时用 `assets` 重新绑定：
 
 ```ts
-import { migrateDiffusionCheckpoint } from '@aelion/sdk';
+import { migrateDiffusionCheckpoint } from '@aelionsdk/sdk';
 
 const result = migrateDiffusionCheckpoint(checkpoint, {
   assets: [

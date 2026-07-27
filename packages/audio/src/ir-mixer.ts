@@ -1,10 +1,10 @@
-import { sampleBoundaryUs, throwIfAborted } from '@aelion/core';
+import { sampleBoundaryUs, throwIfAborted } from '@aelionsdk/core';
 import {
   evaluateAnimatableNumber,
   evaluateAudioState,
   mapIrSourceTime,
   type RenderIr,
-} from '@aelion/render-ir';
+} from '@aelionsdk/render-ir';
 
 import { pitchPreservingTimeStretch } from './time-stretch.js';
 
@@ -44,14 +44,14 @@ function gains(gain: number, pan: number): readonly [number, number] {
 
 function objectProperty(
   value: unknown,
-): Readonly<Record<string, import('@aelion/core').JsonValue>> {
+): Readonly<Record<string, import('@aelionsdk/core').JsonValue>> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Readonly<Record<string, import('@aelion/core').JsonValue>>)
+    ? (value as Readonly<Record<string, import('@aelionsdk/core').JsonValue>>)
     : {};
 }
 
 function fadeEnvelope(
-  audio: Readonly<Record<string, import('@aelion/core').JsonValue>>,
+  audio: Readonly<Record<string, import('@aelionsdk/core').JsonValue>>,
   localTimeUs: number,
   durationUs: number,
 ): number {

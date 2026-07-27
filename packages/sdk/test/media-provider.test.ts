@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AelionError } from '@aelion/core';
+import { AelionError } from '@aelionsdk/core';
 
 interface Deferred<T> {
   readonly promise: Promise<T>;
@@ -33,11 +33,11 @@ const media = vi.hoisted(() => ({
   decodeVideoCalls: 0,
   decodeVideoMaxActive: 0,
   decodeVideoReleases: [] as (() => void)[],
-  decodeVideo: (targetUs: number, options: import('@aelion/media').VideoDecodeOptions = {}) => {
+  decodeVideo: (targetUs: number, options: import('@aelionsdk/media').VideoDecodeOptions = {}) => {
     media.decodeVideoCalls += 1;
     media.decodeVideoActive += 1;
     media.decodeVideoMaxActive = Math.max(media.decodeVideoMaxActive, media.decodeVideoActive);
-    return new Promise<import('@aelion/media').VideoDecodeResult>((resolve, reject) => {
+    return new Promise<import('@aelionsdk/media').VideoDecodeResult>((resolve, reject) => {
       let settled = false;
       const finish = (error?: Error): void => {
         if (settled) return;
@@ -80,7 +80,7 @@ const media = vi.hoisted(() => ({
   }[],
 }));
 
-function mockIndex(): import('@aelion/media').SampleIndex {
+function mockIndex(): import('@aelionsdk/media').SampleIndex {
   return {
     schemaVersion: '1.0.0',
     container: 'unknown',
@@ -97,13 +97,13 @@ function mockIndex(): import('@aelion/media').SampleIndex {
   };
 }
 
-vi.mock('@aelion/media', () => ({
+vi.mock('@aelionsdk/media', () => ({
   createSampleIndex: (
     _bytes: Uint8Array,
-    options: import('@aelion/media').MediaProbeOptions = {},
+    options: import('@aelionsdk/media').MediaProbeOptions = {},
   ) => {
     media.createIndexCalls += 1;
-    return new Promise<import('@aelion/media').SampleIndex>((resolve, reject) => {
+    return new Promise<import('@aelionsdk/media').SampleIndex>((resolve, reject) => {
       const finish = (): void => {
         options.signal?.removeEventListener('abort', onAbort);
         resolve(mockIndex());
@@ -128,12 +128,12 @@ vi.mock('@aelion/media', () => ({
     _bytes: Uint8Array,
     _startUs: number,
     _durationUs: number,
-    options: import('@aelion/media').AudioDecodeOptions = {},
+    options: import('@aelionsdk/media').AudioDecodeOptions = {},
   ) => {
     media.decodeAudioCalls += 1;
     media.decodeAudioActive += 1;
     media.decodeAudioMaxActive = Math.max(media.decodeAudioMaxActive, media.decodeAudioActive);
-    return new Promise<import('@aelion/media').AudioPcmBlock>((resolve, reject) => {
+    return new Promise<import('@aelionsdk/media').AudioPcmBlock>((resolve, reject) => {
       let settled = false;
       const finish = (error?: Error): void => {
         if (settled) return;
@@ -165,7 +165,7 @@ vi.mock('@aelion/media', () => ({
   decodeVideoFrameAt: (
     _bytes: Uint8Array,
     targetUs: number,
-    options: import('@aelion/media').VideoDecodeOptions = {},
+    options: import('@aelionsdk/media').VideoDecodeOptions = {},
   ) => media.decodeVideo(targetUs, options),
   MemoryRangeReader: class {
     public readonly kind = 'memory-range-reader';

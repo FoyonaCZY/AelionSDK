@@ -5,7 +5,7 @@
 用 TypeScript 在浏览器中完成时间线编辑、实时预览、播放和音视频导出。
 
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
-[![npm next](https://img.shields.io/npm/v/@aelion/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelion/sdk)
+[![npm next](https://img.shields.io/npm/v/@aelionsdk/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelionsdk/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Node.js 20](https://img.shields.io/badge/node-20.19%2B-43853d.svg)](package.json)
 
@@ -48,8 +48,8 @@ Session Transaction Commands。
 导出入口和运行时资源插件：
 
 ```bash
-npm install @aelion/sdk@next @aelion/export@next
-npm install --save-dev @aelion/vite-plugin@next vite
+npm install @aelionsdk/sdk@next @aelionsdk/export@next
+npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
 也可以克隆仓库并启动 Quickstart：
@@ -77,7 +77,7 @@ corepack pnpm dev:editor
 
 ```ts
 // vite.config.ts
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -103,7 +103,12 @@ const session = await Aelion.createSession({
 下面这段代码把用户选择的本地文件变成一个可预览的工程：
 
 ```ts
-import { Aelion, ProductionMediaProvider, attachPreviewCanvas, createProject } from '@aelion/sdk';
+import {
+  Aelion,
+  ProductionMediaProvider,
+  attachPreviewCanvas,
+  createProject,
+} from '@aelionsdk/sdk';
 
 async function openVideo(file: File, canvas: HTMLCanvasElement) {
   const media = new ProductionMediaProvider();
@@ -305,7 +310,7 @@ MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，�
 - [`packages`](packages)：SDK 各模块源码；
 - [`apps/docs`](apps/docs)：文档站源码。
 
-大多数应用从 `@aelion/sdk` 开始，需要直接管理导出 Sink 时再使用 `@aelion/export`。底层媒体、渲染、音频和 Material 包可以按需单独接入。
+大多数应用从 `@aelionsdk/sdk` 开始，需要直接管理导出 Sink 时再使用 `@aelionsdk/export`。底层媒体、渲染、音频和 Material 包可以按需单独接入。
 
 ## 本地开发
 

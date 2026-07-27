@@ -1,4 +1,4 @@
-import { throwIfAborted } from '@aelion/core';
+import { throwIfAborted } from '@aelionsdk/core';
 
 export interface AudioChannelMatrix {
   readonly inputChannels: number;

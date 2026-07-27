@@ -1,4 +1,4 @@
-import { canonicalHash } from '@aelion/project-schema';
+import { canonicalHash } from '@aelionsdk/project-schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

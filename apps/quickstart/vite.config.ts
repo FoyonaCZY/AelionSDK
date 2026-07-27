@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({

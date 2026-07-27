@@ -1,6 +1,6 @@
-import type { JsonValue } from '@aelion/core';
-import type { MaterialUniformBinding, WebGl2MaterialProgram } from '@aelion/material-compiler';
-import type { IrMaterialDefinition } from '@aelion/render-ir';
+import type { JsonValue } from '@aelionsdk/core';
+import type { MaterialUniformBinding, WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
+import type { IrMaterialDefinition } from '@aelionsdk/render-ir';
 
 import { migrationMaterialPackage } from './migration.js';
 

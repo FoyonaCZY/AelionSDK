@@ -1,13 +1,13 @@
-import { renderIrAudio } from '@aelion/audio';
-import type { JsonObject } from '@aelion/core';
-import { SeekableMemorySink } from '@aelion/export';
+import { renderIrAudio } from '@aelionsdk/audio';
+import type { JsonObject } from '@aelionsdk/core';
+import { SeekableMemorySink } from '@aelionsdk/export';
 import {
   compileMaterialGraphToWebGl2,
   type MaterialGraph,
   type WebGl2MaterialProgram,
-} from '@aelion/material-compiler';
-import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelion/media';
-import type { IrMaterialDefinition } from '@aelion/render-ir';
+} from '@aelionsdk/material-compiler';
+import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelionsdk/media';
+import type { IrMaterialDefinition } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 import { Aelion, RuntimeMaterialRegistry, type AelionMediaProvider } from '../src/index.js';
@@ -24,7 +24,7 @@ async function bytes(path: string): Promise<Uint8Array> {
   return new Uint8Array(await response.arrayBuffer());
 }
 
-describe('@aelion/sdk public browser facade', () => {
+describe('@aelionsdk/sdk public browser facade', () => {
   it('loads, edits, previews and exports one frozen Project through public APIs', async () => {
     const [project, warmGraph, dissolveGraph, mp4, webm] = await Promise.all([
       json('/examples/aelion-vertical-slice-30s.project.json'),

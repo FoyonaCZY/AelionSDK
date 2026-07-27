@@ -1,5 +1,5 @@
-import { AelionError } from '@aelion/core';
-import type { AelionProject } from '@aelion/project-schema';
+import { AelionError } from '@aelionsdk/core';
+import type { AelionProject } from '@aelionsdk/project-schema';
 
 import { TransactionEngine } from './transaction.js';
 import type {

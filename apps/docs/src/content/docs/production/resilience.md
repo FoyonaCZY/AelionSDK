@@ -8,7 +8,7 @@ SDK 错误不是都用同一种形式：可诊断的引擎问题通常带 `Diagn
 ## 统一错误入口
 
 ```ts
-import { AelionError } from '@aelion/core';
+import { AelionError } from '@aelionsdk/core';
 
 function handleSdkError(error: unknown): void {
   if (error instanceof DOMException && error.name === 'AbortError') {
@@ -81,7 +81,7 @@ const unsubscribe = session.subscribe('diagnostic', ({ diagnostic }) => {
 失败后从头重启。可独立提交的静帧、分片或业务 upload unit 使用 checkpoint runner：
 
 ```ts
-import { BrowserStorageExportCheckpointStore, runCheckpointedExport } from '@aelion/export';
+import { BrowserStorageExportCheckpointStore, runCheckpointedExport } from '@aelionsdk/export';
 
 const store = new BrowserStorageExportCheckpointStore({
   namespace: 'my-editor-export',

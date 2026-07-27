@@ -1,4 +1,4 @@
-import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelion/media';
+import { createSampleIndex, decodeAudioPcmRange, decodeVideoFrameAt } from '@aelionsdk/media';
 import { describe, expect, it } from 'vitest';
 
 import {

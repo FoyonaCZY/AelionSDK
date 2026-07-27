@@ -1,5 +1,5 @@
-import { canonicalStringify, type AelionProject, type ItemEntity } from '@aelion/project-schema';
-import type { JsonObject } from '@aelion/core';
+import { canonicalStringify, type AelionProject, type ItemEntity } from '@aelionsdk/project-schema';
+import type { JsonObject } from '@aelionsdk/core';
 
 import type {
   IrAudioClip,

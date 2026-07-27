@@ -1,5 +1,5 @@
-import type { JsonValue } from '@aelion/core';
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
+import type { JsonValue } from '@aelionsdk/core';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
 
 export interface ComposeRequest {
   readonly type: 'compose';

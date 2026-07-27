@@ -7,8 +7,8 @@ AelionSDK 的公开 Beta 通过 npm `next` tag 分发。普通应用至少安装
 使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
 
 ```bash
-npm install @aelion/sdk@next @aelion/export@next
-npm install --save-dev @aelion/vite-plugin@next vite
+npm install @aelionsdk/sdk@next @aelionsdk/export@next
+npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
 使用 pnpm 或 yarn 时保持相同的包名与 `next` tag。不要导入源码目录或复制仓库内
@@ -72,11 +72,11 @@ apps/my-editor/
   "private": true,
   "type": "module",
   "dependencies": {
-    "@aelion/export": "workspace:*",
-    "@aelion/sdk": "workspace:*"
+    "@aelionsdk/export": "workspace:*",
+    "@aelionsdk/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@aelion/vite-plugin": "workspace:*",
+    "@aelionsdk/vite-plugin": "workspace:*",
     "vite": "7.0.6"
   },
   "scripts": {
@@ -90,10 +90,10 @@ apps/my-editor/
 
 ## 配置 Vite
 
-SDK 的渲染器在 Worker 中运行，播放音频还需要 AudioWorklet。`@aelion/vite-plugin` 会把这些入口放进开发服务器和生产构建中。
+SDK 的渲染器在 Worker 中运行，播放音频还需要 AudioWorklet。`@aelionsdk/vite-plugin` 会把这些入口放进开发服务器和生产构建中。
 
 ```ts title="apps/my-editor/vite.config.ts"
-import { aelion } from '@aelion/vite-plugin';
+import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -155,11 +155,11 @@ SDK 是 ESM，并使用浏览器 API。应用的 TypeScript 配置至少应包�
 业务代码只从包名导入：
 
 ```ts
-import { Aelion, ProductionMediaProvider } from '@aelion/sdk';
-import { OpfsSeekableSink } from '@aelion/export';
+import { Aelion, ProductionMediaProvider } from '@aelionsdk/sdk';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 ```
 
-不要导入 `@aelion/sdk/src/*` 或 `dist/*`。这些路径不是公共接口，打包后的使用方式也可能不同。
+不要导入 `@aelionsdk/sdk/src/*` 或 `dist/*`。这些路径不是公共接口，打包后的使用方式也可能不同。
 
 ## 为什么要配置跨源隔离
 
@@ -195,9 +195,9 @@ corepack pnpm --filter @example/my-editor build
 生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 Beta：
 
 ```bash
-pnpm add @aelion/sdk@0.1.0-beta.1 @aelion/export@0.1.0-beta.1
-pnpm add -D @aelion/vite-plugin@0.1.0-beta.1
+pnpm add @aelionsdk/sdk@0.1.0-beta.1 @aelionsdk/export@0.1.0-beta.1
+pnpm add -D @aelionsdk/vite-plugin@0.1.0-beta.1
 ```
 
-`npm install @aelion/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
+`npm install @aelionsdk/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
 Beta。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。

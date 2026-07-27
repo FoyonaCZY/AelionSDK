@@ -1,6 +1,6 @@
-import { AelionError, type Disposable } from '@aelion/core';
-import type { JsonValue } from '@aelion/core';
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
+import { AelionError, type Disposable } from '@aelionsdk/core';
+import type { JsonValue } from '@aelionsdk/core';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
 
 import type {
   ComposeFailure,

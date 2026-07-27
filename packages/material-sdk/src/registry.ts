@@ -1,5 +1,5 @@
-import { throwIfAborted } from '@aelion/core';
-import type { MaterialGraph } from '@aelion/material-compiler';
+import { throwIfAborted } from '@aelionsdk/core';
+import type { MaterialGraph } from '@aelionsdk/material-compiler';
 
 import { decodeMaterialJson, verifyMaterialPackageSnapshot } from './package.js';
 import {

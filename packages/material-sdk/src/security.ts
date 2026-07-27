@@ -1,4 +1,4 @@
-import { throwIfAborted } from '@aelion/core';
+import { throwIfAborted } from '@aelionsdk/core';
 
 import { verifyMaterialPackage } from './package.js';
 import type { PackedMaterialPackage } from './types.js';

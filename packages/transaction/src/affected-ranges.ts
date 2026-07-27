@@ -4,7 +4,7 @@ import type {
   EntityId,
   ItemEntity,
   TimeRange,
-} from '@aelion/project-schema';
+} from '@aelionsdk/project-schema';
 
 import type { AffectedRange, AtomicOperation } from './types.js';
 

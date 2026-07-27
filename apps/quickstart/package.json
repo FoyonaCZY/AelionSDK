@@ -1,14 +1,14 @@
 {
-  "name": "@aelion/quickstart",
+  "name": "@aelionsdk/quickstart",
   "version": "0.1.0-beta.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@aelion/export": "workspace:*",
-    "@aelion/sdk": "workspace:*"
+    "@aelionsdk/export": "workspace:*",
+    "@aelionsdk/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@aelion/vite-plugin": "workspace:*",
+    "@aelionsdk/vite-plugin": "workspace:*",
     "vite": "7.0.6"
   },
   "scripts": {

@@ -3,9 +3,9 @@ import type {
   PcmSourceBlock,
   SilenceDetectionResult,
   WaveformPeakResult,
-} from '@aelion/audio';
-import type { CapabilityReport } from '@aelion/capability';
-import type { Diagnostic, JsonObject, JsonValue } from '@aelion/core';
+} from '@aelionsdk/audio';
+import type { CapabilityReport } from '@aelionsdk/capability';
+import type { Diagnostic, JsonObject, JsonValue } from '@aelionsdk/core';
 import type {
   ExportProfileId,
   ExportProfileSelection,
@@ -19,12 +19,16 @@ import type {
   WavExportResult,
   WebMExportOptions,
   WebMExportResult,
-} from '@aelion/export';
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
-import type { AelionProject } from '@aelion/project-schema';
-import type { CompileStats, IrMaterialDefinition, RenderIr } from '@aelion/render-ir';
-import type { RenderIrFrameResult } from '@aelion/renderer-worker';
-import type { EditingCommands, TransactionBuilder, TransactionCommit } from '@aelion/transaction';
+} from '@aelionsdk/export';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
+import type { AelionProject } from '@aelionsdk/project-schema';
+import type { CompileStats, IrMaterialDefinition, RenderIr } from '@aelionsdk/render-ir';
+import type { RenderIrFrameResult } from '@aelionsdk/renderer-worker';
+import type {
+  EditingCommands,
+  TransactionBuilder,
+  TransactionCommit,
+} from '@aelionsdk/transaction';
 
 export interface AelionProjectSchemas {
   readonly project: JsonObject;
@@ -70,7 +74,7 @@ export interface AelionRuntimeAssets {
 }
 
 export interface AelionSessionOptions {
-  /** Overrides the v1 schemas bundled with `@aelion/sdk`. */
+  /** Overrides the v1 schemas bundled with `@aelionsdk/sdk`. */
   readonly schemas?: AelionProjectSchemas;
   readonly media?: AelionMediaProvider;
   readonly materials?: AelionRuntimeMaterialRegistry;
