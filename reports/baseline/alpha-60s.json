@@ -55,7 +55,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-2db81804-7b49-4a59-9578-d21b286473e9.webm",
+    "fileName": "aelion-alpha-422a0f36-cf5c-4e72-81d4-ad9d4e656578.webm",
     "writes": 135,
     "bytesWritten": 4740540,
     "maxInFlightWrites": 1,
@@ -4889,18 +4889,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 16738524,
+      "usedJsHeapBytes": 16750136,
       "totalJsHeapBytes": 20072580
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 24657108,
-      "totalJsHeapBytes": 87161092
+      "usedJsHeapBytes": 43802687,
+      "totalJsHeapBytes": 84526187
     }
   },
-  "elapsedMs": 9927.589999999851,
+  "elapsedMs": 9973.445000000298,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-07-27T17:00:52.466Z",
+  "generatedAt": "2026-07-27T17:37:49.671Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",

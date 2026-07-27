@@ -185,20 +185,20 @@ nearest-rank 计算。
 
 | 项目                                | 结果                                                     |
 | ----------------------------------- | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2               | 帧调用 p50 0.29 ms，p95 0.47 ms                          |
-| 1080p、单 pass、WebGL2              | 帧调用 p50 0.37 ms，p95 1.28 ms                          |
-| 1080p、单 pass、WebGPU              | 帧调用 p50 0.79 ms，p95 1.38 ms                          |
-| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.46 ms，p95 1.36 ms                          |
-| 4K、单 pass、WebGL2                 | 帧调用 p50 1.09 ms，p95 1.22 ms                          |
-| 1,000 clips / 32 tracks 冷编译      | p50 24.10 ms，p95 31.77 ms                               |
-| 1,000 clips / 32 tracks warm 增量   | p50 2.04 ms，p95 3.09 ms                                 |
-| 单音轨 1,024-frame 音频块           | p95 0.74 ms，整体约 60.19× 实时                          |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 340.21 ms，平均约 8.74× 实时                |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 366.72 ms，平均约 8.03× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 479.79 ms，约 2.08× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 453.59 ms，`avc1.640033`，约 2.20× 实时                  |
-| OPFS 顺序写入，16 个 1 MiB 块       | 约 495 MiB/s；Memory Sink 约 7.0 GiB/s                   |
-| 1080p WebGL2 180 帧 soak            | 前半 p95 1.01 ms，后半 p95 0.86 ms，dispose 后无 pending |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.27 ms，p95 0.37 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.25 ms，p95 0.40 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.78 ms，p95 1.22 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.52 ms，p95 1.13 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 0.43 ms，p95 0.69 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 23.18 ms，p95 32.57 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 1.95 ms，p95 2.07 ms                                 |
+| 单音轨 1,024-frame 音频块           | p95 0.53 ms，整体约 61.59× 实时                          |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 352.27 ms，平均约 8.52× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 358.90 ms，平均约 8.13× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 509.79 ms，约 1.96× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 481.42 ms，`avc1.640033`，约 2.08× 实时                  |
+| OPFS 顺序写入，16 个 1 MiB 块       | 约 517 MiB/s；Memory Sink 约 7.2 GiB/s                   |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 0.91 ms，后半 p95 0.86 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
@@ -213,11 +213,11 @@ mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入�
 ### 真实媒体和端到端工程
 
 五种公开 fixture 覆盖 moov 头/尾 MP4、fragmented MP4、非零 PTS MP4 和
-VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.45–5.98 ms，最慢
-cold seek p95 为 12.75 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
+VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.49–6.38 ms，最慢
+cold seek p95 为 13.10 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
 
 真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
-1080p30 用时 294.13 ms（约 3.40× 实时），4K30 用时 272.79 ms（约 3.67×
+1080p30 用时 305.78 ms（约 3.27× 实时），4K30 用时 276.94 ms（约 3.61×
 实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close，
 且主线程均没有观测到超过 50 ms 的 Long Task；1080p 产物还由 FFmpeg 解出
 30 个视频帧并完成音频 PCM MD5 回读。
@@ -231,7 +231,7 @@ codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计
 
 60 秒端到端工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
-9.93 秒，即约 6.04× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
+9.97 秒，即约 6.02× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
 偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
 导出更接近完整调用链，但分辨率较低，不能用于推断 1080p 成片速度。
 
@@ -334,7 +334,7 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 ## 最新验证状态
 
 2026-07-28 在 Windows 参考机上完成了与源清单
-`f6af8504d31a2492c936024e7f8f3ae5a3c3ca553fa810198c85e3d2e87309d1`
+`f897cb0cc2e2a7bf697ebb6a51f2c6da820ddb36c70d4ea9cd52a20fedb3b36e`
 绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，40 项产物 postflight
 语义校验通过。Chromium 79 项和 Firefox 67 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包

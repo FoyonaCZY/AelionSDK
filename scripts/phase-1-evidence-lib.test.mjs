@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import {
@@ -18,6 +19,7 @@ import {
   WORKSPACE_IDENTITY_POLICY,
   buildBlockerReviewGateRunBinding,
   buildPhase1Postflight,
+  collectPhase1RunArtifacts,
   excludedWorkspacePath,
   sha256,
   sourceIdentity,
@@ -29,6 +31,7 @@ import {
   validateBlockerReview,
   validateGateRunDocument,
   validatePerformanceEvidence,
+  validatePhase1PostflightAgainstArtifacts,
   validatePhase1PostflightRecord,
   validateRecoveryEvidence,
   validateSeekEvidence,
@@ -36,6 +39,7 @@ import {
 } from './phase-1-evidence-lib.mjs';
 
 const root = '/workspace';
+const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = 'a'.repeat(64);
 const execFileAsync = promisify(execFile);
 
@@ -1203,6 +1207,32 @@ test('blocker review gate binding requires fresh exact artifacts from the serial
     stableJson(runDocument.postflight.artifacts.files),
   );
   assert.equal(buildBlockerReviewGateRunBinding(runDocument, hash, artifacts).passed, true);
+  const recordedArtifacts = artifacts.map(
+    ({ file, command, freshness, bytes, sha256: digest, mtime }) => ({
+      file,
+      ...(command === undefined ? {} : { command }),
+      ...(freshness === undefined ? {} : { freshness }),
+      bytes,
+      sha256: digest,
+      mtime,
+    }),
+  );
+  const transportedArtifacts = artifacts.map(artifact => ({
+    ...artifact,
+    mtime: new Date(Date.parse(artifact.mtime) + 86_400_000).toISOString(),
+    mtimeMs: Date.parse(artifact.mtime) + 86_400_000,
+  }));
+  assert.equal(
+    buildBlockerReviewGateRunBinding(runDocument, hash, transportedArtifacts, recordedArtifacts)
+      .passed,
+    true,
+  );
+  transportedArtifacts[0] = { ...transportedArtifacts[0], bytes: 2 };
+  assert.equal(
+    buildBlockerReviewGateRunBinding(runDocument, hash, transportedArtifacts, recordedArtifacts)
+      .passed,
+    false,
+  );
   artifacts[0] = { ...artifacts[0], mtime: new Date(0).toISOString(), mtimeMs: 0 };
   assert.equal(buildBlockerReviewGateRunBinding(runDocument, hash, artifacts).passed, false);
   const postGateIndex = policy.findIndex(value => value.freshness === 'post-run');
@@ -1274,6 +1304,46 @@ test('postflight fails closed on command, freshness, semantic and binding drift'
       ),
       '0.1.0-beta.1',
     ).passed,
+    false,
+  );
+});
+
+test('postflight validation is stable across checkout mtimes and fails on byte drift', async () => {
+  const artifacts = await collectPhase1RunArtifacts(repositoryRoot);
+  const commands = [...PHASE_1_REQUIRED_GATE_COMMANDS, ...PHASE_1_EVIDENCE_REFRESH_COMMANDS].map(
+    command => ({
+      command,
+      startedAt: '2000-01-01T00:00:00.000Z',
+      endedAt: '2100-01-01T00:00:00.000Z',
+      exitCode: 0,
+      summary: {},
+    }),
+  );
+  const runDocument = {
+    commands,
+    postflight: buildPhase1Postflight(
+      commands,
+      artifacts,
+      '0.1.0-beta.1',
+      '2100-01-01T00:00:01.000Z',
+    ),
+  };
+  assert.equal(runDocument.postflight.passed, true);
+  const transportedArtifacts = artifacts.map(artifact => ({
+    ...artifact,
+    mtime: '2200-01-01T00:00:00.000Z',
+    mtimeMs: Date.parse('2200-01-01T00:00:00.000Z'),
+  }));
+  assert.equal(
+    validatePhase1PostflightAgainstArtifacts(runDocument, transportedArtifacts).passed,
+    true,
+  );
+  transportedArtifacts[0] = {
+    ...transportedArtifacts[0],
+    bytes: transportedArtifacts[0].bytes + 1,
+  };
+  assert.equal(
+    validatePhase1PostflightAgainstArtifacts(runDocument, transportedArtifacts).passed,
     false,
   );
 });

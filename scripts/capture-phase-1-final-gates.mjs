@@ -223,10 +223,19 @@ if (currentSourceIdentity.manifestSha256 !== expectedIdentity) {
 const runDocumentBytes = await readFile(options.results);
 const runDocument = JSON.parse(runDocumentBytes.toString('utf8'));
 const runValidation = validateGateRunDocument(runDocument, expectedIdentity);
+let blockerReviewDocument;
+let blockerReviewReadError = null;
+try {
+  blockerReviewDocument = JSON.parse(await readFile(options.blockerReview, 'utf8'));
+} catch (error) {
+  blockerReviewReadError = error instanceof Error ? error.message : String(error);
+  blockerReviewDocument = null;
+}
 const gateRunBinding = buildBlockerReviewGateRunBinding(
   runDocument,
   sha256(runDocumentBytes),
   await collectBlockerReviewArtifacts(root),
+  blockerReviewDocument?.gateRun?.artifacts?.files,
 );
 const commands = (Array.isArray(runDocument.commands) ? runDocument.commands : []).map(
   (record, index) => normalizeRecord(record, `${options.results}[${index.toString()}]`),
@@ -241,14 +250,6 @@ const artifacts = {
 };
 const checks = currentPostflight.rebuilt.checks;
 
-let blockerReviewDocument;
-let blockerReviewReadError = null;
-try {
-  blockerReviewDocument = JSON.parse(await readFile(options.blockerReview, 'utf8'));
-} catch (error) {
-  blockerReviewReadError = error instanceof Error ? error.message : String(error);
-  blockerReviewDocument = null;
-}
 const blockerReview =
   blockerReviewReadError === null
     ? validateBlockerReview(blockerReviewDocument, currentSourceIdentity, {
