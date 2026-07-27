@@ -1,10 +1,10 @@
 /* eslint-disable */
 
-import { AudioWorkletClock, TransferableAudioWorkletClock } from '@aelion/audio';
-import { exportMuxedInWorker, SeekableMemorySink } from '@aelion/export';
-import { compileMaterialGraphToWebGl2 } from '@aelion/material-compiler';
-import { WorkerCompositor } from '@aelion/renderer-worker';
-import { Aelion } from '@aelion/sdk';
+import { AudioWorkletClock, TransferableAudioWorkletClock } from '@aelionsdk/audio';
+import { exportMuxedInWorker, SeekableMemorySink } from '@aelionsdk/export';
+import { compileMaterialGraphToWebGl2 } from '@aelionsdk/material-compiler';
+import { WorkerCompositor } from '@aelionsdk/renderer-worker';
+import { Aelion } from '@aelionsdk/sdk';
 
 const resultElement = document.querySelector('#result');
 

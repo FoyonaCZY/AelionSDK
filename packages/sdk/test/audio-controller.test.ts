@@ -1,4 +1,4 @@
-import type { PcmSourceBlock } from '@aelion/audio';
+import type { PcmSourceBlock } from '@aelionsdk/audio';
 import { describe, expect, it } from 'vitest';
 
 import {

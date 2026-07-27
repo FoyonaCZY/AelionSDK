@@ -1,4 +1,4 @@
-import { throwIfAborted, type Disposable } from '@aelion/core';
+import { throwIfAborted, type Disposable } from '@aelionsdk/core';
 
 export interface FontAssetRegistration {
   readonly id: string;

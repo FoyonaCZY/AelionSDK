@@ -1,4 +1,4 @@
-import type { RenderIr } from '@aelion/render-ir';
+import type { RenderIr } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 import { measureAvSync, renderIrAudio } from '../src/index.js';

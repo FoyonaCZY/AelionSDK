@@ -43,7 +43,7 @@ import {
   attachPreviewCanvas,
   type AelionSessionApi,
   type PreviewCanvasController,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 
 interface EditorRuntime {
   media: ProductionMediaProvider;

@@ -1,5 +1,5 @@
-import type { PcmSourceBlock } from '@aelion/audio';
-import { throwIfAborted, type JsonObject } from '@aelion/core';
+import type { PcmSourceBlock } from '@aelionsdk/audio';
+import { throwIfAborted, type JsonObject } from '@aelionsdk/core';
 import {
   BlobRangeReader,
   FetchRangeReader,
@@ -19,7 +19,7 @@ import {
   type RangeReader,
   type SampleIndex,
   type VideoFrameDecodeSession,
-} from '@aelion/media';
+} from '@aelionsdk/media';
 
 import type { AelionMediaProvider, AelionMediaRequest } from './types.js';
 

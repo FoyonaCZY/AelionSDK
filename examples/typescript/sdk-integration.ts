@@ -1,4 +1,4 @@
-import { SeekableMemorySink } from '@aelion/export';
+import { SeekableMemorySink } from '@aelionsdk/export';
 import {
   Aelion,
   ProductionMediaProvider,
@@ -6,7 +6,7 @@ import {
   createProject,
   type AelionSessionApi,
   type PreviewCanvasController,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 
 export interface EditorRuntime {
   readonly session: AelionSessionApi;

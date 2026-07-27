@@ -4,7 +4,7 @@ import {
   MemoryResumableMuxedExportStore,
   SeekableMemorySink,
   type ResumableMuxedProfile,
-} from '@aelion/export';
+} from '@aelionsdk/export';
 
 const durationUs = 2_000_000;
 const sampleRate = 48_000;

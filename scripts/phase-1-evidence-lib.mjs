@@ -19,6 +19,7 @@ export const PHASE_1_REQUIRED_GATE_COMMANDS = Object.freeze([
   'corepack pnpm test:pack',
   'corepack pnpm test:consumer',
   'corepack pnpm release:dry-run',
+  'corepack pnpm release:reproducibility',
   'corepack pnpm format:check',
 ]);
 
@@ -27,23 +28,25 @@ export const PHASE_1_EVIDENCE_REFRESH_COMMANDS = Object.freeze([
   'corepack pnpm report:browser:firefox',
   'corepack pnpm report:seek',
   'corepack pnpm report:performance',
+  'corepack pnpm report:recovery',
+  'corepack pnpm report:phase3:check',
   'corepack pnpm report:alpha',
 ]);
 
 export const PHASE_1_EXPECTED_PUBLIC_PACKAGES = Object.freeze([
-  '@aelion/audio',
-  '@aelion/capability',
-  '@aelion/core',
-  '@aelion/export',
-  '@aelion/material-compiler',
-  '@aelion/material-sdk',
-  '@aelion/media',
-  '@aelion/project-schema',
-  '@aelion/render-ir',
-  '@aelion/renderer-worker',
-  '@aelion/sdk',
-  '@aelion/transaction',
-  '@aelion/vite-plugin',
+  '@aelionsdk/audio',
+  '@aelionsdk/capability',
+  '@aelionsdk/core',
+  '@aelionsdk/export',
+  '@aelionsdk/material-compiler',
+  '@aelionsdk/material-sdk',
+  '@aelionsdk/media',
+  '@aelionsdk/project-schema',
+  '@aelionsdk/render-ir',
+  '@aelionsdk/renderer-worker',
+  '@aelionsdk/sdk',
+  '@aelionsdk/transaction',
+  '@aelionsdk/vite-plugin',
 ]);
 
 export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
@@ -56,7 +59,7 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 75,
+  chromium: 79,
   firefox: 67,
 });
 
@@ -87,6 +90,10 @@ export const PHASE_1_RUN_ARTIFACTS = Object.freeze([
   Object.freeze({
     file: 'reports/baseline/performance-1080p30-chromium.json',
     command: 'corepack pnpm report:performance',
+  }),
+  Object.freeze({
+    file: 'reports/baseline/recovery-chromium.json',
+    command: 'corepack pnpm report:recovery',
   }),
   Object.freeze({
     file: 'reports/baseline/tarball-consumer.json',
@@ -454,6 +461,9 @@ function postflightSemanticValidation(expected, artifact, expectedVersion) {
   }
   if (expected.file === 'reports/baseline/performance-1080p30-chromium.json') {
     return validatePerformanceEvidence(artifact.document);
+  }
+  if (expected.file === 'reports/baseline/recovery-chromium.json') {
+    return validateRecoveryEvidence(artifact.document);
   }
   if (expected.file === 'reports/baseline/tarball-consumer.json') {
     return validateTarballConsumer(artifact.document, expectedVersion);
@@ -1383,15 +1393,6 @@ function validateComprehensivePerformance(report, reasons) {
     },
     reasons,
   );
-  const webGpuP95 = report?.material?.warmFilmWebGpu?.wall?.p95Ms;
-  const webGl2P95 = report?.material?.warmFilmWebGl2?.wall?.p95Ms;
-  if (
-    runtime?.webGpu?.adapterAvailable === true &&
-    (!finiteNonNegative(webGpuP95) || !finiteNonNegative(webGl2P95) || webGpuP95 > webGl2P95 * 2)
-  ) {
-    reasons.push('1080p single-pass WebGPU p95 exceeds 2x WebGL2 p95');
-  }
-
   const compilationCases = Array.isArray(report?.compilation?.cases)
     ? report.compilation.cases
     : [];
@@ -1757,7 +1758,7 @@ export function validatePerformanceEvidence(report) {
   );
   validateCompositorBenchmark(
     report?.material?.warmFilmWebGpu,
-    { name: 'Warm Film WebGPU', frames: 30, passes: 1 },
+    { name: 'Warm Film WebGPU', frames: 30, passes: 1, maxP95Ms: 2 },
     reasons,
   );
   validateCompositorBenchmark(
@@ -2162,10 +2163,10 @@ export function validateTarballConsumer(report, expectedVersion) {
   }
 
   const adapter = report?.bundlerAdapter;
-  const pluginPackage = packages.find(entry => entry?.name === '@aelion/vite-plugin');
+  const pluginPackage = packages.find(entry => entry?.name === '@aelionsdk/vite-plugin');
   if (
-    adapter?.id !== '@aelion/vite-plugin' ||
-    adapter?.package !== '@aelion/vite-plugin' ||
+    adapter?.id !== '@aelionsdk/vite-plugin' ||
+    adapter?.package !== '@aelionsdk/vite-plugin' ||
     adapter?.version !== expectedVersion ||
     adapter?.public !== true ||
     adapter?.zeroConfigVite !== false ||

@@ -1,5 +1,5 @@
-import type { PcmSourceBlock } from '@aelion/audio';
-import { AelionError } from '@aelion/core';
+import type { PcmSourceBlock } from '@aelionsdk/audio';
+import { AelionError } from '@aelionsdk/core';
 import {
   createSampleIndex,
   createVideoFrameDecodeSessionFromReader,
@@ -7,7 +7,7 @@ import {
   MemoryRangeReader,
   type SampleIndex,
   type VideoFrameDecodeSession,
-} from '@aelion/media';
+} from '@aelionsdk/media';
 
 import type { AelionMediaProvider } from './types.js';
 

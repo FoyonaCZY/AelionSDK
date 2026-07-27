@@ -115,7 +115,7 @@ Range: bytes=...
 
 ## 生产部署后 Worker / Worklet 404
 
-- 确认使用 `@aelion/vite-plugin`；
+- 确认使用 `@aelionsdk/vite-plugin`；
 - 构建产物中是否有对应资源；
 - Vite `base` 和 CDN public path 是否正确；
 - HTML 和静态资源是否来自不同版本缓存；

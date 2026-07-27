@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 
-import type { JsonObject } from '@aelion/core';
-import type { AelionProject } from '@aelion/project-schema';
-import { ProjectValidator } from '@aelion/project-schema';
-import { IncrementalRenderCompiler } from '@aelion/render-ir';
+import type { JsonObject } from '@aelionsdk/core';
+import type { AelionProject } from '@aelionsdk/project-schema';
+import { ProjectValidator } from '@aelionsdk/project-schema';
+import { IncrementalRenderCompiler } from '@aelionsdk/render-ir';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { TransactionEngine } from '../src/index.js';

@@ -5,8 +5,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
-      '@aelion/core': fileURLToPath(new URL('./packages/core/src/index.ts', import.meta.url)),
-      '@aelion/material-compiler': fileURLToPath(
+      '@aelionsdk/core': fileURLToPath(new URL('./packages/core/src/index.ts', import.meta.url)),
+      '@aelionsdk/material-compiler': fileURLToPath(
         new URL('./packages/material-compiler/src/index.ts', import.meta.url),
       ),
     },

@@ -1,4 +1,4 @@
-import type { Disposable } from '@aelion/core';
+import type { Disposable } from '@aelionsdk/core';
 
 import { SharedPcmRingBuffer, type PcmRingSnapshot } from './pcm-ring.js';
 

@@ -1,5 +1,5 @@
-import type { IrMediaSource } from '@aelion/render-ir';
-import { analyzeIrTimeMap, invertIrSourceTime, mapIrSourceTime } from '@aelion/render-ir';
+import type { IrMediaSource } from '@aelionsdk/render-ir';
+import { analyzeIrTimeMap, invertIrSourceTime, mapIrSourceTime } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 function source(overrides: Partial<IrMediaSource> = {}): IrMediaSource {

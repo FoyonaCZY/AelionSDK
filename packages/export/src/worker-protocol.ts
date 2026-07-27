@@ -1,4 +1,4 @@
-import type { Rational } from '@aelion/core';
+import type { Rational } from '@aelionsdk/core';
 
 import type { OfflineAudioRequest, OfflineFrameRequest, WebMExportResult } from './webm-export.js';
 

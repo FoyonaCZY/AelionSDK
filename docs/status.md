@@ -1,21 +1,23 @@
 # AelionSDK release-candidate status
 
-Updated: 2026-07-27 (Asia/Shanghai)
+Updated: 2026-07-28 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578`
-- Result: 18 of 18 serial commands passed.
+  `f6af8504d31a2492c936024e7f8f3ae5a3c3ca553fa810198c85e3d2e87309d1`
+- Source commit: `76b178faadab8b7080547ed33c20146b6b0668cf`.
+- Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
-- Artifact postflight: passed.
-- Browser conformance: Chromium 75/75 and Firefox 67/67, with zero failed,
+- Artifact postflight: 40 of 40 semantic, freshness, and binding checks passed.
+- Browser conformance: Chromium 79/79 and Firefox 67/67, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
-  consumer, Chromium consumer, Firefox consumer, and release dry-run checks.
-- Media evidence: exact seek, 1080p30 performance, golden rendering, and the
-  60-second browser export with FFmpeg video-frame and audio-PCM readback all
-  passed.
+  consumer, Chromium consumer, Firefox consumer, release dry-run, and
+  byte-for-byte reproducibility checks.
+- Media evidence: exact seek, 1080p30/4K performance, durable WebM/fMP4
+  interruption recovery, golden rendering, and the 60-second browser export
+  with FFmpeg video-frame and audio-PCM readback all passed.
 - Resource evidence: bounded decoder/cache/worker queues, cancellation,
   disposal, provider drain, OPFS cleanup, ten-minute-equivalent audio ring, and
   the 1,000-clip incremental compilation soak passed.
@@ -51,8 +53,7 @@ still requires an independent human blocker review bound to this exact source
 manifest, gate record, and artifact set. Until that review is signed:
 
 - `reports/baseline/phase-1-blocker-review.json` must remain `not-approved`;
-- npm trusted publishing, provenance, version/tag, and GitHub Release must not
-  be performed;
+- npm publishing/provenance, Git tag, and GitHub Release must not be performed;
 - this candidate must not be described as a published 1.0 release.
 
 The independent reviewer must audit resource bounds, cancellation and cleanup,

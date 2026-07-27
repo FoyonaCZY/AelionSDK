@@ -33,7 +33,7 @@ CSS：
 TypeScript：
 
 ```ts
-import { attachPreviewCanvas } from '@aelion/sdk';
+import { attachPreviewCanvas } from '@aelionsdk/sdk';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#preview')!;
 const preview = attachPreviewCanvas(session, canvas, {

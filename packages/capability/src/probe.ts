@@ -1,5 +1,5 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
-import { throwIfAborted } from '@aelion/core';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
+import { throwIfAborted } from '@aelionsdk/core';
 
 import type {
   AudioCapability,

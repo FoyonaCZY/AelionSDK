@@ -1,4 +1,4 @@
-import { AelionError, throwIfAborted, type JsonObject } from '@aelion/core';
+import { AelionError, throwIfAborted, type JsonObject } from '@aelionsdk/core';
 
 import type { ExportProfileId } from './profiles.js';
 

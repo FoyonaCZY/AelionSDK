@@ -34,6 +34,7 @@ jobs:
       - run: pnpm run ci
       - run: pnpm run test:pack
       - run: pnpm run release:dry-run
+      - run: pnpm run release:reproducibility
 
   browser-smoke:
     runs-on: ubuntu-latest
@@ -100,6 +101,8 @@ jobs:
       - run: pnpm report:capability:matrix
       - run: pnpm report:seek
       - run: pnpm report:performance
+      - run: pnpm report:recovery
+      - run: pnpm report:phase3:check
       - run: pnpm report:vertical
       - run: pnpm report:alpha
       - uses: actions/upload-artifact@v4

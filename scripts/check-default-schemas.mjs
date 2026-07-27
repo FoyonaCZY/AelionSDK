@@ -17,7 +17,7 @@ const [projectSchema, materialInstanceSchema] = await Promise.all([
   canonicalJson('schemas/material/v1/instance.schema.json'),
 ]);
 
-const expected = `import type { JsonObject } from '@aelion/core';
+const expected = `import type { JsonObject } from '@aelionsdk/core';
 
 import type { AelionProjectSchemas } from './types.js';
 

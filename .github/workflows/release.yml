@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'FoyonaCZY/AelionSDK'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a release commit from main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - name: Require the bound independent blocker review
+        run: pnpm run report:phase1:gates
+      - run: pnpm run ci
+      - run: pnpm run test:pack
+      - run: pnpm run release:dry-run
+      - run: pnpm run release:reproducibility
+      - run: pnpm run report:phase3:check
+      - name: Build immutable npm tarballs
+        env:
+          AELION_RELEASE_TAG: ${{ github.ref_name }}
+        run: node scripts/prepare-release-packages.mjs "$RUNNER_TEMP/aelion-release"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/aelion-release
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-release-${{ github.ref_name }}
+          path: release-packages
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Publish all packages with provenance
+        env:
+          # Required only to bootstrap packages that do not exist on npm yet.
+          # After Trusted Publishers are configured, npm prefers OIDC and this
+          # repository secret must be removed.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish-release-packages.mjs release-packages/release-manifest.json
+      - name: Install and bundle the published registry packages
+        run: node scripts/test-registry-release.mjs "${GITHUB_REF_NAME#v}"
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-release-${{ github.ref_name }}
+          path: release-packages
+      - name: Create the prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release-packages/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "AelionSDK ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --prerelease

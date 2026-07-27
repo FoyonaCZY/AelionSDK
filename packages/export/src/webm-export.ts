@@ -4,7 +4,7 @@ import {
   frameStartUs,
   throwIfAborted,
   type Rational,
-} from '@aelion/core';
+} from '@aelionsdk/core';
 import {
   AudioSample,
   AudioSampleSource,

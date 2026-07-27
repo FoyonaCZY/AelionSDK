@@ -6,11 +6,11 @@ import {
   type LoudnessReport,
   type SilenceDetectionResult,
   type WaveformPeakResult,
-} from '@aelion/audio';
-import { sampleBoundaryUs, sampleIndexAtTime, type JsonObject } from '@aelion/core';
-import type { AelionProject, ItemEntity } from '@aelion/project-schema';
-import type { RenderIr } from '@aelion/render-ir';
-import type { TransactionBuilder, TransactionCommit } from '@aelion/transaction';
+} from '@aelionsdk/audio';
+import { sampleBoundaryUs, sampleIndexAtTime, type JsonObject } from '@aelionsdk/core';
+import type { AelionProject, ItemEntity } from '@aelionsdk/project-schema';
+import type { RenderIr } from '@aelionsdk/render-ir';
+import type { TransactionBuilder, TransactionCommit } from '@aelionsdk/transaction';
 
 import type {
   AelionAudioAnalysisOptions,

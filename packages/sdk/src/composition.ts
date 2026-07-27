@@ -1,5 +1,5 @@
-import type { JsonObject, JsonValue } from '@aelion/core';
-import type { AelionProject } from '@aelion/project-schema';
+import type { JsonObject, JsonValue } from '@aelionsdk/core';
+import type { AelionProject } from '@aelionsdk/project-schema';
 
 import {
   ProjectBuilder,

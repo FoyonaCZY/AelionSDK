@@ -7,10 +7,12 @@ export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
   resolve: {
     alias: {
-      '@aelion/capability': fileURLToPath(
+      '@aelionsdk/capability': fileURLToPath(
         new URL('../../packages/capability/src/index.ts', import.meta.url),
       ),
-      '@aelion/core': fileURLToPath(new URL('../../packages/core/src/index.ts', import.meta.url)),
+      '@aelionsdk/core': fileURLToPath(
+        new URL('../../packages/core/src/index.ts', import.meta.url),
+      ),
     },
   },
   build: {

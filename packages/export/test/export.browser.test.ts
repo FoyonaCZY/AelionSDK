@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { StreamTargetChunk } from 'mediabunny';
 
-import { createSampleIndex, decodeVideoFrameAt } from '@aelion/media';
-import type { RenderIr } from '@aelion/render-ir';
+import { createSampleIndex, decodeVideoFrameAt } from '@aelionsdk/media';
+import type { RenderIr } from '@aelionsdk/render-ir';
 
 import {
   exportGif,

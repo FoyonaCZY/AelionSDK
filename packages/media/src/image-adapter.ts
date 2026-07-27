@@ -1,4 +1,4 @@
-import { throwIfAborted } from '@aelion/core';
+import { throwIfAborted } from '@aelionsdk/core';
 
 import type { RangeReader } from './types.js';
 

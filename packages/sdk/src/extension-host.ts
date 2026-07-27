@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 export const AELION_EXTENSION_PROTOCOL = 'aelion.extension/1' as const;
 

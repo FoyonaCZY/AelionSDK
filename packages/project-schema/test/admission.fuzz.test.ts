@@ -1,5 +1,5 @@
 import fc from 'fast-check';
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 import { describe, expect, it } from 'vitest';
 
 import {

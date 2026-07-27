@@ -1,6 +1,6 @@
 {
-  "name": "@aelion/media",
-  "version": "0.1.0-alpha.0",
+  "name": "@aelionsdk/media",
+  "version": "0.1.0-beta.1",
   "description": "Range I/O, media indexing, decoding and exact seek for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,7 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
+    "@aelionsdk/core": "0.1.0-beta.1",
     "mediabunny": "1.50.8"
   }
 }

@@ -1,8 +1,8 @@
-import type { JsonObject } from '@aelion/core';
-import type { AelionProject } from '@aelion/project-schema';
-import { ProjectValidator } from '@aelion/project-schema';
-import { IncrementalRenderCompiler } from '@aelion/render-ir';
-import { TransactionEngine } from '@aelion/transaction';
+import type { JsonObject } from '@aelionsdk/core';
+import type { AelionProject } from '@aelionsdk/project-schema';
+import { ProjectValidator } from '@aelionsdk/project-schema';
+import { IncrementalRenderCompiler } from '@aelionsdk/render-ir';
+import { TransactionEngine } from '@aelionsdk/transaction';
 import { bench, describe } from 'vitest';
 
 import materialInstanceSchema from '../schemas/material/v1/instance.schema.json';

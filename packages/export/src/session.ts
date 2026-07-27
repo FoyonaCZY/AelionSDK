@@ -1,9 +1,9 @@
-import { AelionError, type Diagnostic, type JsonValue } from '@aelion/core';
+import { AelionError, type Diagnostic, type JsonValue } from '@aelionsdk/core';
 import {
   LOCAL_RGBA8_COLOR_CAPABILITY,
   preflightColorPipeline,
   type RenderIr,
-} from '@aelion/render-ir';
+} from '@aelionsdk/render-ir';
 
 import {
   exportAv1Mp4,

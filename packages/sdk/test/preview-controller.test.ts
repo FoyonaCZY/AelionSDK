@@ -1,4 +1,4 @@
-import type { RenderIrFrameResult } from '@aelion/renderer-worker';
+import type { RenderIrFrameResult } from '@aelionsdk/renderer-worker';
 import { describe, expect, it, vi } from 'vitest';
 
 import { attachPreviewCanvas } from '../src/preview-controller.js';

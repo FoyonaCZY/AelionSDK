@@ -5,7 +5,7 @@ import {
   type JsonObject,
   type JsonValue,
   type Rational,
-} from '@aelion/core';
+} from '@aelionsdk/core';
 import {
   ProjectValidator,
   canonicalClone,
@@ -15,7 +15,7 @@ import {
   type MarkerEntity,
   type TrackEntity,
   type TransitionEntity,
-} from '@aelion/project-schema';
+} from '@aelionsdk/project-schema';
 
 import { defaultSchemas } from './default-schemas.js';
 import type { ProductionMediaProvider, ProductionMediaProbe } from './production-media-provider.js';

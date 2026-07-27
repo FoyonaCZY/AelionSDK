@@ -1,11 +1,11 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
 import {
   compileMaterialGraph,
   compileMaterialGraphToWebGl2,
   compileMaterialGraphToWebGpu,
   type CompileMaterialOptions,
   type MaterialExecutionPlan,
-} from '@aelion/material-compiler';
+} from '@aelionsdk/material-compiler';
 
 import { packMaterialPackage } from './package.js';
 import type {

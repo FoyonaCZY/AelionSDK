@@ -1,4 +1,4 @@
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 function serialize(value: JsonValue): string {
   if (value === null || typeof value === 'boolean' || typeof value === 'string') {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelion/material-compiler';
+import { compileMaterialGraphToWebGl2, type MaterialGraph } from '@aelionsdk/material-compiler';
 import { WorkerCompositor } from '../src/index.js';
 import type { RendererWorkerRequest, RendererWorkerRequestSetSnapshot } from '../src/protocol.js';
 import { hasUsableWebGpu } from './browser-capabilities.js';

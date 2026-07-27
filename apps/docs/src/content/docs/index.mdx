@@ -67,7 +67,9 @@ corepack pnpm dev:quickstart
 这四者的关系并不复杂：Project 说明“剪什么”，Media Provider 说明“素材到哪里读”，Session 负责执行，Preview Controller 负责把结果显示出来。
 
 :::note[当前发布状态]
-AelionSDK 当前版本是 `0.1.0-alpha.0`，源码可运行，但还没有发布到 npm。现阶段请在本仓库中使用 workspace 包进行开发。npm 安装方式会在首个公开版本发布后开放。
+AelionSDK 当前公开 Beta 是 `0.1.0-beta.1`，通过 npm `next` tag 分发。普通应用安装
+`@aelionsdk/sdk@next`；Vite 应用同时安装 `@aelionsdk/vite-plugin@next`。Beta API 在首个
+稳定版本前仍可能按迁移规则调整。
 :::
 
 ## SDK 管什么，你的应用管什么

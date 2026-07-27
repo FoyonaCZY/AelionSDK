@@ -18,7 +18,7 @@ const [packageSchema, definitionSchema, graphSchema] = await Promise.all([
   canonicalJson('schemas/material/v1/graph.schema.json'),
 ]);
 
-const expected = `import type { JsonObject } from '@aelion/core';
+const expected = `import type { JsonObject } from '@aelionsdk/core';
 
 export const materialPackageSchema = JSON.parse(
   String.raw\`${packageSchema}\`,

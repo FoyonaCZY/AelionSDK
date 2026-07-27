@@ -12,7 +12,7 @@ import {
   IndexedDbProjectRevisionStore,
   ProjectPersistenceController,
   restoreLatestProject,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 
 const store = new IndexedDbProjectRevisionStore({
   databaseName: 'my-editor-projects',

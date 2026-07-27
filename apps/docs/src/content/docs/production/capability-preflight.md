@@ -56,7 +56,7 @@ const unsubscribe = session.subscribe('capability-changed', event => {
 ## 每次导出都做 preflight
 
 ```ts
-import { OpfsSeekableSink } from '@aelion/export';
+import { OpfsSeekableSink } from '@aelionsdk/export';
 
 const sink = new OpfsSeekableSink('output.mp4');
 const options = {

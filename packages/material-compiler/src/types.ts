@@ -1,4 +1,4 @@
-import type { Diagnostic, JsonObject, JsonValue } from '@aelion/core';
+import type { Diagnostic, JsonObject, JsonValue } from '@aelionsdk/core';
 
 export type MaterialValueType = 'float' | 'enum' | 'visual-frame';
 

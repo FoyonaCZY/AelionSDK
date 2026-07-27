@@ -42,7 +42,7 @@ const aliases = Object.fromEntries(
     'renderer-worker',
     'sdk',
     'transaction',
-  ].map(name => [`@aelion/${name}`, resolve(root, `packages/${name}/src/index.ts`)]),
+  ].map(name => [`@aelionsdk/${name}`, resolve(root, `packages/${name}/src/index.ts`)]),
 );
 
 const server = await createViteServer({
@@ -134,7 +134,7 @@ try {
     packageJson(resolve(competitorNodeModules, '@diffusionstudio/core/package.json')),
   ]);
   report.versions = {
-    '@aelion/sdk': aelionPackage.version,
+    '@aelionsdk/sdk': aelionPackage.version,
     '@webav/av-cliper': webavPackage.version,
     '@diffusionstudio/core': diffusionPackage.version,
     chromium: browser.version(),

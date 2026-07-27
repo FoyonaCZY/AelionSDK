@@ -8,26 +8,32 @@ export default defineConfig({
   root,
   resolve: {
     alias: {
-      '@aelion/audio': fileURLToPath(new URL('../../packages/audio/src/index.ts', import.meta.url)),
-      '@aelion/core': fileURLToPath(new URL('../../packages/core/src/index.ts', import.meta.url)),
-      '@aelion/export': fileURLToPath(
+      '@aelionsdk/audio': fileURLToPath(
+        new URL('../../packages/audio/src/index.ts', import.meta.url),
+      ),
+      '@aelionsdk/core': fileURLToPath(
+        new URL('../../packages/core/src/index.ts', import.meta.url),
+      ),
+      '@aelionsdk/export': fileURLToPath(
         new URL('../../packages/export/src/index.ts', import.meta.url),
       ),
-      '@aelion/material-compiler': fileURLToPath(
+      '@aelionsdk/material-compiler': fileURLToPath(
         new URL('../../packages/material-compiler/src/index.ts', import.meta.url),
       ),
-      '@aelion/media': fileURLToPath(new URL('../../packages/media/src/index.ts', import.meta.url)),
-      '@aelion/project-schema': fileURLToPath(
+      '@aelionsdk/media': fileURLToPath(
+        new URL('../../packages/media/src/index.ts', import.meta.url),
+      ),
+      '@aelionsdk/project-schema': fileURLToPath(
         new URL('../../packages/project-schema/src/index.ts', import.meta.url),
       ),
-      '@aelion/render-ir': fileURLToPath(
+      '@aelionsdk/render-ir': fileURLToPath(
         new URL('../../packages/render-ir/src/index.ts', import.meta.url),
       ),
-      '@aelion/renderer-worker': fileURLToPath(
+      '@aelionsdk/renderer-worker': fileURLToPath(
         new URL('../../packages/renderer-worker/src/index.ts', import.meta.url),
       ),
-      '@aelion/sdk': fileURLToPath(new URL('../../packages/sdk/src/index.ts', import.meta.url)),
-      '@aelion/transaction': fileURLToPath(
+      '@aelionsdk/sdk': fileURLToPath(new URL('../../packages/sdk/src/index.ts', import.meta.url)),
+      '@aelionsdk/transaction': fileURLToPath(
         new URL('../../packages/transaction/src/index.ts', import.meta.url),
       ),
     },

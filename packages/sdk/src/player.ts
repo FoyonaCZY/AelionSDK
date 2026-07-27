@@ -4,9 +4,9 @@ import {
   TransferableAudioWorkletClock,
   renderIrAudio,
   type ScheduledVideoFrame,
-} from '@aelion/audio';
-import { sampleIndexAtTime } from '@aelion/core';
-import type { ChangeSet } from '@aelion/transaction';
+} from '@aelionsdk/audio';
+import { sampleIndexAtTime } from '@aelionsdk/core';
+import type { ChangeSet } from '@aelionsdk/transaction';
 
 import type { AelionSession } from './session.js';
 import { normalizePreviewQuality, type NormalizedPreviewQuality } from './preview-quality.js';

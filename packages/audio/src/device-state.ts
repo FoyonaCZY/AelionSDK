@@ -1,4 +1,4 @@
-import { AelionError, throwIfAborted, type Disposable } from '@aelion/core';
+import { AelionError, throwIfAborted, type Disposable } from '@aelionsdk/core';
 
 export type AudioRuntimeState =
   | 'idle'

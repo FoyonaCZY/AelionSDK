@@ -1,4 +1,4 @@
-import type { Diagnostic } from '@aelion/core';
+import type { Diagnostic } from '@aelionsdk/core';
 
 import type { RenderIr } from './types.js';
 

@@ -1,4 +1,4 @@
-import { AelionError, type Disposable } from '@aelion/core';
+import { AelionError, type Disposable } from '@aelionsdk/core';
 
 import { createSinkCompletionBarrier } from './sink-completion.js';
 import type { WebMExportOptions, WebMExportResult } from './webm-export.js';

@@ -1,4 +1,4 @@
-import { AelionError, throwIfAborted } from '@aelion/core';
+import { AelionError, throwIfAborted } from '@aelionsdk/core';
 
 import type { ByteRange, RangeRead, RangeReader } from './types.js';
 

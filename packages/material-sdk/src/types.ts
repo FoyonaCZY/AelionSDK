@@ -1,5 +1,5 @@
-import type { Diagnostic, JsonValue } from '@aelion/core';
-import type { MaterialGraph } from '@aelion/material-compiler';
+import type { Diagnostic, JsonValue } from '@aelionsdk/core';
+import type { MaterialGraph } from '@aelionsdk/material-compiler';
 
 export const MATERIAL_PROTOCOL_VERSION = '1.0.0' as const;
 export const MATERIAL_PACKAGE_SCHEMA =

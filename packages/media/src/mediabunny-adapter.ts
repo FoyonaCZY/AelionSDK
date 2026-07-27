@@ -1,4 +1,4 @@
-import { throwIfAborted, type Diagnostic } from '@aelion/core';
+import { throwIfAborted, type Diagnostic } from '@aelionsdk/core';
 import {
   ALL_FORMATS,
   AudioSampleSink,

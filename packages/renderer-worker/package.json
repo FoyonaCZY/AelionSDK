@@ -1,6 +1,6 @@
 {
-  "name": "@aelion/renderer-worker",
-  "version": "0.1.0-alpha.0",
+  "name": "@aelionsdk/renderer-worker",
+  "version": "0.1.0-beta.1",
   "description": "Off-main-thread WebGL2 and WebGPU compositor for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,8 +40,8 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
-    "@aelion/material-compiler": "workspace:*",
-    "@aelion/render-ir": "workspace:*"
+    "@aelionsdk/core": "0.1.0-beta.1",
+    "@aelionsdk/material-compiler": "0.1.0-beta.1",
+    "@aelionsdk/render-ir": "0.1.0-beta.1"
   }
 }

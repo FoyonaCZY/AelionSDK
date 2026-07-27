@@ -3,7 +3,7 @@ import {
   preflightColorPipeline,
   validateColorPipelineContract,
   type RenderIr,
-} from '@aelion/render-ir';
+} from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 function ir(overrides: Partial<RenderIr> = {}): RenderIr {

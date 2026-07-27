@@ -20,7 +20,7 @@ function isAnimation(value: unknown): value is {
   readonly animation: {
     readonly keyframes: readonly {
       readonly timeUs: number;
-      readonly value: import('@aelion/core').JsonValue;
+      readonly value: import('@aelionsdk/core').JsonValue;
       readonly interpolation: string;
     }[];
   };
@@ -77,10 +77,10 @@ function infinityTime(timeUs: number, firstUs: number, lastUs: number, mode: unk
 }
 
 function interpolateJson(
-  from: import('@aelion/core').JsonValue,
-  to: import('@aelion/core').JsonValue,
+  from: import('@aelionsdk/core').JsonValue,
+  to: import('@aelionsdk/core').JsonValue,
   progress: number,
-): import('@aelion/core').JsonValue {
+): import('@aelionsdk/core').JsonValue {
   if (typeof from === 'number' && typeof to === 'number') return from + (to - from) * progress;
   if (Array.isArray(from) && Array.isArray(to) && from.length === to.length) {
     return from.map((value, index) => interpolateJson(value, to[index] ?? value, progress));
@@ -115,7 +115,7 @@ function easingProgress(progress: number, from: Readonly<Record<string, unknown>
 }
 
 export function evaluateAnimatedValue(
-  value: import('@aelion/core').JsonValue,
+  value: import('@aelionsdk/core').JsonValue,
   sequenceTimeUs: number,
   ownerStartUs = 0,
 ) {
@@ -165,7 +165,7 @@ export function evaluateAnimatedValue(
 }
 
 export function evaluateAnimatableNumber(
-  value: import('@aelion/core').JsonValue | undefined,
+  value: import('@aelionsdk/core').JsonValue | undefined,
   sequenceTimeUs: number,
   ownerStartUs: number,
   fallback: number,
@@ -308,14 +308,14 @@ export function evaluateAudioState(
           const trackAudio = objectProperty(track.audio);
           const gainDb =
             evaluateAnimatableNumber(
-              trackAudio.gainDb as import('@aelion/core').JsonValue,
+              trackAudio.gainDb as import('@aelionsdk/core').JsonValue,
               overlapStart,
               0,
               0,
             ) + evaluateAnimatableNumber(clip.audio.gainDb, overlapStart, clip.range.startUs, 0);
           const pan =
             evaluateAnimatableNumber(
-              trackAudio.pan as import('@aelion/core').JsonValue,
+              trackAudio.pan as import('@aelionsdk/core').JsonValue,
               overlapStart,
               0,
               0,

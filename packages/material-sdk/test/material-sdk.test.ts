@@ -20,7 +20,7 @@ import {
   type MaterialPackageFile,
   type PackedMaterialPackage,
 } from '../src/index.js';
-import type { JsonValue } from '@aelion/core';
+import type { JsonValue } from '@aelionsdk/core';
 
 const declarativeMetadata: MaterialPackageMetadata = {
   id: 'dev.example.transitions',

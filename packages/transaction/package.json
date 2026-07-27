@@ -1,6 +1,6 @@
 {
-  "name": "@aelion/transaction",
-  "version": "0.1.0-alpha.0",
+  "name": "@aelionsdk/transaction",
+  "version": "0.1.0-beta.1",
   "description": "Atomic project transactions, inverses and change sets for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,7 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
-    "@aelion/project-schema": "workspace:*"
+    "@aelionsdk/core": "0.1.0-beta.1",
+    "@aelionsdk/project-schema": "0.1.0-beta.1"
   }
 }

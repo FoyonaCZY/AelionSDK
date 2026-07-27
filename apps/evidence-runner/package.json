@@ -1,18 +1,18 @@
 {
-  "name": "@aelion/evidence-runner",
-  "version": "0.1.0-alpha.0",
+  "name": "@aelionsdk/evidence-runner",
+  "version": "0.1.0-beta.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@aelion/audio": "workspace:*",
-    "@aelion/export": "workspace:*",
-    "@aelion/material-compiler": "workspace:*",
-    "@aelion/media": "workspace:*",
-    "@aelion/project-schema": "workspace:*",
-    "@aelion/render-ir": "workspace:*",
-    "@aelion/renderer-worker": "workspace:*",
-    "@aelion/sdk": "workspace:*",
-    "@aelion/transaction": "workspace:*"
+    "@aelionsdk/audio": "workspace:*",
+    "@aelionsdk/export": "workspace:*",
+    "@aelionsdk/material-compiler": "workspace:*",
+    "@aelionsdk/media": "workspace:*",
+    "@aelionsdk/project-schema": "workspace:*",
+    "@aelionsdk/render-ir": "workspace:*",
+    "@aelionsdk/renderer-worker": "workspace:*",
+    "@aelionsdk/sdk": "workspace:*",
+    "@aelionsdk/transaction": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

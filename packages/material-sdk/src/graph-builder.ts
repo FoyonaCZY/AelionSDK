@@ -1,5 +1,5 @@
-import type { JsonValue } from '@aelion/core';
-import type { GraphBinding, MaterialGraph, MaterialGraphNode } from '@aelion/material-compiler';
+import type { JsonValue } from '@aelionsdk/core';
+import type { GraphBinding, MaterialGraph, MaterialGraphNode } from '@aelionsdk/material-compiler';
 
 import { MATERIAL_GRAPH_SCHEMA, MATERIAL_NODE_SET } from './types.js';
 

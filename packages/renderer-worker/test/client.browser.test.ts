@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
 
 import { WorkerCompositor } from '../src/client.js';
 import type { RendererWorkerRequest } from '../src/protocol.js';

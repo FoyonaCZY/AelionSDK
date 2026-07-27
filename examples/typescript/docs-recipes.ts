@@ -3,7 +3,7 @@ import {
   SeekableMemorySink,
   type RemoteExportAuthorizer,
   type RemoteExportProvider,
-} from '@aelion/export';
+} from '@aelionsdk/export';
 import {
   AelionExtensionHost,
   IndexedDbProjectRevisionStore,
@@ -17,7 +17,7 @@ import {
   type DiffusionMigrationOptions,
   type PreviewCanvasController,
   type WebAvProjectSnapshot,
-} from '@aelion/sdk';
+} from '@aelionsdk/sdk';
 
 /** Product-level Composition/Layer/Clip authoring used by the Composition guide. */
 export function buildCompositionRecipe() {

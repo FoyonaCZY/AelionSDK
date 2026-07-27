@@ -10,7 +10,7 @@ AelionSDK 的公开时间单位是整数微秒，带时间含义的字段通常�
 使用 SDK helper 会更清楚，也能统一检查范围：
 
 ```ts
-import { frames, milliseconds, seconds } from '@aelion/sdk';
+import { frames, milliseconds, seconds } from '@aelionsdk/sdk';
 
 const introStartUs = seconds(2.5); // 2_500_000
 const fadeDurationUs = milliseconds(180); // 180_000
@@ -82,9 +82,14 @@ sourceTime = sourceStart + (timelineTime - timelineStart)
 
 ## 当前变速行为
 
-普通线性 TimeMap 可以设置速度和方向。音频目前采用 varispeed：速度变快时音高也升高，速度变慢时音高降低。当前版本没有把“保音高 time-stretch”作为已完成能力。
+普通线性 TimeMap 可以设置速度和方向。音频默认使用 varispeed：速度变快时音高也
+升高，速度变慢时音高降低。需要保持音高时，在音频 Clip 上设置
+`pitchPolicy: 'preserve'`；引擎会使用确定性的 WSOLA overlap-add，并在任意 PCM
+块边界之间保留连续状态。
 
-如果产品需要广播级变速音频，应把这项限制放进功能设计或使用独立音频处理服务，不能只在 UI 上写“保持音调”。
+非线性 TimeMap 无法由单一 stretch ratio 表达，因此 Project validation 会拒绝
+`pitchPolicy: 'preserve'`。反向、曲线变速或广播级主观音质仍应在目标素材和设备上
+单独验收，不能只根据策略名称推断音质。
 
 ## UI 吸附由产品决定
 

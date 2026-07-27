@@ -1,11 +1,11 @@
-import type { JsonObject } from '@aelion/core';
+import type { JsonObject } from '@aelionsdk/core';
 import {
   compileMaterialGraphToWebGl2,
   type MaterialGraph,
   type WebGl2MaterialProgram,
-} from '@aelion/material-compiler';
-import type { AelionProject, ItemEntity } from '@aelion/project-schema';
-import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelion/render-ir';
+} from '@aelionsdk/material-compiler';
+import type { AelionProject, ItemEntity } from '@aelionsdk/project-schema';
+import { IncrementalRenderCompiler, type IrMaterialDefinition } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
 
 import { RenderIrFrameRenderer, type IrFrameSource } from '../src/index.js';

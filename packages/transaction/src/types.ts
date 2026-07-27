@@ -1,5 +1,5 @@
-import type { Diagnostic, JsonObject, JsonValue } from '@aelion/core';
-import type { AelionProject, CollectionName, EntityId, TimeRange } from '@aelion/project-schema';
+import type { Diagnostic, JsonObject, JsonValue } from '@aelionsdk/core';
+import type { AelionProject, CollectionName, EntityId, TimeRange } from '@aelionsdk/project-schema';
 
 export type AtomicOperation =
   | {

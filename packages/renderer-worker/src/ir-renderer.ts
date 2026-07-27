@@ -1,5 +1,5 @@
-import { AelionError, type Disposable, type JsonValue, throwIfAborted } from '@aelion/core';
-import type { WebGl2MaterialProgram } from '@aelion/material-compiler';
+import { AelionError, type Disposable, type JsonValue, throwIfAborted } from '@aelionsdk/core';
+import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
 import {
   evaluateMaterialInstance,
   evaluateAnimatedValue,
@@ -12,7 +12,7 @@ import {
   type IrTextClip,
   type PortableTextStyle,
   type RenderIr,
-} from '@aelion/render-ir';
+} from '@aelionsdk/render-ir';
 
 import {
   WorkerCompositor,
@@ -678,7 +678,11 @@ function visualParameters(
   const visualRecord = visual as Readonly<Record<string, unknown>>;
   const transform = record(visualRecord.transform);
   const evaluated = (value: unknown): unknown =>
-    evaluateAnimatedValue(value as import('@aelion/core').JsonValue, sequenceTimeUs, ownerStartUs);
+    evaluateAnimatedValue(
+      value as import('@aelionsdk/core').JsonValue,
+      sequenceTimeUs,
+      ownerStartUs,
+    );
   const position = record(evaluated(transform.positionPx));
   const anchor = record(evaluated(transform.anchor));
   const scale = record(evaluated(transform.scale));
@@ -799,7 +803,7 @@ function canvasColor(value: unknown, fallback = 'rgba(0, 0, 0, 0)'): string {
 
 function backgroundParameters(
   value: unknown,
-): Readonly<Record<string, import('@aelion/core').JsonValue>> {
+): Readonly<Record<string, import('@aelionsdk/core').JsonValue>> {
   const rgba = record(value).rgba;
   const components =
     Array.isArray(rgba) && rgba.length === 4

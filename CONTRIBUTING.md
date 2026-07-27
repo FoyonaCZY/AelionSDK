@@ -1,6 +1,7 @@
 # Contributing to AelionSDK
 
-感谢你帮助改进 AelionSDK。当前项目处于 Alpha 阶段，公开 API 和协议仍可能变化。
+感谢你帮助改进 AelionSDK。当前项目处于 Beta 阶段，公开 API 和协议在首个稳定版本
+前仍可能按迁移规则变化。
 
 ## 开始之前
 

@@ -1,6 +1,6 @@
-import type { JsonObject, JsonValue } from '@aelion/core';
-import { AelionError } from '@aelion/core';
-import type { AelionProject, ProjectEntity } from '@aelion/project-schema';
+import type { JsonObject, JsonValue } from '@aelionsdk/core';
+import { AelionError } from '@aelionsdk/core';
+import type { AelionProject, ProjectEntity } from '@aelionsdk/project-schema';
 
 import type { AtomicOperation } from './types.js';
 

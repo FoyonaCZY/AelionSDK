@@ -3,8 +3,8 @@ packages:
   - 'packages/*'
 
 catalog:
-  '@aelion/core': 'workspace:*'
-  '@aelion/project-schema': 'workspace:*'
+  '@aelionsdk/core': 'workspace:*'
+  '@aelionsdk/project-schema': 'workspace:*'
 
 onlyBuiltDependencies:
   - esbuild

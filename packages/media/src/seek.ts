@@ -1,4 +1,4 @@
-import { assertTimeUs } from '@aelion/core';
+import { assertTimeUs } from '@aelionsdk/core';
 
 import type { SampleEntry, SampleIndex, SeekPoint } from './types.js';
 

@@ -215,7 +215,7 @@ async function localThirdPartyTarballs() {
         await readFile(join(packagesDirectory, packageDirectory, 'package.json'), 'utf8'),
       );
       for (const [name, version] of Object.entries(manifest.dependencies ?? {})) {
-        if (!name.startsWith('@aelion/') && !String(version).startsWith('workspace:')) {
+        if (!name.startsWith('@aelionsdk/') && !String(version).startsWith('workspace:')) {
           packageRoots.push({ name, from: join(packagesDirectory, packageDirectory) });
         }
       }
@@ -356,7 +356,7 @@ async function runBrowserConsumer() {
       'pcm-player.worklet': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'audio',
         'dist',
         'pcm-player.worklet.js',
@@ -364,7 +364,7 @@ async function runBrowserConsumer() {
       'pcm-message-player.worklet': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'audio',
         'dist',
         'pcm-message-player.worklet.js',
@@ -372,7 +372,7 @@ async function runBrowserConsumer() {
       'webgl2-worker': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'renderer-worker',
         'dist',
         'webgl2-worker.js',
@@ -380,7 +380,7 @@ async function runBrowserConsumer() {
       'mux-export-worker': join(
         canonicalConsumerDirectory,
         'node_modules',
-        '@aelion',
+        '@aelionsdk',
         'export',
         'dist',
         'mux-export-worker.js',
@@ -397,7 +397,7 @@ async function runBrowserConsumer() {
   const viteConfigPath = join(canonicalConsumerDirectory, 'vite.config.mjs');
   await writeFile(
     viteConfigPath,
-    `import { aelion } from '@aelion/vite-plugin';
+    `import { aelion } from '@aelionsdk/vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -553,19 +553,19 @@ try {
     const manifestPath = join(packageDirectory, 'package.json');
     try {
       const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-      if (manifest.private !== true && manifest.name?.startsWith('@aelion/')) {
+      if (manifest.private !== true && manifest.name?.startsWith('@aelionsdk/')) {
         publicPackages.push({ directory: packageDirectory, manifest });
       }
     } catch (error) {
       if (error?.code !== 'ENOENT') throw error;
     }
   }
-  if (publicPackages.length === 0) throw new Error('No public @aelion packages found');
-  if (!publicPackages.some(entry => entry.manifest.name === '@aelion/sdk')) {
-    throw new Error('@aelion/sdk must be part of the public package set');
+  if (publicPackages.length === 0) throw new Error('No public @aelionsdk packages found');
+  if (!publicPackages.some(entry => entry.manifest.name === '@aelionsdk/sdk')) {
+    throw new Error('@aelionsdk/sdk must be part of the public package set');
   }
-  if (!publicPackages.some(entry => entry.manifest.name === '@aelion/vite-plugin')) {
-    throw new Error('@aelion/vite-plugin must be part of the public package set');
+  if (!publicPackages.some(entry => entry.manifest.name === '@aelionsdk/vite-plugin')) {
+    throw new Error('@aelionsdk/vite-plugin must be part of the public package set');
   }
 
   const tarballs = [];
@@ -668,8 +668,8 @@ try {
   await run(process.execPath, ['smoke.mjs'], consumerDirectory);
   await writeFile(
     join(consumerDirectory, 'contract.ts'),
-    `import { Aelion, type AelionSessionOptions } from '@aelion/sdk';
-import { aelion, type AelionVitePluginOptions } from '@aelion/vite-plugin';
+    `import { Aelion, type AelionSessionOptions } from '@aelionsdk/sdk';
+import { aelion, type AelionVitePluginOptions } from '@aelionsdk/vite-plugin';
 import { defineConfig, type UserConfig } from 'vite';
 
 const pluginOptions = {
@@ -717,22 +717,23 @@ export const contract: UserConfig = config;
     const consumerManifestPath = join(consumerDirectory, 'package.json');
     const consumerContractPath = join(consumerDirectory, 'contract.ts');
     const consumerTsconfigPath = join(consumerDirectory, 'tsconfig.json');
-    const pluginPackage = packedPackages.find(entry => entry.name === '@aelion/vite-plugin');
-    const pluginRoot = join(consumerDirectory, 'node_modules', '@aelion', 'vite-plugin');
+    const pluginPackage = packedPackages.find(entry => entry.name === '@aelionsdk/vite-plugin');
+    const pluginRoot = join(consumerDirectory, 'node_modules', '@aelionsdk', 'vite-plugin');
     const evidence = {
       schemaVersion: '1.0.0',
-      sdkVersion: packedPackages.find(entry => entry.name === '@aelion/sdk')?.version ?? 'unknown',
+      sdkVersion:
+        packedPackages.find(entry => entry.name === '@aelionsdk/sdk')?.version ?? 'unknown',
       generatedAt: new Date().toISOString(),
       command: 'corepack pnpm test:consumer',
       bundlerAdapter: {
-        id: '@aelion/vite-plugin',
-        package: '@aelion/vite-plugin',
+        id: '@aelionsdk/vite-plugin',
+        package: '@aelionsdk/vite-plugin',
         version: pluginPackage?.version ?? 'unknown',
         packageSha256: pluginPackage?.sha256 ?? 'unknown',
         contractSha256: await packageContractHash(pluginRoot),
         public: true,
         zeroConfigVite: false,
-        configuration: "import { aelion } from '@aelion/vite-plugin'; plugins: [aelion()]",
+        configuration: "import { aelion } from '@aelionsdk/vite-plugin'; plugins: [aelion()]",
         viteConfigSha256: browserConsumer.viteConfigSha256,
         note: 'The consumer imports the explicit, versioned Vite plugin from its installed npm tarball. Renderer Worker, Export Worker and both AudioWorklets are served from production chunks; no repository path aliases or private test transforms are used.',
       },

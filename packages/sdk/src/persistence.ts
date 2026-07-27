@@ -1,5 +1,5 @@
-import type { JsonValue } from '@aelion/core';
-import { canonicalHash, canonicalStringify, type AelionProject } from '@aelion/project-schema';
+import type { JsonValue } from '@aelionsdk/core';
+import { canonicalHash, canonicalStringify, type AelionProject } from '@aelionsdk/project-schema';
 
 import type { AelionSessionApi } from './types.js';
 

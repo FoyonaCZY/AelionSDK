@@ -1,4 +1,4 @@
-import type { JsonObject } from '@aelion/core';
+import type { JsonObject } from '@aelionsdk/core';
 
 import type { IrTextClip, IrTextRun } from './types.js';
 

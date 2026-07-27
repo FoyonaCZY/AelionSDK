@@ -26,7 +26,7 @@ try {
       if (error?.code === 'ENOENT') continue;
       throw error;
     }
-    if (manifest.private === true || !manifest.name?.startsWith('@aelion/')) continue;
+    if (manifest.private === true || !manifest.name?.startsWith('@aelionsdk/')) continue;
     if (manifest.version !== expectedVersion) {
       throw new Error(
         `${manifest.name} version ${String(manifest.version)} does not match ${expectedVersion}`,
@@ -40,7 +40,7 @@ try {
     }
     const { stdout, stderr } = await execFileAsync(
       corepackExecutable,
-      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks']),
+      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks', '--tag', 'next']),
       {
         cwd: packageDirectory,
         env: {

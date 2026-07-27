@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { runInNewContext } from 'node:vm';
 
-import type { JsonObject } from '@aelion/core';
-import type { ItemEntity } from '@aelion/project-schema';
+import type { JsonObject } from '@aelionsdk/core';
+import type { ItemEntity } from '@aelionsdk/project-schema';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {

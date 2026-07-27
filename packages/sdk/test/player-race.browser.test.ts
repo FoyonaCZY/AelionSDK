@@ -1,5 +1,5 @@
-import type { PcmSourceBlock } from '@aelion/audio';
-import type { AelionProject } from '@aelion/project-schema';
+import type { PcmSourceBlock } from '@aelionsdk/audio';
+import type { AelionProject } from '@aelionsdk/project-schema';
 import { describe, expect, it } from 'vitest';
 
 import { Aelion, type AelionMediaProvider } from '../src/index.js';

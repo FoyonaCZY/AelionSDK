@@ -173,7 +173,7 @@ Marker 可以属于 Sequence，也可以属于某个 Item。它适合章节、�
 ## 用 Builder 创建工程
 
 ```ts
-import { Aelion, createProject, seconds } from '@aelion/sdk';
+import { Aelion, createProject, seconds } from '@aelionsdk/sdk';
 
 const builder = createProject({
   projectId: 'project_campaign',

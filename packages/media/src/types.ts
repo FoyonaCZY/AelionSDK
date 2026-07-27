@@ -1,4 +1,4 @@
-import type { Diagnostic, Rational } from '@aelion/core';
+import type { Diagnostic, Rational } from '@aelionsdk/core';
 
 export type TrackKind = 'video' | 'audio';
 

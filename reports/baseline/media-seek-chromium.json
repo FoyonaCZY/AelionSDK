@@ -13,38 +13,38 @@
       "container": "mp4",
       "codec": "avc1.64000d",
       "firstPresentationUs": 0,
-      "indexMs": 4.799999982118607,
+      "indexMs": 4.480000000447035,
       "cold": {
         "count": 4,
-        "p50Ms": 3.5550000071525574,
-        "p95Ms": 13.410000026226044,
-        "maxMs": 13.410000026226044,
+        "p50Ms": 3.4700000006705523,
+        "p95Ms": 12.754999998956919,
+        "maxMs": 12.754999998956919,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 13.410000026226044,
+            "elapsedMs": 12.754999998956919,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 2.6700000166893005,
+            "elapsedMs": 3.1899999994784594,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 3.5699999928474426,
+            "elapsedMs": 3.4700000006705523,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 3.5550000071525574,
+            "elapsedMs": 3.5299999993294477,
             "decodedPackets": 18,
             "plannedPackets": 18
           }
@@ -52,92 +52,92 @@
       },
       "warm": {
         "count": 12,
-        "p50Ms": 2.365000009536743,
-        "p95Ms": 3.1500000059604645,
-        "maxMs": 3.1500000059604645,
+        "p50Ms": 2.294999999925494,
+        "p95Ms": 3.2400000002235174,
+        "maxMs": 3.2400000002235174,
         "maxDecodedPackets": 18,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.7150000035762787,
+            "elapsedMs": 3.2400000002235174,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.5250000059604645,
+            "elapsedMs": 1.5600000005215406,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 3.1500000059604645,
+            "elapsedMs": 2.9599999990314245,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 3.0049999952316284,
+            "elapsedMs": 2.5600000005215406,
             "decodedPackets": 18,
             "plannedPackets": 18
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.2549999952316284,
+            "elapsedMs": 2.5149999987334013,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.2900000214576721,
+            "elapsedMs": 1.2350000012665987,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.685000002384186,
+            "elapsedMs": 2.280000001192093,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.560000002384186,
+            "elapsedMs": 2.8399999998509884,
             "decodedPackets": 18,
             "plannedPackets": 18
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.365000009536743,
+            "elapsedMs": 2.294999999925494,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.229999989271164,
+            "elapsedMs": 1.3900000005960464,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.3400000035762787,
+            "elapsedMs": 2.2849999982863665,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.7300000190734863,
+            "elapsedMs": 2.550000000745058,
             "decodedPackets": 18,
             "plannedPackets": 18
           }
@@ -161,38 +161,38 @@
       "container": "mp4",
       "codec": "avc1.64000d",
       "firstPresentationUs": 0,
-      "indexMs": 0.7199999988079071,
+      "indexMs": 0.5749999992549419,
       "cold": {
         "count": 4,
-        "p50Ms": 2.8299999833106995,
-        "p95Ms": 4.894999980926514,
-        "maxMs": 4.894999980926514,
+        "p50Ms": 2.9700000006705523,
+        "p95Ms": 3.405000001192093,
+        "maxMs": 3.405000001192093,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.8299999833106995,
+            "elapsedMs": 3.319999998435378,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.8799999952316284,
+            "elapsedMs": 1.699999999254942,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 3.5799999833106995,
+            "elapsedMs": 2.9700000006705523,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 4.894999980926514,
+            "elapsedMs": 3.405000001192093,
             "decodedPackets": 18,
             "plannedPackets": 18
           }
@@ -200,92 +200,92 @@
       },
       "warm": {
         "count": 12,
-        "p50Ms": 2.3899999856948853,
-        "p95Ms": 3.050000011920929,
-        "maxMs": 3.050000011920929,
+        "p50Ms": 2.3849999997764826,
+        "p95Ms": 2.9649999998509884,
+        "maxMs": 2.9649999998509884,
         "maxDecodedPackets": 18,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.814999997615814,
+            "elapsedMs": 2.9100000001490116,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.4000000059604645,
+            "elapsedMs": 1.3799999989569187,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.5499999821186066,
+            "elapsedMs": 2.355000000447035,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.939999997615814,
+            "elapsedMs": 2.7399999983608723,
             "decodedPackets": 18,
             "plannedPackets": 18
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.3250000178813934,
+            "elapsedMs": 2.3849999997764826,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.1150000095367432,
+            "elapsedMs": 1.2550000008195639,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.3899999856948853,
+            "elapsedMs": 2.544999999925494,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.4200000166893005,
+            "elapsedMs": 2.9649999998509884,
             "decodedPackets": 18,
             "plannedPackets": 18
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.5,
+            "elapsedMs": 2.275000000372529,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 1.2450000047683716,
+            "elapsedMs": 1.1150000002235174,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.1949999928474426,
+            "elapsedMs": 2.599999999627471,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 3.050000011920929,
+            "elapsedMs": 2.5849999990314245,
             "decodedPackets": 18,
             "plannedPackets": 18
           }
@@ -309,38 +309,38 @@
       "container": "mp4",
       "codec": "avc1.64000d",
       "firstPresentationUs": 66666,
-      "indexMs": 1.6899999976158142,
+      "indexMs": 1.5100000016391277,
       "cold": {
         "count": 4,
-        "p50Ms": 3.3899999856948853,
-        "p95Ms": 5.509999990463257,
-        "maxMs": 5.509999990463257,
+        "p50Ms": 3.1600000001490116,
+        "p95Ms": 4.675000000745058,
+        "maxMs": 4.675000000745058,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 4.134999990463257,
+            "elapsedMs": 3.5649999994784594,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 5.509999990463257,
+            "elapsedMs": 4.675000000745058,
             "decodedPackets": 30,
             "plannedPackets": 30
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 3.3899999856948853,
+            "elapsedMs": 3.1600000001490116,
             "decodedPackets": 13,
             "plannedPackets": 13
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 3.1200000047683716,
+            "elapsedMs": 2.775000000372529,
             "decodedPackets": 16,
             "plannedPackets": 16
           }
@@ -348,92 +348,92 @@
       },
       "warm": {
         "count": 12,
-        "p50Ms": 2.794999986886978,
-        "p95Ms": 4.615000009536743,
-        "maxMs": 4.615000009536743,
+        "p50Ms": 2.5650000013411045,
+        "p95Ms": 4.080000000074506,
+        "maxMs": 4.080000000074506,
         "maxDecodedPackets": 30,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.8199999928474426,
+            "elapsedMs": 2.5650000013411045,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 4.615000009536743,
+            "elapsedMs": 3.7900000009685755,
             "decodedPackets": 30,
             "plannedPackets": 30
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.435000002384186,
+            "elapsedMs": 2.9399999994784594,
             "decodedPackets": 13,
             "plannedPackets": 13
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.7349999845027924,
+            "elapsedMs": 2.830000000074506,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.439999997615814,
+            "elapsedMs": 2.5600000005215406,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 4.550000011920929,
+            "elapsedMs": 4.080000000074506,
             "decodedPackets": 30,
             "plannedPackets": 30
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.300000011920929,
+            "elapsedMs": 2.2149999998509884,
             "decodedPackets": 13,
             "plannedPackets": 13
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.794999986886978,
+            "elapsedMs": 2.3200000002980232,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 2.310000002384186,
+            "elapsedMs": 2.605000000447035,
             "decodedPackets": 16,
             "plannedPackets": 16
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 4.58500000834465,
+            "elapsedMs": 3.6799999997019768,
             "decodedPackets": 30,
             "plannedPackets": 30
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.7950000166893005,
+            "elapsedMs": 2.0899999998509884,
             "decodedPackets": 13,
             "plannedPackets": 13
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 2.824999988079071,
+            "elapsedMs": 2.244999999180436,
             "decodedPackets": 16,
             "plannedPackets": 16
           }
@@ -457,38 +457,38 @@
       "container": "mp4",
       "codec": "avc1.64000d",
       "firstPresentationUs": 500000,
-      "indexMs": 0.8400000035762787,
+      "indexMs": 0.650000000372529,
       "cold": {
         "count": 4,
-        "p50Ms": 1.824999988079071,
-        "p95Ms": 3.2100000083446503,
-        "maxMs": 3.2100000083446503,
+        "p50Ms": 1.525000000372529,
+        "p95Ms": 3.099999999627471,
+        "maxMs": 3.099999999627471,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 1.6749999821186066,
+            "elapsedMs": 1.549999998882413,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 3.2100000083446503,
+            "elapsedMs": 3.099999999627471,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 2.0150000154972076,
+            "elapsedMs": 1.525000000372529,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 1.824999988079071,
+            "elapsedMs": 1.5199999995529652,
             "decodedPackets": 3,
             "plannedPackets": 3
           }
@@ -496,92 +496,92 @@
       },
       "warm": {
         "count": 12,
-        "p50Ms": 1.4850000143051147,
-        "p95Ms": 2.8550000190734863,
-        "maxMs": 2.8550000190734863,
+        "p50Ms": 1.4199999999254942,
+        "p95Ms": 2.4450000002980232,
+        "maxMs": 2.4450000002980232,
         "maxDecodedPackets": 15,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 1.4850000143051147,
+            "elapsedMs": 2.044999999925494,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 2.560000002384186,
+            "elapsedMs": 2.419999999925494,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 1.3349999785423279,
+            "elapsedMs": 1.1799999997019768,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 1.4900000095367432,
+            "elapsedMs": 1.4550000000745058,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 1.2849999964237213,
+            "elapsedMs": 1.175000000745058,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 2.3250000178813934,
+            "elapsedMs": 2.2599999997764826,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 1.7849999964237213,
+            "elapsedMs": 1.5199999995529652,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 1.6299999952316284,
+            "elapsedMs": 1.2649999987334013,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 550000,
             "presentationUs": 533333,
-            "elapsedMs": 1.280000001192093,
+            "elapsedMs": 1.075000001117587,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1033333,
-            "elapsedMs": 2.8550000190734863,
+            "elapsedMs": 2.4450000002980232,
             "decodedPackets": 15,
             "plannedPackets": 15
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533333,
-            "elapsedMs": 1.4650000035762787,
+            "elapsedMs": 1.3349999990314245,
             "decodedPackets": 3,
             "plannedPackets": 3
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533333,
-            "elapsedMs": 1.3949999809265137,
+            "elapsedMs": 1.4199999999254942,
             "decodedPackets": 3,
             "plannedPackets": 3
           }
@@ -605,38 +605,38 @@
       "container": "webm",
       "codec": "vp09.00.11.08.01.02.02.02.00",
       "firstPresentationUs": 0,
-      "indexMs": 3.185000002384186,
+      "indexMs": 3.255000000819564,
       "cold": {
         "count": 4,
-        "p50Ms": 5.230000019073486,
-        "p95Ms": 8.360000014305115,
-        "maxMs": 8.360000014305115,
+        "p50Ms": 4.655000001192093,
+        "p95Ms": 6.9599999990314245,
+        "maxMs": 6.9599999990314245,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533000,
-            "elapsedMs": 5.230000019073486,
+            "elapsedMs": 4.639999998733401,
             "decodedPackets": 11,
             "plannedPackets": 11
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1000000,
-            "elapsedMs": 5.965000003576279,
+            "elapsedMs": 5.160000000149012,
             "decodedPackets": 19,
             "plannedPackets": 19
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533000,
-            "elapsedMs": 8.360000014305115,
+            "elapsedMs": 6.9599999990314245,
             "decodedPackets": 29,
             "plannedPackets": 29
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533000,
-            "elapsedMs": 4.9549999833106995,
+            "elapsedMs": 4.655000001192093,
             "decodedPackets": 17,
             "plannedPackets": 17
           }
@@ -644,92 +644,92 @@
       },
       "warm": {
         "count": 12,
-        "p50Ms": 4.120000004768372,
-        "p95Ms": 6.140000015497208,
-        "maxMs": 6.140000015497208,
+        "p50Ms": 4.154999999329448,
+        "p95Ms": 5.980000000447035,
+        "maxMs": 5.980000000447035,
         "maxDecodedPackets": 29,
         "samples": [
           {
             "targetUs": 550000,
             "presentationUs": 533000,
-            "elapsedMs": 2.685000002384186,
+            "elapsedMs": 2.7100000008940697,
             "decodedPackets": 11,
             "plannedPackets": 11
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1000000,
-            "elapsedMs": 4.120000004768372,
+            "elapsedMs": 4.455000000074506,
             "decodedPackets": 19,
             "plannedPackets": 19
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533000,
-            "elapsedMs": 6.140000015497208,
+            "elapsedMs": 5.570000000298023,
             "decodedPackets": 29,
             "plannedPackets": 29
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533000,
-            "elapsedMs": 4.280000001192093,
+            "elapsedMs": 4.425000000745058,
             "decodedPackets": 17,
             "plannedPackets": 17
           },
           {
             "targetUs": 550000,
             "presentationUs": 533000,
-            "elapsedMs": 2.8250000178813934,
+            "elapsedMs": 2.775000000372529,
             "decodedPackets": 11,
             "plannedPackets": 11
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1000000,
-            "elapsedMs": 4.28999999165535,
+            "elapsedMs": 4.154999999329448,
             "decodedPackets": 19,
             "plannedPackets": 19
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533000,
-            "elapsedMs": 5.9000000059604645,
+            "elapsedMs": 5.974999999627471,
             "decodedPackets": 29,
             "plannedPackets": 29
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533000,
-            "elapsedMs": 4.46000000834465,
+            "elapsedMs": 3.755000000819564,
             "decodedPackets": 17,
             "plannedPackets": 17
           },
           {
             "targetUs": 550000,
             "presentationUs": 533000,
-            "elapsedMs": 2.7349999845027924,
+            "elapsedMs": 2.7900000009685755,
             "decodedPackets": 11,
             "plannedPackets": 11
           },
           {
             "targetUs": 1050000,
             "presentationUs": 1000000,
-            "elapsedMs": 4.064999997615814,
+            "elapsedMs": 4.150000000372529,
             "decodedPackets": 19,
             "plannedPackets": 19
           },
           {
             "targetUs": 1550000,
             "presentationUs": 1533000,
-            "elapsedMs": 5.4549999833106995,
+            "elapsedMs": 5.980000000447035,
             "decodedPackets": 29,
             "plannedPackets": 29
           },
           {
             "targetUs": 2550000,
             "presentationUs": 2533000,
-            "elapsedMs": 3.915000021457672,
+            "elapsedMs": 4.154999999329448,
             "decodedPackets": 17,
             "plannedPackets": 17
           }
@@ -754,7 +754,7 @@
   },
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:seek",
-  "generatedAt": "2026-07-26T18:48:17.700Z",
+  "generatedAt": "2026-07-27T17:00:06.127Z",
   "browser": "Google Chrome 150.0.7871.186",
   "browserVersion": "150.0.7871.186"
 }

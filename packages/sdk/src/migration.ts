@@ -1,5 +1,5 @@
-import { normalizeRational, type JsonObject, type JsonValue, type Rational } from '@aelion/core';
-import type { AelionProject } from '@aelion/project-schema';
+import { normalizeRational, type JsonObject, type JsonValue, type Rational } from '@aelionsdk/core';
+import type { AelionProject } from '@aelionsdk/project-schema';
 
 import {
   ProjectBuilder,

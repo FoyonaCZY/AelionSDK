@@ -4,10 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 import type { Plugin } from 'vite';
 
-const virtualPrefix = '\0@aelion/vite-plugin:runtime-asset:';
-const publicPrefix = '/@aelion/vite-plugin/runtime-assets';
+const virtualPrefix = '\0@aelionsdk/vite-plugin:runtime-asset:';
+const publicPrefix = '/@aelionsdk/vite-plugin/runtime-assets';
 
-type AelionPackageName = '@aelion/audio' | '@aelion/export' | '@aelion/renderer-worker';
+type AelionPackageName = '@aelionsdk/audio' | '@aelionsdk/export' | '@aelionsdk/renderer-worker';
 
 interface RuntimeAsset {
   readonly entryFile: string;
@@ -21,11 +21,11 @@ interface RuntimeAsset {
 
 /** Options for the official Aelion Vite integration. */
 export interface AelionVitePluginOptions {
-  /** Emit and serve both `@aelion/audio` AudioWorklet entries. Defaults to true. */
+  /** Emit and serve both `@aelionsdk/audio` AudioWorklet entries. Defaults to true. */
   audioWorklets?: boolean;
-  /** Emit and serve the `@aelion/renderer-worker` module Worker. Defaults to true. */
+  /** Emit and serve the `@aelionsdk/renderer-worker` module Worker. Defaults to true. */
   rendererWorker?: boolean;
-  /** Emit and serve the `@aelion/export` mux Worker. Defaults to true. */
+  /** Emit and serve the `@aelionsdk/export` mux Worker. Defaults to true. */
   exportWorker?: boolean;
 }
 
@@ -52,9 +52,9 @@ function createRuntimeAsset(
   fileName: string,
 ): RuntimeAsset {
   const namespace =
-    packageName === '@aelion/audio'
+    packageName === '@aelionsdk/audio'
       ? 'audio'
-      : packageName === '@aelion/export'
+      : packageName === '@aelionsdk/export'
         ? 'export'
         : 'renderer-worker';
   const key = `${namespace}/${fileName}`;
@@ -80,24 +80,24 @@ export function aelion(options: AelionVitePluginOptions = {}): Plugin {
   const includeAudioWorklets = options.audioWorklets ?? true;
   const includeRendererWorker = options.rendererWorker ?? true;
   const includeExportWorker = options.exportWorker ?? true;
-  const audioDist = includeAudioWorklets ? packageDistDirectory('@aelion/audio') : undefined;
+  const audioDist = includeAudioWorklets ? packageDistDirectory('@aelionsdk/audio') : undefined;
   const rendererDist = includeRendererWorker
-    ? packageDistDirectory('@aelion/renderer-worker')
+    ? packageDistDirectory('@aelionsdk/renderer-worker')
     : undefined;
-  const exportDist = includeExportWorker ? packageDistDirectory('@aelion/export') : undefined;
+  const exportDist = includeExportWorker ? packageDistDirectory('@aelionsdk/export') : undefined;
   const assets = [
     ...(audioDist === undefined
       ? []
       : [
-          createRuntimeAsset('@aelion/audio', audioDist, 'pcm-player.worklet.js'),
-          createRuntimeAsset('@aelion/audio', audioDist, 'pcm-message-player.worklet.js'),
+          createRuntimeAsset('@aelionsdk/audio', audioDist, 'pcm-player.worklet.js'),
+          createRuntimeAsset('@aelionsdk/audio', audioDist, 'pcm-message-player.worklet.js'),
         ]),
     ...(rendererDist === undefined
       ? []
-      : [createRuntimeAsset('@aelion/renderer-worker', rendererDist, 'webgl2-worker.js')]),
+      : [createRuntimeAsset('@aelionsdk/renderer-worker', rendererDist, 'webgl2-worker.js')]),
     ...(exportDist === undefined
       ? []
-      : [createRuntimeAsset('@aelion/export', exportDist, 'mux-export-worker.js')]),
+      : [createRuntimeAsset('@aelionsdk/export', exportDist, 'mux-export-worker.js')]),
   ];
   const assetByVirtualId = new Map(assets.map(asset => [asset.virtualId, asset]));
   const assetByPublicUrl = new Map(assets.map(asset => [asset.publicUrl, asset]));
@@ -105,13 +105,13 @@ export function aelion(options: AelionVitePluginOptions = {}): Plugin {
   let command: 'build' | 'serve' | undefined;
 
   return {
-    name: '@aelion/vite-plugin',
+    name: '@aelionsdk/vite-plugin',
     enforce: 'pre',
     config() {
       const excluded = [
-        ...(includeAudioWorklets ? ['@aelion/audio', '@aelion/sdk'] : []),
-        ...(includeRendererWorker ? ['@aelion/renderer-worker', '@aelion/sdk'] : []),
-        ...(includeExportWorker ? ['@aelion/export', '@aelion/sdk'] : []),
+        ...(includeAudioWorklets ? ['@aelionsdk/audio', '@aelionsdk/sdk'] : []),
+        ...(includeRendererWorker ? ['@aelionsdk/renderer-worker', '@aelionsdk/sdk'] : []),
+        ...(includeExportWorker ? ['@aelionsdk/export', '@aelionsdk/sdk'] : []),
       ];
       return {
         optimizeDeps: {

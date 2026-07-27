@@ -3,7 +3,7 @@ import {
   materialDefinition,
   materialGraph,
   packMaterialPackage,
-} from '@aelion/material-sdk';
+} from '@aelionsdk/material-sdk';
 
 const graph = materialGraph(g => {
   const eased = g.transitionCurve(

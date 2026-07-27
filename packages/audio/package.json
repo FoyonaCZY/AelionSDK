@@ -1,6 +1,6 @@
 {
-  "name": "@aelion/audio",
-  "version": "0.1.0-alpha.0",
+  "name": "@aelionsdk/audio",
+  "version": "0.1.0-beta.1",
   "description": "AudioWorklet clock, PCM buffering and audio mixing for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,7 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelion/core": "workspace:*",
-    "@aelion/render-ir": "workspace:*"
+    "@aelionsdk/core": "0.1.0-beta.1",
+    "@aelionsdk/render-ir": "0.1.0-beta.1"
   }
 }
