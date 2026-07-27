@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { lstat, readFile, readdir } from 'node:fs/promises';
@@ -128,13 +129,15 @@ export const PHASE_1_BLOCKER_REVIEW_ARTIFACTS = Object.freeze([
 ]);
 
 export const WORKSPACE_IDENTITY_POLICY = Object.freeze({
-  version: '3.2.0',
-  algorithm: 'sha256(stable-json(files))',
+  version: '3.3.0',
+  algorithm: 'sha256(stable-json(canonical-lf(files)))',
+  textNormalization:
+    'Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF',
   symbolicLinks: 'reject every non-excluded symbolic link',
   specialFiles: 'reject every non-excluded non-regular filesystem entry',
   exclusions: Object.freeze([
     'root reports/** and benchmarks/reports/** evidence outputs',
-    'VCS/dependency/build/cache directories: .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results',
+    'VCS/dependency/build/cache directories: .astro, .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results',
     'generated TypeDoc projection: apps/docs/src/content/docs/api/**',
     'browser snapshot output directories named __screenshots__',
     'generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}',
@@ -180,6 +183,7 @@ export function excludedWorkspacePath(root, path) {
     segments.some(segment =>
       [
         '.git',
+        '.astro',
         '.pnpm-store',
         '.vite',
         '.vitest',
@@ -206,7 +210,7 @@ async function workspaceFiles(root, directory = root, entries = []) {
     const details = await lstat(path);
     if (details.isDirectory()) await workspaceFiles(root, path, entries);
     else if (details.isFile()) {
-      const bytes = await readFile(path);
+      const bytes = canonicalWorkspaceBytes(await readFile(path));
       entries.push({
         path: normalizedPath(root, path),
         bytes: bytes.byteLength,
@@ -223,6 +227,22 @@ async function workspaceFiles(root, directory = root, entries = []) {
     }
   }
   return entries;
+}
+
+function canonicalWorkspaceBytes(bytes) {
+  // Match Git's text=auto binary heuristic closely enough for the repository's
+  // `* text=auto eol=lf` policy: a NUL in the first 8000 bytes marks binary
+  // content, while text CRLF pairs are normalized to LF before hashing.
+  if (bytes.subarray(0, 8_000).includes(0) || !bytes.includes(13)) return bytes;
+
+  const normalized = Buffer.allocUnsafe(bytes.byteLength);
+  let outputOffset = 0;
+  for (let inputOffset = 0; inputOffset < bytes.byteLength; inputOffset += 1) {
+    if (bytes[inputOffset] === 13 && bytes[inputOffset + 1] === 10) continue;
+    normalized[outputOffset] = bytes[inputOffset];
+    outputOffset += 1;
+  }
+  return normalized.subarray(0, outputOffset);
 }
 
 async function commandOutput(root, command, args) {
@@ -243,6 +263,7 @@ export async function sourceIdentity(root) {
     kind: 'workspace-input-manifest',
     policyVersion: WORKSPACE_IDENTITY_POLICY.version,
     algorithm: WORKSPACE_IDENTITY_POLICY.algorithm,
+    textNormalization: WORKSPACE_IDENTITY_POLICY.textNormalization,
     symbolicLinks: WORKSPACE_IDENTITY_POLICY.symbolicLinks,
     specialFiles: WORKSPACE_IDENTITY_POLICY.specialFiles,
     exclusions: [...WORKSPACE_IDENTITY_POLICY.exclusions],
@@ -266,6 +287,8 @@ export function sourceIdentitiesEqual(left, right) {
     right.policyVersion === left.policyVersion &&
     left.algorithm === WORKSPACE_IDENTITY_POLICY.algorithm &&
     right.algorithm === left.algorithm &&
+    left.textNormalization === WORKSPACE_IDENTITY_POLICY.textNormalization &&
+    right.textNormalization === left.textNormalization &&
     left.symbolicLinks === WORKSPACE_IDENTITY_POLICY.symbolicLinks &&
     right.symbolicLinks === left.symbolicLinks &&
     left.specialFiles === WORKSPACE_IDENTITY_POLICY.specialFiles &&

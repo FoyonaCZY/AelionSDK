@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -48,6 +49,7 @@ function identity() {
     kind: 'workspace-input-manifest',
     policyVersion: WORKSPACE_IDENTITY_POLICY.version,
     algorithm: WORKSPACE_IDENTITY_POLICY.algorithm,
+    textNormalization: WORKSPACE_IDENTITY_POLICY.textNormalization,
     symbolicLinks: WORKSPACE_IDENTITY_POLICY.symbolicLinks,
     specialFiles: WORKSPACE_IDENTITY_POLICY.specialFiles,
     exclusions: [...WORKSPACE_IDENTITY_POLICY.exclusions],
@@ -129,6 +131,7 @@ function passingPostflight(commands = gateCommands()) {
 test('workspace identity excludes only the exact post-gate projections plus generated evidence', () => {
   assert.equal(excludedWorkspacePath(root, '/workspace/reports/a.json'), true);
   assert.equal(excludedWorkspacePath(root, '/workspace/a/__screenshots__/x.png'), true);
+  assert.equal(excludedWorkspacePath(root, '/workspace/apps/docs/.astro/content.d.ts'), true);
   assert.equal(
     excludedWorkspacePath(
       root,
@@ -172,6 +175,39 @@ test('post-gate projections do not churn source identity but every other documen
   }
 });
 
+test('source identity is stable across Git-normalized text checkouts and generated Astro state', async () => {
+  const workspace = await mkdtemp(join(tmpdir(), 'aelion-phase-1-canonical-text-'));
+  try {
+    await mkdir(join(workspace, 'apps', 'docs', '.astro'), { recursive: true });
+    await writeFile(join(workspace, 'source.ts'), 'export const value = 1;\r\n');
+    await writeFile(join(workspace, 'apps', 'docs', '.astro', 'content.d.ts'), 'generated\r\n');
+    const windowsCheckout = await sourceIdentity(workspace);
+
+    await writeFile(join(workspace, 'source.ts'), 'export const value = 1;\n');
+    await writeFile(join(workspace, 'apps', 'docs', '.astro', 'content.d.ts'), 'changed\n');
+    const posixCheckout = await sourceIdentity(workspace);
+
+    assert.equal(posixCheckout.manifestSha256, windowsCheckout.manifestSha256);
+    assert.equal(posixCheckout.totalBytes, windowsCheckout.totalBytes);
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
+  }
+});
+
+test('source identity preserves binary CRLF bytes', async () => {
+  const workspace = await mkdtemp(join(tmpdir(), 'aelion-phase-1-binary-'));
+  try {
+    const binaryPath = join(workspace, 'asset.bin');
+    await writeFile(binaryPath, Buffer.from([0, 13, 10, 255]));
+    const before = await sourceIdentity(workspace);
+    await writeFile(binaryPath, Buffer.from([0, 10, 255]));
+    const after = await sourceIdentity(workspace);
+    assert.notEqual(after.manifestSha256, before.manifestSha256);
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
+  }
+});
+
 test('source identity rejects every non-excluded symbolic link', async () => {
   const workspace = await mkdtemp(join(tmpdir(), 'aelion-phase-1-symlink-'));
   try {
@@ -195,6 +231,7 @@ test('source identity equality binds every policy field', () => {
   assert.equal(sourceIdentitiesEqual(baseline, identity()), true);
   for (const candidate of [
     { ...identity(), algorithm: 'sha512(stable-json(files))' },
+    { ...identity(), textNormalization: 'none' },
     { ...identity(), symbolicLinks: 'follow symbolic links' },
     { ...identity(), specialFiles: 'ignore special files' },
     { ...identity(), exclusions: [...WORKSPACE_IDENTITY_POLICY.exclusions, 'extra exclusion'] },
