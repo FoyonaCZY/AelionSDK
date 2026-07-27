@@ -180,25 +180,25 @@ nearest-rank 计算。
 
 | 项目                                | 结果                                                     |
 | ----------------------------------- | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2               | 帧调用 p50 0.25 ms，p95 0.38 ms                          |
-| 1080p、单 pass、WebGL2              | 帧调用 p50 0.38 ms，p95 0.96 ms                          |
-| 1080p、单 pass、WebGPU              | 帧调用 p50 0.79 ms，p95 1.12 ms                          |
-| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.42 ms，p95 1.36 ms                          |
-| 4K、单 pass、WebGL2                 | 帧调用 p50 0.73 ms，p95 0.76 ms                          |
-| 1,000 clips / 32 tracks 冷编译      | p50 22.79 ms，p95 33.99 ms                               |
-| 1,000 clips / 32 tracks warm 增量   | p50 1.90 ms，p95 2.01 ms                                 |
-| 单音轨 1,024-frame 音频块           | p95 0.54 ms，整体约 62.08× 实时                          |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 252.24 ms，平均约 11.82× 实时               |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 415.06 ms，平均约 7.19× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 516.74 ms，约 1.94× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 470.52 ms，`avc1.640033`，约 2.13× 实时                  |
-| OPFS 顺序写入，16 个 1 MiB 块       | 约 475 MiB/s；Memory Sink 约 6.1 GiB/s                   |
-| 1080p WebGL2 180 帧 soak            | 前半 p95 1.05 ms，后半 p95 0.85 ms，dispose 后无 pending |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.26 ms，p95 0.41 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.39 ms，p95 1.01 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.78 ms，p95 1.09 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.49 ms，p95 1.26 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 1.08 ms，p95 1.09 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 23.81 ms，p95 27.85 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 1.91 ms，p95 2.02 ms                                 |
+| 单音轨 1,024-frame 音频块           | p95 0.54 ms，整体约 62.29× 实时                          |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 360.40 ms，平均约 8.26× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 368.48 ms，平均约 7.88× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 487.34 ms，约 2.05× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 449.55 ms，`avc1.640033`，约 2.22× 实时                  |
+| OPFS 顺序写入，16 个 1 MiB 块       | 约 476 MiB/s；Memory Sink 约 6.7 GiB/s                   |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 1.04 ms，后半 p95 0.95 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
 mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入媒体解码。因此
-1080p 的 7.5×–8× 是编码管线基线，不应当直接当作真实多轨工程的导出速度。
+1080p 的约 8× 是编码管线基线，不应当直接当作真实多轨工程的导出速度。
 
 同页公开 Profile preflight 中，WebM、H.264 MP4、AV1 MP4 和 HEVC MP4 全部按
 实际尺寸协商并通过；H.264 在 1080p 选择 `avc1.640028`，4K 选择
@@ -208,11 +208,11 @@ mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入�
 ### 真实媒体和端到端工程
 
 五种公开 fixture 覆盖 moov 头/尾 MP4、fragmented MP4、非零 PTS MP4 和
-VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.61–6.32 ms，最慢
-cold seek p95 为 14.37 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
+VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.95–6.17 ms，最慢
+cold seek p95 为 14.59 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
 
 真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
-1080p30 用时 306.98 ms（约 3.26× 实时），4K30 用时 286.13 ms（约 3.49×
+1080p30 用时 296.71 ms（约 3.37× 实时），4K30 用时 272.35 ms（约 3.67×
 实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close，
 且主线程均没有观测到超过 50 ms 的 Long Task；1080p 产物还由 FFmpeg 解出
 30 个视频帧并完成音频 PCM MD5 回读。
@@ -226,7 +226,7 @@ codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计
 
 60 秒端到端工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
-16.79 秒，即约 3.57× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
+10.11 秒，即约 5.94× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
 偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
 导出更接近完整调用链，但分辨率较低，不能用于推断 1080p 成片速度。
 
@@ -329,15 +329,17 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 ## 最新验证状态
 
 2026-07-27 在 Windows 参考机上完成了与源清单
-`c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578`
-绑定的串行最终门禁：18/18 个命令通过，门禁前后源清单一致，产物 postflight
-语义校验通过。Chromium 75 项和 Firefox 67 项浏览器测试均为零失败、零跳过；
-13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、golden、
-benchmark、1080p30 性能、seek 与 60 秒导出外部 FFmpeg readback 均通过。
+`edde42a68d61bbd7cb8a3ca757bcc046d4937a8cc6fdb27b9fc4541becb466fc`
+绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，40 项产物 postflight
+语义校验通过。Chromium 79 项和 Firefox 67 项浏览器测试均为零失败、零跳过；
+13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包
+字节可复现性、golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出
+外部 FFmpeg readback 均通过。
 
 完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态投影见
-`docs/status.md`。这些结果证明当前提交候选满足仓库的自动化发布门禁，但不代表
-npm 已发布，也不替代仓库策略要求的独立人工 blocker review。
+`docs/status.md`。这些结果证明当前提交候选满足仓库的自动化发布门禁；发布还受
+独立人工 blocker review 约束，是否已经完成发布以 npm registry 与 GitHub
+Release 为准。
 
 ## License
 

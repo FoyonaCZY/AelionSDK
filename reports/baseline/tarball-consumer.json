@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
-  "sdkVersion": "0.1.0-alpha.0",
-  "generatedAt": "2026-07-27T14:30:34.480Z",
+  "sdkVersion": "0.1.0-beta.1",
+  "generatedAt": "2026-07-27T15:43:50.188Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelion/vite-plugin",
     "package": "@aelion/vite-plugin",
-    "version": "0.1.0-alpha.0",
-    "packageSha256": "acd52319aba7436070a58c795467efa407266f69de9f149db418f70dcbd4e6b7",
+    "version": "0.1.0-beta.1",
+    "packageSha256": "12c43093273dff4201f21fbed02f77a8a4331bfb832dcccd22e36bdc22c8cb56",
     "contractSha256": "0209250522bbe5cdef9eb86c3275ba0ed4ab9759b950f45796821973503658cb",
     "public": true,
     "zeroConfigVite": false,
@@ -17,21 +17,21 @@
   },
   "consumerContract": {
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
-    "dependencyContractSha256": "66c79e234848883831d54961b6252e91fe5983d62abdcb8ec1d56c39f87b05b8",
+    "dependencyContractSha256": "cfc6c724063fc780b70719552ca834bc26939e8cef632e3c619a9f69e9b4d1c0",
     "dependencyContract": {
-      "@aelion/audio": "aelion-audio-0.1.0-alpha.0.tgz",
-      "@aelion/capability": "aelion-capability-0.1.0-alpha.0.tgz",
-      "@aelion/core": "aelion-core-0.1.0-alpha.0.tgz",
-      "@aelion/export": "aelion-export-0.1.0-alpha.0.tgz",
-      "@aelion/material-compiler": "aelion-material-compiler-0.1.0-alpha.0.tgz",
-      "@aelion/material-sdk": "aelion-material-sdk-0.1.0-alpha.0.tgz",
-      "@aelion/media": "aelion-media-0.1.0-alpha.0.tgz",
-      "@aelion/project-schema": "aelion-project-schema-0.1.0-alpha.0.tgz",
-      "@aelion/render-ir": "aelion-render-ir-0.1.0-alpha.0.tgz",
-      "@aelion/renderer-worker": "aelion-renderer-worker-0.1.0-alpha.0.tgz",
-      "@aelion/sdk": "aelion-sdk-0.1.0-alpha.0.tgz",
-      "@aelion/transaction": "aelion-transaction-0.1.0-alpha.0.tgz",
-      "@aelion/vite-plugin": "aelion-vite-plugin-0.1.0-alpha.0.tgz",
+      "@aelion/audio": "aelion-audio-0.1.0-beta.1.tgz",
+      "@aelion/capability": "aelion-capability-0.1.0-beta.1.tgz",
+      "@aelion/core": "aelion-core-0.1.0-beta.1.tgz",
+      "@aelion/export": "aelion-export-0.1.0-beta.1.tgz",
+      "@aelion/material-compiler": "aelion-material-compiler-0.1.0-beta.1.tgz",
+      "@aelion/material-sdk": "aelion-material-sdk-0.1.0-beta.1.tgz",
+      "@aelion/media": "aelion-media-0.1.0-beta.1.tgz",
+      "@aelion/project-schema": "aelion-project-schema-0.1.0-beta.1.tgz",
+      "@aelion/render-ir": "aelion-render-ir-0.1.0-beta.1.tgz",
+      "@aelion/renderer-worker": "aelion-renderer-worker-0.1.0-beta.1.tgz",
+      "@aelion/sdk": "aelion-sdk-0.1.0-beta.1.tgz",
+      "@aelion/transaction": "aelion-transaction-0.1.0-beta.1.tgz",
+      "@aelion/vite-plugin": "aelion-vite-plugin-0.1.0-beta.1.tgz",
       "@esbuild/win32-x64": "esbuild-win32-x64-0.25.12.tgz",
       "@rollup/rollup-win32-x64-msvc": "rollup-rollup-win32-x64-msvc-4.62.2.tgz",
       "@types/dom-mediacapture-transform": "types-dom-mediacapture-transform-0.1.12.tgz",
@@ -58,75 +58,75 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "22e62da1a805aa5a270406512bed0a24b79aa90a1a5dad8c33eccd17d4c4041d",
+    "packageJsonSha256": "69c9e62cdd1bbba47397b6ffdbd8af489bffae4ecb767619aaebbdeb2084216a",
     "sourceSha256": "9cdf5beb3d1b1d6d86be6373fecab8a02b2f87d56f88530f7a8c5cedd4785f11",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
   "packages": [
     {
       "name": "@aelion/audio",
-      "version": "0.1.0-alpha.0",
-      "sha256": "8d8bdfbad6dff76d62d33e82eafdc6fa481e830f07ee30804fd5a285f84d5135"
+      "version": "0.1.0-beta.1",
+      "sha256": "a5b3749c916116008acd84da534502c3f8c1de24ac3ca2289eaf79214bc660eb"
     },
     {
       "name": "@aelion/capability",
-      "version": "0.1.0-alpha.0",
-      "sha256": "4a35fd5b10e64f0959356794b7f4dd0ce08ab253b9a7c115fc52596fa80e1761"
+      "version": "0.1.0-beta.1",
+      "sha256": "5f3e68882a33e3e451888808235a9a5d73d7d4dce7624d3a73f4f3a2fa7cbb6c"
     },
     {
       "name": "@aelion/core",
-      "version": "0.1.0-alpha.0",
-      "sha256": "0d3ef13fc738a56238d9876c1bc48960b52a2e1d8be6b3fceedd60bb45984b5d"
+      "version": "0.1.0-beta.1",
+      "sha256": "1f4b6afbe931a99f375fff5c78bfbca98971f4ab42b00883ac056c6669e262e4"
     },
     {
       "name": "@aelion/export",
-      "version": "0.1.0-alpha.0",
-      "sha256": "169f590e04f08153b07fa8e45bd7686d4466305333e1d384213109bab91a4cea"
+      "version": "0.1.0-beta.1",
+      "sha256": "38fc255df5af61cb5df3f162130977558e221b83c08343333a192176879eee9f"
     },
     {
       "name": "@aelion/material-compiler",
-      "version": "0.1.0-alpha.0",
-      "sha256": "33dbac43d734d07eadd7fc9610c0526eebf1dbd6fc15b60d5a2ea57e2c5e8319"
+      "version": "0.1.0-beta.1",
+      "sha256": "9aa7278f8ddd7299ab655e7b0ff896e8e7ec5928feda880965b62cfa10de77fd"
     },
     {
       "name": "@aelion/material-sdk",
-      "version": "0.1.0-alpha.0",
-      "sha256": "61a1fe5091bf1d33e8eaf4f4b67939f463c79e340b1241133db66cf74cf477ab"
+      "version": "0.1.0-beta.1",
+      "sha256": "99c7293b200b3cb0958e59d228b346a057b9f0ad0e9245f7efa24f25c69c4fca"
     },
     {
       "name": "@aelion/media",
-      "version": "0.1.0-alpha.0",
-      "sha256": "81bee47fe6e59b737ad0b6ca852b32fbc146959a80c1be0f7cd7dd3ab19f8ca1"
+      "version": "0.1.0-beta.1",
+      "sha256": "6fb344e8fb4fe66e42befc6ecbf91540c1e668a2562eaec28495fd37e1b10a3d"
     },
     {
       "name": "@aelion/project-schema",
-      "version": "0.1.0-alpha.0",
-      "sha256": "4d231f3138df15c753d2a952a78ac77f83ff394c42e7c8f44bf1a9b60cd6e83a"
+      "version": "0.1.0-beta.1",
+      "sha256": "9fa30bf6d0c2a922ebb10283e86dac0dffa884fbc92261756dc3927952c1f17c"
     },
     {
       "name": "@aelion/render-ir",
-      "version": "0.1.0-alpha.0",
-      "sha256": "d48bb45a22da8a83bc6d5b560e7018535cacce1bd354ddf052d03210e565fa5b"
+      "version": "0.1.0-beta.1",
+      "sha256": "27d51d38998992e0c14b3e52115db6c59263ba217826db5276853bfc8cc0383d"
     },
     {
       "name": "@aelion/renderer-worker",
-      "version": "0.1.0-alpha.0",
-      "sha256": "4e6d4f9a9c7070b1cb675cd1c9401731f4aa0033161cfaae6b26f7cadecf12c8"
+      "version": "0.1.0-beta.1",
+      "sha256": "6122a544aca268fcffcc5a0018e73d6e48fcedb77732e6a6be5922fb5ccf3a74"
     },
     {
       "name": "@aelion/sdk",
-      "version": "0.1.0-alpha.0",
-      "sha256": "90ed9b8715503b2ab7830dabe27b978a84910fe5de4805578851d4ff005bb0d4"
+      "version": "0.1.0-beta.1",
+      "sha256": "9a062b6d05d39b27ea066282798d353c1fbb0f027fc94e297ee01cb8525901b0"
     },
     {
       "name": "@aelion/transaction",
-      "version": "0.1.0-alpha.0",
-      "sha256": "a1aff95c8bae9d17bd5adb87b971e9b4e4aa95f5c91377cff67f039fb1a0990c"
+      "version": "0.1.0-beta.1",
+      "sha256": "184f1a2a7e5fb2e9a5d6dd7b812dc619941a178dcc2d62bb1d9922e87643060f"
     },
     {
       "name": "@aelion/vite-plugin",
-      "version": "0.1.0-alpha.0",
-      "sha256": "acd52319aba7436070a58c795467efa407266f69de9f149db418f70dcbd4e6b7"
+      "version": "0.1.0-beta.1",
+      "sha256": "12c43093273dff4201f21fbed02f77a8a4331bfb832dcccd22e36bdc22c8cb56"
     }
   ],
   "runtimeAssets": [
@@ -174,7 +174,7 @@
             225,
             255
           ],
-          "workerTimingUs": 84195
+          "workerTimingUs": 87335
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -182,10 +182,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22976,
-          "playedFrames": 1024,
+          "availableReadFrames": 23488,
+          "playedFrames": 512,
           "underrunFrames": 0,
-          "timeUs": 21333
+          "timeUs": 10667
         },
         "sessionFacade": {
           "revision": "3",
@@ -204,7 +204,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6000
+            "workerTimingUs": 6240
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -212,10 +212,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22592,
-            "playedFrames": 1408,
+            "availableReadFrames": 22080,
+            "playedFrames": 1920,
             "underrunFrames": 0,
-            "timeUs": 29333
+            "timeUs": 40000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {
@@ -248,7 +248,7 @@
             225,
             255
           ],
-          "workerTimingUs": 17540
+          "workerTimingUs": 23520
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -256,10 +256,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23360,
-          "playedFrames": 640,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 26667
+          "timeUs": 37333
         },
         "sessionFacade": {
           "revision": "3",
@@ -278,7 +278,7 @@
               225,
               255
             ],
-            "workerTimingUs": 5900
+            "workerTimingUs": 6680
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -286,10 +286,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22976,
-            "playedFrames": 1024,
+            "availableReadFrames": 22592,
+            "playedFrames": 1408,
             "underrunFrames": 0,
-            "timeUs": 29333
+            "timeUs": 37333
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {

@@ -1,87 +1,94 @@
 {
   "schemaVersion": "3.0.0",
   "evidenceKind": "aelion-phase-1-blocker-review",
-  "generatedAt": "2026-07-26T18:51:21.034Z",
+  "generatedAt": "2026-07-27T15:50:36.492Z",
   "decision": "not-approved",
   "reviewedAt": null,
   "reviewers": [],
   "sourceIdentity": {
     "policyVersion": "3.2.0",
-    "manifestSha256": "c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578",
-    "vcsCommit": "9248e443f8f75fac71187b42533859f8a512488d"
+    "manifestSha256": "edde42a68d61bbd7cb8a3ca757bcc046d4937a8cc6fdb27b9fc4541becb466fc",
+    "vcsCommit": "eb1ea9d29a0977f1893ecc0b18230c92ffa7a2d6"
   },
   "gateRun": {
-    "resultsSha256": "8e60e630c1d8cd63441a09e4a0c8c75d927031aa2bdbb802c52821674280ef45",
-    "startedAt": "2026-07-26T18:43:16.662Z",
-    "endedAt": "2026-07-26T18:49:07.289Z",
-    "sourceManifestSha256": "c2f891f021513c49c55c985640b886cd3045fa09476c90d20227e44d4e4af578",
+    "resultsSha256": "f9c50f244d5d2a5ecc4ef677b3120b64ba89090e412a1dc87c4783001047c095",
+    "startedAt": "2026-07-27T15:40:41.363Z",
+    "endedAt": "2026-07-27T15:46:27.237Z",
+    "sourceManifestSha256": "edde42a68d61bbd7cb8a3ca757bcc046d4937a8cc6fdb27b9fc4541becb466fc",
     "artifacts": {
       "files": [
         {
           "file": "reports/baseline/browser-smoke-chromium.json",
           "command": "corepack pnpm report:browser:chromium",
-          "bytes": 27964,
-          "sha256": "79e17a70527f4a954132c2292b61a4fdd692a8f66f3b4bbf05d71fd2bc646cb2",
-          "mtime": "2026-07-26T18:47:53.333Z"
+          "bytes": 29510,
+          "sha256": "21c5a56abc214ff54361a5e0feb38c8c8b46d69af61e8fc8653e18cb6c32922c",
+          "mtime": "2026-07-27T15:45:16.541Z"
         },
         {
           "file": "reports/baseline/browser-smoke-firefox.json",
           "command": "corepack pnpm report:browser:firefox",
-          "bytes": 24287,
-          "sha256": "bdae93ca9b8ee8dcd61d2a467c79c33d3fd6cdc397c94166e7887b74c97fd537",
-          "mtime": "2026-07-26T18:48:13.623Z"
+          "bytes": 24319,
+          "sha256": "318c1cf9854cd7f2fc4fc53ef9d3e816ef30fb6050f9b410bb1fc1a70b5bd574",
+          "mtime": "2026-07-27T15:45:35.739Z"
         },
         {
           "file": "reports/baseline/media-seek-chromium.json",
           "command": "corepack pnpm report:seek",
-          "bytes": 21605,
-          "sha256": "d37675ac3bcdbea99b46b08fec42512db05be8461c5f8682bdde769308ec329d",
-          "mtime": "2026-07-26T18:48:17.703Z"
+          "bytes": 21596,
+          "sha256": "92630d4f1ec18b8ce24f42317effb11928859b74af7b2cdb5b2be68640d919eb",
+          "mtime": "2026-07-27T15:45:39.759Z"
         },
         {
           "file": "reports/baseline/performance-1080p30-chromium.json",
           "command": "corepack pnpm report:performance",
-          "bytes": 64011,
-          "sha256": "d8c59a2a27346081a499727abb292f5298ae5b2279f807f1030abc10aaa465dd",
-          "mtime": "2026-07-26T18:48:30.464Z"
+          "bytes": 63522,
+          "sha256": "276eea0d3b5bb65f8c82301fcea6639aa0b1ce0b3ae8c21d90415bee25cb2549",
+          "mtime": "2026-07-27T15:45:49.403Z"
+        },
+        {
+          "file": "reports/baseline/recovery-chromium.json",
+          "command": "corepack pnpm report:recovery",
+          "bytes": 33162,
+          "sha256": "1246395c288bab1e8a5b93d5d83611a8483763fa6c89bee1f384e31902771352",
+          "mtime": "2026-07-27T15:45:56.574Z"
         },
         {
           "file": "reports/baseline/tarball-consumer.json",
           "command": "corepack pnpm test:consumer",
-          "bytes": 11053,
-          "sha256": "0f3026b5116d5d88f38696e3b8623a8773c89c882973cafa150ae8bdfddbb1fd",
-          "mtime": "2026-07-26T18:46:50.880Z"
+          "bytes": 11024,
+          "sha256": "4b65a0d6420e79f497d010bf02fbb7a9bfe88e3543fff8776a25618b8234f270",
+          "mtime": "2026-07-27T15:43:50.192Z"
         },
         {
           "file": "reports/baseline/alpha-60s.json",
           "command": "corepack pnpm report:alpha",
-          "bytes": 114821,
-          "sha256": "4ecc19c61f9c32ae87f4ca713696edf1ac6d2b00245423ef774e58bc8ea0034d",
-          "mtime": "2026-07-26T18:49:06.869Z"
+          "bytes": 114846,
+          "sha256": "d3c071978e59fb6dca3ad6231195695c69b0366f33d35cdab9356082d361f4af",
+          "mtime": "2026-07-27T15:46:26.871Z"
         },
         {
           "file": "reports/baseline/alpha-60s.webm",
           "command": "corepack pnpm report:alpha",
           "bytes": 4740152,
           "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8",
-          "mtime": "2026-07-26T18:49:06.605Z"
+          "mtime": "2026-07-27T15:46:26.598Z"
         },
         {
           "file": "README.md",
           "freshness": "post-run",
-          "bytes": 19052,
-          "sha256": "ec6aad873aef98539475725e5a6fff2a2098de4f61e9b396543631491124134d",
-          "mtime": "2026-07-26T18:50:56.223Z"
+          "bytes": 20312,
+          "sha256": "987967a259ce6d5e9a4e699034d3ea2ca4bb2d1409d15fcd3467e31eadb4d24f",
+          "mtime": "2026-07-27T15:50:00.639Z"
         },
         {
           "file": "docs/status.md",
           "freshness": "post-run",
-          "bytes": 2783,
-          "sha256": "b92749275b7ac2d67e5d83e5f20a4ed376d1abbb184ba36b313f62fdff1f6946",
-          "mtime": "2026-07-26T18:50:56.833Z"
+          "bytes": 3082,
+          "sha256": "a1cfe7d6c57fcb7031e8939f7485a53888cc3c319138405adc3a4815d57caa39",
+          "mtime": "2026-07-27T15:48:43.382Z"
         }
       ],
-      "setSha256": "d0f641120c4443da025e0f34b85caeab4a2789eb3423ff4b88664a9d607eef5b"
+      "setSha256": "e015a9dac621ff71aba95d367e90a741c16e47fab4c638cd94d35736baaf4f69"
     }
   },
   "checks": {
