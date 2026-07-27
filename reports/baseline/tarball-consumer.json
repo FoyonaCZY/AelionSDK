@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-beta.1",
-  "generatedAt": "2026-07-27T16:58:01.693Z",
+  "generatedAt": "2026-07-27T17:34:55.803Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelionsdk/vite-plugin",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.0.6.tgz"
     },
-    "packageJsonSha256": "595c61f3f041c574122f4849dfe590ca8c8a5bf5a2440789ca2d143705ffd127",
+    "packageJsonSha256": "ecc04ba4f742b12838412979a69571975c9278bd31388b3187c3fc3130ea9df6",
     "sourceSha256": "dc9f68f5f5c0555a9e4412ca492c1e2924289406fa755114c66fabe1c34864f0",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -174,7 +174,7 @@
             225,
             255
           ],
-          "workerTimingUs": 88285
+          "workerTimingUs": 89415
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -204,7 +204,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6465
+            "workerTimingUs": 6570
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -248,7 +248,7 @@
             225,
             255
           ],
-          "workerTimingUs": 19020
+          "workerTimingUs": 21340
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -256,10 +256,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22336,
-          "playedFrames": 1664,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 50667
+          "timeUs": 37333
         },
         "sessionFacade": {
           "revision": "3",
@@ -278,7 +278,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6360
+            "workerTimingUs": 6020
           },
           "sharedClock": {
             "contextState": "suspended",
