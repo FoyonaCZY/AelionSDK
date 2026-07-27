@@ -1,28 +1,29 @@
 {
   "schemaVersion": "3.0.0",
   "generatedBy": "scripts/run-phase-1-final-gates.mjs",
-  "startedAt": "2026-07-27T17:31:50.763Z",
+  "startedAt": "2026-07-27T18:14:10.057Z",
   "sourceIdentityBefore": {
     "kind": "workspace-input-manifest",
-    "policyVersion": "3.2.0",
-    "algorithm": "sha256(stable-json(files))",
+    "policyVersion": "3.3.0",
+    "algorithm": "sha256(stable-json(canonical-lf(files)))",
+    "textNormalization": "Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF",
     "symbolicLinks": "reject every non-excluded symbolic link",
     "specialFiles": "reject every non-excluded non-regular filesystem entry",
     "exclusions": [
       "root reports/** and benchmarks/reports/** evidence outputs",
-      "VCS/dependency/build/cache directories: .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results",
+      "VCS/dependency/build/cache directories: .astro, .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results",
       "generated TypeDoc projection: apps/docs/src/content/docs/api/**",
       "browser snapshot output directories named __screenshots__",
       "generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}",
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 399,
-    "totalBytes": 3733560,
-    "manifestSha256": "f897cb0cc2e2a7bf697ebb6a51f2c6da820ddb36c70d4ea9cd52a20fedb3b36e",
+    "fileCount": 394,
+    "totalBytes": 3706888,
+    "manifestSha256": "9c3a60f09fc4b888feb3272eabf4319727d5df1d5eb2a3006a925fa8fd41932c",
     "vcs": {
-      "commit": "f53ae3afa9e15df17b512455a3b972c34edf7b3a",
-      "tree": "e56cb679b66690cb02c26bd01b7c15228d23a883"
+      "commit": "4cab4ea2a07cdf9e37e4bdc0a1ba19e0ca686617",
+      "tree": "bf089385fa5dc0b2b5ccecbb5aeb41e27286432c"
     },
     "files": [
       {
@@ -47,28 +48,28 @@
       },
       {
         "path": ".gitignore",
-        "bytes": 529,
-        "sha256": "1b436cec5e136d846ca71d640f880d853383474a976d5a269e3a8997f659c68c"
+        "bytes": 503,
+        "sha256": "b96c06b9021a5ed3da8e34738e60a91dcec76c39dc2fdb2b8b836931ea3e273f"
       },
       {
         "path": ".node-version",
-        "bytes": 9,
-        "sha256": "980075351ecade4c303f48138ca769d68524662cc1f4f23d854c97ec1300f832"
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
       },
       {
         "path": ".npmrc",
-        "bytes": 168,
-        "sha256": "43e079c91a1a06a246a0610ae817a7c312e505c9e17c04de4a623eb8e64de437"
+        "bytes": 167,
+        "sha256": "ce743b3fb60727b50c69f611e6b262ceb8e371c13b3a0041d81455b2f799ef45"
       },
       {
         "path": ".nvmrc",
-        "bytes": 9,
-        "sha256": "980075351ecade4c303f48138ca769d68524662cc1f4f23d854c97ec1300f832"
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
       },
       {
         "path": ".prettierignore",
-        "bytes": 161,
-        "sha256": "d0e4b8a0b699c16561ba1ba5a59ca6fbc6d28e21b0c445014395b0b2f8a1dae7"
+        "bytes": 150,
+        "sha256": "c4e71b747ad4841268af131bce704cc098c7d5bbbb92f17949f9cd9408065c27"
       },
       {
         "path": ".prettierrc.json",
@@ -92,8 +93,8 @@
       },
       {
         "path": "LICENSE",
-        "bytes": 1114,
-        "sha256": "251d712b2fec16d38e9a4b292fb7453941b5e017df5c2fa18829a9c1ae76d20f"
+        "bytes": 1093,
+        "sha256": "2abe635675859cf5e117e234d57afceefc598105f7c04fbbd2786688a73318dd"
       },
       {
         "path": "SECURITY.md",
@@ -136,31 +137,6 @@
         "sha256": "92eabb642c0c6120d5c55d6b34a4dd2afa65cf71096c988fea0de002a827d4e6"
       },
       {
-        "path": "apps/docs/.astro/collections/docs.schema.json",
-        "bytes": 19961,
-        "sha256": "6ee05cf942f7449f0131b177a913248b56bcd10705a813bd8f42ba3e26b637a1"
-      },
-      {
-        "path": "apps/docs/.astro/content-assets.mjs",
-        "bytes": 25,
-        "sha256": "6eec27650a023e5d1805c36b527913e976d473c2b4e5d659cbe1587643209e83"
-      },
-      {
-        "path": "apps/docs/.astro/content-modules.mjs",
-        "bytes": 224,
-        "sha256": "a01425613f10e92c7a83b688b5e936f682e7b45255102a3cc00373cf26801973"
-      },
-      {
-        "path": "apps/docs/.astro/content.d.ts",
-        "bytes": 7394,
-        "sha256": "704cc6b17701cac8113299ab163149a86bdf2fe91ba1d1bb110d074e23f4853d"
-      },
-      {
-        "path": "apps/docs/.astro/types.d.ts",
-        "bytes": 76,
-        "sha256": "38ea3df3779cce222cd51ba2c9dc9ac053a859208d3097aa3165f70c71517736"
-      },
-      {
         "path": "apps/docs/README.md",
         "bytes": 2162,
         "sha256": "e659945b0c6dcc39cb4113ddf48ec90e638dc9a1b3caf91e11f3acad3107cab1"
@@ -177,8 +153,8 @@
       },
       {
         "path": "apps/docs/public/favicon.svg",
-        "bytes": 487,
-        "sha256": "d81f5d221171df3e939d063a9a7b23eb73845c8fd5357387fdc46301bda63385"
+        "bytes": 476,
+        "sha256": "72ea9ee80564a92d14db70df4b0f01c7a9ee14d8735b43c75976fbb70e7f073d"
       },
       {
         "path": "apps/docs/scripts/astro.mjs",
@@ -587,13 +563,13 @@
       },
       {
         "path": "examples/README.md",
-        "bytes": 3027,
-        "sha256": "cc27060cbfe534e974f1db5ae570b4e9cc0372585b4cc10bc1b1674df375a0de"
+        "bytes": 2994,
+        "sha256": "da749f56a7e5f6942bd5811a124f2dc8864dc29de1485f399c8cd2177f2f71ea"
       },
       {
         "path": "examples/aelion-alpha-60s.project.json",
-        "bytes": 7620,
-        "sha256": "c0da5c0cf3465c589cff58ff7acee2eac88b07b183955fc2a4c2d6e40d39348e"
+        "bytes": 7309,
+        "sha256": "1e57dfc32789960e4a69f652ba610a4bbb2ef690d53cc8f3771ba5d4daece17b"
       },
       {
         "path": "examples/aelion-project-v1.example.json",
@@ -602,18 +578,18 @@
       },
       {
         "path": "examples/aelion-vertical-slice-30s.project.json",
-        "bytes": 7476,
-        "sha256": "6f469fb67c1a37c583c05eb50f1725275fad24e9020ca96736911451ddf2478f"
+        "bytes": 7166,
+        "sha256": "765269add1c27f650a27c7bef4283a0af6dedbba971a53a9a176416683d9c6d5"
       },
       {
         "path": "examples/materials/README.md",
-        "bytes": 1589,
-        "sha256": "a807d2f54ad0a7252721f14cf663aeb7472617f176cab42556f3564c200c8a1b"
+        "bytes": 1554,
+        "sha256": "e91afeae6a214c2afdcc4aa1a254828b11f5f713b15ea9cff2788384cf3785ab"
       },
       {
         "path": "examples/materials/authoring-sdk/cross-dissolve.ts",
-        "bytes": 1366,
-        "sha256": "c8fc0c6aaba4499706ea33cf84532bc837db32a56bdff9f3fb0f3bf3a0557bfd"
+        "bytes": 1319,
+        "sha256": "cbdb3e6dddff1a5e1c10715d13cf4794a55b5178bfd84598731f445fbe4f369d"
       },
       {
         "path": "examples/materials/cross-dissolve/graphs/cross-dissolve.graph.json",
@@ -667,13 +643,13 @@
       },
       {
         "path": "examples/typescript/sdk-integration.ts",
-        "bytes": 2257,
-        "sha256": "cb07f30577eeead3c3dc3b0b24bbc2d0b9610a75016ccaf74eff30233f060308"
+        "bytes": 2183,
+        "sha256": "4f34cc6bc617e9f0088a8acf4c59961c21f037b55894bbe9236c6abd4f0eae25"
       },
       {
         "path": "examples/typescript/tsconfig.json",
-        "bytes": 349,
-        "sha256": "8bd52c1bbaebb9cd16f9969330fba442a42e019472eaa1508277dc7b30d2ffe1"
+        "bytes": 334,
+        "sha256": "05df5dc751730b53db51b0c39740ea6964601a925c1e54bb068b7b421eab1f7f"
       },
       {
         "path": "fixtures/manifests/media-v1.json",
@@ -687,8 +663,8 @@
       },
       {
         "path": "fixtures/media/.gitkeep",
-        "bytes": 2,
-        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
       },
       {
         "path": "fixtures/media/mp4-fragmented-h264-aac.mp4",
@@ -1767,23 +1743,23 @@
       },
       {
         "path": "schemas/material/v1/definition.schema.json",
-        "bytes": 11434,
-        "sha256": "626bb5ef52331b2beef8fc88fb3c60d9585c41f5963a9e9ce3b3d87bb810d3eb"
+        "bytes": 11085,
+        "sha256": "7dd9e409d44966295262e363cd8fd42c4a4812fa18d57dd7a47b025eddbe0475"
       },
       {
         "path": "schemas/material/v1/graph.schema.json",
-        "bytes": 4612,
-        "sha256": "03c7c0f2fedae97533dd60352166076a7e4733c0ed4e09afaccb14d72f226eec"
+        "bytes": 4439,
+        "sha256": "d89b8eaad10137d6bc5872b65220f59d663f999df12776c2ccae2070fe898522"
       },
       {
         "path": "schemas/material/v1/instance.schema.json",
-        "bytes": 2049,
-        "sha256": "a03d68d23701d6e3cee61470362a6582ac99dcce438378fe9f3f081a0d6e0ab5"
+        "bytes": 1973,
+        "sha256": "6ae89c540b1b9a7eb65e74569c3ed8b9bc46c746a276656da965539752d72cc0"
       },
       {
         "path": "schemas/material/v1/package.schema.json",
-        "bytes": 4063,
-        "sha256": "44ea0e61df1439dadee9fa71d8985eb4ff0454f95091c6dfaf1ec01f93e8538f"
+        "bytes": 3903,
+        "sha256": "b31268ff48e30d439210c012c5bfb7597961cf73de71cc037581fb1ea354222c"
       },
       {
         "path": "schemas/project/v1/project.schema.json",
@@ -1917,13 +1893,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 109451,
-        "sha256": "7773a86eb7ad8efcc048a047557b94943d615a715993d644ddcfdb95317b7b4d"
+        "bytes": 110598,
+        "sha256": "d0373d289078eeb8f001b23999ba43c805fb86e90b54620464a0f05c41d36fe7"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 42703,
-        "sha256": "08e31fc6488d86d7d8cd1e94419d8199096f0dca58276092e7af9a0bdccd40a5"
+        "bytes": 44526,
+        "sha256": "8274a3f5d164b00f962b866ed8796318600b649f335f5b0b28a82b30fc5eb764"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -1962,8 +1938,8 @@
       },
       {
         "path": "scripts/validate-material-examples.mjs",
-        "bytes": 14612,
-        "sha256": "81c01bcc2efc2245cda7546730f825315d80b146bac665ab13c4c92ede3c8a03"
+        "bytes": 14306,
+        "sha256": "b11575d5914e6019a7b42ccf02b143fd4a899441b5cc353d948f26f499fc65e9"
       },
       {
         "path": "scripts/verify-clean-environment.mjs",
@@ -2025,107 +2001,107 @@
   "commands": [
     {
       "command": "corepack pnpm run ci",
-      "startedAt": "2026-07-27T17:31:50.908Z",
-      "endedAt": "2026-07-27T17:33:14.906Z",
+      "startedAt": "2026-07-27T18:14:10.193Z",
+      "endedAt": "2026-07-27T18:15:30.216Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "xport/test/audio-export.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 11\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/time-map.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 7\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/cache-proxy.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 7\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/video-scheduler.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/resource-governor.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 7\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/transferable-pcm-queue.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/color.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 4550\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m large Project accelerated soak\u001b[2m > \u001b[22mcompiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly \u001b[33m 4549\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m41 passed\u001b[39m\u001b[22m\u001b[90m (41)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m334 passed\u001b[39m\u001b[22m\u001b[90m (334)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:32:57\n\u001b[2m   Duration \u001b[22m 5.32s\u001b[2m (transform 1.81s, setup 0ms, collect 17.97s, tests 20.79s, environment 8ms, prepare 5.39s)\u001b[22m\n\n\n> @aelionsdk/vite-plugin@0.1.0-beta.1 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: production build, development server\n\n> aelion-sdk@0.1.0-beta.1 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\nTAP version 13\n# Subtest: Darwin parsers return only approved non-identifying fields\nok 1 - Darwin parsers return only approved non-identifying fields\n  ---\n  duration_ms: 1.7887\n  ...\n# Subtest: reference-device probe uses Darwin data and records explicit fallback limitations\nok 2 - reference-device probe uses Darwin data and records explicit fallback limitations\n  ---\n  duration_ms: 0.633\n  ...\n# Subtest: browser identity requires Playwright and page versions to agree\nok 3 - browser identity requires Playwright and page versions to agree\n  ---\n  duration_ms: 0.5168\n  ...\n# Subtest: failed staged JSON validation preserves the published artifact\nok 4 - failed staged JSON validation preserves the published artifact\n  ---\n  duration_ms: 14.3163\n  ...\n# Subtest: Alpha pair publication restores both old artifacts when report publish fails\nok 5 - Alpha pair publication restores both old artifacts when report publish fails\n  ---\n  duration_ms: 34.2664\n  ...\n# Subtest: Alpha pair publication serializes canonical path aliases in one process\nok 6 - Alpha pair publication serializes canonical path aliases in one process\n  ---\n  duration_ms: 105.7133\n  ...\n# Subtest: Alpha pair publication serializes the same canonical pair across processes\nok 7 - Alpha pair publication serializes the same canonical pair across processes\n  ---\n  duration_ms: 220.3842\n  ...\n# Subtest: Alpha pair publication rolls back when published bytes fail readback binding\nok 8 - Alpha pair publication rolls back when published bytes fail readback binding\n  ---\n  duration_ms: 25.8914\n  ...\n# Subtest: workspace identity excludes only the exact post-gate projections plus generated evidence\nok 9 - workspace identity excludes only the exact post-gate projections plus generated evidence\n  ---\n  duration_ms: 1.8026\n  ...\n# Subtest: post-gate projections do not churn source identity but every other document remains bound\nok 10 - post-gate projections do not churn source identity but every other document remains bound\n  ---\n  duration_ms: 87.9608\n  ...\n# Subtest: source identity rejects every non-excluded symbolic link\nok 11 - source identity rejects every non-excluded symbolic link\n  ---\n  duration_ms: 3.0944\n  ...\n# Subtest: source identity equality binds every policy field\nok 12 - source identity equality binds every policy field\n  ---\n  duration_ms: 0.346\n  ...\n# Subtest: source identity rejects non-regular filesystem entries\nok 13 - source identity rejects non-regular filesystem entries # SKIP\n  ---\n  duration_ms: 0.0798\n  ...\n# Subtest: the final runner policy is exactly fourteen gates plus seven evidence refreshes\nok 14 - the final runner policy is exactly fourteen gates plus seven evidence refreshes\n  ---\n  duration_ms: 0.5048\n  ...\n# Subtest: seek and performance validators fail closed on resource or SLO drift\nok 15 - seek and performance validators fail closed on resource or SLO drift\n  ---\n  duration_ms: 4.2892\n  ...\n# Subtest: strict browser summaries require exact reviewed counts and zero skipped work\nok 16 - strict browser summaries require exact reviewed counts and zero skipped work\n  ---\n  duration_ms: 0.3611\n  ...\n# Subtest: Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes\nok 17 - Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes\n  ---\n  duration_ms: 1.9934\n  ...\n# Subtest: gate record must be serial and bound to one source identity\nok 18 - gate record must be serial and bound to one source identity\n  ---\n  duration_ms: 2.8196\n  ...\n# Subtest: tarball consumer validator checks exact package, asset and browser contracts\nok 19 - tarball consumer validator checks exact package, asset and browser contracts\n  ---\n  duration_ms: 1.7538\n  ...\n# Subtest: Alpha cleanup and blocker review both fail closed\nok 20 - Alpha cleanup and blocker review both fail closed\n  ---\n  duration_ms: 2.9632\n  ...\n# Subtest: blocker review gate binding requires fresh exact artifacts from the serial run\nok 21 - blocker review gate binding requires fresh exact artifacts from the serial run\n  ---\n  duration_ms: 2.7057\n  ...\n# Subtest: postflight fails closed on command, freshness, semantic and binding drift\nok 22 - postflight fails closed on command, freshness, semantic and binding drift\n  ---\n  duration_ms: 1.7402\n  ...\n# Subtest: postflight validation is stable across checkout mtimes and fails on byte drift\nok 23 - postflight validation is stable across checkout mtimes and fails on byte drift\n  ---\n  duration_ms: 15.5851\n  ...\n1..23\n# tests 23\n# suites 0\n# pass 22\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0\n# duration_ms 459.7897\n\n> aelion-sdk@0.1.0-beta.1 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 113\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/project.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 220\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m36 passed\u001b[39m\u001b[22m\u001b[90m (36)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:06\n\u001b[2m   Duration \u001b[22m 676ms\u001b[2m (transform 110ms, setup 0ms, collect 442ms, tests 334ms, environment 0ms, prepare 150ms)\u001b[22m\n\n\n> aelion-sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@0.1.0-beta.1 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\n\u001b[36mvite v7.0.6 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 354 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  1.99 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.97 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CaSGBhjJ.css                                      \u001b[39m\u001b[1m\u001b[2m  1.96 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.99 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-BSAAyGgG.js          \u001b[39m\u001b[1m\u001b[2m  9.27 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.43 kB\u001b[22m\u001b[2m │ map:    26.80 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dtahw-Vs.js                                       \u001b[39m\u001b[1m\u001b[2m456.19 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 128.22 kB\u001b[22m\u001b[2m │ map: 1,520.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DUZaMs5e.js                             \u001b[39m\u001b[1m\u001b[33m529.40 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 131.41 kB\u001b[22m\u001b[2m │ map: 2,322.36 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 2.00s\u001b[39m\n\n> aelion-sdk@0.1.0-beta.1 build:editor C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/editor-demo build\n\n\n> @aelionsdk/editor-demo@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\editor-demo\n> vite build\n\n\u001b[36mvite v7.0.6 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 354 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.61 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-C9w8bZ6F.css                                      \u001b[39m\u001b[1m\u001b[2m  6.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   2.12 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-BSAAyGgG.js          \u001b[39m\u001b[1m\u001b[2m  9.27 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.43 kB\u001b[22m\u001b[2m │ map:    26.80 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DQ6_tvQc.js                                       \u001b[39m\u001b[1m\u001b[2m465.01 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 131.00 kB\u001b[22m\u001b[2m │ map: 1,549.68 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DUZaMs5e.js                             \u001b[39m\u001b[1m\u001b[33m529.40 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 131.41 kB\u001b[22m\u001b[2m │ map: 2,322.36 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.94s\u001b[39m\n\n> aelion-sdk@0.1.0-beta.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@0.1.0-beta.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
+        "outputTail": "est.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/video-scheduler.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/color.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/transferable-pcm-queue.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 4492\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m large Project accelerated soak\u001b[2m > \u001b[22mcompiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly \u001b[33m 4491\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m41 passed\u001b[39m\u001b[22m\u001b[90m (41)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m334 passed\u001b[39m\u001b[22m\u001b[90m (334)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:15:13\n\u001b[2m   Duration \u001b[22m 5.27s\u001b[2m (transform 2.11s, setup 0ms, collect 18.01s, tests 19.98s, environment 8ms, prepare 5.27s)\u001b[22m\n\n\n> @aelionsdk/vite-plugin@0.1.0-beta.1 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: production build, development server\n\n> aelion-sdk@0.1.0-beta.1 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\nTAP version 13\n# Subtest: Darwin parsers return only approved non-identifying fields\nok 1 - Darwin parsers return only approved non-identifying fields\n  ---\n  duration_ms: 1.3833\n  ...\n# Subtest: reference-device probe uses Darwin data and records explicit fallback limitations\nok 2 - reference-device probe uses Darwin data and records explicit fallback limitations\n  ---\n  duration_ms: 0.6001\n  ...\n# Subtest: browser identity requires Playwright and page versions to agree\nok 3 - browser identity requires Playwright and page versions to agree\n  ---\n  duration_ms: 0.4875\n  ...\n# Subtest: failed staged JSON validation preserves the published artifact\nok 4 - failed staged JSON validation preserves the published artifact\n  ---\n  duration_ms: 13.76\n  ...\n# Subtest: Alpha pair publication restores both old artifacts when report publish fails\nok 5 - Alpha pair publication restores both old artifacts when report publish fails\n  ---\n  duration_ms: 33.3454\n  ...\n# Subtest: Alpha pair publication serializes canonical path aliases in one process\nok 6 - Alpha pair publication serializes canonical path aliases in one process\n  ---\n  duration_ms: 109.2263\n  ...\n# Subtest: Alpha pair publication serializes the same canonical pair across processes\nok 7 - Alpha pair publication serializes the same canonical pair across processes\n  ---\n  duration_ms: 233.6115\n  ...\n# Subtest: Alpha pair publication rolls back when published bytes fail readback binding\nok 8 - Alpha pair publication rolls back when published bytes fail readback binding\n  ---\n  duration_ms: 31.4547\n  ...\n# Subtest: workspace identity excludes only the exact post-gate projections plus generated evidence\nok 9 - workspace identity excludes only the exact post-gate projections plus generated evidence\n  ---\n  duration_ms: 1.5381\n  ...\n# Subtest: post-gate projections do not churn source identity but every other document remains bound\nok 10 - post-gate projections do not churn source identity but every other document remains bound\n  ---\n  duration_ms: 81.3239\n  ...\n# Subtest: source identity is stable across Git-normalized text checkouts and generated Astro state\nok 11 - source identity is stable across Git-normalized text checkouts and generated Astro state\n  ---\n  duration_ms: 51.6326\n  ...\n# Subtest: source identity preserves binary CRLF bytes\nok 12 - source identity preserves binary CRLF bytes\n  ---\n  duration_ms: 46.1726\n  ...\n# Subtest: source identity rejects every non-excluded symbolic link\nok 13 - source identity rejects every non-excluded symbolic link\n  ---\n  duration_ms: 3.112\n  ...\n# Subtest: source identity equality binds every policy field\nok 14 - source identity equality binds every policy field\n  ---\n  duration_ms: 0.8234\n  ...\n# Subtest: source identity rejects non-regular filesystem entries\nok 15 - source identity rejects non-regular filesystem entries # SKIP\n  ---\n  duration_ms: 0.1292\n  ...\n# Subtest: the final runner policy is exactly fourteen gates plus seven evidence refreshes\nok 16 - the final runner policy is exactly fourteen gates plus seven evidence refreshes\n  ---\n  duration_ms: 0.555\n  ...\n# Subtest: seek and performance validators fail closed on resource or SLO drift\nok 17 - seek and performance validators fail closed on resource or SLO drift\n  ---\n  duration_ms: 3.9284\n  ...\n# Subtest: strict browser summaries require exact reviewed counts and zero skipped work\nok 18 - strict browser summaries require exact reviewed counts and zero skipped work\n  ---\n  duration_ms: 0.4759\n  ...\n# Subtest: Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes\nok 19 - Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes\n  ---\n  duration_ms: 1.8808\n  ...\n# Subtest: gate record must be serial and bound to one source identity\nok 20 - gate record must be serial and bound to one source identity\n  ---\n  duration_ms: 3.1605\n  ...\n# Subtest: tarball consumer validator checks exact package, asset and browser contracts\nok 21 - tarball consumer validator checks exact package, asset and browser contracts\n  ---\n  duration_ms: 2.2965\n  ...\n# Subtest: Alpha cleanup and blocker review both fail closed\nok 22 - Alpha cleanup and blocker review both fail closed\n  ---\n  duration_ms: 3.1232\n  ...\n# Subtest: blocker review gate binding requires fresh exact artifacts from the serial run\nok 23 - blocker review gate binding requires fresh exact artifacts from the serial run\n  ---\n  duration_ms: 2.7692\n  ...\n# Subtest: postflight fails closed on command, freshness, semantic and binding drift\nok 24 - postflight fails closed on command, freshness, semantic and binding drift\n  ---\n  duration_ms: 0.9717\n  ...\n# Subtest: postflight validation is stable across checkout mtimes and fails on byte drift\nok 25 - postflight validation is stable across checkout mtimes and fails on byte drift\n  ---\n  duration_ms: 15.5314\n  ...\n1..25\n# tests 25\n# suites 0\n# pass 24\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0\n# duration_ms 477.4672\n\n> aelion-sdk@0.1.0-beta.1 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 120\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/project.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 219\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m36 passed\u001b[39m\u001b[22m\u001b[90m (36)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:15:22\n\u001b[2m   Duration \u001b[22m 685ms\u001b[2m (transform 109ms, setup 0ms, collect 457ms, tests 339ms, environment 0ms, prepare 156ms)\u001b[22m\n\n\n> aelion-sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@0.1.0-beta.1 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\n\u001b[36mvite v7.0.6 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 354 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  1.99 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.97 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CaSGBhjJ.css                                      \u001b[39m\u001b[1m\u001b[2m  1.96 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.99 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-BSAAyGgG.js          \u001b[39m\u001b[1m\u001b[2m  9.27 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.43 kB\u001b[22m\u001b[2m │ map:    26.80 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-Dtahw-Vs.js                                       \u001b[39m\u001b[1m\u001b[2m456.19 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 128.22 kB\u001b[22m\u001b[2m │ map: 1,520.24 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DUZaMs5e.js                             \u001b[39m\u001b[1m\u001b[33m529.40 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 131.41 kB\u001b[22m\u001b[2m │ map: 2,322.36 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.96s\u001b[39m\n\n> aelion-sdk@0.1.0-beta.1 build:editor C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/editor-demo build\n\n\n> @aelionsdk/editor-demo@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\editor-demo\n> vite build\n\n\u001b[36mvite v7.0.6 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 354 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.61 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-C9w8bZ6F.css                                      \u001b[39m\u001b[1m\u001b[2m  6.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   2.12 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-BSAAyGgG.js          \u001b[39m\u001b[1m\u001b[2m  9.27 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.43 kB\u001b[22m\u001b[2m │ map:    26.80 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DQ6_tvQc.js                                       \u001b[39m\u001b[1m\u001b[2m465.01 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 131.00 kB\u001b[22m\u001b[2m │ map: 1,549.68 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DUZaMs5e.js                             \u001b[39m\u001b[1m\u001b[33m529.40 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 131.41 kB\u001b[22m\u001b[2m │ map: 2,322.36 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.94s\u001b[39m\n\n> aelion-sdk@0.1.0-beta.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@0.1.0-beta.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
         "outputTailTruncated": true
       }
     },
     {
       "command": "corepack pnpm test:browser",
-      "startedAt": "2026-07-27T17:33:14.908Z",
-      "endedAt": "2026-07-27T17:33:26.829Z",
+      "startedAt": "2026-07-27T18:15:30.218Z",
+      "endedAt": "2026-07-27T18:15:42.217Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/resumable-export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 3454\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mencodes one complete fragmented MP4 unit or fails closed without runtime AAC \u001b[33m 460\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' } \u001b[33m 1618\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' } \u001b[33m 1371\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1859\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 1049\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 624\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 623\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 463\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 369\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 319\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/vertical-slice.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 256\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 136\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 94\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 93\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 96\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/client.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 22\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/production-media-provider.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m13 passed\u001b[39m\u001b[22m\u001b[90m (13)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m79 passed\u001b[39m\u001b[22m\u001b[90m (79)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:15\n\u001b[2m   Duration \u001b[22m 11.06s\u001b[2m (transform 0ms, setup 0ms, collect 505ms, tests 7.79s, environment 0ms, prepare 120.77s)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/resumable-export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 3478\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mencodes one complete fragmented MP4 unit or fails closed without runtime AAC \u001b[33m 460\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' } \u001b[33m 1636\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' } \u001b[33m 1377\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1870\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 1051\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 625\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 625\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 470\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 374\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 321\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/vertical-slice.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 277\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 145\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 95\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 97\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 75\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/client.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 22\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/production-media-provider.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 10\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m13 passed\u001b[39m\u001b[22m\u001b[90m (13)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m79 passed\u001b[39m\u001b[22m\u001b[90m (79)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:15:30\n\u001b[2m   Duration \u001b[22m 11.14s\u001b[2m (transform 0ms, setup 0ms, collect 534ms, tests 7.86s, environment 0ms, prepare 121.21s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:firefox",
-      "startedAt": "2026-07-27T17:33:26.831Z",
-      "endedAt": "2026-07-27T17:33:45.147Z",
+      "startedAt": "2026-07-27T18:15:42.219Z",
+      "endedAt": "2026-07-27T18:16:00.551Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 3844\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 2297\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2051\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Project → Render IR → Material Graph → Worker renderer\u001b[2m > \u001b[22mapplies alpha masks with invert, feather and consumed matte semantics \u001b[33m 323\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2222\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 2221\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1169\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22mcloses an owned frame and enters error state when its subscriber throws \u001b[33m 325\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22mdoes not enqueue or publish a stale PCM generation after a newer seek \u001b[33m 330\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 608\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 635\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 623\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 215\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m67 passed\u001b[39m\u001b[22m\u001b[90m (67)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:27\n\u001b[2m   Duration \u001b[22m 17.23s\u001b[2m (transform 0ms, setup 0ms, collect 765ms, tests 11.37s, environment 0ms, prepare 101.49s)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 3865\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 2290\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2126\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 2126\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2130\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Project → Render IR → Material Graph → Worker renderer\u001b[2m > \u001b[22mapplies alpha masks with invert, feather and consumed matte semantics \u001b[33m 324\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1188\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22mcloses an owned frame and enters error state when its subscriber throws \u001b[33m 328\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22mdoes not enqueue or publish a stale PCM generation after a newer seek \u001b[33m 340\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22maborts and drains an in-flight PCM fill before Session disposal completes \u001b[33m 311\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 612\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m13 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 621\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 399\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 210\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m67 passed\u001b[39m\u001b[22m\u001b[90m (67)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:15:42\n\u001b[2m   Duration \u001b[22m 17.19s\u001b[2m (transform 0ms, setup 0ms, collect 802ms, tests 11.15s, environment 0ms, prepare 101.78s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:webkit",
-      "startedAt": "2026-07-27T17:33:45.149Z",
-      "endedAt": "2026-07-27T17:33:49.150Z",
+      "startedAt": "2026-07-27T18:16:00.553Z",
+      "endedAt": "2026-07-27T18:16:04.515Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\u001b[2m01:33:45\u001b[22m \u001b[36m\u001b[1m[vite]\u001b[22m\u001b[39m \u001b[90m\u001b[2m(client)\u001b[22m\u001b[39m Re-optimizing dependencies because vite config has changed\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 136\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:45\n\u001b[2m   Duration \u001b[22m 3.33s\u001b[2m (transform 0ms, setup 0ms, collect 277ms, tests 140ms, environment 0ms, prepare 5.38s)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\u001b[2m02:16:01\u001b[22m \u001b[36m\u001b[1m[vite]\u001b[22m\u001b[39m \u001b[90m\u001b[2m(client)\u001b[22m\u001b[39m Re-optimizing dependencies because vite config has changed\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 136\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:16:01\n\u001b[2m   Duration \u001b[22m 3.28s\u001b[2m (transform 0ms, setup 0ms, collect 264ms, tests 140ms, environment 0ms, prepare 5.33s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:mobile",
-      "startedAt": "2026-07-27T17:33:49.152Z",
-      "endedAt": "2026-07-27T17:33:52.889Z",
+      "startedAt": "2026-07-27T18:16:04.517Z",
+      "endedAt": "2026-07-27T18:16:08.252Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 452\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m browser capability report\u001b[2m > \u001b[22mprobes real browser configurations and returns a serializable report \u001b[33m 411\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 95\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:49\n\u001b[2m   Duration \u001b[22m 2.93s\u001b[2m (transform 0ms, setup 0ms, collect 121ms, tests 547ms, environment 0ms, prepare 5.11s)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 454\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m browser capability report\u001b[2m > \u001b[22mprobes real browser configurations and returns a serializable report \u001b[33m 414\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 94\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:16:05\n\u001b[2m   Duration \u001b[22m 2.91s\u001b[2m (transform 0ms, setup 0ms, collect 122ms, tests 548ms, environment 0ms, prepare 5.14s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:golden",
-      "startedAt": "2026-07-27T17:33:52.890Z",
-      "endedAt": "2026-07-27T17:33:53.993Z",
+      "startedAt": "2026-07-27T18:16:08.253Z",
+      "endedAt": "2026-07-27T18:16:09.342Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/renderer-worker/test/material.golden.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:53\n\u001b[2m   Duration \u001b[22m 388ms\u001b[2m (transform 76ms, setup 0ms, collect 132ms, tests 4ms, environment 0ms, prepare 84ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/renderer-worker/test/material.golden.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:16:08\n\u001b[2m   Duration \u001b[22m 384ms\u001b[2m (transform 76ms, setup 0ms, collect 136ms, tests 5ms, environment 0ms, prepare 87ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:security",
-      "startedAt": "2026-07-27T17:33:53.995Z",
-      "endedAt": "2026-07-27T17:33:55.711Z",
+      "startedAt": "2026-07-27T18:16:09.344Z",
+      "endedAt": "2026-07-27T18:16:11.136Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 174\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/corpus.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 88\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/material-sdk/test/material-sdk.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 100\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m46 passed\u001b[39m\u001b[22m\u001b[90m (46)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:54\n\u001b[2m   Duration \u001b[22m 978ms\u001b[2m (transform 327ms, setup 0ms, collect 1.43s, tests 362ms, environment 0ms, prepare 227ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 162\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/corpus.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 79\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/material-sdk/test/material-sdk.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 114\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m46 passed\u001b[39m\u001b[22m\u001b[90m (46)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:16:10\n\u001b[2m   Duration \u001b[22m 1.02s\u001b[2m (transform 323ms, setup 0ms, collect 1.47s, tests 355ms, environment 1ms, prepare 251ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:soak",
-      "startedAt": "2026-07-27T17:33:55.712Z",
-      "endedAt": "2026-07-27T17:33:59.226Z",
+      "startedAt": "2026-07-27T18:16:11.138Z",
+      "endedAt": "2026-07-27T18:16:14.776Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/audio/test/pcm-ring.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 378\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mwraps interleaved writes into planar reads without allocation growth \u001b[33m 377\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mrecords underrun frames and zero-fills output \u001b[33m 377\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mruns a ten-minute equivalent bounded producer/consumer simulation without underrun \u001b[33m 377\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdoes not accept writes after end or close \u001b[33m 377\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdrops all queued PCM when closed \u001b[33m 377\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2275\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m large Project accelerated soak\u001b[2m > \u001b[22mcompiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly \u001b[33m 2274\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m7 passed\u001b[39m\u001b[22m\u001b[90m (7)\u001b[39m\n\u001b[2m   Start at \u001b[22m 01:33:56\n\u001b[2m   Duration \u001b[22m 2.81s\u001b[2m (transform 197ms, setup 0ms, collect 755ms, tests 2.65s, environment 0ms, prepare 144ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/audio/test/pcm-ring.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 366\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mwraps interleaved writes into planar reads without allocation growth \u001b[33m 364\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mrecords underrun frames and zero-fills output \u001b[33m 364\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mruns a ten-minute equivalent bounded producer/consumer simulation without underrun \u001b[33m 364\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdoes not accept writes after end or close \u001b[33m 364\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdrops all queued PCM when closed \u001b[33m 364\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2341\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m large Project accelerated soak\u001b[2m > \u001b[22mcompiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly \u001b[33m 2341\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m7 passed\u001b[39m\u001b[22m\u001b[90m (7)\u001b[39m\n\u001b[2m   Start at \u001b[22m 02:16:11\n\u001b[2m   Duration \u001b[22m 2.90s\u001b[2m (transform 209ms, setup 0ms, collect 787ms, tests 2.71s, environment 0ms, prepare 159ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm bench",
-      "startedAt": "2026-07-27T17:33:59.228Z",
-      "endedAt": "2026-07-27T17:34:04.872Z",
+      "startedAt": "2026-07-27T18:16:14.778Z",
+      "endedAt": "2026-07-27T18:16:20.388Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\n\u001b[33mBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\u001b[39m\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\n \u001b[32m✓\u001b[39m benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22mRender IR compilation\u001b[33m 3850\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[1mname                                       \u001b[22m  \u001b[1m      hz\u001b[22m  \u001b[1m    min\u001b[22m  \u001b[1m    max\u001b[22m  \u001b[1m   mean\u001b[22m  \u001b[1m    p75\u001b[22m  \u001b[1m    p99\u001b[22m  \u001b[1m   p995\u001b[22m  \u001b[1m   p999\u001b[22m  \u001b[1m   rme\u001b[22m  \u001b[1msamples\u001b[22m\n   \u001b[32m·\u001b[39m cold compile 1,000 clips                     \u001b[34m 19.8028\u001b[39m  \u001b[36m48.7349\u001b[39m  \u001b[36m53.5325\u001b[39m  \u001b[36m50.4979\u001b[39m  \u001b[36m51.2914\u001b[39m  \u001b[36m53.5325\u001b[39m  \u001b[36m53.5325\u001b[39m  \u001b[36m53.5325\u001b[39m  \u001b[2m±2.08%\u001b[22m  \u001b[2m     10\u001b[22m\n   \u001b[32m·\u001b[39m incremental no-op compile 1,000 clips        \u001b[34m  320.78\u001b[39m  \u001b[36m 2.8844\u001b[39m  \u001b[36m 4.1545\u001b[39m  \u001b[36m 3.1174\u001b[39m  \u001b[36m 3.2192\u001b[39m  \u001b[36m 3.9317\u001b[39m  \u001b[36m 4.1545\u001b[39m  \u001b[36m 4.1545\u001b[39m  \u001b[2m±1.16%\u001b[22m  \u001b[2m    161\u001b[22m\n   \u001b[32m·\u001b[39m session initialization 1,000 clips           \u001b[34m 19.6451\u001b[39m  \u001b[36m49.6880\u001b[39m  \u001b[36m52.6479\u001b[39m  \u001b[36m50.9031\u001b[39m  \u001b[36m51.4130\u001b[39m  \u001b[36m52.6479\u001b[39m  \u001b[36m52.6479\u001b[39m  \u001b[36m52.6479\u001b[39m  \u001b[2m±1.45%\u001b[22m  \u001b[2m     10\u001b[22m\n   \u001b[32m·\u001b[39m single-field transaction commit 1,000 clips  \u001b[34m4,307.71\u001b[39m  \u001b[36m 0.1810\u001b[39m  \u001b[36m 0.9103\u001b[39m  \u001b[36m 0.2321\u001b[39m  \u001b[36m 0.2397\u001b[39m  \u001b[36m 0.4218\u001b[39m  \u001b[36m 0.4580\u001b[39m  \u001b[36m 0.5442\u001b[39m  \u001b[2m±0.93%\u001b[22m  \u001b[2m   2154\u001b[22m\n   \u001b[32m·\u001b[39m schema-validated field commit 1,000 clips    \u001b[34m 24.1351\u001b[39m  \u001b[36m39.0679\u001b[39m  \u001b[36m44.4120\u001b[39m  \u001b[36m41.4334\u001b[39m  \u001b[36m41.6282\u001b[39m  \u001b[36m44.4120\u001b[39m  \u001b[36m44.4120\u001b[39m  \u001b[36m44.4120\u001b[39m  \u001b[2m±2.27%\u001b[22m  \u001b[2m     13\u001b[22m\n\n\u001b[1m\u001b[46m BENCH \u001b[49m\u001b[22m \u001b[36mSummary\n\u001b[39m\n  single-field transaction commit 1,000 clips\u001b[2m - benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22m\u001b[2mRender IR compilation\u001b[22m\n\u001b[32m    13.43x \u001b[39m\u001b[90mfaster than \u001b[39mincremental no-op compile 1,000 clips\n\u001b[32m    178.48x \u001b[39m\u001b[90mfaster than \u001b[39mschema-validated field commit 1,000 clips\n\u001b[32m    217.53x \u001b[39m\u001b[90mfaster than \u001b[39mcold compile 1,000 clips\n\u001b[32m    219.28x \u001b[39m\u001b[90mfaster than \u001b[39msession initialization 1,000 clips",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\n\u001b[33mBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\u001b[39m\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\n \u001b[32m✓\u001b[39m benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22mRender IR compilation\u001b[33m 3856\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[1mname                                       \u001b[22m  \u001b[1m      hz\u001b[22m  \u001b[1m    min\u001b[22m  \u001b[1m    max\u001b[22m  \u001b[1m   mean\u001b[22m  \u001b[1m    p75\u001b[22m  \u001b[1m    p99\u001b[22m  \u001b[1m   p995\u001b[22m  \u001b[1m   p999\u001b[22m  \u001b[1m   rme\u001b[22m  \u001b[1msamples\u001b[22m\n   \u001b[32m·\u001b[39m cold compile 1,000 clips                     \u001b[34m 20.0696\u001b[39m  \u001b[36m48.3143\u001b[39m  \u001b[36m53.9655\u001b[39m  \u001b[36m49.8265\u001b[39m  \u001b[36m50.6298\u001b[39m  \u001b[36m53.9655\u001b[39m  \u001b[36m53.9655\u001b[39m  \u001b[36m53.9655\u001b[39m  \u001b[2m±2.29%\u001b[22m  \u001b[2m     11\u001b[22m\n   \u001b[32m·\u001b[39m incremental no-op compile 1,000 clips        \u001b[34m  321.68\u001b[39m  \u001b[36m 2.9337\u001b[39m  \u001b[36m 3.9930\u001b[39m  \u001b[36m 3.1086\u001b[39m  \u001b[36m 3.1319\u001b[39m  \u001b[36m 3.9034\u001b[39m  \u001b[36m 3.9930\u001b[39m  \u001b[36m 3.9930\u001b[39m  \u001b[2m±1.04%\u001b[22m  \u001b[2m    161\u001b[22m\n   \u001b[32m·\u001b[39m session initialization 1,000 clips           \u001b[34m 19.7364\u001b[39m  \u001b[36m49.5305\u001b[39m  \u001b[36m54.5279\u001b[39m  \u001b[36m50.6679\u001b[39m  \u001b[36m50.6369\u001b[39m  \u001b[36m54.5279\u001b[39m  \u001b[36m54.5279\u001b[39m  \u001b[36m54.5279\u001b[39m  \u001b[2m±2.06%\u001b[22m  \u001b[2m     10\u001b[22m\n   \u001b[32m·\u001b[39m single-field transaction commit 1,000 clips  \u001b[34m4,595.05\u001b[39m  \u001b[36m 0.1810\u001b[39m  \u001b[36m 0.5117\u001b[39m  \u001b[36m 0.2176\u001b[39m  \u001b[36m 0.2128\u001b[39m  \u001b[36m 0.3844\u001b[39m  \u001b[36m 0.4096\u001b[39m  \u001b[36m 0.4716\u001b[39m  \u001b[2m±0.83%\u001b[22m  \u001b[2m   2298\u001b[22m\n   \u001b[32m·\u001b[39m schema-validated field commit 1,000 clips    \u001b[34m 23.9180\u001b[39m  \u001b[36m40.5893\u001b[39m  \u001b[36m43.8845\u001b[39m  \u001b[36m41.8096\u001b[39m  \u001b[36m42.3262\u001b[39m  \u001b[36m43.8845\u001b[39m  \u001b[36m43.8845\u001b[39m  \u001b[36m43.8845\u001b[39m  \u001b[2m±1.58%\u001b[22m  \u001b[2m     12\u001b[22m\n\n\u001b[1m\u001b[46m BENCH \u001b[49m\u001b[22m \u001b[36mSummary\n\u001b[39m\n  single-field transaction commit 1,000 clips\u001b[2m - benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22m\u001b[2mRender IR compilation\u001b[22m\n\u001b[32m    14.28x \u001b[39m\u001b[90mfaster than \u001b[39mincremental no-op compile 1,000 clips\n\u001b[32m    192.12x \u001b[39m\u001b[90mfaster than \u001b[39mschema-validated field commit 1,000 clips\n\u001b[32m    228.96x \u001b[39m\u001b[90mfaster than \u001b[39mcold compile 1,000 clips\n\u001b[32m    232.82x \u001b[39m\u001b[90mfaster than \u001b[39msession initialization 1,000 clips",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:pack",
-      "startedAt": "2026-07-27T17:34:04.874Z",
-      "endedAt": "2026-07-27T17:34:27.756Z",
+      "startedAt": "2026-07-27T18:16:20.390Z",
+      "endedAt": "2026-07-27T18:16:43.391Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2135,19 +2111,19 @@
     },
     {
       "command": "corepack pnpm test:consumer",
-      "startedAt": "2026-07-27T17:34:27.758Z",
-      "endedAt": "2026-07-27T17:35:24.378Z",
+      "startedAt": "2026-07-27T18:16:43.393Z",
+      "endedAt": "2026-07-27T18:17:39.728Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 89415\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 21333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6570\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22080,\n          \"playedFrames\": 1920,\n          \"underrunFrames\": 0,\n          \"timeUs\": 40000\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 21340\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 37333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6020\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22592,\n          \"playedFrames\": 1408,\n          \"underrunFrames\": 0,\n          \"timeUs\": 37333\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@0.1.0-beta.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 83360\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 21333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6775\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22592,\n          \"playedFrames\": 1408,\n          \"underrunFrames\": 0,\n          \"timeUs\": 29333\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 20080\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 37333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6100\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22336,\n          \"playedFrames\": 1664,\n          \"underrunFrames\": 0,\n          \"timeUs\": 42667\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm release:dry-run",
-      "startedAt": "2026-07-27T17:35:24.380Z",
-      "endedAt": "2026-07-27T17:36:02.126Z",
+      "startedAt": "2026-07-27T18:17:39.730Z",
+      "endedAt": "2026-07-27T18:17:59.126Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2157,8 +2133,8 @@
     },
     {
       "command": "corepack pnpm release:reproducibility",
-      "startedAt": "2026-07-27T17:36:02.128Z",
-      "endedAt": "2026-07-27T17:36:24.109Z",
+      "startedAt": "2026-07-27T18:17:59.128Z",
+      "endedAt": "2026-07-27T18:18:20.898Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2168,8 +2144,8 @@
     },
     {
       "command": "corepack pnpm format:check",
-      "startedAt": "2026-07-27T17:36:24.111Z",
-      "endedAt": "2026-07-27T17:36:28.815Z",
+      "startedAt": "2026-07-27T18:18:20.899Z",
+      "endedAt": "2026-07-27T18:18:25.268Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2179,19 +2155,19 @@
     },
     {
       "command": "corepack pnpm report:browser:chromium",
-      "startedAt": "2026-07-27T17:36:28.817Z",
-      "endedAt": "2026-07-27T17:36:41.800Z",
+      "startedAt": "2026-07-27T18:18:25.269Z",
+      "endedAt": "2026-07-27T18:18:38.179Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@0.1.0-beta.1 report:browser:chromium C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json\n\n\u001b[2m01:36:29\u001b[22m \u001b[36m\u001b[1m[vite]\u001b[22m\u001b[39m \u001b[90m\u001b[2m(client)\u001b[22m\u001b[39m Re-optimizing dependencies because vite config has changed\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-chromium.json",
+        "outputTail": "> aelion-sdk@0.1.0-beta.1 report:browser:chromium C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json\n\n\u001b[2m02:18:29\u001b[22m \u001b[36m\u001b[1m[vite]\u001b[22m\u001b[39m \u001b[90m\u001b[2m(client)\u001b[22m\u001b[39m Re-optimizing dependencies because vite config has changed\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:browser:firefox",
-      "startedAt": "2026-07-27T17:36:41.802Z",
-      "endedAt": "2026-07-27T17:37:00.620Z",
+      "startedAt": "2026-07-27T18:18:38.181Z",
+      "endedAt": "2026-07-27T18:18:56.974Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2201,8 +2177,8 @@
     },
     {
       "command": "corepack pnpm report:seek",
-      "startedAt": "2026-07-27T17:37:00.622Z",
-      "endedAt": "2026-07-27T17:37:03.493Z",
+      "startedAt": "2026-07-27T18:18:56.976Z",
+      "endedAt": "2026-07-27T18:19:02.962Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2212,8 +2188,8 @@
     },
     {
       "command": "corepack pnpm report:performance",
-      "startedAt": "2026-07-27T17:37:03.495Z",
-      "endedAt": "2026-07-27T17:37:13.062Z",
+      "startedAt": "2026-07-27T18:19:02.964Z",
+      "endedAt": "2026-07-27T18:19:12.531Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2223,8 +2199,8 @@
     },
     {
       "command": "corepack pnpm report:recovery",
-      "startedAt": "2026-07-27T17:37:13.064Z",
-      "endedAt": "2026-07-27T17:37:20.134Z",
+      "startedAt": "2026-07-27T18:19:12.533Z",
+      "endedAt": "2026-07-27T18:19:19.688Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2234,8 +2210,8 @@
     },
     {
       "command": "corepack pnpm report:phase3:check",
-      "startedAt": "2026-07-27T17:37:20.136Z",
-      "endedAt": "2026-07-27T17:37:20.482Z",
+      "startedAt": "2026-07-27T18:19:19.690Z",
+      "endedAt": "2026-07-27T18:19:20.022Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2245,8 +2221,8 @@
     },
     {
       "command": "corepack pnpm report:alpha",
-      "startedAt": "2026-07-27T17:37:20.484Z",
-      "endedAt": "2026-07-27T17:37:49.921Z",
+      "startedAt": "2026-07-27T18:19:20.025Z",
+      "endedAt": "2026-07-27T18:19:49.464Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2255,10 +2231,10 @@
       }
     }
   ],
-  "updatedAt": "2026-07-27T17:37:49.921Z",
+  "updatedAt": "2026-07-27T18:19:49.464Z",
   "postflight": {
     "schemaVersion": "1.0.0",
-    "generatedAt": "2026-07-27T17:37:49.924Z",
+    "generatedAt": "2026-07-27T18:19:49.466Z",
     "expectedVersion": "0.1.0-beta.1",
     "passed": true,
     "checks": [
@@ -2282,7 +2258,7 @@
         "id": "browser-smoke-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:36:40.771Z",
+          "value": "2026-07-27T18:18:40.192Z",
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -2290,7 +2266,7 @@
         "id": "browser-smoke-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1785173789489,
+          "value": 1785176308925,
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -2310,7 +2286,7 @@
         "id": "browser-smoke-firefox-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:36:59.587Z",
+          "value": "2026-07-27T18:18:58.983Z",
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -2318,7 +2294,7 @@
         "id": "browser-smoke-firefox-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1785173802459,
+          "value": 1785176321860,
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -2338,7 +2314,7 @@
         "id": "media-seek-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:03.310Z",
+          "value": "2026-07-27T18:19:02.778Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -2346,7 +2322,7 @@
         "id": "media-seek-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:03.307Z",
+          "value": "2026-07-27T18:19:02.773Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -2379,7 +2355,7 @@
         "id": "performance-1080p30-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:12.869Z",
+          "value": "2026-07-27T18:19:12.344Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -2387,7 +2363,7 @@
         "id": "performance-1080p30-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:12.865Z",
+          "value": "2026-07-27T18:19:12.340Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -2395,8 +2371,8 @@
         "id": "performance-1080p30-chromium-json-semantic",
         "passed": true,
         "details": {
-          "webGl2P95Ms": 0.40499999932944775,
-          "exportRealtimeMultiple": 9.427380885023977,
+          "webGl2P95Ms": 1.375,
+          "exportRealtimeMultiple": 9.238131310808626,
           "steadyLongTasksOver50Ms": 0,
           "initializationLongTasksOver50Ms": 0,
           "pcm": {
@@ -2421,7 +2397,7 @@
         "id": "recovery-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:19.931Z",
+          "value": "2026-07-27T18:19:19.471Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -2429,7 +2405,7 @@
         "id": "recovery-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:19.928Z",
+          "value": "2026-07-27T18:19:19.468Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -2463,7 +2439,7 @@
         "id": "tarball-consumer-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:34:55.805Z",
+          "value": "2026-07-27T18:17:11.264Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -2471,7 +2447,7 @@
         "id": "tarball-consumer-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:34:55.803Z",
+          "value": "2026-07-27T18:17:11.260Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -2523,7 +2499,7 @@
         "id": "alpha-60s-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:49.673Z",
+          "value": "2026-07-27T18:19:49.177Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -2531,7 +2507,7 @@
         "id": "alpha-60s-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:49.671Z",
+          "value": "2026-07-27T18:19:49.175Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -2581,8 +2557,8 @@
             },
             "sessionRuntimeBeforeDispose": {
               "renderer": {
-                "requestedFrames": 11,
-                "renderedFrames": 11,
+                "requestedFrames": 10,
+                "renderedFrames": 10,
                 "failedFrames": 0,
                 "lastBackend": "webgl2",
                 "lastWidth": 320,
@@ -2621,8 +2597,8 @@
             },
             "sessionRuntimeAfterDispose": {
               "renderer": {
-                "requestedFrames": 11,
-                "renderedFrames": 11,
+                "requestedFrames": 10,
+                "renderedFrames": 10,
                 "failedFrames": 0,
                 "lastBackend": "webgl2",
                 "lastWidth": 320,
@@ -2690,7 +2666,7 @@
         "id": "alpha-60s-webm-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-07-27T17:37:49.389Z",
+          "value": "2026-07-27T18:19:48.924Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -2705,84 +2681,85 @@
         {
           "file": "reports/baseline/browser-smoke-chromium.json",
           "command": "corepack pnpm report:browser:chromium",
-          "bytes": 29622,
-          "sha256": "af503c9df2e4be2073f51a00c303eefc8564705458b5c15b3f2f2dcd90550101",
-          "mtime": "2026-07-27T17:36:40.771Z"
+          "bytes": 29637,
+          "sha256": "5cfb96cafc88c973da71d659535671bbd86f0d2b58403777db5a7b1db0c1581e",
+          "mtime": "2026-07-27T18:18:40.192Z"
         },
         {
           "file": "reports/baseline/browser-smoke-firefox.json",
           "command": "corepack pnpm report:browser:firefox",
-          "bytes": 24330,
-          "sha256": "e9e9084314e68a356c1cc3b00513a92d5a0e232bbfe1d943cdc74262864b821a",
-          "mtime": "2026-07-27T17:36:59.587Z"
+          "bytes": 24310,
+          "sha256": "d751e8d6b77b06b320b2d840951770e7fa79ffc859be6d9bf3a3759074df32da",
+          "mtime": "2026-07-27T18:18:58.983Z"
         },
         {
           "file": "reports/baseline/media-seek-chromium.json",
           "command": "corepack pnpm report:seek",
-          "bytes": 21527,
-          "sha256": "f5e8c7e54ba6905c8a63aef76daee39fe795dab66d458c685e46cbfebc57fed2",
-          "mtime": "2026-07-27T17:37:03.310Z"
+          "bytes": 21515,
+          "sha256": "3bab868ad45a2d26bd7a4c2a5e2084dfbfce66ce8da6facfb2bbecc3c43f7734",
+          "mtime": "2026-07-27T18:19:02.778Z"
         },
         {
           "file": "reports/baseline/performance-1080p30-chromium.json",
           "command": "corepack pnpm report:performance",
-          "bytes": 63389,
-          "sha256": "a6f35a462d1cc6905fb39d3f9f3ae69fa84fbbb5ace26d661e2de976ba50106e",
-          "mtime": "2026-07-27T17:37:12.869Z"
+          "bytes": 63372,
+          "sha256": "37958042df55dfc501ec9437c8fae89e33b683ff466c52342d31ea009be99578",
+          "mtime": "2026-07-27T18:19:12.344Z"
         },
         {
           "file": "reports/baseline/recovery-chromium.json",
           "command": "corepack pnpm report:recovery",
           "bytes": 33162,
-          "sha256": "cb9714c118abd5c7d6899a18509ea8e9c6e7a3962583a0ff21ea2fcc2e6048dd",
-          "mtime": "2026-07-27T17:37:19.931Z"
+          "sha256": "2d7f181799a96380671b7f5ed0a210ca82b533cc60e58324df120b33a8354a7c",
+          "mtime": "2026-07-27T18:19:19.471Z"
         },
         {
           "file": "reports/baseline/tarball-consumer.json",
           "command": "corepack pnpm test:consumer",
           "bytes": 11151,
-          "sha256": "b93d67f554b368508413c352b5b5d31f64ba7448a85d81d6942edf941c105511",
-          "mtime": "2026-07-27T17:34:55.805Z"
+          "sha256": "07e48c69255be3d721497d1f4ed68551ef71c98608dcfbc88c92eda7f9ab12ac",
+          "mtime": "2026-07-27T18:17:11.264Z"
         },
         {
           "file": "reports/baseline/alpha-60s.json",
           "command": "corepack pnpm report:alpha",
-          "bytes": 114845,
-          "sha256": "b856f292ca6fcd821e3d436b01bc37ab712b1f492c714521a1b324f20dfc3e0f",
-          "mtime": "2026-07-27T17:37:49.673Z"
+          "bytes": 114775,
+          "sha256": "ec17f7e18605b10c0cdc2e8c75444051c394ce04d6fe20f968e56647c9a05228",
+          "mtime": "2026-07-27T18:19:49.177Z"
         },
         {
           "file": "reports/baseline/alpha-60s.webm",
           "command": "corepack pnpm report:alpha",
           "bytes": 4740152,
           "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8",
-          "mtime": "2026-07-27T17:37:49.389Z"
+          "mtime": "2026-07-27T18:19:48.924Z"
         }
       ],
-      "setSha256": "5a3f4e802eccdf1c1cc829e892908ce6567502c521b38d80d898968f0f199958"
+      "setSha256": "fd3ef4d65307ed323e708d263f714b97ed6506e9559842d01a60e9127f442000"
     }
   },
   "sourceIdentityAfter": {
     "kind": "workspace-input-manifest",
-    "policyVersion": "3.2.0",
-    "algorithm": "sha256(stable-json(files))",
+    "policyVersion": "3.3.0",
+    "algorithm": "sha256(stable-json(canonical-lf(files)))",
+    "textNormalization": "Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF",
     "symbolicLinks": "reject every non-excluded symbolic link",
     "specialFiles": "reject every non-excluded non-regular filesystem entry",
     "exclusions": [
       "root reports/** and benchmarks/reports/** evidence outputs",
-      "VCS/dependency/build/cache directories: .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results",
+      "VCS/dependency/build/cache directories: .astro, .git, .pnpm-store, .vite, .vitest, coverage, dist, node_modules, playwright-report, test-results",
       "generated TypeDoc projection: apps/docs/src/content/docs/api/**",
       "browser snapshot output directories named __screenshots__",
       "generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}",
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 399,
-    "totalBytes": 3733560,
-    "manifestSha256": "f897cb0cc2e2a7bf697ebb6a51f2c6da820ddb36c70d4ea9cd52a20fedb3b36e",
+    "fileCount": 394,
+    "totalBytes": 3706888,
+    "manifestSha256": "9c3a60f09fc4b888feb3272eabf4319727d5df1d5eb2a3006a925fa8fd41932c",
     "vcs": {
-      "commit": "f53ae3afa9e15df17b512455a3b972c34edf7b3a",
-      "tree": "e56cb679b66690cb02c26bd01b7c15228d23a883"
+      "commit": "4cab4ea2a07cdf9e37e4bdc0a1ba19e0ca686617",
+      "tree": "bf089385fa5dc0b2b5ccecbb5aeb41e27286432c"
     },
     "files": [
       {
@@ -2807,28 +2784,28 @@
       },
       {
         "path": ".gitignore",
-        "bytes": 529,
-        "sha256": "1b436cec5e136d846ca71d640f880d853383474a976d5a269e3a8997f659c68c"
+        "bytes": 503,
+        "sha256": "b96c06b9021a5ed3da8e34738e60a91dcec76c39dc2fdb2b8b836931ea3e273f"
       },
       {
         "path": ".node-version",
-        "bytes": 9,
-        "sha256": "980075351ecade4c303f48138ca769d68524662cc1f4f23d854c97ec1300f832"
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
       },
       {
         "path": ".npmrc",
-        "bytes": 168,
-        "sha256": "43e079c91a1a06a246a0610ae817a7c312e505c9e17c04de4a623eb8e64de437"
+        "bytes": 167,
+        "sha256": "ce743b3fb60727b50c69f611e6b262ceb8e371c13b3a0041d81455b2f799ef45"
       },
       {
         "path": ".nvmrc",
-        "bytes": 9,
-        "sha256": "980075351ecade4c303f48138ca769d68524662cc1f4f23d854c97ec1300f832"
+        "bytes": 8,
+        "sha256": "75053fb82fe4512318dd99556daf58b862fb81c96cf1153249b75f8116edf440"
       },
       {
         "path": ".prettierignore",
-        "bytes": 161,
-        "sha256": "d0e4b8a0b699c16561ba1ba5a59ca6fbc6d28e21b0c445014395b0b2f8a1dae7"
+        "bytes": 150,
+        "sha256": "c4e71b747ad4841268af131bce704cc098c7d5bbbb92f17949f9cd9408065c27"
       },
       {
         "path": ".prettierrc.json",
@@ -2852,8 +2829,8 @@
       },
       {
         "path": "LICENSE",
-        "bytes": 1114,
-        "sha256": "251d712b2fec16d38e9a4b292fb7453941b5e017df5c2fa18829a9c1ae76d20f"
+        "bytes": 1093,
+        "sha256": "2abe635675859cf5e117e234d57afceefc598105f7c04fbbd2786688a73318dd"
       },
       {
         "path": "SECURITY.md",
@@ -2896,31 +2873,6 @@
         "sha256": "92eabb642c0c6120d5c55d6b34a4dd2afa65cf71096c988fea0de002a827d4e6"
       },
       {
-        "path": "apps/docs/.astro/collections/docs.schema.json",
-        "bytes": 19961,
-        "sha256": "6ee05cf942f7449f0131b177a913248b56bcd10705a813bd8f42ba3e26b637a1"
-      },
-      {
-        "path": "apps/docs/.astro/content-assets.mjs",
-        "bytes": 25,
-        "sha256": "6eec27650a023e5d1805c36b527913e976d473c2b4e5d659cbe1587643209e83"
-      },
-      {
-        "path": "apps/docs/.astro/content-modules.mjs",
-        "bytes": 224,
-        "sha256": "a01425613f10e92c7a83b688b5e936f682e7b45255102a3cc00373cf26801973"
-      },
-      {
-        "path": "apps/docs/.astro/content.d.ts",
-        "bytes": 7394,
-        "sha256": "704cc6b17701cac8113299ab163149a86bdf2fe91ba1d1bb110d074e23f4853d"
-      },
-      {
-        "path": "apps/docs/.astro/types.d.ts",
-        "bytes": 76,
-        "sha256": "38ea3df3779cce222cd51ba2c9dc9ac053a859208d3097aa3165f70c71517736"
-      },
-      {
         "path": "apps/docs/README.md",
         "bytes": 2162,
         "sha256": "e659945b0c6dcc39cb4113ddf48ec90e638dc9a1b3caf91e11f3acad3107cab1"
@@ -2937,8 +2889,8 @@
       },
       {
         "path": "apps/docs/public/favicon.svg",
-        "bytes": 487,
-        "sha256": "d81f5d221171df3e939d063a9a7b23eb73845c8fd5357387fdc46301bda63385"
+        "bytes": 476,
+        "sha256": "72ea9ee80564a92d14db70df4b0f01c7a9ee14d8735b43c75976fbb70e7f073d"
       },
       {
         "path": "apps/docs/scripts/astro.mjs",
@@ -3347,13 +3299,13 @@
       },
       {
         "path": "examples/README.md",
-        "bytes": 3027,
-        "sha256": "cc27060cbfe534e974f1db5ae570b4e9cc0372585b4cc10bc1b1674df375a0de"
+        "bytes": 2994,
+        "sha256": "da749f56a7e5f6942bd5811a124f2dc8864dc29de1485f399c8cd2177f2f71ea"
       },
       {
         "path": "examples/aelion-alpha-60s.project.json",
-        "bytes": 7620,
-        "sha256": "c0da5c0cf3465c589cff58ff7acee2eac88b07b183955fc2a4c2d6e40d39348e"
+        "bytes": 7309,
+        "sha256": "1e57dfc32789960e4a69f652ba610a4bbb2ef690d53cc8f3771ba5d4daece17b"
       },
       {
         "path": "examples/aelion-project-v1.example.json",
@@ -3362,18 +3314,18 @@
       },
       {
         "path": "examples/aelion-vertical-slice-30s.project.json",
-        "bytes": 7476,
-        "sha256": "6f469fb67c1a37c583c05eb50f1725275fad24e9020ca96736911451ddf2478f"
+        "bytes": 7166,
+        "sha256": "765269add1c27f650a27c7bef4283a0af6dedbba971a53a9a176416683d9c6d5"
       },
       {
         "path": "examples/materials/README.md",
-        "bytes": 1589,
-        "sha256": "a807d2f54ad0a7252721f14cf663aeb7472617f176cab42556f3564c200c8a1b"
+        "bytes": 1554,
+        "sha256": "e91afeae6a214c2afdcc4aa1a254828b11f5f713b15ea9cff2788384cf3785ab"
       },
       {
         "path": "examples/materials/authoring-sdk/cross-dissolve.ts",
-        "bytes": 1366,
-        "sha256": "c8fc0c6aaba4499706ea33cf84532bc837db32a56bdff9f3fb0f3bf3a0557bfd"
+        "bytes": 1319,
+        "sha256": "cbdb3e6dddff1a5e1c10715d13cf4794a55b5178bfd84598731f445fbe4f369d"
       },
       {
         "path": "examples/materials/cross-dissolve/graphs/cross-dissolve.graph.json",
@@ -3427,13 +3379,13 @@
       },
       {
         "path": "examples/typescript/sdk-integration.ts",
-        "bytes": 2257,
-        "sha256": "cb07f30577eeead3c3dc3b0b24bbc2d0b9610a75016ccaf74eff30233f060308"
+        "bytes": 2183,
+        "sha256": "4f34cc6bc617e9f0088a8acf4c59961c21f037b55894bbe9236c6abd4f0eae25"
       },
       {
         "path": "examples/typescript/tsconfig.json",
-        "bytes": 349,
-        "sha256": "8bd52c1bbaebb9cd16f9969330fba442a42e019472eaa1508277dc7b30d2ffe1"
+        "bytes": 334,
+        "sha256": "05df5dc751730b53db51b0c39740ea6964601a925c1e54bb068b7b421eab1f7f"
       },
       {
         "path": "fixtures/manifests/media-v1.json",
@@ -3447,8 +3399,8 @@
       },
       {
         "path": "fixtures/media/.gitkeep",
-        "bytes": 2,
-        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
       },
       {
         "path": "fixtures/media/mp4-fragmented-h264-aac.mp4",
@@ -4527,23 +4479,23 @@
       },
       {
         "path": "schemas/material/v1/definition.schema.json",
-        "bytes": 11434,
-        "sha256": "626bb5ef52331b2beef8fc88fb3c60d9585c41f5963a9e9ce3b3d87bb810d3eb"
+        "bytes": 11085,
+        "sha256": "7dd9e409d44966295262e363cd8fd42c4a4812fa18d57dd7a47b025eddbe0475"
       },
       {
         "path": "schemas/material/v1/graph.schema.json",
-        "bytes": 4612,
-        "sha256": "03c7c0f2fedae97533dd60352166076a7e4733c0ed4e09afaccb14d72f226eec"
+        "bytes": 4439,
+        "sha256": "d89b8eaad10137d6bc5872b65220f59d663f999df12776c2ccae2070fe898522"
       },
       {
         "path": "schemas/material/v1/instance.schema.json",
-        "bytes": 2049,
-        "sha256": "a03d68d23701d6e3cee61470362a6582ac99dcce438378fe9f3f081a0d6e0ab5"
+        "bytes": 1973,
+        "sha256": "6ae89c540b1b9a7eb65e74569c3ed8b9bc46c746a276656da965539752d72cc0"
       },
       {
         "path": "schemas/material/v1/package.schema.json",
-        "bytes": 4063,
-        "sha256": "44ea0e61df1439dadee9fa71d8985eb4ff0454f95091c6dfaf1ec01f93e8538f"
+        "bytes": 3903,
+        "sha256": "b31268ff48e30d439210c012c5bfb7597961cf73de71cc037581fb1ea354222c"
       },
       {
         "path": "schemas/project/v1/project.schema.json",
@@ -4677,13 +4629,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 109451,
-        "sha256": "7773a86eb7ad8efcc048a047557b94943d615a715993d644ddcfdb95317b7b4d"
+        "bytes": 110598,
+        "sha256": "d0373d289078eeb8f001b23999ba43c805fb86e90b54620464a0f05c41d36fe7"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 42703,
-        "sha256": "08e31fc6488d86d7d8cd1e94419d8199096f0dca58276092e7af9a0bdccd40a5"
+        "bytes": 44526,
+        "sha256": "8274a3f5d164b00f962b866ed8796318600b649f335f5b0b28a82b30fc5eb764"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -4722,8 +4674,8 @@
       },
       {
         "path": "scripts/validate-material-examples.mjs",
-        "bytes": 14612,
-        "sha256": "81c01bcc2efc2245cda7546730f825315d80b146bac665ab13c4c92ede3c8a03"
+        "bytes": 14306,
+        "sha256": "b11575d5914e6019a7b42ccf02b143fd4a899441b5cc353d948f26f499fc65e9"
       },
       {
         "path": "scripts/verify-clean-environment.mjs",
@@ -4783,5 +4735,5 @@
     ]
   },
   "sourceIdentityMatches": true,
-  "endedAt": "2026-07-27T17:37:50.066Z"
+  "endedAt": "2026-07-27T18:19:49.606Z"
 }
