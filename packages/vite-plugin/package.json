@@ -51,6 +51,6 @@
     "@aelionsdk/renderer-worker": "0.1.0-beta.1"
   },
   "peerDependencies": {
-    "vite": "^7.0.0"
+    "vite": "^7.3.6"
   }
 }
