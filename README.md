@@ -44,7 +44,7 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前公开 Beta 是 `0.1.0-beta.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
+当前 1.0 Release Candidate 是 `1.0.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
 导出入口和运行时资源插件：
 
 ```bash
@@ -185,20 +185,20 @@ nearest-rank 计算。
 
 | 项目                                | 结果                                                     |
 | ----------------------------------- | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2               | 帧调用 p50 0.26 ms，p95 0.34 ms                          |
-| 1080p、单 pass、WebGL2              | 帧调用 p50 0.33 ms，p95 1.45 ms                          |
-| 1080p、单 pass、WebGPU              | 帧调用 p50 0.79 ms，p95 1.07 ms                          |
-| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.46 ms，p95 1.20 ms                          |
-| 4K、单 pass、WebGL2                 | 帧调用 p50 1.09 ms，p95 1.23 ms                          |
-| 1,000 clips / 32 tracks 冷编译      | p50 21.03 ms，p95 29.52 ms                               |
-| 1,000 clips / 32 tracks warm 增量   | p50 1.84 ms，p95 1.93 ms                                 |
-| 单音轨 1,024-frame 音频块           | p95 0.45 ms，整体约 65.58× 实时                          |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 370.63 ms，平均约 8.05× 实时                |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 400.13 ms，平均约 7.21× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 529.21 ms，约 1.89× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 491.45 ms，`avc1.640033`，约 2.03× 实时                  |
-| OPFS 顺序写入，16 个 1 MiB 块       | 约 467 MiB/s；Memory Sink 约 6.0 GiB/s                   |
-| 1080p WebGL2 180 帧 soak            | 前半 p95 0.98 ms，后半 p95 0.95 ms，dispose 后无 pending |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.23 ms，p95 0.49 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.23 ms，p95 0.38 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.73 ms，p95 1.12 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.64 ms，p95 1.07 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 1.09 ms，p95 1.13 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 21.23 ms，p95 29.60 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 1.92 ms，p95 2.20 ms                                 |
+| 单音轨 1,024-frame 音频块           | p95 0.43 ms，整体约 63.91× 实时                          |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 377.84 ms，平均约 7.89× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 374.85 ms，平均约 7.62× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 493.67 ms，约 2.03× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 449.66 ms，`avc1.640033`，约 2.22× 实时                  |
+| OPFS 顺序写入，16 个 1 MiB 块       | 约 452 MiB/s；Memory Sink 约 6.87 GiB/s                  |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 0.98 ms，后半 p95 1.02 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
@@ -275,9 +275,9 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
-Beta。使用前需要了解这些边界：
+1.0 RC 阶段。使用前需要了解这些边界：
 
-- 13 个公开包通过 npm `next` tag 发布；Beta API 在首个稳定版本前仍可能按迁移规则调整；
+- 13 个公开包通过 npm `next` tag 发布；RC API 在首个稳定版本前仍可能按迁移规则调整；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
   真机、iOS 与 Android 实体设备仍未认证；
 - 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；
@@ -334,9 +334,9 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 ## 最新验证状态
 
 2026-07-28 在 Windows 参考机上完成了与源清单
-`9c3a60f09fc4b888feb3272eabf4319727d5df1d5eb2a3006a925fa8fd41932c`
+`714daf26de8ae2ba230da483be50c6faf1ae9f0c38544097f1a4f034b2d79be4`
 绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，40 项产物 postflight
-语义校验通过。Chromium 79 项和 Firefox 67 项浏览器测试均为零失败、零跳过；
+语义校验通过。Chromium 83 项和 Firefox 69 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包
 字节可复现性、golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出
 外部 FFmpeg readback 均通过。

@@ -2,14 +2,14 @@
 
 Browser-first video editing, preview, playback and export APIs for AelionSDK.
 
-## Install the public Beta
+## Install the 1.0 Release Candidate
 
 ```bash
 npm install @aelionsdk/sdk@next
 npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
-`next` currently resolves to `0.1.0-beta.1`. Pin the exact version after
+`next` currently resolves to `1.0.0-rc.1`. Pin the exact version after
 validation instead of following a moving prerelease tag.
 
 ## Vite setup
@@ -67,9 +67,9 @@ pnpm exec aelion-migrate --from diffusion --input checkpoint.json \
 Use the `@aelionsdk/sdk/migrate-cli` subpath to call the same file migration
 API from Node.js.
 
-## Beta contract
+## Release Candidate contract
 
-The Beta is tested on the automated Chromium and Firefox matrix. Playwright
+The RC is tested on the automated Chromium and Firefox matrix. Playwright
 WebKit and a mobile viewport cover public capability and fallback contracts;
 physical Safari, iOS and Android devices are not yet certified. Local color
 execution is RGBA8 SDR. Public APIs may still change before the first stable

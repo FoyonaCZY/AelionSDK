@@ -1,9 +1,9 @@
 ---
 title: 安装与工程配置
-description: 从 npm 安装 AelionSDK Beta，启动 Quickstart，并配置自己的 Vite 应用。
+description: 从 npm 安装 AelionSDK 1.0 Release Candidate，启动 Quickstart，并配置自己的 Vite 应用。
 ---
 
-AelionSDK 的公开 Beta 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
+AelionSDK 的 1.0 Release Candidate 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
 使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
 
 ```bash
@@ -235,12 +235,12 @@ corepack pnpm --filter @example/my-editor build
 
 ## 锁定精确版本
 
-生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 Beta：
+生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 RC：
 
 ```bash
-pnpm add @aelionsdk/sdk@0.1.0-beta.1 @aelionsdk/export@0.1.0-beta.1
-pnpm add -D @aelionsdk/vite-plugin@0.1.0-beta.1
+pnpm add @aelionsdk/sdk@1.0.0-rc.1 @aelionsdk/export@1.0.0-rc.1
+pnpm add -D @aelionsdk/vite-plugin@1.0.0-rc.1
 ```
 
 `npm install @aelionsdk/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
-Beta。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。
+RC。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。

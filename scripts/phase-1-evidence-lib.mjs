@@ -60,8 +60,8 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 79,
-  firefox: 67,
+  chromium: 83,
+  firefox: 69,
 });
 
 export const PHASE_1_ARTIFACT_CLOCK_TOLERANCE_MS = 5_000;

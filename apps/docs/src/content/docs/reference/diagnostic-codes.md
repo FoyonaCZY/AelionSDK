@@ -3,7 +3,7 @@ title: Diagnostic 错误码
 description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---
 
-本表对应源码版本 `0.1.0-beta.1`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
+本表对应源码版本 `1.0.0-rc.1`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
 
 产品代码只依赖 `code` 和结构化字段，不解析英文 `message`：
 
@@ -45,7 +45,7 @@ interface Diagnostic {
 - `details`：可记录 codec/backend/limit 等结构化上下文；
 - `cause`：只用于日志/调试，不序列化进 Project，也不能作为稳定业务条件。
 
-结构化诊断可能出现在 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 中。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material Registry 的少量拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 Beta 阶段的临时形式，产品不要长期依赖这种字符串解析。
+结构化诊断可能出现在 `AelionError.diagnostics`、`Result.diagnostics`、capability report、export preflight 或 Session `diagnostic` event 中。`TimeError`/`CanonicalizationError` 直接在 error 上提供 `.code`。当前 Material Registry 的少量拒绝仍是 `TypeError`/`ReferenceError`，code 位于 message 前缀；这是 RC 阶段的临时形式，产品不要长期依赖这种字符串解析。
 
 参数/生命周期前置条件仍可能用标准 `RangeError`、`TypeError`、`ReferenceError` 表达，例如无 MediaProvider、dispose 后调用、非法 seek、重复 Player subscriber 或重复 Material runtime registration。这些不是可枚举 diagnostic code；调用方应在类型/UI 状态层预防，并按 error class 处理，不解析英文 message。
 
@@ -245,7 +245,7 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 | `MATERIAL_MIGRATION_INVALID`          | migration 非确定、版本链不连续或输出协议无效                           |
 | `MATERIAL_EXECUTION_BUDGET_DENIED`    | Composition/Lab 的 pass/texture/quality 预算不允许执行                 |
 
-协议还保留 `MATERIAL_COMPILE_FAILED`、`MATERIAL_EXECUTION_FAILED` 等面向未来的目录项；当前源码不会稳定发出这些 code，因此本 Beta runtime 表不把它们列为已实现事件。
+协议还保留 `MATERIAL_COMPILE_FAILED`、`MATERIAL_EXECUTION_FAILED` 等面向未来的目录项；当前源码不会稳定发出这些 code，因此本 RC runtime 表不把它们列为已实现事件。
 
 ## 9. Export
 

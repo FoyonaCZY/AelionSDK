@@ -10,7 +10,7 @@ description: Material Package、Definition、Graph、Instance、执行限制、�
 | 协议     | Aelion Material Protocol，简称 AMP       |
 | 版本     | 1.0.0 Draft                              |
 | 日期     | 2026-07-10                               |
-| 状态     | Beta 实现协议；尚未形成 1.0 兼容承诺     |
+| 状态     | RC 实现协议；尚未形成 1.0 稳定兼容承诺   |
 | 适用范围 | 视觉滤镜、视觉特效、视觉转场、视觉生成器 |
 
 ## 整体模型
@@ -1397,5 +1397,5 @@ AMP v1 当前由 `@aelionsdk/material-compiler`、`@aelionsdk/material-sdk`、Pr
 - Core Node 的精确公式和 Golden 容差由 [Core Node Math 1.0](/AelionSDK/reference/core-node-math-v1/) 定义；
 - 当前实现范围、宿主注册和发布检查见 [Material 创作与接入](/AelionSDK/guides/materials/)。
 
-AMP v1 的稳定兼容承诺只会随正式版本和 release notes 生效；公开 Beta 实现不自动
+AMP v1 的稳定兼容承诺只会随正式版本和 release notes 生效；公开 RC 实现不自动
 构成 1.0 稳定性承诺。

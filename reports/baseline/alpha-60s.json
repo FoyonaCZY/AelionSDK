@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 29980000,
-    "emittedFrames": 10,
+    "currentTimeUs": 29972000,
+    "emittedFrames": 9,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 29966666
+    "lastTimestampUs": 29933333
   },
   "preview": {
     "width": 320,
@@ -61,7 +61,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-297eff71-601c-4532-a561-55e56898e97f.webm",
+    "fileName": "aelion-alpha-27ef2203-c572-459a-abe3-c7139d11ab65.webm",
     "writes": 135,
     "bytesWritten": 4756115,
     "maxInFlightWrites": 1,
@@ -4746,9 +4746,6 @@
       "stats-changed",
       "stats-changed",
       "stats-changed",
-      "stats-changed",
-      "stats-changed",
-      "stats-changed",
       "stats-changed"
     ],
     "usedFacadeOnly": true
@@ -4778,16 +4775,16 @@
     "sessionStateAfterDispose": "disposed",
     "sessionRuntimeBeforeDispose": {
       "renderer": {
-        "requestedFrames": 11,
-        "renderedFrames": 11,
+        "requestedFrames": 10,
+        "renderedFrames": 10,
         "failedFrames": 0,
         "lastBackend": "webgl2",
         "lastWidth": 320,
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 1350,
-          "gpuCompletionUs": 1280
+          "totalWorkerUs": 2160,
+          "gpuCompletionUs": 2035
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4835,16 +4832,16 @@
     },
     "sessionRuntimeAfterDispose": {
       "renderer": {
-        "requestedFrames": 11,
-        "renderedFrames": 11,
+        "requestedFrames": 10,
+        "renderedFrames": 10,
         "failedFrames": 0,
         "lastBackend": "webgl2",
         "lastWidth": 320,
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 1350,
-          "gpuCompletionUs": 1280
+          "totalWorkerUs": 2160,
+          "gpuCompletionUs": 2035
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4929,18 +4926,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 15802818,
-      "totalJsHeapBytes": 21503650
+      "usedJsHeapBytes": 15820272,
+      "totalJsHeapBytes": 22032168
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 26298451,
-      "totalJsHeapBytes": 83674467
+      "usedJsHeapBytes": 47405330,
+      "totalJsHeapBytes": 83007066
     }
   },
-  "elapsedMs": 10126.505000002682,
+  "elapsedMs": 10252.755000002682,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-07-28T01:28:53.477Z",
+  "generatedAt": "2026-07-28T07:52:19.873Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",

@@ -5,6 +5,14 @@ const DEPENDENCY_SECTIONS = [
   'peerDependencies',
 ];
 
+export const RELEASE_LOCKFILE_INSTALL_ARGS = Object.freeze([
+  'pnpm',
+  'install',
+  '--lockfile-only',
+  '--no-frozen-lockfile',
+  '--ignore-scripts',
+]);
+
 export const RELEASE_VERSION_DOCUMENTS = Object.freeze([
   'README.md',
   'apps/docs/src/content/docs/index.mdx',

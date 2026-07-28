@@ -2,10 +2,21 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  RELEASE_LOCKFILE_INSTALL_ARGS,
   RELEASE_VERSION_DOCUMENTS,
   updateDocumentVersion,
   updateManifestVersion,
 } from './release-version-lib.mjs';
+
+test('version updates can intentionally refresh a frozen workspace lockfile', () => {
+  assert.deepEqual(RELEASE_LOCKFILE_INSTALL_ARGS, [
+    'pnpm',
+    'install',
+    '--lockfile-only',
+    '--no-frozen-lockfile',
+    '--ignore-scripts',
+  ]);
+});
 
 test('manifest updates exact public package pins and preserves workspace links', () => {
   const source = {

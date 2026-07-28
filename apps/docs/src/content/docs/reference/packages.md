@@ -3,7 +3,7 @@ title: 包和公开入口
 description: 查询 13 个 @aelionsdk 包的职责、主要导出和使用对象。
 ---
 
-当前所有公开包版本都是 `0.1.0-beta.1`，通过 npm `next` tag 分发。只有
+当前所有公开包版本都是 `1.0.0-rc.1`，通过 npm `next` tag 分发。只有
 `package.json` 的 `exports` 暴露的入口属于公共 API；`src/*`、`dist/*` 和测试
 helper 不在兼容范围内。
 
@@ -17,7 +17,7 @@ helper 不在兼容范围内。
 | ------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | 产品应用入口 | `@aelionsdk/sdk`、`@aelionsdk/export`、`@aelionsdk/vite-plugin`                                            | 面向应用开发者；优先保持源码和行为兼容，弃用后按版本政策保留迁移窗口                                   |
 | 扩展作者入口 | `@aelionsdk/material-sdk`、`@aelionsdk/project-schema`                                                     | 面向 Material、导入器和工程工具作者；协议与 Schema 有显式版本和 migration                              |
-| 高级执行层   | `core`、`capability`、`media`、`material-compiler`、`render-ir`、`renderer-worker`、`audio`、`transaction` | 面向自定义宿主和引擎贡献者；公共 exports 仍受 API snapshot 管理，但 1.0 前允许有记录的 beta 破坏性调整 |
+| 高级执行层   | `core`、`capability`、`media`、`material-compiler`、`render-ir`、`renderer-worker`、`audio`、`transaction` | 面向自定义宿主和引擎贡献者；公共 exports 仍受 API snapshot 管理，但 1.0 前允许有记录的预发布破坏性调整 |
 
 应用应优先只依赖产品应用入口。直接依赖高级执行层等同于选择更窄的兼容边界，并需要
 自行跟进 CHANGELOG、能力矩阵和资源生命周期变化。
@@ -125,4 +125,4 @@ Application
 
 应用不应把 SDK 内部依赖关系复制成自己的横向调用网络。能从 Session 获得的功能就从 Session 使用，这样升级时只需要跟踪公共接口。
 
-每个符号的参数、返回类型和源码链接见侧栏 API Reference。Beta 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。
+每个符号的参数、返回类型和源码链接见侧栏 API Reference。RC 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。
