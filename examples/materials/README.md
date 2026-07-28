@@ -22,7 +22,7 @@ Manifest 中的 `bytes` 和 `sha256` 对 Graph/Definition 当前文件内容有�
 校验后生成 canonical manifest、逐文件 SHA-256 和 package integrity；完整代码见
 [`authoring-sdk/cross-dissolve.ts`](authoring-sdk/cross-dissolve.ts)。
 完整创作、打包、精确解析、trusted-code 和宿主接入流程见
-[`Material 创作与接入`](../../apps/docs/src/content/docs/guides/materials.md)。
+[`Material 创作与接入`](../../apps/docs/src/content/docs/zh/guides/materials.md)。
 
 可以运行结构和语义检查：
 

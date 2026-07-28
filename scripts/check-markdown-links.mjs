@@ -63,13 +63,14 @@ async function localTargetExists(file, target) {
         : target.slice(docsSiteBase.length).replace(/\/+$/u, '');
     if (route.startsWith('api/')) return true;
 
-    const routePath = resolve(docsContentDirectory, route);
-    const routeCandidates = [
+    const routePaths = [resolve(docsContentDirectory, route)];
+    if (!route.startsWith('zh/')) routePaths.push(resolve(docsContentDirectory, 'zh', route));
+    const routeCandidates = routePaths.flatMap(routePath => [
       `${routePath}.md`,
       `${routePath}.mdx`,
       resolve(routePath, 'index.md'),
       resolve(routePath, 'index.mdx'),
-    ];
+    ]);
     for (const candidate of routeCandidates) {
       if (await exists(candidate)) return true;
     }
