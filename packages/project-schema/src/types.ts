@@ -30,7 +30,35 @@ export interface ProjectEntity extends JsonObject {
   id: EntityId;
 }
 
+export interface SequenceColorFormat extends JsonObject {
+  width: number;
+  height: number;
+  pixelAspectRatio: Rational & JsonObject;
+  frameRate: Rational & JsonObject;
+  sampleRate: 44_100 | 48_000 | 96_000;
+  channelLayout: 'mono' | 'stereo' | '5.1';
+  workingColorSpace: 'srgb-linear' | 'display-p3-linear' | 'rec2020-linear';
+  /** Defaults to `bt709` for legacy Project v1 documents. */
+  colorPrimaries?: 'bt709' | 'display-p3' | 'bt2020';
+  /** Defaults to `srgb` for legacy Project v1 documents. */
+  transferFunction?: 'srgb' | 'gamma22' | 'pq' | 'hlg';
+  /** Defaults to `rgb` for the linear compositing surface. */
+  matrixCoefficients?: 'rgb' | 'bt709' | 'bt2020-ncl';
+  /** Defaults to `full` for the linear compositing surface. */
+  colorRange?: 'full' | 'limited';
+  /** Defaults to `4:4:4`; an encoder may require an explicit conversion to `4:2:0`. */
+  chromaSubsampling?: 'rgb' | '4:4:4' | '4:2:2' | '4:2:0';
+  /** Defaults to `premultiplied` inside the renderer. */
+  alphaMode?: 'opaque' | 'premultiplied';
+  /** Defaults to `none`; HDR must fail closed when it cannot be presented without conversion. */
+  toneMapping?: 'none' | 'bt2390' | 'reinhard';
+  /** Defaults to 8 for legacy Project v1 documents. */
+  bitDepth?: 8 | 10;
+  backgroundColor: JsonObject;
+}
+
 export interface SequenceEntity extends ProjectEntity {
+  format: SequenceColorFormat & JsonObject;
   trackIds: EntityId[];
   transitionIds: EntityId[];
   materialInstanceIds: EntityId[];

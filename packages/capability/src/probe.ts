@@ -420,7 +420,7 @@ function environment(): CapabilityEnvironment {
     deviceMemoryGiB: navigatorWithMemory.deviceMemory ?? null,
     crossOriginIsolated: globalThis.crossOriginIsolated,
     secureContext: globalThis.isSecureContext,
-    origin: globalThis.location.origin,
+    origin: typeof globalThis.location === 'undefined' ? 'unknown' : globalThis.location.origin,
   };
 }
 
@@ -452,8 +452,14 @@ function probeColor(): ColorCapability {
     // from display hardware. HDR/10-bit projects fail closed until the renderer
     // has a float/10-bit surface and matching encoder path.
     localExecution: {
-      workingColorSpaces: ['srgb-linear', 'display-p3-linear', 'rec2020-linear'],
-      transferFunctions: ['srgb', 'gamma22'],
+      workingColorSpaces: ['srgb-linear'],
+      colorPrimaries: ['bt709'],
+      transferFunctions: ['srgb'],
+      matrixCoefficients: ['rgb'],
+      colorRanges: ['full'],
+      chromaSubsamplings: ['rgb', '4:4:4'],
+      alphaModes: ['opaque', 'premultiplied'],
+      toneMappings: ['none'],
       bitDepths: [8],
       hdrPresentation: false,
     },

@@ -129,6 +129,7 @@ describe('production export protocols', () => {
           profileId: 'mp4-h264-aac',
           mimeType: 'video/mp4',
           byteLength: 10,
+          sha256: 'a'.repeat(64),
         },
       };
     }
@@ -146,11 +147,21 @@ describe('production export protocols', () => {
     };
     await expect(
       runRemoteExport({
-        provider: { id: 'provider', start: () => Promise.resolve(session) },
+        provider: {
+          id: 'provider',
+          negotiate: () =>
+            Promise.resolve({
+              protocolVersion: '1.0.0',
+              acceptedProfileIds: ['mp4-h264-aac'],
+              maxAssetBytes: 1_024,
+            }),
+          start: () => Promise.resolve(session),
+        },
         authorizer: {
           authorize: () => Promise.resolve({ scheme: 'Bearer', token: 'secret' }),
         },
         request: {
+          protocolVersion: '1.0.0',
           contentId: 'content',
           idempotencyKey: 'content:mp4',
           profileId: 'mp4-h264-aac',
@@ -158,12 +169,71 @@ describe('production export protocols', () => {
           sequenceId: 'sequence',
           revision: '7',
           manifest: {},
+          assets: [],
+          assetAuthorizations: [],
         },
       }),
     ).rejects.toMatchObject({
       diagnostics: [expect.objectContaining({ code: 'REMOTE_EXPORT_FAILED' })],
     });
     expect({ cancelled, cleaned }).toEqual({ cancelled: 1, cleaned: 1 });
+  });
+
+  it('negotiates compatibility before issuing per-asset credentials or starting upload', async () => {
+    let authorizedAssets = 0;
+    let starts = 0;
+    await expect(
+      runRemoteExport({
+        provider: {
+          id: 'provider',
+          negotiate: () =>
+            Promise.resolve({
+              protocolVersion: '1.0.0',
+              acceptedProfileIds: [],
+              maxAssetBytes: 1,
+            }),
+          start: () => {
+            starts += 1;
+            throw new Error('not reached');
+          },
+        },
+        authorizer: {
+          authorize: () => Promise.resolve({ scheme: 'Bearer', token: 'service-token' }),
+        },
+        assetAuthorizer: {
+          authorizeAsset: asset => {
+            authorizedAssets += 1;
+            return Promise.resolve({
+              assetId: asset.assetId,
+              scheme: 'Bearer',
+              token: 'asset-token',
+            });
+          },
+        },
+        request: {
+          protocolVersion: '1.0.0',
+          contentId: 'content',
+          idempotencyKey: 'content:mp4',
+          profileId: 'mp4-h264-aac',
+          projectId: 'project',
+          sequenceId: 'sequence',
+          revision: '7',
+          manifest: {},
+          assets: [
+            {
+              assetId: 'source',
+              contentId: 'source-v1',
+              byteLength: 10,
+              sha256: 'b'.repeat(64),
+            },
+          ],
+          assetAuthorizations: [],
+        },
+      }),
+    ).rejects.toMatchObject({
+      diagnostics: [expect.objectContaining({ code: 'REMOTE_EXPORT_INCOMPATIBLE' })],
+    });
+    expect({ authorizedAssets, starts }).toEqual({ authorizedAssets: 0, starts: 0 });
   });
 
   it('returns a remote option when the preferred local profile is unavailable', async () => {

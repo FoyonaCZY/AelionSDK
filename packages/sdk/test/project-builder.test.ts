@@ -18,6 +18,14 @@ function mediaIndex(): SampleIndex {
         codedWidth: 1920,
         codedHeight: 1080,
         rotation: 0,
+        color: {
+          primaries: 'bt709',
+          transfer: 'bt709',
+          matrix: 'bt709',
+          fullRange: false,
+          highDynamicRange: false,
+          canBeTransparent: false,
+        },
       },
       {
         kind: 'audio',

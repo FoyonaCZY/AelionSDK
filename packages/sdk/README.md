@@ -52,6 +52,21 @@ See the [AelionSDK documentation](https://foyonaczy.github.io/AelionSDK/) for
 media registration, Composition APIs, preview, local export, persistent
 checkpoints, deployment headers and capability preflight.
 
+## Migrate WebAV or Diffusion projects
+
+The package also installs `aelion-migrate`. It produces a validated Project
+and a versioned loss report; strict mode never writes a Project when rendering
+semantics cannot be preserved.
+
+```bash
+pnpm exec aelion-migrate --from webav --input webav.json --out project.aelion.json
+pnpm exec aelion-migrate --from diffusion --input checkpoint.json \
+  --assets assets.json --dry-run
+```
+
+Use the `@aelionsdk/sdk/migrate-cli` subpath to call the same file migration
+API from Node.js.
+
 ## Beta contract
 
 The Beta is tested on the automated Chromium and Firefox matrix. Playwright

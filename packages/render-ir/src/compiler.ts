@@ -56,6 +56,17 @@ function boolean(value: unknown, context: string): boolean {
   return value;
 }
 
+function enumValue<const TValues extends readonly string[]>(
+  value: unknown,
+  values: TValues,
+  fallback: TValues[number],
+  context: string,
+): TValues[number] {
+  if (value === undefined) return fallback;
+  if (typeof value === 'string' && values.includes(value)) return value as TValues[number];
+  throw new TypeError(`${context} is unsupported`);
+}
+
 function mediaSource(item: ItemEntity): IrMediaSource {
   const source = object(item.source, `item ${item.id}.source`);
   const stream = object(source.stream, `item ${item.id}.source.stream`);
@@ -608,12 +619,47 @@ export class IncrementalRenderCompiler {
         sampleRate: number(format.sampleRate, 'format.sampleRate'),
         channelLayout: string(format.channelLayout, 'format.channelLayout'),
         workingColorSpace: string(format.workingColorSpace, 'format.workingColorSpace'),
-        transferFunction:
-          format.transferFunction === 'gamma22' ||
-          format.transferFunction === 'pq' ||
-          format.transferFunction === 'hlg'
-            ? format.transferFunction
-            : 'srgb',
+        colorPrimaries: enumValue(
+          format.colorPrimaries,
+          ['bt709', 'display-p3', 'bt2020'],
+          format.workingColorSpace === 'display-p3-linear'
+            ? 'display-p3'
+            : format.workingColorSpace === 'rec2020-linear'
+              ? 'bt2020'
+              : 'bt709',
+          'format.colorPrimaries',
+        ),
+        transferFunction: enumValue(
+          format.transferFunction,
+          ['srgb', 'gamma22', 'pq', 'hlg'],
+          'srgb',
+          'format.transferFunction',
+        ),
+        matrixCoefficients: enumValue(
+          format.matrixCoefficients,
+          ['rgb', 'bt709', 'bt2020-ncl'],
+          'rgb',
+          'format.matrixCoefficients',
+        ),
+        colorRange: enumValue(format.colorRange, ['full', 'limited'], 'full', 'format.colorRange'),
+        chromaSubsampling: enumValue(
+          format.chromaSubsampling,
+          ['rgb', '4:4:4', '4:2:2', '4:2:0'],
+          '4:4:4',
+          'format.chromaSubsampling',
+        ),
+        alphaMode: enumValue(
+          format.alphaMode,
+          ['opaque', 'premultiplied'],
+          'premultiplied',
+          'format.alphaMode',
+        ),
+        toneMapping: enumValue(
+          format.toneMapping,
+          ['none', 'bt2390', 'reinhard'],
+          'none',
+          'format.toneMapping',
+        ),
         bitDepth: format.bitDepth === 10 ? 10 : 8,
         backgroundColor: jsonObject(format.backgroundColor, 'format.backgroundColor'),
         durationUs:

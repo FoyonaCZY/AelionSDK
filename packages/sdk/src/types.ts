@@ -11,6 +11,8 @@ import type {
   ExportProfileSelection,
   ExportPreflightReport,
   GifExportResult,
+  RemoteExportAsset,
+  RemoteExportAssetAuthorizer,
   RemoteExportAuthorizer,
   RemoteExportProvider,
   RemoteExportResult,
@@ -23,7 +25,11 @@ import type {
 import type { WebGl2MaterialProgram } from '@aelionsdk/material-compiler';
 import type { AelionProject } from '@aelionsdk/project-schema';
 import type { CompileStats, IrMaterialDefinition, RenderIr } from '@aelionsdk/render-ir';
-import type { RenderIrFrameResult } from '@aelionsdk/renderer-worker';
+import type {
+  RendererWorkerResourceSnapshot,
+  RendererWorkerTiming,
+  RenderIrFrameResult,
+} from '@aelionsdk/renderer-worker';
 import type {
   EditingCommands,
   TransactionBuilder,
@@ -57,6 +63,8 @@ export interface AelionMediaProvider {
     durationUs: number,
     signal?: AbortSignal,
   ): Promise<PcmSourceBlock>;
+  /** Optional bounded, JSON-safe resource snapshot used by privacy-safe support reports. */
+  getDiagnosticSnapshot?(): JsonObject;
 }
 
 export interface AelionRuntimeMaterialRegistry {
@@ -381,6 +389,10 @@ export interface AelionRemoteExportOptions {
   readonly profile: ExportProfileId;
   readonly provider: RemoteExportProvider;
   readonly authorizer: RemoteExportAuthorizer;
+  /** Content-addressed source assets required by the remote renderer. */
+  readonly assets?: readonly RemoteExportAsset[];
+  /** Issues short-lived, per-asset credentials after protocol negotiation succeeds. */
+  readonly assetAuthorizer?: RemoteExportAssetAuthorizer;
   /** Replaces the default canonical Project manifest when a provider needs extra bindings. */
   readonly manifest?: JsonObject;
   /** Overrides the content-derived idempotency key for an existing provider workflow. */
@@ -412,6 +424,8 @@ export interface AelionSessionStats {
     readonly lastWidth: number | null;
     readonly lastHeight: number | null;
     readonly lastRenderScale: number | null;
+    readonly lastTiming: RendererWorkerTiming | null;
+    readonly lastResources: RendererWorkerResourceSnapshot | null;
     readonly pendingFrames: number;
     readonly maxPendingFrames: number;
     readonly rendererPresent: boolean;
@@ -438,6 +452,22 @@ export interface AelionSessionStats {
     readonly activeJobId: string | null;
     readonly progress: number;
   };
+  readonly timings: {
+    readonly projectLoad: AelionOperationTimingStats;
+    readonly capabilityProbe: AelionOperationTimingStats;
+    readonly preview: AelionOperationTimingStats;
+    readonly export: AelionOperationTimingStats;
+  };
+}
+
+export interface AelionOperationTimingStats {
+  readonly count: number;
+  readonly succeeded: number;
+  readonly failed: number;
+  readonly cancelled: number;
+  readonly totalUs: number;
+  readonly maximumUs: number;
+  readonly lastUs: number | null;
 }
 
 export interface AelionSessionSnapshot {
@@ -466,12 +496,35 @@ export interface AelionSessionApi {
   getCapabilitySnapshot(): CapabilityReport | null;
   getDiagnostics(): readonly Diagnostic[];
   getStats(): AelionSessionStats;
+  createDiagnosticReport(options?: AelionDiagnosticReportOptions): AelionDiagnosticReport;
   subscribe(listener: (event: AelionSessionEvent) => void): () => void;
   subscribe<T extends AelionSessionEventType>(
     type: T,
     listener: (event: AelionSessionEventOf<T>) => void,
   ): () => void;
   dispose(): Promise<void>;
+}
+
+export interface AelionDiagnosticReportOptions {
+  /**
+   * `safe` omits messages, entity ids, free-form details and identifying
+   * environment strings. `full` is an explicit opt-in for local debugging.
+   */
+  readonly privacy?: 'safe' | 'full';
+}
+
+export interface AelionDiagnosticReport {
+  readonly schemaVersion: '1.0.0';
+  readonly generatedAt: string;
+  readonly privacy: 'safe' | 'full';
+  readonly session: {
+    readonly state: AelionSessionState;
+    readonly revision: string | null;
+  };
+  readonly capability: JsonObject | null;
+  readonly diagnostics: readonly JsonObject[];
+  readonly stats: JsonObject;
+  readonly media: JsonObject | null;
 }
 
 export interface AelionApi {

@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 29972000,
-    "emittedFrames": 9,
+    "currentTimeUs": 29980000,
+    "emittedFrames": 10,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 29933333
+    "lastTimestampUs": 29966666
   },
   "preview": {
     "width": 320,
@@ -43,7 +43,13 @@
         "height": 180,
         "frameRate": 30,
         "bitrateMode": "variable",
-        "targetBitrate": 800000
+        "targetBitrate": 800000,
+        "sourceColorSpace": {
+          "primaries": "bt709",
+          "transfer": "iec61966-2-1",
+          "matrix": "rgb",
+          "fullRange": true
+        }
       },
       "audio": {
         "codec": "opus",
@@ -55,9 +61,9 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-cf2a3790-2dbc-4730-a038-523221711a9e.webm",
+    "fileName": "aelion-alpha-297eff71-601c-4532-a561-55e56898e97f.webm",
     "writes": 135,
-    "bytesWritten": 4740540,
+    "bytesWritten": 4756115,
     "maxInFlightWrites": 1,
     "closed": true,
     "aborted": false
@@ -4740,6 +4746,9 @@
       "stats-changed",
       "stats-changed",
       "stats-changed",
+      "stats-changed",
+      "stats-changed",
+      "stats-changed",
       "stats-changed"
     ],
     "usedFacadeOnly": true
@@ -4750,7 +4759,7 @@
   "resources": {
     "mediaBeforeDispose": {
       "assets": 3,
-      "cachedBytes": 388313,
+      "cachedBytes": 390606,
       "maxCachedBytes": 16777216,
       "inFlightAssetLoads": 0,
       "inFlightSampleIndexes": 0,
@@ -4769,13 +4778,30 @@
     "sessionStateAfterDispose": "disposed",
     "sessionRuntimeBeforeDispose": {
       "renderer": {
-        "requestedFrames": 10,
-        "renderedFrames": 10,
+        "requestedFrames": 11,
+        "renderedFrames": 11,
         "failedFrames": 0,
         "lastBackend": "webgl2",
         "lastWidth": 320,
         "lastHeight": 180,
         "lastRenderScale": 1,
+        "lastTiming": {
+          "totalWorkerUs": 1350,
+          "gpuCompletionUs": 1280
+        },
+        "lastResources": {
+          "activeRequests": 0,
+          "cancelledRequests": 0,
+          "webgpuDevices": 0,
+          "webgpuPipelines": 0,
+          "webgpuBuffers": 0,
+          "webgpuTextures": 0,
+          "webgl2Contexts": 0,
+          "webgl2Programs": 0,
+          "webgl2Buffers": 0,
+          "webgl2Textures": 0,
+          "inputFrames": 0
+        },
         "pendingFrames": 0,
         "maxPendingFrames": 2,
         "rendererPresent": true,
@@ -4809,13 +4835,30 @@
     },
     "sessionRuntimeAfterDispose": {
       "renderer": {
-        "requestedFrames": 10,
-        "renderedFrames": 10,
+        "requestedFrames": 11,
+        "renderedFrames": 11,
         "failedFrames": 0,
         "lastBackend": "webgl2",
         "lastWidth": 320,
         "lastHeight": 180,
         "lastRenderScale": 1,
+        "lastTiming": {
+          "totalWorkerUs": 1350,
+          "gpuCompletionUs": 1280
+        },
+        "lastResources": {
+          "activeRequests": 0,
+          "cancelledRequests": 0,
+          "webgpuDevices": 0,
+          "webgpuPipelines": 0,
+          "webgpuBuffers": 0,
+          "webgpuTextures": 0,
+          "webgl2Contexts": 0,
+          "webgl2Programs": 0,
+          "webgl2Buffers": 0,
+          "webgl2Textures": 0,
+          "inputFrames": 0
+        },
         "pendingFrames": 0,
         "maxPendingFrames": 2,
         "rendererPresent": false,
@@ -4886,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 16758152,
-      "totalJsHeapBytes": 20072580
+      "usedJsHeapBytes": 15802818,
+      "totalJsHeapBytes": 21503650
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 39049718,
-      "totalJsHeapBytes": 84901726
+      "usedJsHeapBytes": 26298451,
+      "totalJsHeapBytes": 83674467
     }
   },
-  "elapsedMs": 9931.670000001788,
+  "elapsedMs": 10126.505000002682,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-07-27T18:19:49.175Z",
+  "generatedAt": "2026-07-28T01:28:53.477Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
@@ -4923,14 +4966,14 @@
   "browserVersion": "150.0.7871.186",
   "artifact": {
     "file": "reports/baseline/alpha-60s.webm",
-    "bytes": 4740152,
-    "sha256": "dd566c03b211645db1a721f1fab07a5daa51337ac0d5333ef3de90db034528d8"
+    "bytes": 4755727,
+    "sha256": "2f4c0aa4409cf3c063367485aa5e47376640daa82ddaebdf403bb7c1d5a7aa4e"
   },
   "externalReadback": {
     "implementation": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "a0bc631b163adf2cbac04b602d22369b81f1d8f1d1cdfa5a001a3766f508527b",
-    "audioPcmMd5": "MD5=a0781de6f5258ebb546fc79a536ac803"
+    "videoFrameMd5DocumentSha256": "1a352c3e34495abb48df15847928f504d3b431bc87464425766faeb967183bd8",
+    "audioPcmMd5": "MD5=bf9147fe03eb526690555fb367345601"
   }
 }

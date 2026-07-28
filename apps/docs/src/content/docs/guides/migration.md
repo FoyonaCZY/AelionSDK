@@ -71,6 +71,30 @@ const result = migrateDiffusionCheckpoint(checkpoint, {
 
 无法等价映射的多描边、描边端点、文字背景、阴影、发光、非 `source-over` Canvas 混合等能力会生成渲染损失诊断。
 
+## 批量迁移 CLI
+
+安装 `@aelionsdk/sdk` 后可以直接迁移文件：
+
+```bash
+pnpm exec aelion-migrate --from webav --input webav.json --out project.aelion.json
+pnpm exec aelion-migrate --from diffusion --input checkpoint.json \
+  --assets assets.json --out project.aelion.json --report migration-report.json
+```
+
+WebAV 的 `assets` 可以放在输入快照中，也可以用 `--assets` 提供数组或 `{ "assets": [...] }` 文件。Diffusion 的素材绑定通常需要单独的 `--assets` 文件。CLI 会输出并保存一个版本化报告，其中包含：
+
+- `passed`、`lossy` 或 `failed` 状态；
+- info/warning/error 计数和完整诊断；
+- 源对象到 Aelion 实体的 `entityMap`；
+- 输出 Project 的字节数和 SHA-256。
+
+默认严格模式遇到 error diagnostic 时只写报告，不写 Project。`--strict=false` 会明确生成 `lossy` Project，`--dry-run` 则执行完整转换和 Schema/语义校验但不写 Project：
+
+```bash
+pnpm exec aelion-migrate --from diffusion --input checkpoint.json \
+  --assets assets.json --dry-run
+```
+
 ## 宽松模式只适合人工修复流程
 
 ```ts

@@ -1,5 +1,5 @@
 import type { PcmSourceBlock } from '@aelionsdk/audio';
-import { AelionError } from '@aelionsdk/core';
+import { AelionError, type JsonObject } from '@aelionsdk/core';
 import {
   createSampleIndex,
   createVideoFrameDecodeSessionFromReader,
@@ -310,6 +310,10 @@ export class ByteMediaProvider implements AelionMediaProvider {
       pendingLoads: this.#operationWaiters.length,
       maxConcurrentLoads: this.#maxConcurrentOperations,
     };
+  }
+
+  public getDiagnosticSnapshot(): JsonObject {
+    return this.snapshot() as unknown as JsonObject;
   }
 
   async #asset(assetId: string, signal?: AbortSignal): Promise<CachedAsset> {

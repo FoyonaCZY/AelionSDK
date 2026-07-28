@@ -1,7 +1,7 @@
 {
   "evidenceVersion": "1.0.0",
   "command": "pnpm report:vertical",
-  "generatedAt": "2026-07-13T02:39:57.820Z",
+  "generatedAt": "2026-07-28T01:29:14.373Z",
   "projectId": "prj_vertical_slice_30s",
   "revision": "1",
   "durationUs": 30000000,
@@ -44,12 +44,37 @@
     "mimeType": "video/webm; codecs=\"vp09.00.10.08, opus\"",
     "videoFrames": 900,
     "audioFrames": 1440000,
-    "durationUs": 30000000
+    "durationUs": 30000000,
+    "encoderConfiguration": {
+      "profile": "webm-vp9-opus",
+      "video": {
+        "codec": "vp9",
+        "codecString": "vp09.00.10.08",
+        "width": 320,
+        "height": 180,
+        "frameRate": 30,
+        "bitrateMode": "variable",
+        "targetBitrate": 800000,
+        "sourceColorSpace": {
+          "primaries": "bt709",
+          "transfer": "iec61966-2-1",
+          "matrix": "rgb",
+          "fullRange": true
+        }
+      },
+      "audio": {
+        "codec": "opus",
+        "sampleRate": 48000,
+        "channelCount": 2,
+        "bitrateMode": "variable",
+        "targetBitrate": 96000
+      }
+    }
   },
   "sink": {
-    "fileName": "aelion-vertical-247e6448-77c7-4d45-99d0-56d9a997dd67.webm",
+    "fileName": "aelion-vertical-bcca532b-09be-4883-990e-3b5cf65358b0.webm",
     "writes": 69,
-    "bytesWritten": 2361030,
+    "bytesWritten": 2369226,
     "maxInFlightWrites": 1,
     "closed": true,
     "aborted": false
@@ -73,31 +98,30 @@
     "opfsOutputRemoved": true
   },
   "progress": [
-    0.00055555,
-    0.1011111,
+    0.0005555555555555556,
+    0.10111111111111111,
     0.20166666666666666,
     0.3016666666666667,
-    0.4022222166666667,
+    0.4022222222222222,
     0.5024888888888889,
     0.6027555555555556,
     0.7030222222222222,
     0.8032888888888889,
     0.9035555555555556,
-    1,
     1
   ],
-  "elapsedMs": 22390.985000014305,
-  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+  "elapsedMs": 3034.609999999404,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "artifact": {
     "file": "reports/baseline/vertical-slice-30s.webm",
-    "bytes": 2360792,
-    "sha256": "afa317e36dae45182027284c930bfc838c562b9f06bd311118577013b8a180e6"
+    "bytes": 2368988,
+    "sha256": "0d0a0de07266453b2b0db90d0d15a7eebf9838830f952c873ea50fb10738ec94"
   },
   "externalReadback": {
-    "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+    "implementation": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "532fdd7276b7ed1d47f62c5b152fa69fed36ee10bd51f7ed5347be4698d04b74",
-    "audioPcmMd5": "MD5=5e1cd26d19ef4576df28175e3053b474"
+    "videoFrameMd5DocumentSha256": "7422eecb5637c44d29bd5720cbae9fc4478060b8feded943baf0a0839ad07349",
+    "audioPcmMd5": "MD5=e469a8f677ca7704a0235df04463c521"
   }
 }

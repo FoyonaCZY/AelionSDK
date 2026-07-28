@@ -48,7 +48,13 @@ export interface ColorCapability {
   /** The color contract implemented by the current local renderer/exporter. */
   readonly localExecution: {
     readonly workingColorSpaces: readonly string[];
+    readonly colorPrimaries: readonly ('bt709' | 'display-p3' | 'bt2020')[];
     readonly transferFunctions: readonly ('srgb' | 'gamma22' | 'pq' | 'hlg')[];
+    readonly matrixCoefficients: readonly ('rgb' | 'bt709' | 'bt2020-ncl')[];
+    readonly colorRanges: readonly ('full' | 'limited')[];
+    readonly chromaSubsamplings: readonly ('rgb' | '4:4:4' | '4:2:2' | '4:2:0')[];
+    readonly alphaModes: readonly ('opaque' | 'premultiplied')[];
+    readonly toneMappings: readonly ('none' | 'bt2390' | 'reinhard')[];
     readonly bitDepths: readonly (8 | 10)[];
     readonly hdrPresentation: boolean;
   };

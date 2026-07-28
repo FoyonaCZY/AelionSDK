@@ -46,6 +46,14 @@ export interface VideoTrackInfo {
   readonly codedWidth: number;
   readonly codedHeight: number;
   readonly rotation: number;
+  readonly color: {
+    readonly primaries: 'bt709' | 'bt470bg' | 'smpte170m' | 'bt2020' | null;
+    readonly transfer: 'bt709' | 'smpte170m' | 'iec61966-2-1' | 'linear' | 'pq' | 'hlg' | null;
+    readonly matrix: 'rgb' | 'bt709' | 'bt470bg' | 'smpte170m' | 'bt2020-ncl' | null;
+    readonly fullRange: boolean | null;
+    readonly highDynamicRange: boolean;
+    readonly canBeTransparent: boolean;
+  };
   readonly timeBase?: Rational;
   readonly description?: Uint8Array;
 }

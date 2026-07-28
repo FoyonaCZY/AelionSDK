@@ -8,11 +8,13 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
+import { releaseChannelForVersion } from './release-policy.mjs';
 
 const execFileAsync = promisify(execFile);
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const packagesDirectory = join(root, 'packages');
 const expectedVersion = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version;
+const releaseChannel = releaseChannelForVersion(expectedVersion);
 const published = [];
 const npmCache = await mkdtemp(join(tmpdir(), 'aelion-npm-dry-run-'));
 
@@ -40,7 +42,14 @@ try {
     }
     const { stdout, stderr } = await execFileAsync(
       corepackExecutable,
-      corepackArguments(['pnpm', 'publish', '--dry-run', '--no-git-checks', '--tag', 'next']),
+      corepackArguments([
+        'pnpm',
+        'publish',
+        '--dry-run',
+        '--no-git-checks',
+        '--tag',
+        releaseChannel.npmDistTag,
+      ]),
       {
         cwd: packageDirectory,
         env: {

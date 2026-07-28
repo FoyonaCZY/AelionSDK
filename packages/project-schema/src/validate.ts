@@ -723,16 +723,56 @@ function validateColorSemantics(project: AelionProject, diagnostics: DiagnosticS
   for (const sequence of Object.values(project.sequences)) {
     const format = sequence.format as {
       readonly workingColorSpace?: unknown;
+      readonly colorPrimaries?: unknown;
       readonly transferFunction?: unknown;
+      readonly matrixCoefficients?: unknown;
+      readonly chromaSubsampling?: unknown;
+      readonly toneMapping?: unknown;
       readonly bitDepth?: unknown;
     };
-    if (format.transferFunction !== 'pq' && format.transferFunction !== 'hlg') continue;
-    if (format.workingColorSpace !== 'rec2020-linear' || format.bitDepth !== 10) {
+    const expectedPrimaries =
+      format.workingColorSpace === 'display-p3-linear'
+        ? 'display-p3'
+        : format.workingColorSpace === 'rec2020-linear'
+          ? 'bt2020'
+          : 'bt709';
+    if (format.colorPrimaries !== undefined && format.colorPrimaries !== expectedPrimaries) {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_COLOR_PRIMARIES_MISMATCH',
+          `Sequence ${sequence.id} color primaries do not match its linear working space`,
+          ['sequences', sequence.id, 'format', 'colorPrimaries'],
+          sequence.id,
+        ),
+      );
+    }
+    const hdr = format.transferFunction === 'pq' || format.transferFunction === 'hlg';
+    if (hdr && (format.workingColorSpace !== 'rec2020-linear' || format.bitDepth !== 10)) {
       diagnostics.push(
         semanticDiagnostic(
           'PROJECT_HDR_FORMAT_INVALID',
           `HDR Sequence ${sequence.id} requires rec2020-linear working space and 10-bit output`,
           ['sequences', sequence.id, 'format'],
+          sequence.id,
+        ),
+      );
+    }
+    if (format.toneMapping !== undefined && format.toneMapping !== 'none' && !hdr) {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_TONE_MAPPING_INPUT_INVALID',
+          `Sequence ${sequence.id} tone mapping requires PQ or HLG input`,
+          ['sequences', sequence.id, 'format', 'toneMapping'],
+          sequence.id,
+        ),
+      );
+    }
+    if (format.chromaSubsampling === 'rgb' && format.matrixCoefficients !== 'rgb') {
+      diagnostics.push(
+        semanticDiagnostic(
+          'PROJECT_RGB_MATRIX_INVALID',
+          `Sequence ${sequence.id} RGB chroma requires RGB matrix coefficients`,
+          ['sequences', sequence.id, 'format', 'matrixCoefficients'],
           sequence.id,
         ),
       );

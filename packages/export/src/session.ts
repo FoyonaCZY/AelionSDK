@@ -133,11 +133,147 @@ function verifyAudioEncoderRuntime(config: AudioEncoderConfig): Promise<boolean>
   return probe;
 }
 
+export type AudioExportCodec = 'opus' | 'aac';
+
+export interface AudioExportCapabilityEntry {
+  readonly codec: AudioExportCodec;
+  readonly codecString: 'opus' | 'mp4a.40.2';
+  readonly sampleRate: number;
+  readonly channelCount: number;
+  readonly bitrate: number;
+  readonly declaredSupported: boolean;
+  readonly runtimeSupported: boolean;
+  readonly supported: boolean;
+  readonly reason?:
+    | 'EXPORT_AUDIO_ENCODER_UNAVAILABLE'
+    | 'EXPORT_AUDIO_CONFIG_UNSUPPORTED'
+    | 'EXPORT_AUDIO_RUNTIME_CANARY_FAILED'
+    | 'EXPORT_AUDIO_CONFIG_PROBE_FAILED';
+}
+
+export interface ProbeAudioExportMatrixOptions {
+  readonly codecs?: readonly AudioExportCodec[];
+  readonly sampleRates?: readonly number[];
+  readonly channelCounts?: readonly number[];
+  readonly bitratePerChannel?: number;
+}
+
+/**
+ * Probes the exact multichannel/sample-rate matrix advertised to a host.
+ *
+ * `isConfigSupported()` is not accepted as sufficient evidence: every declared
+ * configuration also encodes and flushes four real AudioData blocks. This
+ * catches runtimes that advertise AAC/Opus but fail when the encoder is used.
+ */
+export async function probeAudioExportMatrix(
+  options: ProbeAudioExportMatrixOptions = {},
+): Promise<readonly AudioExportCapabilityEntry[]> {
+  const codecs = options.codecs ?? ['opus', 'aac'];
+  const sampleRates = options.sampleRates ?? [44_100, 48_000, 96_000];
+  const channelCounts = options.channelCounts ?? [1, 2, 6];
+  const bitratePerChannel = options.bitratePerChannel ?? 64_000;
+  for (const [values, name] of [
+    [sampleRates, 'sampleRates'],
+    [channelCounts, 'channelCounts'],
+  ] as const) {
+    if (values.length === 0 || values.some(value => !Number.isSafeInteger(value) || value <= 0)) {
+      throw new RangeError(`${name} must contain positive safe integers`);
+    }
+  }
+  if (!Number.isSafeInteger(bitratePerChannel) || bitratePerChannel <= 0) {
+    throw new RangeError('bitratePerChannel must be a positive safe integer');
+  }
+
+  const entries: AudioExportCapabilityEntry[] = [];
+  for (const codec of codecs) {
+    const codecString = codec === 'aac' ? 'mp4a.40.2' : 'opus';
+    for (const sampleRate of sampleRates) {
+      for (const channelCount of channelCounts) {
+        const bitrate = bitratePerChannel * channelCount;
+        if (typeof AudioEncoder !== 'function') {
+          entries.push({
+            codec,
+            codecString,
+            sampleRate,
+            channelCount,
+            bitrate,
+            declaredSupported: false,
+            runtimeSupported: false,
+            supported: false,
+            reason: 'EXPORT_AUDIO_ENCODER_UNAVAILABLE',
+          });
+          continue;
+        }
+        const config: AudioEncoderConfig = {
+          codec: codecString,
+          sampleRate,
+          numberOfChannels: channelCount,
+          bitrate,
+          bitrateMode: 'variable',
+          ...(codec === 'aac'
+            ? { aac: { format: 'aac' as const } }
+            : { opus: { format: 'opus' as const } }),
+        };
+        try {
+          const declaredSupported =
+            (await AudioEncoder.isConfigSupported(config)).supported === true;
+          const runtimeSupported = declaredSupported && (await verifyAudioEncoderRuntime(config));
+          entries.push({
+            codec,
+            codecString,
+            sampleRate,
+            channelCount,
+            bitrate,
+            declaredSupported,
+            runtimeSupported,
+            supported: runtimeSupported,
+            ...(!declaredSupported
+              ? { reason: 'EXPORT_AUDIO_CONFIG_UNSUPPORTED' as const }
+              : !runtimeSupported
+                ? { reason: 'EXPORT_AUDIO_RUNTIME_CANARY_FAILED' as const }
+                : {}),
+          });
+        } catch {
+          entries.push({
+            codec,
+            codecString,
+            sampleRate,
+            channelCount,
+            bitrate,
+            declaredSupported: false,
+            runtimeSupported: false,
+            supported: false,
+            reason: 'EXPORT_AUDIO_CONFIG_PROBE_FAILED',
+          });
+        }
+      }
+    }
+  }
+  return entries;
+}
+
 function channelCount(layout: string): number | undefined {
   if (layout === 'mono') return 1;
   if (layout === 'stereo') return 2;
   if (layout === '5.1') return 6;
   return undefined;
+}
+
+function sourceColorSpace(ir: RenderIr): VideoColorSpaceInit {
+  if (
+    ir.colorPrimaries !== 'bt709' ||
+    ir.transferFunction !== 'srgb' ||
+    ir.matrixCoefficients !== 'rgb' ||
+    ir.colorRange !== 'full'
+  ) {
+    throw new TypeError('COLOR_EXPORT_RGBA_CONVERSION_UNSUPPORTED');
+  }
+  return {
+    primaries: 'bt709',
+    transfer: 'iec61966-2-1',
+    matrix: 'rgb',
+    fullRange: true,
+  };
 }
 
 async function preflightMuxedExport(
@@ -477,6 +613,7 @@ export async function exportFrozenRenderIrWebM(
     channelCount: channelCount(options.ir.channelLayout) ?? 0,
     videoBitrate: options.videoBitrate,
     audioBitrate: options.audioBitrate,
+    sourceColorSpace: sourceColorSpace(options.ir),
     ...(report.encoderConfiguration?.videoCodecString === undefined
       ? {}
       : { videoCodecString: report.encoderConfiguration.videoCodecString }),
@@ -513,6 +650,7 @@ export async function exportFrozenRenderIrMp4(
     channelCount: channelCount(options.ir.channelLayout) ?? 0,
     videoBitrate: options.videoBitrate,
     audioBitrate: options.audioBitrate,
+    sourceColorSpace: sourceColorSpace(options.ir),
     ...(report.encoderConfiguration?.videoCodecString === undefined
       ? {}
       : { videoCodecString: report.encoderConfiguration.videoCodecString }),
@@ -553,6 +691,7 @@ async function exportFrozenRenderIrAlternativeMp4(
     channelCount: channelCount(options.ir.channelLayout) ?? 0,
     videoBitrate: options.videoBitrate,
     audioBitrate: options.audioBitrate,
+    sourceColorSpace: sourceColorSpace(options.ir),
     ...(report.encoderConfiguration?.videoCodecString === undefined
       ? {}
       : { videoCodecString: report.encoderConfiguration.videoCodecString }),

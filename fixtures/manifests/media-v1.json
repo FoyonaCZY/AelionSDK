@@ -2,14 +2,14 @@
   "manifestVersion": "1.0.0",
   "generator": {
     "command": "pnpm fixtures:generate",
-    "ffmpegVersion": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers"
+    "ffmpegVersion": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers"
   },
   "fixtures": [
     {
       "id": "mp4-moov-head-h264-aac",
-      "file": "fixtures/media/mp4-moov-head-h264-aac.mp4",
-      "sha256": "9f70332e7cd4490c130422aa08145bb72067e75e74c909f8db418af3e43ff025",
-      "bytes": 151713,
+      "file": "fixtures\\media\\mp4-moov-head-h264-aac.mp4",
+      "sha256": "eddf5bac21092c27342bce6f2185fabd673705b6179e1b4a172a68a37dde5364",
+      "bytes": 151552,
       "license": "CC0-1.0",
       "container": "mp4",
       "features": ["moov-head", "b-frames", "cfr", "audio-video"],
@@ -31,9 +31,9 @@
     },
     {
       "id": "mp4-fragmented-h264-aac",
-      "file": "fixtures/media/mp4-fragmented-h264-aac.mp4",
-      "sha256": "3ebc4e35f8cb7852254d2dd021fb58162dcc1420e7f357c21fd20d1e65284382",
-      "bytes": 150873,
+      "file": "fixtures\\media\\mp4-fragmented-h264-aac.mp4",
+      "sha256": "13fd7327488552d8e5eca156fea44371a1a3f3e93016a054e20a64b6adc223db",
+      "bytes": 150712,
       "license": "CC0-1.0",
       "container": "mp4",
       "features": ["fragmented", "b-frames", "cfr", "audio-video"],
@@ -55,9 +55,9 @@
     },
     {
       "id": "mp4-moov-tail-h264-aac",
-      "file": "fixtures/media/mp4-moov-tail-h264-aac.mp4",
-      "sha256": "2fa7bc887bdd3103104e7fbb8c6727e53b97c876559336032fd5d417cb51449d",
-      "bytes": 151713,
+      "file": "fixtures\\media\\mp4-moov-tail-h264-aac.mp4",
+      "sha256": "7331f17abf5ec0d416bfe7fa2a15a1e598241229ad87188f8e2f427b3a603816",
+      "bytes": 151552,
       "license": "CC0-1.0",
       "container": "mp4",
       "features": ["moov-tail", "b-frames", "cfr", "audio-video"],
@@ -79,9 +79,9 @@
     },
     {
       "id": "mp4-nonzero-pts-h264-aac",
-      "file": "fixtures/media/mp4-nonzero-pts-h264-aac.mp4",
-      "sha256": "ab5563faad53e961172d6fee64424f844d4bba92c431a8a60e49970f424fee73",
-      "bytes": 151737,
+      "file": "fixtures\\media\\mp4-nonzero-pts-h264-aac.mp4",
+      "sha256": "62cde5761d1be0d10ffb2840a4c072b5994c70282119e0015487c3f45e153ddd",
+      "bytes": 151576,
       "license": "CC0-1.0",
       "container": "mp4",
       "features": ["nonzero-pts", "b-frames", "cfr", "audio-video"],
@@ -104,9 +104,9 @@
     },
     {
       "id": "webm-vp9-opus-vfr",
-      "file": "fixtures/media/webm-vp9-opus-vfr.webm",
-      "sha256": "d49e1d29712a1858fe11d246ae4905289575cfec664abe05fd9a8af0e7d7b21e",
-      "bytes": 118300,
+      "file": "fixtures\\media\\webm-vp9-opus-vfr.webm",
+      "sha256": "a63fd0799cff04690b07c2c79d5c702bcd34b60f6164787c9c7ac2b692922ac8",
+      "bytes": 119527,
       "license": "CC0-1.0",
       "container": "webm",
       "features": ["vfr", "vp9", "opus", "multiple-clusters", "audio-video"],
@@ -122,6 +122,105 @@
         "audio": {
           "codecFamily": "opus",
           "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-rotation-90-h264-aac",
+      "file": "fixtures\\media\\mp4-rotation-90-h264-aac.mp4",
+      "sha256": "4cca0b9cf3df24a7d96cc12b755f98b67225720957b28ac7685a9a7974569d19",
+      "bytes": 151552,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["rotation-90", "display-matrix", "b-frames", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "rotation": 90,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-long-gop-h264-aac",
+      "file": "fixtures\\media\\mp4-long-gop-h264-aac.mp4",
+      "sha256": "580b9178188dd40fae8d5a003422ee00b51370c6f1ee377f1629a0ed89e78912",
+      "bytes": 144836,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["long-gop", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "maximumGopFrames": 90,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mp4-audio-tail-h264-aac",
+      "file": "fixtures\\media\\mp4-audio-tail-h264-aac.mp4",
+      "sha256": "43f5addab73bbe4a86c39abb8045e47e61c37571998fae7d4df16aa636f11125",
+      "bytes": 151623,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["audio-tail", "audio-video-duration-mismatch", "b-frames"],
+      "expected": {
+        "durationUs": 3050000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1,
+          "minimumTailUs": 40000
+        }
+      }
+    },
+    {
+      "id": "mp4-sparse-30m-h264-aac",
+      "file": "fixtures\\media\\mp4-sparse-30m-h264-aac.mp4",
+      "sha256": "59ef6fa23949d1e10342e255f72eb4c8ed07a0a66cdfac3ef267664a9262c14e",
+      "bytes": 4436787,
+      "license": "CC0-1.0",
+      "container": "mp4",
+      "features": ["30-minute", "sparse-video", "long-file", "audio-video"],
+      "expected": {
+        "durationUs": 1800000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 64,
+          "height": 36,
+          "variableFrameRate": false,
+          "hasBFrames": false
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 8000,
           "channels": 1
         }
       }

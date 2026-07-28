@@ -123,6 +123,21 @@ console.log(report.webgl2.available, report.webgpu.available);
 
 Report 会给出 node、depth、pass、纹理采样和中间纹理预算，以及 WebGL2/WebGPU 编译是否可用。构建 Material 编辑器时，可以把这些信息放进作者调试面板。
 
+`@aelionsdk/material-sdk` 同时安装 `aelion-material` 命令。可以从一个可工作的声明式 Graph 包开始：
+
+```bash
+pnpm exec aelion-material init ./my-pack
+pnpm exec aelion-material build ./my-pack
+pnpm exec aelion-material validate ./my-pack
+pnpm exec aelion-material types ./my-pack
+pnpm exec aelion-material preview ./my-pack
+pnpm exec aelion-material prepublish ./my-pack
+pnpm exec aelion-material pack ./my-pack --out ./dist/my-pack.aelionmat
+```
+
+`build` 在作者修改已声明文件后刷新 payload size/hash，并生成类型和预览报告。`validate`/`inspect` 检查 manifest、所有 payload hash、Package/Definition/Graph Schema、语义和编译预算；`types` 生成参数类型；`preview` 生成可供 CI 或作者界面读取的 Lab 报告；`prepublish` 另外要求无错误诊断、严格确定性以及 Graph 的 WebGL2/WebGPU 编译一致性。RGBA Golden 文件可用
+`aelion-material golden actual.rgba expected.rgba --tolerance 2` 比较。
+
 仓库内还有三个静态示例：cross-dissolve、warm-film 和 soft-glow。运行校验：
 
 ```bash

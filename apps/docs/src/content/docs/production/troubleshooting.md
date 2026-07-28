@@ -33,6 +33,7 @@ description: 定位素材导入、预览、拖动、播放、音画同步、导�
 console.log(session.getSnapshot());
 console.log(preview.snapshot());
 console.log(session.getDiagnostics());
+console.log(session.createDiagnosticReport());
 ```
 
 ## 拖动播放头越来越卡
@@ -142,7 +143,8 @@ GC 不保证立刻回落到完全相同数值，重点看多轮打开/关闭后�
 
 - 去除 token/敏感 locator 后的最小 Project；
 - 可公开的最小媒体，或至少提供容器、codec、时长和 probe；
-- capability report（先检查 userAgent 等隐私字段）；
+- 默认 privacy-safe 的 `session.createDiagnosticReport()`；只有取得用户同意才附
+  `{ privacy: 'full' }` 报告；
 - Diagnostic code/details，不只发截图；
 - 明确的期望结果和实际结果；
 - 是否能在 Quickstart 或参考编辑器复现；

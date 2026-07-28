@@ -161,7 +161,7 @@ async function openVideo(file: File, canvas: HTMLCanvasElement) {
 | 音频       | 多轨混音、1–8 声道确定性流式重采样、连续保音高变速、ducking、waveform、响度、true peak 和 limiter   |
 | 媒体       | MP4/WebM 索引与 seek、VideoFrame/PCM 解码、HTTP Range、代理素材、分段索引、缓存和资源预算           |
 | 导出       | H.264/AV1/HEVC + AAC MP4、VP9/Opus WebM、持久分段恢复、图片、GIF、WAV/RF64，以及多种 Writable Sink  |
-| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、实体映射和无静默渲染损失诊断                         |
+| 迁移       | WebAV Sprite 与 Diffusion checkpoint 严格迁移、CLI/dry-run、实体映射和无静默渲染损失报告            |
 | 持久化     | canonical Project 快照、跨刷新 generation、内容 hash 校验和 IndexedDB 自动恢复                      |
 | 扩展       | 自定义 Material、隔离 Worker RPC、远程导出 Provider、持久 CacheStore、媒体读取器和能力探测          |
 
@@ -185,20 +185,20 @@ nearest-rank 计算。
 
 | 项目                                | 结果                                                     |
 | ----------------------------------- | -------------------------------------------------------- |
-| 720p、单 pass、WebGL2               | 帧调用 p50 0.24 ms，p95 0.39 ms                          |
-| 1080p、单 pass、WebGL2              | 帧调用 p50 0.40 ms，p95 1.38 ms                          |
-| 1080p、单 pass、WebGPU              | 帧调用 p50 0.74 ms，p95 0.95 ms                          |
-| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.50 ms，p95 1.21 ms                          |
-| 4K、单 pass、WebGL2                 | 帧调用 p50 0.78 ms，p95 0.81 ms                          |
-| 1,000 clips / 32 tracks 冷编译      | p50 23.28 ms，p95 29.12 ms                               |
-| 1,000 clips / 32 tracks warm 增量   | p50 1.92 ms，p95 2.28 ms                                 |
-| 单音轨 1,024-frame 音频块           | p95 0.45 ms，整体约 63.63× 实时                          |
-| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 354.56 ms，平均约 8.38× 实时                |
-| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 361.75 ms，平均约 8.00× 实时                |
-| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 517.15 ms，约 1.93× 实时                                 |
-| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 467.97 ms，`avc1.640033`，约 2.14× 实时                  |
-| OPFS 顺序写入，16 个 1 MiB 块       | 约 517 MiB/s；Memory Sink 约 6.8 GiB/s                   |
-| 1080p WebGL2 180 帧 soak            | 前半 p95 1.06 ms，后半 p95 0.94 ms，dispose 后无 pending |
+| 720p、单 pass、WebGL2               | 帧调用 p50 0.26 ms，p95 0.34 ms                          |
+| 1080p、单 pass、WebGL2              | 帧调用 p50 0.33 ms，p95 1.45 ms                          |
+| 1080p、单 pass、WebGPU              | 帧调用 p50 0.79 ms，p95 1.07 ms                          |
+| 1080p、四 pass Soft Glow、WebGL2    | 帧调用 p50 0.46 ms，p95 1.20 ms                          |
+| 4K、单 pass、WebGL2                 | 帧调用 p50 1.09 ms，p95 1.23 ms                          |
+| 1,000 clips / 32 tracks 冷编译      | p50 21.03 ms，p95 29.52 ms                               |
+| 1,000 clips / 32 tracks warm 增量   | p50 1.84 ms，p95 1.93 ms                                 |
+| 单音轨 1,024-frame 音频块           | p95 0.45 ms，整体约 65.58× 实时                          |
+| 1080p30 VP9/Opus WebM，3 秒，4 Mbps | 两次导出 p50 370.63 ms，平均约 8.05× 实时                |
+| 1080p30 H.264/AAC MP4，3 秒，4 Mbps | 两次导出 p50 400.13 ms，平均约 7.21× 实时                |
+| 4K30 VP9/Opus WebM，1 秒，12 Mbps   | 529.21 ms，约 1.89× 实时                                 |
+| 4K30 H.264/AAC MP4，1 秒，12 Mbps   | 491.45 ms，`avc1.640033`，约 2.03× 实时                  |
+| OPFS 顺序写入，16 个 1 MiB 块       | 约 467 MiB/s；Memory Sink 约 6.0 GiB/s                   |
+| 1080p WebGL2 180 帧 soak            | 前半 p95 0.98 ms，后半 p95 0.95 ms，dispose 后无 pending |
 
 合成数据测量的是 `WorkerCompositor.compose()` 完成一次确定性 Material 调用的墙钟
 时间，不等于完整播放器 FPS。导出矩阵使用生成的 Canvas 帧和静音，计时包含编码、
@@ -213,11 +213,11 @@ mux、Sink 关闭和 Memory Sink 最终连续数组组装，但不包含输入�
 ### 真实媒体和端到端工程
 
 五种公开 fixture 覆盖 moov 头/尾 MP4、fragmented MP4、非零 PTS MP4 和
-VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.46–6.59 ms，最慢
-cold seek p95 为 13.04 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
+VP9/VFR WebM。四个确定性目标点的 warm seek p95 为 2.72–7.49 ms，最慢
+cold seek p95 为 15.34 ms；测试结束后活动 decoder 和保留 VideoFrame 都归零。
 
 真实素材全链路基准把固定 H.264/AAC MP4 通过公开 Session 分别缩放并导出：
-1080p30 用时 295.09 ms（约 3.39× 实时），4K30 用时 275.82 ms（约 3.63×
+1080p30 用时 310.53 ms（约 3.22× 实时），4K30 用时 290.97 ms（约 3.44×
 实时）。两项都覆盖输入解码、Render IR、PCM 解码/混音、编码、mux 和 sink close，
 且主线程均没有观测到超过 50 ms 的 Long Task；1080p 产物还由 FFmpeg 解出
 30 个视频帧并完成音频 PCM MD5 回读。
@@ -231,7 +231,7 @@ codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计
 
 60 秒端到端工程通过公开 Session API 完成编辑、播放、预览、VP9/Opus 导出和
 外部 FFmpeg 全量解码回读。其输出为 320×180、30 fps、800 kbps，用时
-9.93 秒，即约 6.04× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
+10.13 秒，即约 5.93× 实时；成片包含 1,800 个视频帧、60 秒音频，音视频末端
 偏差为 333 μs，主线程没有观测到超过 50 ms 的 Long Task。这个项目比生成帧
 导出更接近完整调用链，但分辨率较低，不能用于推断 1080p 成片速度。
 
@@ -242,9 +242,9 @@ codec packet 的完整尾部填充；逻辑 A/V 末端按请求的 PCM 帧数计
 
 | 引擎                        | 连续预览 p95 | warm seek p95 |
 | --------------------------- | -----------: | ------------: |
-| Aelion                      |     13.16 ms |       8.30 ms |
-| WebAV 1.2.8                 |     33.94 ms |      68.31 ms |
-| Diffusion Studio Core 4.0.3 |      0.18 ms |       0.19 ms |
+| Aelion                      |     13.99 ms |       7.36 ms |
+| WebAV 1.2.8                 |     33.31 ms |     108.35 ms |
+| Diffusion Studio Core 4.0.3 |      0.18 ms |       0.23 ms |
 
 三者的缓存、GPU readback 和 `seek()` 完成语义不同；Diffusion 的低调用耗时尤其
 不能单独证明最终像素已经以相同方式完成。该基准只适合监控同一环境、同一脚本下的

@@ -41,4 +41,53 @@ describe('ProductionMediaProvider browser image path', () => {
       provider.dispose();
     }
   });
+
+  it('imports, seeks and decodes bounded windows from a 30-minute source', async () => {
+    const response = await fetch('/fixtures/media/mp4-sparse-30m-h264-aac.mp4');
+    expect(response.ok).toBe(true);
+    const provider = new ProductionMediaProvider({
+      maxDecodeSessions: 1,
+      maxCachedVideoFramesPerSession: 2,
+      maxCachedVideoBytesPerSession: 64 * 36 * 4 * 2,
+      maxSequentialDecodeGapUs: 2_000_000,
+    });
+    provider.registerBlob('long-source', await response.blob());
+
+    try {
+      const probe = await provider.probe('long-source');
+      const video = probe.index.tracks.find(track => track.kind === 'video');
+      const audio = probe.index.tracks.find(track => track.kind === 'audio');
+      if (video === undefined || audio === undefined) throw new Error('Long fixture is incomplete');
+      expect(probe.index.durationUs).toBeGreaterThanOrEqual(1_800_000_000);
+
+      const opening = await provider.frameAt('long-source', 0, 0);
+      const ending = await provider.frameAt('long-source', 0, 1_799_000_000);
+      const tail = await provider.pcmRange('long-source', 0, 1_799_000_000, 250_000);
+      try {
+        expect(opening.displayWidth).toBe(64);
+        expect(ending.timestamp).toBeGreaterThanOrEqual(1_799_000_000);
+        expect(tail.frameCount).toBeGreaterThan(0);
+        expect(provider.snapshot()).toMatchObject({
+          activeOperations: 0,
+          pendingOperations: 0,
+          decodeSessions: 1,
+          activeDecodeSessions: 0,
+        });
+        expect(provider.snapshot().cachedVideoFrames).toBeLessThanOrEqual(2);
+        expect(provider.snapshot().cachedVideoBytes).toBeLessThanOrEqual(64 * 36 * 4 * 2);
+      } finally {
+        opening.close();
+        ending.close();
+      }
+
+      provider.clear();
+      expect(provider.snapshot()).toMatchObject({
+        cachedIndexes: 0,
+        cachedVideoFrames: 0,
+        decodeSessions: 0,
+      });
+    } finally {
+      provider.dispose();
+    }
+  }, 60_000);
 });

@@ -6,6 +6,7 @@ export * from './media-provider.js';
 export * from './production-media-provider.js';
 export * from './project-builder.js';
 export * from './composition.js';
+export * from './diagnostic-report.js';
 export * from './migration.js';
 export * from './migration-materials.js';
 export * from './audio-controller.js';

@@ -1,6 +1,6 @@
 import { renderIrAudio } from '@aelionsdk/audio';
 import { probeCapabilities } from '@aelionsdk/capability';
-import { AelionError, type Diagnostic } from '@aelionsdk/core';
+import { AelionError, type Diagnostic, type JsonObject } from '@aelionsdk/core';
 import {
   createRemoteExportContentId,
   exportFrozenRenderIrAv1Mp4,
@@ -42,6 +42,7 @@ import {
 
 import { SessionAudioController, projectAudioMastering } from './audio-controller.js';
 import { createMasteredAudioRenderer } from './audio-mastering.js';
+import { createAelionDiagnosticReport } from './diagnostic-report.js';
 import { AelionPlayer } from './player.js';
 import { normalizePreviewQuality } from './preview-quality.js';
 import { defaultSchemas } from './default-schemas.js';
@@ -49,6 +50,8 @@ import { ExportJob } from './export-job.js';
 import type {
   AelionAudioApi,
   AelionAudioMasteringOptions,
+  AelionDiagnosticReport,
+  AelionDiagnosticReportOptions,
   AelionExportApi,
   AelionExportJob,
   AelionExportJobSnapshot,
@@ -167,6 +170,45 @@ function frameHasAlpha(frame: VideoFrame): boolean {
 
 const DEFAULT_MAX_DIAGNOSTICS = 256;
 
+interface MutableOperationTiming {
+  count: number;
+  succeeded: number;
+  failed: number;
+  cancelled: number;
+  totalUs: number;
+  maximumUs: number;
+  lastUs: number | null;
+}
+
+function emptyOperationTiming(): MutableOperationTiming {
+  return {
+    count: 0,
+    succeeded: 0,
+    failed: 0,
+    cancelled: 0,
+    totalUs: 0,
+    maximumUs: 0,
+    lastUs: null,
+  };
+}
+
+function recordOperationTiming(
+  timing: MutableOperationTiming,
+  startedAt: number,
+  outcome: 'succeeded' | 'failed' | 'cancelled',
+): void {
+  const durationUs = Math.max(0, Math.round((performance.now() - startedAt) * 1_000));
+  timing.count += 1;
+  timing[outcome] += 1;
+  timing.totalUs += durationUs;
+  timing.maximumUs = Math.max(timing.maximumUs, durationUs);
+  timing.lastUs = durationUs;
+}
+
+function operationTimingSnapshot(timing: MutableOperationTiming) {
+  return Object.freeze({ ...timing });
+}
+
 function diagnosticHistoryLimit(value: number | undefined): number {
   const limit = value ?? DEFAULT_MAX_DIAGNOSTICS;
   if (!Number.isSafeInteger(limit) || limit <= 0) {
@@ -209,11 +251,16 @@ export class AelionSession implements AelionSessionApi {
   #lastPreviewWidth: number | undefined;
   #lastPreviewHeight: number | undefined;
   #lastPreviewRenderScale: number | undefined;
+  #lastPreviewTiming: import('@aelionsdk/renderer-worker').RendererWorkerTiming | undefined;
+  #lastPreviewResources:
+    | import('@aelionsdk/renderer-worker').RendererWorkerResourceSnapshot
+    | undefined;
   #exportJobsStarted = 0;
   #exportJobsCompleted = 0;
   #exportJobsFailed = 0;
   #exportJobsCancelled = 0;
   #activeExportJob: AelionExportJob | AelionProfileExportJob | AelionRemoteExportJob | undefined;
+  #activeExportStartedAt: number | undefined;
   #nextExportJobId = 1;
   #loadGeneration = 0;
   #loadInProgress = 0;
@@ -221,6 +268,12 @@ export class AelionSession implements AelionSessionApi {
   #disposeTask: Promise<void> | undefined;
   #activeInteractiveEdit: ActiveInteractiveEdit | undefined;
   #nextInteractiveEditId = 1;
+  readonly #operationTimings = {
+    projectLoad: emptyOperationTiming(),
+    capabilityProbe: emptyOperationTiming(),
+    preview: emptyOperationTiming(),
+    export: emptyOperationTiming(),
+  };
 
   public readonly player: AelionPlayer;
   public readonly audio: AelionAudioApi;
@@ -306,10 +359,12 @@ export class AelionSession implements AelionSessionApi {
   }
 
   public async loadProject(value: unknown): Promise<void> {
+    const startedAt = performance.now();
     this.#assertActive();
     const validation = this.#validator.validate(value);
     if (!validation.ok) {
       for (const diagnostic of validation.diagnostics) this.#recordDiagnostic(diagnostic);
+      recordOperationTiming(this.#operationTimings.projectLoad, startedAt, 'failed');
       throw new AelionError(validation.diagnostics);
     }
 
@@ -326,9 +381,21 @@ export class AelionSession implements AelionSessionApi {
       () => undefined,
       () => undefined,
     );
-    return task.finally(() => {
-      this.#loadInProgress -= 1;
-    });
+    return task
+      .then(
+        () => recordOperationTiming(this.#operationTimings.projectLoad, startedAt, 'succeeded'),
+        (error: unknown) => {
+          recordOperationTiming(
+            this.#operationTimings.projectLoad,
+            startedAt,
+            error instanceof DOMException && error.name === 'AbortError' ? 'cancelled' : 'failed',
+          );
+          throw error;
+        },
+      )
+      .finally(() => {
+        this.#loadInProgress -= 1;
+      });
   }
 
   async #installProject(project: AelionProject, generation: number): Promise<void> {
@@ -423,6 +490,7 @@ export class AelionSession implements AelionSessionApi {
   }
 
   async #renderPreviewFrame(options: AelionPreviewOptions) {
+    const startedAt = performance.now();
     this.#previewRequestedFrames += 1;
     this.#emitStats();
     try {
@@ -445,10 +513,18 @@ export class AelionSession implements AelionSessionApi {
       this.#lastPreviewWidth = result.width;
       this.#lastPreviewHeight = result.height;
       this.#lastPreviewRenderScale = result.renderScale;
+      this.#lastPreviewTiming = result.timing;
+      this.#lastPreviewResources = result.resources;
+      recordOperationTiming(this.#operationTimings.preview, startedAt, 'succeeded');
       this.#emitStats();
       return result;
     } catch (error) {
       this.#previewFailedFrames += 1;
+      recordOperationTiming(
+        this.#operationTimings.preview,
+        startedAt,
+        error instanceof DOMException && error.name === 'AbortError' ? 'cancelled' : 'failed',
+      );
       this.#recordErrorDiagnostics(error);
       this.#emitStats();
       throw error;
@@ -456,12 +532,23 @@ export class AelionSession implements AelionSessionApi {
   }
 
   public async probeCapabilities(signal?: AbortSignal) {
+    const startedAt = performance.now();
     this.#assertActive();
-    const capability = await probeCapabilities(signal === undefined ? {} : { signal });
-    this.#capability = capability;
-    for (const diagnostic of capability.diagnostics) this.#recordDiagnostic(diagnostic);
-    this.#emit({ type: 'capability-changed', capability });
-    return capability;
+    try {
+      const capability = await probeCapabilities(signal === undefined ? {} : { signal });
+      this.#capability = capability;
+      for (const diagnostic of capability.diagnostics) this.#recordDiagnostic(diagnostic);
+      recordOperationTiming(this.#operationTimings.capabilityProbe, startedAt, 'succeeded');
+      this.#emit({ type: 'capability-changed', capability });
+      return capability;
+    } catch (error) {
+      recordOperationTiming(
+        this.#operationTimings.capabilityProbe,
+        startedAt,
+        error instanceof DOMException && error.name === 'AbortError' ? 'cancelled' : 'failed',
+      );
+      throw error;
+    }
   }
 
   public getSnapshot(): AelionSessionSnapshot {
@@ -484,6 +571,25 @@ export class AelionSession implements AelionSessionApi {
     return Object.freeze([...this.#diagnostics]);
   }
 
+  public createDiagnosticReport(options?: AelionDiagnosticReportOptions): AelionDiagnosticReport {
+    let media: JsonObject | null = null;
+    try {
+      media = this.#options.media?.getDiagnosticSnapshot?.() ?? null;
+    } catch {
+      // Support report generation must remain available when a custom media
+      // provider's optional inspection hook is itself unhealthy.
+    }
+    return createAelionDiagnosticReport({
+      state: this.#state,
+      revision: this.revision,
+      capability: this.#capability ?? null,
+      diagnostics: this.getDiagnostics(),
+      stats: this.getStats(),
+      media,
+      ...(options === undefined ? {} : { options }),
+    });
+  }
+
   public getStats(): AelionSessionStats {
     const active = this.#activeExportJob?.getSnapshot();
     const renderer = this.#renderer?.snapshot();
@@ -504,6 +610,8 @@ export class AelionSession implements AelionSessionApi {
         lastWidth: this.#lastPreviewWidth ?? null,
         lastHeight: this.#lastPreviewHeight ?? null,
         lastRenderScale: this.#lastPreviewRenderScale ?? null,
+        lastTiming: this.#lastPreviewTiming ?? null,
+        lastResources: this.#lastPreviewResources ?? null,
         pendingFrames: renderer?.pendingFrames ?? 0,
         maxPendingFrames: renderer?.maxPendingFrames ?? this.#options.maxPendingFrames ?? 2,
         rendererPresent: renderer !== undefined,
@@ -531,6 +639,12 @@ export class AelionSession implements AelionSessionApi {
         jobsCancelled: this.#exportJobsCancelled,
         activeJobId: active?.id ?? null,
         progress: active?.progress ?? 0,
+      }),
+      timings: Object.freeze({
+        projectLoad: operationTimingSnapshot(this.#operationTimings.projectLoad),
+        capabilityProbe: operationTimingSnapshot(this.#operationTimings.capabilityProbe),
+        preview: operationTimingSnapshot(this.#operationTimings.preview),
+        export: operationTimingSnapshot(this.#operationTimings.export),
       }),
     });
   }
@@ -973,6 +1087,7 @@ export class AelionSession implements AelionSessionApi {
     const id = `export-${this.#nextExportJobId.toString()}`;
     this.#nextExportJobId += 1;
     this.#exportJobsStarted += 1;
+    this.#activeExportStartedAt = performance.now();
     const job = new ExportJob({
       id,
       ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
@@ -999,10 +1114,7 @@ export class AelionSession implements AelionSessionApi {
         }
       },
       onSnapshot: snapshot => this.#acceptExportSnapshot(snapshot),
-      onSettled: settled => {
-        if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
-        this.#emitStats();
-      },
+      onSettled: settled => this.#acceptExportSettled(settled),
     });
     this.#activeExportJob = job;
     this.#emitStats();
@@ -1032,6 +1144,7 @@ export class AelionSession implements AelionSessionApi {
     const id = `export-${this.#nextExportJobId.toString()}`;
     this.#nextExportJobId += 1;
     this.#exportJobsStarted += 1;
+    this.#activeExportStartedAt = performance.now();
     const job = new ExportJob<AelionProfileExportResult>({
       id,
       ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
@@ -1144,10 +1257,7 @@ export class AelionSession implements AelionSessionApi {
         }
       },
       onSnapshot: snapshot => this.#acceptExportSnapshot(snapshot),
-      onSettled: settled => {
-        if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
-        this.#emitStats();
-      },
+      onSettled: settled => this.#acceptExportSettled(settled),
     });
     this.#activeExportJob = job;
     this.#emitStats();
@@ -1185,6 +1295,7 @@ export class AelionSession implements AelionSessionApi {
     const id = `export-${this.#nextExportJobId.toString()}`;
     this.#nextExportJobId += 1;
     this.#exportJobsStarted += 1;
+    this.#activeExportStartedAt = performance.now();
     const job = new ExportJob({
       id,
       ...(options.signal === undefined ? {} : { externalSignal: options.signal }),
@@ -1198,7 +1309,11 @@ export class AelionSession implements AelionSessionApi {
           return await runRemoteExport({
             provider: options.provider,
             authorizer: options.authorizer,
+            ...(options.assetAuthorizer === undefined
+              ? {}
+              : { assetAuthorizer: options.assetAuthorizer }),
             request: {
+              protocolVersion: '1.0.0',
               contentId,
               idempotencyKey: options.idempotencyKey ?? contentId,
               profileId: options.profile,
@@ -1206,6 +1321,8 @@ export class AelionSession implements AelionSessionApi {
               sequenceId,
               revision,
               manifest,
+              assets: options.assets ?? [],
+              assetAuthorizations: [],
             },
             signal,
             onProgress: (progress, stage) => {
@@ -1219,10 +1336,7 @@ export class AelionSession implements AelionSessionApi {
         }
       },
       onSnapshot: snapshot => this.#acceptExportSnapshot(snapshot),
-      onSettled: settled => {
-        if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
-        this.#emitStats();
-      },
+      onSettled: settled => this.#acceptExportSettled(settled),
     });
     this.#activeExportJob = job;
     this.#emitStats();
@@ -1237,6 +1351,26 @@ export class AelionSession implements AelionSessionApi {
     if (snapshot.state === 'completed') this.#exportJobsCompleted += 1;
     else if (snapshot.state === 'cancelled') this.#exportJobsCancelled += 1;
     else if (snapshot.state === 'failed') this.#exportJobsFailed += 1;
+    this.#emitStats();
+  }
+
+  #acceptExportSettled(
+    settled: AelionExportJob | AelionProfileExportJob | AelionRemoteExportJob,
+  ): void {
+    if (this.#activeExportJob === settled) this.#activeExportJob = undefined;
+    const startedAt = this.#activeExportStartedAt;
+    this.#activeExportStartedAt = undefined;
+    if (startedAt !== undefined) {
+      recordOperationTiming(
+        this.#operationTimings.export,
+        startedAt,
+        settled.state === 'completed'
+          ? 'succeeded'
+          : settled.state === 'cancelled'
+            ? 'cancelled'
+            : 'failed',
+      );
+    }
     this.#emitStats();
   }
 

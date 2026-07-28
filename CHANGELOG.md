@@ -4,7 +4,45 @@
 
 ## Unreleased
 
-No changes yet.
+### Added
+
+- Added a transactional `release:version` command that synchronizes all
+  workspace manifests, exact public-package pins, curated current-version
+  documentation, the pnpm lockfile and the SDK API snapshot, restoring the
+  original tree when a generated step fails.
+- Added explicit product, extension-author and advanced execution package
+  stability tiers with a documented deprecation window.
+- Added a versioned browser/device compatibility matrix, capability gates,
+  privacy-safe diagnostic reports, bounded HTTP Range retries and a
+  reproducible media corpus covering rotation, B-frames, non-zero PTS, VFR,
+  long GOP, audio tails and sparse 30-minute sources.
+- Added an explicit Project/Render IR color contract for primaries, transfer,
+  matrix, range, chroma, alpha, tone mapping and bit depth. Unsupported
+  wide-gamut/HDR combinations now fail closed; SDR exports carry explicit
+  source metadata and have preview-versus-decoded-export pixel coverage.
+- Added a runtime-verified audio export capability matrix for Opus/AAC at
+  44.1/48/96 kHz and mono/stereo/5.1, plus a bounded 30-minute resumable export
+  checkpoint and restart boundary test.
+- Added Remote Export Protocol 1.0 negotiation, content-addressed assets,
+  per-asset ephemeral authorization, progress/cancellation, idempotency and
+  result byte/hash verification.
+- Added `aelion-material` author tooling for scaffold/build/validate/type
+  generation/Lab reports/Golden comparison/prepublish/deterministic packaging,
+  and `aelion-migrate` for strict or explicitly lossy WebAV/Diffusion file
+  migration with dry runs, entity maps and SHA-256 loss reports.
+- Added Webpack 5/Rspack runtime-asset emission and explicit Next.js/CDN asset
+  URL/copy helpers alongside the existing Vite plugin.
+
+### Changed
+
+- Release artifacts now derive their npm dist-tag and GitHub release kind from
+  strict SemVer: prereleases use `next` and GitHub prerelease, while stable
+  versions use `latest` and a full GitHub Release.
+- CI now rejects drift between the root version, all 18 workspace packages,
+  exact internal package pins and the curated current-version documentation.
+- Release tarball consumers now execute the installed Material and migration
+  bins, type-check both Node subpath APIs and verify every published bin target
+  before browser smoke tests.
 
 ## 0.1.0-beta.1 — 2026-07-27
 

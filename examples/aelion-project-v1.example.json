@@ -81,6 +81,14 @@
         "sampleRate": 48000,
         "channelLayout": "stereo",
         "workingColorSpace": "srgb-linear",
+        "colorPrimaries": "bt709",
+        "transferFunction": "srgb",
+        "matrixCoefficients": "rgb",
+        "colorRange": "full",
+        "chromaSubsampling": "4:4:4",
+        "alphaMode": "premultiplied",
+        "toneMapping": "none",
+        "bitDepth": 8,
         "backgroundColor": {
           "space": "srgb-linear",
           "rgba": [0, 0, 0, 1]

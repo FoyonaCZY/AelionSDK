@@ -1,14 +1,14 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "0.1.0-beta.1",
-  "generatedAt": "2026-07-27T18:17:11.260Z",
+  "generatedAt": "2026-07-28T01:23:46.578Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelionsdk/vite-plugin",
     "package": "@aelionsdk/vite-plugin",
     "version": "0.1.0-beta.1",
-    "packageSha256": "e70785336d1775cf0bcd1e8ad88521bb453998698b82b71a277b8b735d77087b",
-    "contractSha256": "5d3650510e71fc4d55fa4215c989d40272686c935dd4c787525024c2fa4d835c",
+    "packageSha256": "25a500aa700bd7f4e3a5b302b64a6b5c8679618fc8d131afeb4f4b3b9c96f17f",
+    "contractSha256": "0bb25c8cc63954339ba45a2abdb88f3d6e70b97b49766fc31e1a3f70750aaabb",
     "public": true,
     "zeroConfigVite": false,
     "configuration": "import { aelion } from '@aelionsdk/vite-plugin'; plugins: [aelion()]",
@@ -17,7 +17,7 @@
   },
   "consumerContract": {
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
-    "dependencyContractSha256": "668c3956fcea4b18d6f9720c81dc27979c0ad492330ff409122cee6c465ea089",
+    "dependencyContractSha256": "6bb479b167029b08a49afac52fb90f28396e4fc6508f3291f705b62d31e31cd6",
     "dependencyContract": {
       "@aelionsdk/audio": "aelionsdk-audio-0.1.0-beta.1.tgz",
       "@aelionsdk/capability": "aelionsdk-capability-0.1.0-beta.1.tgz",
@@ -32,35 +32,50 @@
       "@aelionsdk/sdk": "aelionsdk-sdk-0.1.0-beta.1.tgz",
       "@aelionsdk/transaction": "aelionsdk-transaction-0.1.0-beta.1.tgz",
       "@aelionsdk/vite-plugin": "aelionsdk-vite-plugin-0.1.0-beta.1.tgz",
-      "@esbuild/win32-x64": "esbuild-win32-x64-0.25.12.tgz",
+      "@esbuild/win32-x64": "esbuild-win32-x64-0.28.1.tgz",
       "@rollup/rollup-win32-x64-msvc": "rollup-rollup-win32-x64-msvc-4.62.2.tgz",
       "@types/dom-mediacapture-transform": "types-dom-mediacapture-transform-0.1.12.tgz",
       "@types/dom-webcodecs": "types-dom-webcodecs-0.1.13.tgz",
       "@types/estree": "types-estree-1.0.9.tgz",
       "@types/node": "types-node-20.19.8.tgz",
-      "ajv": "ajv-8.17.1.tgz",
+      "ajv": "ajv-8.18.0.tgz",
       "ajv-formats": "ajv-formats-3.0.1.tgz",
-      "esbuild": "esbuild-0.25.12.tgz",
+      "esbuild": "esbuild-0.28.1.tgz",
       "fast-deep-equal": "fast-deep-equal-3.1.3.tgz",
-      "fast-uri": "fast-uri-3.1.3.tgz",
+      "fast-uri": "fast-uri-3.1.4.tgz",
       "fdir": "fdir-6.5.0.tgz",
+      "fsevents": "fsevents-2.3.3.tgz",
       "json-schema-traverse": "json-schema-traverse-1.0.0.tgz",
       "mediabunny": "mediabunny-1.50.8.tgz",
-      "nanoid": "nanoid-3.3.15.tgz",
+      "nanoid": "nanoid-3.3.16.tgz",
       "picocolors": "picocolors-1.1.1.tgz",
       "picomatch": "picomatch-4.0.5.tgz",
-      "postcss": "postcss-8.5.16.tgz",
+      "postcss": "postcss-8.5.23.tgz",
       "require-from-string": "require-from-string-2.0.2.tgz",
       "rollup": "rollup-4.62.2.tgz",
       "source-map-js": "source-map-js-1.2.1.tgz",
       "tinyglobby": "tinyglobby-0.2.17.tgz",
       "typescript": "typescript-5.8.3.tgz",
       "undici-types": "undici-types-6.21.0.tgz",
-      "vite": "vite-7.0.6.tgz"
+      "vite": "vite-7.3.6.tgz"
     },
-    "packageJsonSha256": "754bf6ead3563a5440c610a117241fe9a68b9b293865c57ceb3b2588b8a6b86c",
-    "sourceSha256": "dc9f68f5f5c0555a9e4412ca492c1e2924289406fa755114c66fabe1c34864f0",
+    "packageJsonSha256": "da5e0eae8a4ff416dcfcf703c20d4f8d61618ac8559c40e9427c409ddfac6004",
+    "sourceSha256": "e9e9008eb3a07329afc5e1c1ca679b59203ea88106d8731782c1edb772eb3e76",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
+  },
+  "cliConsumer": {
+    "material": {
+      "packageId": "dev.example.starter",
+      "integrity": "sha256:1a182fc8da31be4b8a4eb2bfa91c4f7e8ab928a6abd21719670789f8c8d9cb9b",
+      "archiveSha256": "353dde4e592fdeb6b222656b8a219cf443be53af4276593dfe5da05b4be9bef3"
+    },
+    "migration": {
+      "source": "webav",
+      "status": "passed",
+      "dryRun": true,
+      "projectSha256": "234ccff53e8943387f2a723563f3ae5c0f72563e251b5fcf2ab0ab2f6585e522",
+      "reportSha256": "f166692c46628728d0b98451018620e8631e1bda85a92bf6ab6522dc247284f1"
+    }
   },
   "packages": [
     {
@@ -71,7 +86,7 @@
     {
       "name": "@aelionsdk/capability",
       "version": "0.1.0-beta.1",
-      "sha256": "59afb1553a753e2beffb55c5191dd93bdc84a88d5e92b2a605446068718644dc"
+      "sha256": "d704e0d2c3c9516b559f2a69961a40881fb909bc7f9eae9b451ecf91fdbda932"
     },
     {
       "name": "@aelionsdk/core",
@@ -81,7 +96,7 @@
     {
       "name": "@aelionsdk/export",
       "version": "0.1.0-beta.1",
-      "sha256": "dfbba9b3d2aee61011b1f678f377dccbed4a3f6a31fdd4e0affb408fb7bc522d"
+      "sha256": "ac7d1fd869e32343f5fe7ebf7ad5fc1a6fa9a93c5017512e6954f4458989125d"
     },
     {
       "name": "@aelionsdk/material-compiler",
@@ -91,32 +106,32 @@
     {
       "name": "@aelionsdk/material-sdk",
       "version": "0.1.0-beta.1",
-      "sha256": "30d998c2c1f0e3b25607a69e75c0f4f104ae0b4cdef3f85d146b39daf3b91867"
+      "sha256": "f23a1d203cb2d8800f6f962d016214ad45fe9e346caf3f429a53e195ddb8b23a"
     },
     {
       "name": "@aelionsdk/media",
       "version": "0.1.0-beta.1",
-      "sha256": "59d71bd646b47be4f778cfd223da7c612af1caed796ba7dd2a7676fde25cf76e"
+      "sha256": "6f93a173598a3dea8d66e114c196cf4a1e4bee26f6949a19e5ef26ad9283e23f"
     },
     {
       "name": "@aelionsdk/project-schema",
       "version": "0.1.0-beta.1",
-      "sha256": "629c7ee5de5b90d5c7c7ba9e70d18b281290f693e3a6cbe6454a5bc44838e3f5"
+      "sha256": "c8ea9fe4f19aedd6530f7f7105fd5053d92acf4ed94bea1b248b5e51a567f2bd"
     },
     {
       "name": "@aelionsdk/render-ir",
       "version": "0.1.0-beta.1",
-      "sha256": "892277dd2f8e55206102e2ffb6a9d326ccd027fd1b5b141a17bd6d4eea6cb3b9"
+      "sha256": "fe015f6abb777d23b0f7465a3f37424bea6bc14a84dacc3e6c6ab37317038744"
     },
     {
       "name": "@aelionsdk/renderer-worker",
       "version": "0.1.0-beta.1",
-      "sha256": "0733d15305ad03c2f1200c894feb437addc52c0b7b967ff035932b9db99dd584"
+      "sha256": "4c1caaee29d87616b759b20a7d1e19837e3149151d66fe7551bdb9b82bda0f75"
     },
     {
       "name": "@aelionsdk/sdk",
       "version": "0.1.0-beta.1",
-      "sha256": "c57597f47dbc0cbfdb34c69736de2c7bbaaa4484908091f921e69b509007646d"
+      "sha256": "6f4f974f9b2c3015feaad627bc0d22dcf3541e975d72ff96ad057c45abb98ed8"
     },
     {
       "name": "@aelionsdk/transaction",
@@ -126,7 +141,7 @@
     {
       "name": "@aelionsdk/vite-plugin",
       "version": "0.1.0-beta.1",
-      "sha256": "e70785336d1775cf0bcd1e8ad88521bb453998698b82b71a277b8b735d77087b"
+      "sha256": "25a500aa700bd7f4e3a5b302b64a6b5c8679618fc8d131afeb4f4b3b9c96f17f"
     }
   ],
   "runtimeAssets": [
@@ -153,10 +168,10 @@
     },
     {
       "id": "mux-export-worker",
-      "publicUrl": "/assets/aelion-export-mux-export-worker.js-Dsm9QkOw.js",
-      "file": "dist/assets/aelion-export-mux-export-worker.js-Dsm9QkOw.js",
-      "bytes": 9200,
-      "sha256": "ddcea5edb6f72ed4d7a905bcfd15c4a4978c03706194e26017861e229e337d37"
+      "publicUrl": "/assets/aelion-export-mux-export-worker.js-Heoc6vjz.js",
+      "file": "dist/assets/aelion-export-mux-export-worker.js-Heoc6vjz.js",
+      "bytes": 9533,
+      "sha256": "b2a1f7afce57eded84a3813d5f3cd903b5cebc515ea50aed0d25b54408da8654"
     }
   ],
   "browsers": [
@@ -174,7 +189,7 @@
             225,
             255
           ],
-          "workerTimingUs": 83360
+          "workerTimingUs": 80080
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -204,7 +219,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6775
+            "workerTimingUs": 5875
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -237,7 +252,7 @@
     {
       "browser": "firefox",
       "report": {
-        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0",
         "crossOriginIsolated": true,
         "workerCompositor": {
           "backend": "webgl2",
@@ -248,7 +263,7 @@
             225,
             255
           ],
-          "workerTimingUs": 20080
+          "workerTimingUs": 18900
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -256,10 +271,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22976,
-          "playedFrames": 1024,
+          "availableReadFrames": 23616,
+          "playedFrames": 384,
           "underrunFrames": 0,
-          "timeUs": 37333
+          "timeUs": 8000
         },
         "sessionFacade": {
           "revision": "3",
@@ -278,7 +293,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6100
+            "workerTimingUs": 5760
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -286,10 +301,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22336,
-            "playedFrames": 1664,
+            "availableReadFrames": 23616,
+            "playedFrames": 384,
             "underrunFrames": 0,
-            "timeUs": 42667
+            "timeUs": 8000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {

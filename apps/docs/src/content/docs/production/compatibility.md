@@ -16,6 +16,12 @@ description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/
 
 Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前，需要你自己完成目标设备测试。
 
+机器可读的版本化矩阵位于
+[`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/compatibility/matrix.v1.json)。
+CI 会校验它与 SDK 版本一致、覆盖 codec/container/GPU/AudioWorklet/OPFS/
+SharedArrayBuffer 轴，并要求每个 `tested` 结论都指向仓库内真实证据。`blocked` 或
+`uncertified` 不能计作通过。
+
 ## 当前自动化覆盖
 
 | 环境                       | 当前结论    | 已覆盖的主要路径                                         |
@@ -32,23 +38,42 @@ Chromium Linux CI 证明固定 smoke 可以运行，不等于所有 Linux 发行
 
 ## 主要功能的判断方式
 
-| 功能                    | 现状                   | 上线时怎么判断                    |
-| ----------------------- | ---------------------- | --------------------------------- |
-| Project / Transaction   | Chromium、Firefox 已测 | 单元和浏览器集成                  |
-| Worker + WebGL2 Preview | Chromium、Firefox 已测 | `probeCapabilities()` + 实际首帧  |
-| WebGPU Material         | 设备相关               | capability 支持后按策略启用       |
-| AudioWorklet Player     | Chromium、Firefox 已测 | 用户手势 + 实际播放               |
-| SharedArrayBuffer 音频  | 需要 COOP/COEP         | `window.crossOriginIsolated`      |
-| MP4/H.264/AAC 输入      | 环境相关               | 实际 probe/decode                 |
-| WebM/VP9/Opus 输入      | 固定语料已测           | 具体素材仍要 probe                |
-| MP4/H.264/AAC 导出      | 环境相关               | `preflightProfile()` + AAC canary |
-| MP4/AV1/AAC 导出        | 环境相关               | 精确 AV1 config + preflight       |
-| MP4/HEVC/AAC 导出       | 环境相关               | 精确 HEVC config + preflight      |
-| WebM/VP9/Opus 导出      | Chromium、Firefox 已测 | 每个 Project preflight            |
-| 图片/GIF                | Canvas 能力相关        | preflight                         |
-| WAV/RF64                | 核心路径已测           | 大文件使用流式 Sink               |
-| OPFS                    | 环境和 quota 相关      | capability + 实际写入             |
-| HDR/PQ/HLG/10-bit       | 当前不支持             | preflight 会拒绝                  |
+| 功能                    | 现状                   | 上线时怎么判断                      |
+| ----------------------- | ---------------------- | ----------------------------------- |
+| Project / Transaction   | Chromium、Firefox 已测 | 单元和浏览器集成                    |
+| Worker + WebGL2 Preview | Chromium、Firefox 已测 | `probeCapabilities()` + 实际首帧    |
+| WebGPU Material         | 设备相关               | capability 支持后按策略启用         |
+| AudioWorklet Player     | Chromium、Firefox 已测 | 用户手势 + 实际播放                 |
+| SharedArrayBuffer 音频  | 需要 COOP/COEP         | `window.crossOriginIsolated`        |
+| MP4/H.264/AAC 输入      | 环境相关               | 实际 probe/decode                   |
+| WebM/VP9/Opus 输入      | 固定语料已测           | 具体素材仍要 probe                  |
+| MP4/H.264/AAC 导出      | 环境相关               | `preflightProfile()` + AAC canary   |
+| MP4/AV1/AAC 导出        | 环境相关               | 精确 AV1 config + preflight         |
+| MP4/HEVC/AAC 导出       | 环境相关               | 精确 HEVC config + preflight        |
+| WebM/VP9/Opus 导出      | Chromium、Firefox 已测 | 每个 Project preflight              |
+| 音频编码采样率/声道     | 环境相关               | `probeAudioExportMatrix()` + canary |
+| 图片/GIF                | Canvas 能力相关        | preflight                           |
+| WAV/RF64                | 核心路径已测           | 大文件使用流式 Sink                 |
+| OPFS                    | 环境和 quota 相关      | capability + 实际写入               |
+| HDR/PQ/HLG/10-bit       | 当前不支持             | preflight 会拒绝                    |
+
+产品门控应直接匹配探针 id 和可用性，不应根据 user-agent 推断：
+
+```ts
+import { evaluateCapabilityGate } from '@aelionsdk/capability';
+
+const report = await session.probeCapabilities();
+const gate = evaluateCapabilityGate(report, {
+  codecIds: ['decode-h264-1080p'],
+  gpu: 'webgl2',
+  audioWorklet: true,
+  secureContext: true,
+});
+
+if (!gate.ok) {
+  // 显示 gate.diagnostics，并关闭对应入口或选择明确降级路径。
+}
+```
 
 ## 生产必须使用 HTTPS
 

@@ -29,7 +29,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./migrate-cli": {
+      "types": "./dist/migrate-cli-lib.d.ts",
+      "import": "./dist/migrate-cli-lib.js"
     }
+  },
+  "bin": {
+    "aelion-migrate": "./dist/migrate-cli.js"
   },
   "files": [
     "dist",
@@ -41,6 +48,7 @@
   },
   "scripts": {
     "build": "tsc -b",
+    "migrate": "corepack pnpm run build && node dist/migrate-cli.js",
     "typecheck": "tsc -b --pretty false",
     "api:snapshot": "corepack pnpm run build && node check-api-snapshot.mjs",
     "api:snapshot:update": "corepack pnpm run build && node check-api-snapshot.mjs --update",

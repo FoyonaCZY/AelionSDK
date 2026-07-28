@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0.0",
+  "sdkVersion": "0.1.0-beta.1",
+  "generatedAt": "2026-07-28",
+  "policy": {
+    "runtimeProbeRequired": true,
+    "userAgentDecisionAllowed": false,
+    "blockedRunCountsAsPass": false
+  },
+  "environments": [
+    {
+      "id": "desktop-chromium-reference",
+      "status": "tested",
+      "scope": "Reference desktop Chromium browser suite and package consumer",
+      "evidence": [
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    },
+    {
+      "id": "desktop-firefox-reference",
+      "status": "tested",
+      "scope": "Reference desktop Firefox browser suite and package consumer",
+      "evidence": [
+        "reports/baseline/browser-smoke-firefox.json",
+        "reports/baseline/capability-firefox.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    },
+    {
+      "id": "playwright-webkit-contract",
+      "status": "tested",
+      "scope": "Public capability/profile contract only; this is not Safari device certification",
+      "evidence": ["reports/baseline/capability-webkit.json"]
+    },
+    {
+      "id": "macos-safari-device",
+      "status": "uncertified",
+      "scope": "Requires a real macOS Safari run with codec, GPU, audio, storage and export evidence",
+      "evidence": []
+    },
+    {
+      "id": "ios-ipados-safari-device",
+      "status": "uncertified",
+      "scope": "Requires real foreground/background, interruption, memory, thermal and export evidence",
+      "evidence": []
+    },
+    {
+      "id": "android-chrome-device",
+      "status": "uncertified",
+      "scope": "Requires real codec, GPU, memory, storage, background and export evidence",
+      "evidence": []
+    },
+    {
+      "id": "windows-gpu-matrix",
+      "status": "uncertified",
+      "scope": "Requires representative Intel, AMD and NVIDIA driver evidence",
+      "evidence": []
+    },
+    {
+      "id": "linux-gpu-matrix",
+      "status": "uncertified",
+      "scope": "CI smoke is not a distribution and driver product certification",
+      "evidence": []
+    }
+  ],
+  "axes": [
+    {
+      "id": "codec-configurations",
+      "status": "capability-gated",
+      "decision": "Use exact VideoDecoder/VideoEncoder/AudioDecoder/AudioEncoder config probes",
+      "evidence": [
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/capability-firefox.json",
+        "reports/baseline/capability-webkit.json"
+      ]
+    },
+    {
+      "id": "containers",
+      "status": "tested",
+      "decision": "MP4/WebM indexes, decode, mux, FFmpeg readback and resumable units are corpus tested",
+      "evidence": [
+        "reports/baseline/media-seek-chromium.json",
+        "reports/baseline/recovery-chromium.json",
+        "reports/baseline/alpha-60s.json"
+      ]
+    },
+    {
+      "id": "gpu-webgl2",
+      "status": "tested",
+      "decision": "WebGL2 is the portable local rendering baseline when its real context probe succeeds",
+      "evidence": [
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/browser-smoke-firefox.json"
+      ]
+    },
+    {
+      "id": "gpu-webgpu",
+      "status": "capability-gated",
+      "decision": "Enable only after adapter/device acquisition; allow explicit WebGL2 fallback",
+      "evidence": [
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/performance-1080p30-chromium.json"
+      ]
+    },
+    {
+      "id": "audio-worklet",
+      "status": "tested",
+      "decision": "Require AudioContext and AudioWorklet module initialization after user activation",
+      "evidence": [
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/browser-smoke-firefox.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    },
+    {
+      "id": "opfs",
+      "status": "capability-gated",
+      "decision": "Probe OPFS, estimate quota and verify an actual sink operation before large exports",
+      "evidence": [
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/recovery-chromium.json"
+      ]
+    },
+    {
+      "id": "shared-array-buffer",
+      "status": "capability-gated",
+      "decision": "Require secure context and cross-origin isolation; otherwise use the bounded transferable queue",
+      "evidence": [
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    }
+  ]
+}
