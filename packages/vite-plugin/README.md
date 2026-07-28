@@ -58,4 +58,4 @@ runtime entries on the same SDK version.
 
 Production pages should use HTTPS. For the SharedArrayBuffer audio path, also return `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. CSP must allow same-origin `worker-src` and `script-src`.
 
-This package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK). The `0.1.0-beta.1` API may change before the first stable release.
+This package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK). The `1.0.0-rc.1` API may change before the first stable release.

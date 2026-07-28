@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+## 1.0.0-rc.1 — 2026-07-28
+
 ### Added
 
 - Added a transactional `release:version` command that synchronizes all

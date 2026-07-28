@@ -3,17 +3,17 @@ title: 当前版本状态
 description: 查看源码版本、已经验证的范围、已知限制和仍需仓库之外完成的发布工作。
 ---
 
-> 当前版本：`0.1.0-beta.1`
+> 当前版本：`1.0.0-rc.1`
 >
 > 源码状态：核心编辑、预览、播放和导出链路已实现
 >
-> 发布渠道：npm `next`、Git Tag `v0.1.0-beta.1` 和 GitHub prerelease
+> 发布渠道：npm `next`、Git Tag `v1.0.0-rc.1` 和 GitHub prerelease
 
 ## 现在可以怎么使用
 
 当前源码可以运行一个完整浏览器剪辑流程：注册素材，创建和加载 Project，预览与播放，修改时间线并撤销，最后本地或远程导出。Project Builder、ProductionMediaProvider、Preview Canvas Controller 和参考编辑器都只使用公开包入口。
 
-当前版本是首个公开 Beta，适合产品集成、功能验证和目标设备测试。Beta 不等于所有
+当前版本是首个 1.0 Release Candidate，适合产品集成、功能验证和目标设备测试。RC 不等于所有
 浏览器和设备都获得产品认证；如果要对外承诺更广浏览器矩阵、长期 API 兼容或商业
 SLA，仍需完成本页后半部分列出的认证工作。
 
@@ -63,11 +63,11 @@ SLA，仍需完成本页后半部分列出的认证工作。
 - WebM/MP4 可以通过 `exportResumableMuxed()` 和 IndexedDB 原子 checkpoint
   从第一个未提交单元继续；普通 Session 导出不会自动选择业务 Job ID。
 - trusted Shader/WASM 默认拒绝，签名不能替代宿主执行授权。
-- Beta 公共 API 在首个稳定版本前仍可能按迁移规则变化。
+- RC 公共 API 在首个稳定版本前仍可能按迁移规则变化。
 
 ## 源码完成不等于已经交付的事项
 
-下面这些事情不属于本次公开 Beta 的承诺，不能因为 main 分支测试通过就对外宣称
+下面这些事情不属于本次 1.0 RC 的承诺，不能因为 main 分支测试通过就对外宣称
 已经具备：
 
 - Safari、iOS、Android 以及更广 OS/GPU 矩阵；

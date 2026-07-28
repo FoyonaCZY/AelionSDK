@@ -44,7 +44,7 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前公开 Beta 是 `0.1.0-beta.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
+当前 1.0 Release Candidate 是 `1.0.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
 导出入口和运行时资源插件：
 
 ```bash
@@ -275,9 +275,9 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
-Beta。使用前需要了解这些边界：
+1.0 RC 阶段。使用前需要了解这些边界：
 
-- 13 个公开包通过 npm `next` tag 发布；Beta API 在首个稳定版本前仍可能按迁移规则调整；
+- 13 个公开包通过 npm `next` tag 发布；RC API 在首个稳定版本前仍可能按迁移规则调整；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
   真机、iOS 与 Android 实体设备仍未认证；
 - 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；

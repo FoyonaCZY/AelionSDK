@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/export",
-  "version": "0.1.0-beta.1",
+  "version": "1.0.0-rc.1",
   "description": "Streaming WebCodecs and WebM export pipeline for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,9 +40,9 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/core": "0.1.0-beta.1",
-    "@aelionsdk/media": "0.1.0-beta.1",
-    "@aelionsdk/render-ir": "0.1.0-beta.1",
+    "@aelionsdk/core": "1.0.0-rc.1",
+    "@aelionsdk/media": "1.0.0-rc.1",
+    "@aelionsdk/render-ir": "1.0.0-rc.1",
     "mediabunny": "1.50.8"
   }
 }

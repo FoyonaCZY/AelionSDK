@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
 import { parseReleaseVersion } from './release-policy.mjs';
 import {
+  RELEASE_LOCKFILE_INSTALL_ARGS,
   RELEASE_VERSION_DOCUMENTS,
   updateDocumentVersion,
   updateManifestVersion,
@@ -77,16 +78,12 @@ if (checkOnly) {
 
 try {
   await Promise.all([...changed].map(([path, source]) => writeFile(path, source)));
-  await execFileAsync(
-    corepackExecutable,
-    corepackArguments(['pnpm', 'install', '--lockfile-only', '--ignore-scripts']),
-    {
-      cwd: root,
-      env: { ...process.env, COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' },
-      encoding: 'utf8',
-      maxBuffer: 16 * 1_024 * 1_024,
-    },
-  );
+  await execFileAsync(corepackExecutable, corepackArguments(RELEASE_LOCKFILE_INSTALL_ARGS), {
+    cwd: root,
+    env: { ...process.env, COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' },
+    encoding: 'utf8',
+    maxBuffer: 16 * 1_024 * 1_024,
+  });
   await execFileAsync(
     corepackExecutable,
     corepackArguments(['pnpm', '--filter', '@aelionsdk/sdk', 'run', 'api:snapshot:update']),
