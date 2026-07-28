@@ -60,4 +60,4 @@ Timeline time is expressed in integer microseconds. `preview.render()` cancels s
 
 Use `@aelionsdk/export` and run `session.export.preflightProfile(options)` before starting an export. If the report is not OK, show the issue codes to the user instead of silently changing formats. Memory sinks are suitable for short clips; use OPFS or a remote sink for long renders.
 
-When the page is closed, dispose the preview, Session and media provider in that order. Continue with [editor UI integration](/AelionSDK/guides/editor-ui/) and [media import](/AelionSDK/guides/media-import/).
+When the page is closed, dispose the preview, Session and media provider in that order. Continue with [editor UI integration](/AelionSDK/zh/guides/editor-ui/) and [media import](/AelionSDK/zh/guides/media-import/).
