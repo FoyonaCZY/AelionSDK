@@ -69,7 +69,7 @@ TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段�
 - Adjustment 可以作用于已经合成的下层画面；
 - 支持嵌套 Sequence、图片和 animated image 适配。
 
-当前本地画面管线是 RGBA8 SDR。P3 可以进入线性工作空间，但 PQ、HLG、10-bit 和 HDR 输出会在 renderer/export preflight 中明确拒绝，不会偷偷转成 SDR。
+Project/Render IR 可以显式描述 BT.709、Display-P3、BT.2020、PQ、HLG、range、chroma、alpha、tone mapping 和 8/10-bit。当前本地执行契约仍只有 sRGB-linear / BT.709 / RGBA8 SDR；P3、BT.2020、PQ、HLG、10-bit、HDR 和尚未实现的 tone mapping 会在 renderer/export preflight 中明确拒绝，不会偷偷改成另一套颜色语义。
 
 ## 预览和播放
 
@@ -91,6 +91,7 @@ TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段�
 - Item/Track gain、equal-power pan、fade、mute/solo；
 - 最多 8 声道 channel matrix；
 - 44.1/48/96 kHz、1–8 声道的确定性流式重采样，任意 PCM 分块产生相同输出；
+- `probeAudioExportMatrix()` 对 Opus/AAC 的 44.1/48/96 kHz、mono/stereo/5.1 组合同时执行配置探测和真实 encode/flush canary；
 - 跨 PCM 块保持 overlap 状态的线性保音高变速；
 - 与画面相同的 TimeMap 和 Automation 时间；
 - Sidechain ducking 的 lookahead、attack/release；
@@ -120,22 +121,23 @@ overlap 状态，适合自定义音频宿主按小块连续拉取。
 
 ## 导出
 
-| 输出 | 当前格式        | 备注                                       |
-| ---- | --------------- | ------------------------------------------ |
-| 视频 | VP9/Opus WebM   | Worker/inline，流式 mux                    |
-| 视频 | H.264/AAC MP4   | 必须通过 codec 检查和 AAC runtime canary   |
-| 视频 | AV1/AAC MP4     | capability/preflight 支持时启用            |
-| 视频 | HEVC/AAC MP4    | capability/preflight 支持时启用            |
-| 静帧 | PNG、JPEG、WebP | 指定时间点                                 |
-| 动图 | GIF             | 当前按完整 Sequence                        |
-| 音频 | PCM WAV、RF64   | s16/f32，大文件用 OPFS                     |
-| 远程 | 自定义 Provider | canonical manifest、幂等、鉴权、进度、取消 |
+| 输出 | 当前格式        | 备注                                                      |
+| ---- | --------------- | --------------------------------------------------------- |
+| 视频 | VP9/Opus WebM   | Worker/inline，流式 mux                                   |
+| 视频 | H.264/AAC MP4   | 必须通过 codec 检查和 AAC runtime canary                  |
+| 视频 | AV1/AAC MP4     | capability/preflight 支持时启用                           |
+| 视频 | HEVC/AAC MP4    | capability/preflight 支持时启用                           |
+| 静帧 | PNG、JPEG、WebP | 指定时间点                                                |
+| 动图 | GIF             | 当前按完整 Sequence                                       |
+| 音频 | PCM WAV、RF64   | s16/f32，大文件用 OPFS                                    |
+| 远程 | Provider v1     | 协商、内容寻址素材、短期鉴权、幂等、进度、取消、结果 hash |
 
 H.264 会按尺寸/帧率自动协商 AVC profile/level；AV1 与 HEVC 也使用精确 codec
 configuration 做能力门控。导出支持 preflight、冻结 revision、进度、取消、背压和
-半成品清理。连续 MP4/WebM 中途失败后从 profile 起点重启；可独立提交的输出单元可用
-`BrowserStorageExportCheckpointStore` 跨刷新恢复，远程 Provider 通过 content ID 与
-idempotency key 恢复/去重。
+半成品清理。`exportResumableMuxed()` 将 MP4/WebM 按完整帧边界写成带 SHA-256 的独立单元，
+可用 `IndexedDbResumableMuxedExportStore` 跨刷新从第一个缺失单元继续；30 分钟任务的
+有界 checkpoint/restart 已进入浏览器回归。远程 Provider 先协商协议/profile/素材预算，
+再按 content ID 与 idempotency key 恢复或去重。
 
 ## Material
 
@@ -152,7 +154,7 @@ Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者
 - 4K 可以离线探测和导出，但没有跨设备 4K30 实时预览保证；
 - HDR/10-bit 尚未实现；
 - 保音高策略只支持线性 TimeMap；
-- 非 Vite bundler 需要宿主显式部署并传入 runtime assets，尚无逐 bundler 认证；
+- Vite、Webpack 5/Rspack 有构建适配器；Next.js 与 CDN 采用显式、版本一致的 runtime asset URL，仍需在最终部署做 200/MIME/CSP 验证；
 - 公开包通过 npm `next` tag 发布，版本仍是 Beta；
 - Beta API 可能变化，Project/Material 协议变化必须配迁移。
 

@@ -1043,37 +1043,36 @@ await session.materials.applyUpgrade(report, {
 ### 13.1 API 分层
 
 ```ts
-import { AelionMaterial } from '@aelionsdk/material-sdk';
+import {
+  MaterialLabSession,
+  materialDefinition,
+  materialGraph,
+  packMaterialPackage,
+} from '@aelionsdk/material-sdk';
 
-const workspace = await AelionMaterial.open('./my-material');
-
-const validation = await workspace.validate({
-  targets: ['webgpu', 'webgl2'],
-  trust: 'declarative',
+const graph = materialGraph(builder => {
+  builder.output('result', builder.invert('invert', builder.inputFrame('source')));
 });
-
-const preview = await workspace.createPreview({
-  materialId: 'cross-zoom',
-  fixture: 'builtin://transition/city-to-forest',
-  canvas,
-});
-
-preview.setParameter('intensity', 0.8);
-preview.setTransitionProgress(0.5);
-
-const artifact = await workspace.pack({ signWith: publisherKey });
+const authored = materialDefinition({
+  id: 'invert',
+  kind: 'visual-filter',
+  display: { name: 'Invert' },
+})
+  .graph('graphs/invert.graph.json', graph)
+  .build();
+const report = new MaterialLabSession(authored).analyze();
+const artifact = await packMaterialPackage({ metadata, materials: [authored] });
 ```
 
-建议工具包：
+当前发布包：
 
-| 包                            | 作用                                                     |
-| ----------------------------- | -------------------------------------------------------- |
-| `@aelionsdk/material-schema`  | Manifest/Definition/Graph JSON Schema 和 TypeScript 类型 |
-| `@aelionsdk/material-sdk`     | 校验、编译、预览、打包和签名                             |
-| `@aelionsdk/material-nodes`   | Core Node 定义和 Builder                                 |
-| `@aelionsdk/material-testing` | Golden、性能、跨后端一致性测试                           |
-| `@aelionsdk/material-cli`     | validate/build/pack/sign/test/inspect                    |
-| `@aelionsdk/material-studio`  | 可选的可视化 Graph 编辑器组件                            |
+| 包                             | 作用                                                                |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `@aelionsdk/material-compiler` | Core Node Registry、Graph 校验以及 WebGL2/WebGPU 编译               |
+| `@aelionsdk/material-sdk`      | Definition/Graph Builder、Schema、Lab、Golden、打包、签名和作者 CLI |
+| `@aelionsdk/renderer-worker`   | 已解析 Material 的浏览器渲染执行                                    |
+
+Material Studio 是可以基于这些 API 构建的上层产品，不是当前发布的 npm 包。
 
 ### 13.2 Graph Builder
 
@@ -1094,15 +1093,20 @@ Builder 只是生成 canonical Graph，不形成第二种运行协议。Material
 ### 13.3 CLI
 
 ```text
-aelion-material init
+aelion-material init ./my-pack
+aelion-material build ./my-pack
 aelion-material validate ./my-pack
 aelion-material inspect ./my-pack
-aelion-material test ./my-pack --targets webgpu,webgl2
+aelion-material types ./my-pack [--out material.generated.d.ts]
+aelion-material preview ./my-pack [--out material-preview.json]
+aelion-material golden actual.rgba expected.rgba [--tolerance 2]
+aelion-material prepublish ./my-pack
 aelion-material pack ./my-pack --out dist/my-pack.aelionmat
-aelion-material sign dist/my-pack.aelionmat --key publisher.key
 ```
 
-Validate 至少检查：
+CLI 由 `@aelionsdk/material-sdk` 的 `bin` 提供。签名密钥不由通用 CLI 读取；需要签名的宿主应从自己的密钥系统取得 `CryptoKey`，再显式调用 `signMaterialPackage()`。
+
+`build` 重新计算 manifest 已声明 payload 的字节数与 SHA-256，然后生成参数类型和 Lab 预览报告。Validate 检查：
 
 - JSON Schema；
 - package path/hash；
@@ -1112,7 +1116,9 @@ Validate 至少检查：
 - kind 强制契约；
 - padding/temporal 推导是否被 contract 覆盖；
 - 后端和 feature 可用性；
-- 配额、确定性、安全和许可证清单。
+- 配额、确定性和安全边界。
+
+`prepublish` 在此基础上要求没有 error diagnostic、Graph 同时通过 WebGL2/WebGPU 编译，而且 Material 不得声明为 non-deterministic。许可证政策和发布者身份属于 Catalog/宿主策略，不能由离线 CLI 猜测。
 
 ### 13.4 Material Studio 所需能力
 

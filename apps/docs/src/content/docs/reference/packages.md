@@ -9,6 +9,19 @@ helper 不在兼容范围内。
 
 如果你在做普通剪辑应用，先看[我需要安装哪些包](/AelionSDK/start/packages/)。本页主要供查询和底层扩展使用。
 
+## 稳定性层级
+
+所有包都会随同一个版本发布，但“已发布到 npm”不表示它们具有相同的兼容承诺：
+
+| 层级         | 包                                                                                                         | 兼容承诺                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 产品应用入口 | `@aelionsdk/sdk`、`@aelionsdk/export`、`@aelionsdk/vite-plugin`                                            | 面向应用开发者；优先保持源码和行为兼容，弃用后按版本政策保留迁移窗口                                   |
+| 扩展作者入口 | `@aelionsdk/material-sdk`、`@aelionsdk/project-schema`                                                     | 面向 Material、导入器和工程工具作者；协议与 Schema 有显式版本和 migration                              |
+| 高级执行层   | `core`、`capability`、`media`、`material-compiler`、`render-ir`、`renderer-worker`、`audio`、`transaction` | 面向自定义宿主和引擎贡献者；公共 exports 仍受 API snapshot 管理，但 1.0 前允许有记录的 beta 破坏性调整 |
+
+应用应优先只依赖产品应用入口。直接依赖高级执行层等同于选择更窄的兼容边界，并需要
+自行跟进 CHANGELOG、能力矩阵和资源生命周期变化。
+
 ## 产品应用直接依赖的包
 
 ### `@aelionsdk/sdk`
@@ -23,6 +36,7 @@ helper 不在兼容范围内。
 - `attachPreviewCanvas()`；
 - `session.audio` 的分析、波形、静音移除与母带；
 - revision 持久化、WebAV/Diffusion 迁移和隔离 Worker 扩展；
+- `aelion-migrate` 文件 CLI 和 `@aelionsdk/sdk/migrate-cli` Node 入口；
 - Session、Player、Transaction、Preview、Export 的公开类型；
 - `RuntimeMaterialRegistry` 和默认 Schema。
 
@@ -57,7 +71,7 @@ import { OpfsSeekableSink, type RemoteExportProvider } from '@aelionsdk/export';
 
 ### `@aelionsdk/vite-plugin`
 
-只在 Vite 配置中使用：
+Vite 配置：
 
 ```ts
 import { aelion } from '@aelionsdk/vite-plugin';
@@ -65,8 +79,10 @@ import { aelion } from '@aelionsdk/vite-plugin';
 export default defineConfig({ plugins: [aelion()] });
 ```
 
-它负责 Renderer Worker、Export Worker 和 AudioWorklet 构建入口。非 Vite 宿主
-不依赖这个包，改用 `AelionSessionOptions.runtimeAssets` 显式传入部署 URL。
+它负责 Renderer Worker、Export Worker 和 AudioWorklet 构建入口。同一个包还导出
+`AelionWebpackPlugin`（Webpack 5/Rspack）、`loadAelionRuntimeAssets()`（自定义复制）
+和 `aelionRuntimeAssetUrls()`（Next client boundary / CDN）。所有路径最终都显式传给
+`AelionSessionOptions.runtimeAssets`。
 
 ### `@aelionsdk/material-sdk`
 
@@ -77,6 +93,7 @@ export default defineConfig({ plugins: [aelion()] });
 - `MaterialRegistry`、`MaterialCatalog`；
 - `MaterialLabSession`；
 - 签名、TrustStore、migration、Golden helper。
+- `aelion-material` 脚手架、校验、类型生成、预览报告、Golden 和确定性打包 CLI。
 
 ## 引擎层包
 

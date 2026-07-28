@@ -17,6 +17,10 @@ const fixtures = [
   ['mp4-fragmented-h264-aac.mp4', 'mp4', 'avc', 'aac'],
   ['mp4-moov-tail-h264-aac.mp4', 'mp4', 'avc', 'aac'],
   ['mp4-nonzero-pts-h264-aac.mp4', 'mp4', 'avc', 'aac'],
+  ['mp4-rotation-90-h264-aac.mp4', 'mp4', 'avc', 'aac'],
+  ['mp4-long-gop-h264-aac.mp4', 'mp4', 'avc', 'aac'],
+  ['mp4-audio-tail-h264-aac.mp4', 'mp4', 'avc', 'aac'],
+  ['mp4-sparse-30m-h264-aac.mp4', 'mp4', 'avc', 'aac'],
   ['webm-vp9-opus-vfr.webm', 'webm', 'vp9', 'opus'],
 ] as const;
 
@@ -40,6 +44,14 @@ describe('media corpus normalization', () => {
         expect(index.presentationOrder[video.id]).toHaveLength(
           index.samples[video.id]?.length ?? 0,
         );
+        expect(video.color).toEqual({
+          primaries: 'bt709',
+          transfer: 'bt709',
+          matrix: 'bt709',
+          fullRange: false,
+          highDynamicRange: false,
+          canBeTransparent: false,
+        });
       }
       expect(index.capabilities).toEqual({
         timingAndSize: true,
@@ -89,6 +101,54 @@ describe('media corpus normalization', () => {
     expect(resolveVideoSeek(index, video.id, 1_050_000).presentationUs).toBeGreaterThanOrEqual(
       500_000,
     );
+  });
+
+  it('preserves rotation metadata instead of baking an implicit orientation', async () => {
+    const bytes = new Uint8Array(
+      await readFile(new URL('fixtures/media/mp4-rotation-90-h264-aac.mp4', root)),
+    );
+    const index = await createSampleIndex(bytes);
+    expect(index.tracks.find(track => track.kind === 'video')).toMatchObject({ rotation: 90 });
+  });
+
+  it('plans bounded exact seeks from the only sync frame in a long GOP', async () => {
+    const bytes = new Uint8Array(
+      await readFile(new URL('fixtures/media/mp4-long-gop-h264-aac.mp4', root)),
+    );
+    const index = await createSampleIndex(bytes);
+    const video = index.tracks.find(track => track.kind === 'video');
+    if (video === undefined) throw new Error('Fixture has no video track');
+    const samples = index.samples[video.id] ?? [];
+    expect(samples.filter(sample => sample.isSync)).toHaveLength(1);
+    expect(resolveVideoSeek(index, video.id, 2_900_000).samplesToDecode).toBeGreaterThan(80);
+  });
+
+  it('keeps an audio tail distinct from the video end', async () => {
+    const bytes = new Uint8Array(
+      await readFile(new URL('fixtures/media/mp4-audio-tail-h264-aac.mp4', root)),
+    );
+    const index = await createSampleIndex(bytes);
+    const endUs = (kind: 'video' | 'audio'): number => {
+      const track = index.tracks.find(value => value.kind === kind);
+      if (track === undefined) throw new Error(`Fixture has no ${kind} track`);
+      return Math.max(
+        ...(index.samples[track.id] ?? []).map(
+          sample => sample.presentationTimestampUs + sample.durationUs,
+        ),
+      );
+    };
+    expect(endUs('audio') - endUs('video')).toBeGreaterThanOrEqual(40_000);
+  });
+
+  it('indexes a sparse 30-minute source without expanding it into timeline memory', async () => {
+    const bytes = new Uint8Array(
+      await readFile(new URL('fixtures/media/mp4-sparse-30m-h264-aac.mp4', root)),
+    );
+    const index = await createSampleIndex(bytes);
+    expect(index.durationUs).toBeGreaterThanOrEqual(1_800_000_000);
+    const video = index.tracks.find(track => track.kind === 'video');
+    if (video === undefined) throw new Error('Fixture has no video track');
+    expect(index.samples[video.id]?.length).toBeLessThanOrEqual(1_801);
   });
 
   it('demuxes through the RangeReader contract without requiring a whole-file API', async () => {

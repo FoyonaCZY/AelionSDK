@@ -24,6 +24,14 @@ pnpm bench:competitors -- \
 
 默认门禁要求 Aelion 在参考场景下连续预览 p95 不高于 33 ms、warm seek p95 不高于 150 ms。结果写入 `reports/baseline/competitor-benchmark-chromium.json`。
 
+2026-07-28 的 Windows 参考机结果如下。这里报告的是 API 调用返回延迟，不是长视频导出吞吐：
+
+| 引擎                        | 连续预览 p95 | warm seek p95 |
+| --------------------------- | -----------: | ------------: |
+| Aelion                      |     13.99 ms |       7.36 ms |
+| WebAV 1.2.8                 |     33.31 ms |     108.35 ms |
+| Diffusion Studio Core 4.0.3 |      0.18 ms |       0.23 ms |
+
 ## 如何理解结果
 
 这是一项同机、公开 API 级别的工程回归，不是通用跑分榜。当前 fixture 是 320×180 H.264 源，三者都缩放到 1080p 输出；它不能替代 1080p 原生长 GOP、4K、VFR、复杂 Shader、长时间播放和真实业务素材 corpus。

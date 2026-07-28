@@ -50,10 +50,37 @@ describe('RangeReader', () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockRejectedValue(new TypeError('Failed to fetch (CORS)'));
-    const reader = new FetchRangeReader('cors', 'https://media.invalid/cors.mp4', { fetch });
+    const reader = new FetchRangeReader('cors', 'https://media.invalid/cors.mp4', {
+      fetch,
+      retryDelayMs: 0,
+    });
     await expect(reader.read({ offset: 0, length: 1 })).rejects.toMatchObject({
       diagnostics: [expect.objectContaining({ code: 'MEDIA_NETWORK_OR_CORS_FAILED' })],
     });
+    expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('retries transient Range failures and preserves the exact requested interval', async () => {
+    const fetch = vi
+      .fn<typeof globalThis.fetch>()
+      .mockRejectedValueOnce(new TypeError('temporary disconnect'))
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(
+        new Response(Uint8Array.from([7, 8]), {
+          status: 206,
+          headers: { 'content-range': 'bytes 4-5/10' },
+        }),
+      );
+    const reader = new FetchRangeReader('retry', 'https://media.invalid/retry.mp4', {
+      fetch,
+      retryDelayMs: 0,
+    });
+    await expect(reader.read({ offset: 4, length: 2 })).resolves.toMatchObject({
+      bytes: Uint8Array.from([7, 8]),
+      range: { offset: 4, length: 2 },
+      totalSize: 10,
+    });
+    expect(fetch).toHaveBeenCalledTimes(3);
   });
 });
 
@@ -76,6 +103,14 @@ describe('exact seek planning', () => {
         codedWidth: 320,
         codedHeight: 180,
         rotation: 0,
+        color: {
+          primaries: 'bt709',
+          transfer: 'bt709',
+          matrix: 'bt709',
+          fullRange: false,
+          highDynamicRange: false,
+          canBeTransparent: false,
+        },
       },
     ],
     presentationOrder: { 1: [0, 1, 2, 3] },

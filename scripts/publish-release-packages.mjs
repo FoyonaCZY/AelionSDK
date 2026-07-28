@@ -8,6 +8,7 @@ import { promisify } from 'node:util';
 
 import { PHASE_1_EXPECTED_PUBLIC_PACKAGES } from './phase-1-evidence-lib.mjs';
 import { publishWithRegistryConsistency } from './publish-release-packages-lib.mjs';
+import { releaseChannelForVersion } from './release-policy.mjs';
 
 const execFileAsync = promisify(execFile);
 const manifestArgument = process.argv[2];
@@ -17,10 +18,12 @@ if (manifestArgument === undefined) {
 const manifestPath = resolve(manifestArgument);
 const directory = dirname(manifestPath);
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+const releaseChannel = releaseChannelForVersion(manifest.version);
 if (
   manifest.schemaVersion !== '1.0.0' ||
   manifest.registry !== 'https://registry.npmjs.org/' ||
-  manifest.npmDistTag !== 'next' ||
+  manifest.npmDistTag !== releaseChannel.npmDistTag ||
+  manifest.prerelease !== releaseChannel.prerelease ||
   manifest.tag !== `v${manifest.version}` ||
   !Array.isArray(manifest.packages) ||
   manifest.packages.length !== 13

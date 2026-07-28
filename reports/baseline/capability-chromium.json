@@ -4,14 +4,14 @@
   "engine": "chromium",
   "report": {
     "schemaVersion": "1.0.0",
-    "generatedAt": "2026-07-13T02:38:16.769Z",
+    "generatedAt": "2026-07-28T01:25:19.228Z",
     "tier": "a",
     "environment": {
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
-      "platform": "macOS",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+      "platform": "Windows",
       "language": "zh-CN",
-      "hardwareConcurrency": 6,
-      "deviceMemoryGiB": 16,
+      "hardwareConcurrency": 12,
+      "deviceMemoryGiB": 32,
       "crossOriginIsolated": true,
       "secureContext": true,
       "origin": "http://127.0.0.1:4174"
@@ -39,6 +39,36 @@
         "supported": true,
         "config": {
           "codec": "vp09.00.10.08",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "flip": false,
+          "hardwareAcceleration": "no-preference",
+          "rotation": 0
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-av1-1080p",
+        "kind": "video-decoder",
+        "codec": "av01.0.08M.08",
+        "supported": true,
+        "config": {
+          "codec": "av01.0.08M.08",
+          "codedHeight": 1080,
+          "codedWidth": 1920,
+          "flip": false,
+          "hardwareAcceleration": "no-preference",
+          "rotation": 0
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "decode-hevc-1080p",
+        "kind": "video-decoder",
+        "codec": "hvc1.1.6.L120.B0",
+        "supported": true,
+        "config": {
+          "codec": "hvc1.1.6.L120.B0",
           "codedHeight": 1080,
           "codedWidth": 1920,
           "flip": false,
@@ -90,6 +120,47 @@
           "framerate": 30,
           "hardwareAcceleration": "no-preference",
           "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-av1-1080p30",
+        "kind": "video-encoder",
+        "codec": "av01.0.08M.08",
+        "supported": true,
+        "config": {
+          "alpha": "discard",
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "av01.0.08M.08",
+          "contentHint": "",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "latencyMode": "quality",
+          "width": 1920
+        },
+        "diagnostics": []
+      },
+      {
+        "id": "encode-hevc-1080p30",
+        "kind": "video-encoder",
+        "codec": "hvc1.1.6.L120.B0",
+        "supported": true,
+        "config": {
+          "alpha": "discard",
+          "bitrate": 8000000,
+          "bitrateMode": "variable",
+          "codec": "hvc1.1.6.L120.B0",
+          "contentHint": "",
+          "framerate": 30,
+          "hardwareAcceleration": "no-preference",
+          "height": 1080,
+          "hevc": {
+            "format": "hevc"
+          },
           "latencyMode": "quality",
           "width": 1920
         },
@@ -179,6 +250,7 @@
           "float32-blendable",
           "float32-filterable",
           "indirect-first-instance",
+          "primitive-index",
           "rg11b10ufloat-renderable",
           "shader-f16",
           "subgroups",
@@ -201,7 +273,7 @@
           "maxDynamicStorageBuffersPerPipelineLayout": 8,
           "maxSampledTexturesPerShaderStage": 48,
           "maxSamplersPerShaderStage": 16,
-          "maxStorageBuffersPerShaderStage": 10,
+          "maxStorageBuffersPerShaderStage": 16,
           "maxStorageTexturesPerShaderStage": 8,
           "maxUniformBuffersPerShaderStage": 12,
           "maxUniformBufferBindingSize": 65536,
@@ -221,9 +293,10 @@
           "maxComputeWorkgroupSizeY": 1024,
           "maxComputeWorkgroupSizeZ": 64,
           "maxComputeWorkgroupsPerDimension": 65535,
-          "maxStorageBuffersInFragmentStage": 10,
+          "maxImmediateSize": 64,
+          "maxStorageBuffersInFragmentStage": 16,
           "maxStorageTexturesInFragmentStage": 8,
-          "maxStorageBuffersInVertexStage": 10,
+          "maxStorageBuffersInVertexStage": 16,
           "maxStorageTexturesInVertexStage": 8
         }
       }
@@ -256,6 +329,64 @@
         "available": true
       }
     },
+    "color": {
+      "displayP3Gamut": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE",
+            "severity": "warning",
+            "message": "The current display does not advertise Display-P3 gamut",
+            "recoverable": true
+          }
+        ]
+      },
+      "highDynamicRange": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_HDR_DISPLAY_UNAVAILABLE",
+            "severity": "warning",
+            "message": "The current display does not advertise high dynamic range",
+            "recoverable": true
+          }
+        ]
+      },
+      "localExecution": {
+        "workingColorSpaces": [
+          "srgb-linear"
+        ],
+        "colorPrimaries": [
+          "bt709"
+        ],
+        "transferFunctions": [
+          "srgb"
+        ],
+        "matrixCoefficients": [
+          "rgb"
+        ],
+        "colorRanges": [
+          "full"
+        ],
+        "chromaSubsamplings": [
+          "rgb",
+          "4:4:4"
+        ],
+        "alphaModes": [
+          "opaque",
+          "premultiplied"
+        ],
+        "toneMappings": [
+          "none"
+        ],
+        "bitDepths": [
+          8
+        ],
+        "hdrPresentation": false
+      }
+    },
     "wasm": {
       "available": {
         "status": "supported",
@@ -267,6 +398,18 @@
         "code": "CAPABILITY_CODEC_CONFIG_UNSUPPORTED",
         "severity": "warning",
         "message": "VideoEncoder does not support avc1.42001e",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE",
+        "severity": "warning",
+        "message": "The current display does not advertise Display-P3 gamut",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_HDR_DISPLAY_UNAVAILABLE",
+        "severity": "warning",
+        "message": "The current display does not advertise high dynamic range",
         "recoverable": true
       }
     ]

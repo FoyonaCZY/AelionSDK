@@ -94,13 +94,17 @@ jobs:
         with:
           name: npm-release-${{ github.ref_name }}
           path: release-packages
-      - name: Create the prerelease
+      - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          release_args=()
+          if [ "$(node -p "JSON.parse(require('fs').readFileSync('release-packages/release-manifest.json', 'utf8')).prerelease")" = "true" ]; then
+            release_args+=(--prerelease)
+          fi
           gh release create "$GITHUB_REF_NAME" release-packages/* \
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
             --title "AelionSDK ${GITHUB_REF_NAME}" \
             --generate-notes \
-            --prerelease
+            "${release_args[@]}"

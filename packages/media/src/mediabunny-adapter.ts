@@ -106,12 +106,26 @@ function copyVideoDecoderConfig(config: VideoDecoderConfig): VideoDecoderConfig 
 }
 
 async function videoTrackInfo(track: InputVideoTrack): Promise<VideoTrackInfo> {
-  const [codec, codecString, width, height, rotation, timeResolution, config] = await Promise.all([
+  const [
+    codec,
+    codecString,
+    width,
+    height,
+    rotation,
+    colorSpace,
+    highDynamicRange,
+    canBeTransparent,
+    timeResolution,
+    config,
+  ] = await Promise.all([
     track.getCodec(),
     track.getCodecParameterString(),
     track.getCodedWidth(),
     track.getCodedHeight(),
     track.getRotation(),
+    track.getColorSpace(),
+    track.hasHighDynamicRange(),
+    track.canBeTransparent(),
     track.getTimeResolution(),
     track.getDecoderConfig(),
   ]);
@@ -124,6 +138,14 @@ async function videoTrackInfo(track: InputVideoTrack): Promise<VideoTrackInfo> {
     codedWidth: width,
     codedHeight: height,
     rotation,
+    color: {
+      primaries: colorSpace.primaries ?? null,
+      transfer: colorSpace.transfer ?? null,
+      matrix: colorSpace.matrix ?? null,
+      fullRange: colorSpace.fullRange ?? null,
+      highDynamicRange,
+      canBeTransparent,
+    },
     timeBase: { numerator: 1, denominator: timeResolution },
     ...(configDescription === undefined ? {} : { description: configDescription }),
   };

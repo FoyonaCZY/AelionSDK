@@ -1,24 +1,51 @@
 {
   "evidenceVersion": "1.0.0",
   "command": "pnpm report:export",
-  "generatedAt": "2026-07-10T07:27:01.175Z",
-  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+  "generatedAt": "2026-07-28T01:29:24.916Z",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "artifact": {
     "file": "reports/baseline/export-webm-vp9-opus.webm",
-    "bytes": 33836,
-    "sha256": "9225f87a4cc0ad38da17eaf9e2072998b4d0027e1ee5710d26512658753233ee"
+    "bytes": 33791,
+    "sha256": "438c39c725a8cd21f8775aae1d0cb5b9f110786dcbd35863197a0f980ab2d11d"
   },
   "export": {
     "mimeType": "video/webm; codecs=\"vp09.00.10.08, opus\"",
     "videoFrames": 30,
     "audioFrames": 48000,
-    "durationUs": 1000000
+    "durationUs": 1000000,
+    "encoderConfiguration": {
+      "profile": "webm-vp9-opus",
+      "video": {
+        "codec": "vp9",
+        "codecString": "vp09.00.10.08",
+        "width": 320,
+        "height": 180,
+        "frameRate": 30,
+        "bitrateMode": "variable",
+        "targetBitrate": 1000000,
+        "sourceColorSpace": {
+          "primaries": "bt709",
+          "transfer": "iec61966-2-1",
+          "matrix": "rgb",
+          "fullRange": true
+        }
+      },
+      "audio": {
+        "codec": "opus",
+        "sampleRate": 48000,
+        "channelCount": 2,
+        "bitrateMode": "variable",
+        "targetBitrate": 96000
+      }
+    }
   },
   "sink": {
     "writes": 1,
-    "bytesWritten": 33836,
-    "finalSize": 33836,
-    "maxInFlightWrites": 1
+    "bytesWritten": 33791,
+    "finalSize": 33791,
+    "maxInFlightWrites": 1,
+    "closed": true,
+    "aborted": false
   },
   "readback": {
     "container": "webm",
@@ -32,10 +59,10 @@
     "decodedHeight": 180
   },
   "externalReadback": {
-    "implementation": "ffmpeg version 8.1-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2026 the FFmpeg developers",
+    "implementation": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "ae36f226e7e4ae365ee4bd7058a8675546c3ed2e08d4b282daeac0f0a7d48da3",
-    "audioPcmMd5": "MD5=0f21842a2454e62e9b6672545c5d7fdb"
+    "videoFrameMd5DocumentSha256": "3f648b5e0e7198e640c9b959caefe2504e1d99dd140f3005af458ff0331566e7",
+    "audioPcmMd5": "MD5=f6ffb41113d2de00dd1aab7e5cae5a65"
   }
 }

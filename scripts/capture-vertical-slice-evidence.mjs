@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
 
+import { ffmpegCommand } from './ffmpeg-command.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outputDirectory = resolve(root, 'reports', 'baseline');
 const mediaPath = resolve(outputDirectory, 'vertical-slice-30s.webm');
@@ -66,8 +68,8 @@ try {
   await mkdir(outputDirectory, { recursive: true });
   await writeFile(mediaPath, outputBytes);
   const [ffmpegVersion, videoReadback, audioReadback] = await Promise.all([
-    run('ffmpeg', ['-version']),
-    run('ffmpeg', [
+    run(ffmpegCommand, ['-version']),
+    run(ffmpegCommand, [
       '-hide_banner',
       '-loglevel',
       'error',
@@ -79,7 +81,7 @@ try {
       'framemd5',
       '-',
     ]),
-    run('ffmpeg', [
+    run(ffmpegCommand, [
       '-hide_banner',
       '-loglevel',
       'error',

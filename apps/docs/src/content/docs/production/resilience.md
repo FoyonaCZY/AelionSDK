@@ -55,6 +55,19 @@ const unsubscribe = session.subscribe('diagnostic', ({ diagnostic }) => {
 
 遥测不要上传完整 Project、素材名、URL query、token 或原始 `cause`。Details 也要按字段 allowlist 过滤，并限制单条和单会话体积。
 
+需要一次性提交可比较的支持包时，使用 Session 的版本化诊断报告：
+
+```ts
+const report = session.createDiagnosticReport(); // privacy: 'safe'
+uploadSupportBundle(report);
+```
+
+默认 `safe` 模式只包含稳定错误码、聚合耗时/资源计数、能力状态和非识别性环境位；
+它不包含诊断 message/details、实体 ID、浏览器 UA、平台、origin、GPU adapter 或原始
+`cause`。只有用户明确同意且上传链路受控时才使用
+`createDiagnosticReport({ privacy: 'full' })`。自定义 Media Provider 的
+`getDiagnosticSnapshot()` 也必须只返回计数和枚举，不能返回素材 URL、文件名或 token。
+
 ## 哪些错误可以重试
 
 适合在条件变化后重试：
@@ -77,8 +90,36 @@ const unsubscribe = session.subscribe('diagnostic', ({ diagnostic }) => {
 
 ## 跨刷新恢复导出
 
-连续 MP4/WebM 不能从任意 container byte offset 安全续写，因此本地 muxed profile
-失败后从头重启。可独立提交的静帧、分片或业务 upload unit 使用 checkpoint runner：
+不能从任意 container byte offset 盲目续写 MP4/WebM。Aelion 的 resumable muxed
+路径把输出编码为完整 WebM cluster 或 fMP4 fragment，并在每个单元原子提交后保存
+manifest 和 SHA-256；刷新后从第一个缺失单元继续：
+
+```ts
+import { exportResumableMuxed, IndexedDbResumableMuxedExportStore } from '@aelionsdk/export';
+
+await exportResumableMuxed({
+  key: exportJobId,
+  contentId: projectContentHash,
+  profile: 'mp4-h264-aac',
+  store: new IndexedDbResumableMuxedExportStore({
+    databaseName: 'my-editor-export-checkpoints',
+  }),
+  durationUs,
+  width,
+  height,
+  frameRate,
+  sampleRate,
+  channelCount,
+  renderFrame,
+  renderAudio,
+  sink: freshEmptySeekableStream,
+});
+```
+
+恢复调用必须使用相同 content/configuration identity 和一个新的空 Sink。实现会验证
+所有已提交单元，最终按顺序重新组装成片；不得把任意半成品 byte offset 当成 checkpoint。
+
+可独立提交的静帧或业务 upload unit 则使用通用 checkpoint runner：
 
 ```ts
 import { BrowserStorageExportCheckpointStore, runCheckpointedExport } from '@aelionsdk/export';
@@ -158,6 +199,7 @@ const unsubscribers = [
 - 页面卸载前不能依赖长时间异步 dispose，一般只做同步停止并依靠下一次启动清理；
 - 启动时扫描 OPFS 中的半成品和过期任务；
 - Remote Export 用 idempotency key 查询已有任务；
-- 本地导出 Job 不能跨刷新恢复，连续 MP4/WebM 失败后从 profile 起点重启。
+- 普通本地 Job 不能跨刷新恢复；需要恢复的 MP4/WebM 必须显式使用
+  `exportResumableMuxed()`，不能复用已失败 Job 或旧 Sink。
 
 事件字段见[事件与统计](/AelionSDK/reference/events-stats/)，错误码见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。

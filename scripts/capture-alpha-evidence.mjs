@@ -13,6 +13,7 @@ import {
   probeReferenceDevice,
   publishValidatedMediaReport,
 } from './evidence-runtime.mjs';
+import { ffmpegCommand } from './ffmpeg-command.mjs';
 import { validateAlphaEvidence } from './phase-1-evidence-lib.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,8 +110,8 @@ try {
     mediaBytes: outputBytes,
     buildReport: async ({ stagingMediaPath, bytes, sha256 }) => {
       const [ffmpegVersion, videoReadback, audioReadback] = await Promise.all([
-        run('ffmpeg', ['-version']),
-        run('ffmpeg', [
+        run(ffmpegCommand, ['-version']),
+        run(ffmpegCommand, [
           '-hide_banner',
           '-loglevel',
           'error',
@@ -122,7 +123,7 @@ try {
           'framemd5',
           '-',
         ]),
-        run('ffmpeg', [
+        run(ffmpegCommand, [
           '-hide_banner',
           '-loglevel',
           'error',

@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 
 import { PHASE_1_EXPECTED_PUBLIC_PACKAGES } from './phase-1-evidence-lib.mjs';
 import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
+import { releaseChannelForVersion } from './release-policy.mjs';
 
 const execFileAsync = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -23,9 +24,7 @@ const outputDirectory = isAbsolute(outputArgument)
   : resolve(root, outputArgument);
 const rootManifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 const version = rootManifest.version;
-if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u.test(version)) {
-  throw new Error(`Root version is not publishable SemVer: ${String(version)}`);
-}
+const releaseChannel = releaseChannelForVersion(version);
 const expectedTag = `v${version}`;
 if (
   process.env.AELION_RELEASE_TAG !== undefined &&
@@ -151,7 +150,8 @@ const releaseManifest = {
   schemaVersion: '1.0.0',
   version,
   tag: expectedTag,
-  npmDistTag: 'next',
+  prerelease: releaseChannel.prerelease,
+  npmDistTag: releaseChannel.npmDistTag,
   registry: 'https://registry.npmjs.org/',
   sourceCommit,
   packages: releasePackages,

@@ -221,8 +221,14 @@ export interface RenderIr {
   readonly sampleRate: number;
   readonly channelLayout: string;
   readonly workingColorSpace: string;
-  readonly transferFunction?: 'srgb' | 'gamma22' | 'pq' | 'hlg';
-  readonly bitDepth?: 8 | 10;
+  readonly colorPrimaries: 'bt709' | 'display-p3' | 'bt2020';
+  readonly transferFunction: 'srgb' | 'gamma22' | 'pq' | 'hlg';
+  readonly matrixCoefficients: 'rgb' | 'bt709' | 'bt2020-ncl';
+  readonly colorRange: 'full' | 'limited';
+  readonly chromaSubsampling: 'rgb' | '4:4:4' | '4:2:2' | '4:2:0';
+  readonly alphaMode: 'opaque' | 'premultiplied';
+  readonly toneMapping: 'none' | 'bt2390' | 'reinhard';
+  readonly bitDepth: 8 | 10;
   readonly backgroundColor?: JsonObject;
   readonly durationUs: number;
   readonly tracks: readonly IrTrack[];

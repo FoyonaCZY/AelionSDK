@@ -52,6 +52,8 @@ export interface WebMExportOptions {
   readonly videoCodecString?: string;
   /** Exact audio codec string selected by preflight. */
   readonly audioCodecString?: string;
+  /** Color interpretation of the RGBA frames passed to the encoder. */
+  readonly sourceColorSpace?: VideoColorSpaceInit;
   readonly sink: WritableStream<{
     readonly type: 'write';
     readonly data: Uint8Array<ArrayBuffer>;
@@ -90,6 +92,12 @@ export interface MuxedEncoderConfiguration {
     readonly frameRate: number;
     readonly bitrateMode: 'variable';
     readonly targetBitrate: number;
+    readonly sourceColorSpace: {
+      readonly primaries: VideoColorPrimaries | null;
+      readonly transfer: VideoTransferCharacteristics | null;
+      readonly matrix: VideoMatrixCoefficients | null;
+      readonly fullRange: boolean | null;
+    };
   };
   readonly audio: {
     readonly codec: string;
@@ -122,6 +130,12 @@ type ExportStage =
 
 const MAIN_THREAD_YIELD_INTERVAL_MS = 16;
 const audioEncoderRuntimeSupport = new Map<string, Promise<boolean>>();
+const DEFAULT_SOURCE_COLOR_SPACE = Object.freeze({
+  primaries: 'bt709' as const,
+  transfer: 'iec61966-2-1' as const,
+  matrix: 'rgb' as const,
+  fullRange: true,
+});
 
 export interface MuxedExportRange {
   readonly videoStartFrame: number;
@@ -274,6 +288,12 @@ export async function exportMuxed(
     throw new RangeError('Muxed export range must be a non-empty subset of the timeline');
   }
   throwIfAborted(options.signal, profile.operationName);
+  const sourceColorSpace = {
+    primaries: options.sourceColorSpace?.primaries ?? DEFAULT_SOURCE_COLOR_SPACE.primaries,
+    transfer: options.sourceColorSpace?.transfer ?? DEFAULT_SOURCE_COLOR_SPACE.transfer,
+    matrix: options.sourceColorSpace?.matrix ?? DEFAULT_SOURCE_COLOR_SPACE.matrix,
+    fullRange: options.sourceColorSpace?.fullRange ?? DEFAULT_SOURCE_COLOR_SPACE.fullRange,
+  };
   if (profile.audioCodec === 'aac') {
     const runtimeConfig: AudioEncoderConfig = {
       codec: options.audioCodecString ?? 'mp4a.40.2',
@@ -397,6 +417,7 @@ export async function exportMuxed(
         const sample = new VideoSample(frame, {
           timestamp: (timestampUs - rangeTimestampBaseUs) / 1_000_000,
           duration: durationUs / 1_000_000,
+          colorSpace: sourceColorSpace,
         });
         try {
           await videoSource.add(sample);
@@ -467,6 +488,7 @@ export async function exportMuxed(
           frameRate: options.frameRate.numerator / options.frameRate.denominator,
           bitrateMode: 'variable',
           targetBitrate: options.videoBitrate,
+          sourceColorSpace,
         },
         audio: {
           codec: profile.audioCodec,

@@ -130,6 +130,33 @@ describe('Aelion Project v1', () => {
     expect(result.ok, JSON.stringify(result.diagnostics, null, 2)).toBe(true);
   });
 
+  it('validates explicit color semantics and rejects incoherent combinations', () => {
+    const candidate = canonicalClone(project);
+    const sequence = (candidate.sequences as JsonObject).seq_main as JsonObject;
+    const format = sequence.format as JsonObject;
+    Object.assign(format, {
+      workingColorSpace: 'rec2020-linear',
+      colorPrimaries: 'bt2020',
+      transferFunction: 'pq',
+      matrixCoefficients: 'bt2020-ncl',
+      colorRange: 'limited',
+      chromaSubsampling: '4:2:0',
+      alphaMode: 'opaque',
+      toneMapping: 'none',
+      bitDepth: 10,
+    });
+    expect(validator.validate(candidate).ok).toBe(true);
+
+    format.colorPrimaries = 'bt709';
+    const invalid = validator.validate(candidate);
+    expect(invalid.ok).toBe(false);
+    expect(invalid.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_COLOR_PRIMARIES_MISMATCH' }),
+      ]),
+    );
+  });
+
   it('accepts optional audio Track solo state and rejects non-boolean values', () => {
     const candidate = canonicalClone(project);
     const track = (candidate.tracks as JsonObject).track_music as JsonObject;

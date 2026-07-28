@@ -116,23 +116,66 @@ aelion({ rendererWorker: true, audioWorklets: false });
 
 ## 非 Vite / CDN 宿主
 
-Webpack、Rspack、Rollup、自研 ESM loader 或纯 CDN 页面不需要伪装成 Vite。把构建
-后的四个入口部署到同源静态目录，并由宿主显式给出最终 URL：
+`@aelionsdk/vite-plugin` 也导出不依赖 Vite runtime 的 Webpack 5/Rspack 适配器：
+
+```ts title="webpack.config.ts / rspack.config.ts"
+import { AelionWebpackPlugin } from '@aelionsdk/vite-plugin';
+
+export default {
+  plugins: [new AelionWebpackPlugin()],
+};
+```
+
+在 client-only 应用模块中使用同一稳定目录：
 
 ```ts
+import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
+
 const session = await Aelion.createSession({
   media,
-  runtimeAssets: {
-    rendererWorker: '/aelion/webgl2-worker.js',
-    exportWorker: '/aelion/mux-export-worker.js',
-    sharedAudioWorklet: '/aelion/pcm-player.worklet.js',
-    transferableAudioWorklet: '/aelion/pcm-message-player.worklet.js',
+  runtimeAssets: aelionRuntimeAssetUrls('/'),
+});
+```
+
+Next.js 的组件边界必须显式放在客户端；其 `_next` 输出可这样配置：
+
+```ts title="next.config.ts"
+import { AelionWebpackPlugin } from '@aelionsdk/vite-plugin';
+
+export default {
+  webpack(config) {
+    config.plugins.push(new AelionWebpackPlugin({ outputDirectory: 'static/aelion' }));
+    return config;
   },
+};
+```
+
+```ts title="app/aelion-client.ts"
+'use client';
+
+import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
+
+export const runtimeAssets = aelionRuntimeAssetUrls('/_next/', 'static/aelion');
+```
+
+如果使用 `basePath` 或 `assetPrefix`，`publicBase` 也必须包含同一个前缀；不要在 Server
+Component 或 SSR 阶段创建 Session、Worker、Canvas 或 AudioContext。
+
+Rollup、自研 ESM loader 或纯 CDN 页面可以用
+`loadAelionRuntimeAssets()` 在构建期复制四个入口，或给出版本化 CDN URL：
+
+```ts
+import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
+
+const session = await Aelion.createSession({
+  media,
+  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/0.1.0/'),
 });
 ```
 
 URL 可以是 `string` 或 `URL`，必须指向部署后真正可访问的 ESM 文件。若只设置部分
-字段，未设置的入口仍使用包内 `import.meta.url` 默认值。上线前用 Network 面板验证
+字段，未设置的入口仍使用包内 `import.meta.url` 默认值。应用 ESM、Worker 和 Worklet
+必须来自同一个 SDK 版本。上线前用 Network 面板验证
 四个入口的 200 响应、JavaScript MIME、CSP 与版本一致性。
 
 ## TypeScript 配置

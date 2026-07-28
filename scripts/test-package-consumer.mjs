@@ -128,6 +128,86 @@ async function packageContractHash(packageRoot) {
   return hash.digest('hex');
 }
 
+async function runCliConsumer() {
+  const materialRoot = join(consumerDirectory, 'node_modules', '@aelionsdk', 'material-sdk');
+  const sdkRoot = join(consumerDirectory, 'node_modules', '@aelionsdk', 'sdk');
+  const materialBin = join(materialRoot, 'dist', 'cli.js');
+  const migrationBin = join(sdkRoot, 'dist', 'migrate-cli.js');
+  const materialDirectory = join(consumerDirectory, 'material-author-fixture');
+  const materialArchive = join(consumerDirectory, 'material-author-fixture.aelionmat');
+  const migrationInput = join(consumerDirectory, 'webav-migration.json');
+  const migrationReport = join(consumerDirectory, 'webav-migration-report.json');
+
+  await run(process.execPath, [materialBin, 'init', materialDirectory], consumerDirectory);
+  const materialPrepublish = await run(
+    process.execPath,
+    [materialBin, 'prepublish', materialDirectory],
+    consumerDirectory,
+  );
+  await run(
+    process.execPath,
+    [materialBin, 'pack', materialDirectory, '--out', materialArchive],
+    consumerDirectory,
+  );
+  await writeFile(
+    migrationInput,
+    `${JSON.stringify(
+      {
+        width: 640,
+        height: 360,
+        assets: [{ id: 'still', kind: 'image' }],
+        sprites: [
+          {
+            id: 'still',
+            kind: 'image',
+            assetId: 'still',
+            time: { offset: 0, duration: 1_000_000 },
+          },
+        ],
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  const migration = await run(
+    process.execPath,
+    [
+      migrationBin,
+      '--from',
+      'webav',
+      '--input',
+      migrationInput,
+      '--report',
+      migrationReport,
+      '--dry-run',
+    ],
+    consumerDirectory,
+  );
+  const materialReport = JSON.parse(materialPrepublish.stdout);
+  const migrationResult = JSON.parse(migration.stdout);
+  if (
+    materialReport.packageId !== 'dev.example.starter' ||
+    migrationResult.status !== 'passed' ||
+    migrationResult.dryRun !== true
+  ) {
+    throw new Error('Installed CLI consumer returned an unexpected contract');
+  }
+  return {
+    material: {
+      packageId: materialReport.packageId,
+      integrity: materialReport.integrity,
+      archiveSha256: await sha256(materialArchive),
+    },
+    migration: {
+      source: migrationResult.source,
+      status: migrationResult.status,
+      dryRun: migrationResult.dryRun,
+      projectSha256: migrationResult.projectSha256,
+      reportSha256: await sha256(migrationReport),
+    },
+  };
+}
+
 async function inspectRuntimeAssets(distDirectory) {
   const assetsDirectory = join(distDirectory, 'assets');
   const expectedAssets = [
@@ -645,6 +725,16 @@ try {
     for (const required of ['LICENSE', 'README.md', 'dist/index.js', 'dist/index.d.ts']) {
       await stat(join(packageRoot, required));
     }
+    for (const target of Object.values(installedManifest.bin ?? {})) {
+      if (typeof target !== 'string' || !target.startsWith('./dist/')) {
+        throw new Error(`${manifest.name} exposes an unsafe package bin target`);
+      }
+      const path = join(packageRoot, target);
+      await stat(path);
+      if (!(await readFile(path, 'utf8')).startsWith('#!/usr/bin/env node')) {
+        throw new Error(`${manifest.name} package bin is missing its Node shebang`);
+      }
+    }
     const files = await walk(packageRoot);
     if (files.some(file => file.endsWith('.tsbuildinfo') || /\/src\//u.test(file))) {
       throw new Error(`${manifest.name} contains internal build/source files`);
@@ -669,6 +759,8 @@ try {
   await writeFile(
     join(consumerDirectory, 'contract.ts'),
     `import { Aelion, type AelionSessionOptions } from '@aelionsdk/sdk';
+import { migrateProjectFile } from '@aelionsdk/sdk/migrate-cli';
+import { validateMaterialAuthorPackage } from '@aelionsdk/material-sdk/author-cli';
 import { aelion, type AelionVitePluginOptions } from '@aelionsdk/vite-plugin';
 import { defineConfig, type UserConfig } from 'vite';
 
@@ -682,6 +774,7 @@ const sessionOptions = { preferredBackend: 'webgl2' } satisfies AelionSessionOpt
 const session = await Aelion.createSession(sessionOptions);
 await session.dispose();
 export const contract: UserConfig = config;
+export const nodeCliContracts = { migrateProjectFile, validateMaterialAuthorPackage };
 `,
   );
   await writeFile(
@@ -711,6 +804,7 @@ export const contract: UserConfig = config;
     [join(consumerDirectory, 'node_modules', 'typescript', 'bin', 'tsc'), '--noEmit'],
     consumerDirectory,
   );
+  const cliConsumer = await runCliConsumer();
   process.stdout.write(`Package consumer smoke passed: ${checks.join(', ')}\n`);
   if (browserMode) {
     const browserConsumer = await runBrowserConsumer();
@@ -745,6 +839,7 @@ export const contract: UserConfig = config;
         sourceSha256: await sha256(consumerContractPath),
         tsconfigSha256: await sha256(consumerTsconfigPath),
       },
+      cliConsumer,
       packages: packedPackages,
       runtimeAssets: browserConsumer.runtimeAssets,
       browsers: browserConsumer.browsers,

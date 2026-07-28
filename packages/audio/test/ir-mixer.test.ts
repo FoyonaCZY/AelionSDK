@@ -14,6 +14,14 @@ const ir: RenderIr = {
   sampleRate: 48_000,
   channelLayout: 'stereo',
   workingColorSpace: 'srgb-linear',
+  colorPrimaries: 'bt709',
+  transferFunction: 'srgb',
+  matrixCoefficients: 'rgb',
+  colorRange: 'full',
+  chromaSubsampling: '4:4:4',
+  alphaMode: 'premultiplied',
+  toneMapping: 'none',
+  bitDepth: 8,
   durationUs: 1_000_000,
   tracks: [
     {

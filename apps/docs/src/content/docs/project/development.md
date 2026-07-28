@@ -19,25 +19,27 @@ corepack pnpm run ci
 
 ## 常用命令
 
-| 命令                                    | 用途                                                       |
-| --------------------------------------- | ---------------------------------------------------------- |
-| `corepack pnpm run ci`                  | format、Schema、lint、typecheck、unit、build、API snapshot |
-| `corepack pnpm run docs:check`          | 检查全部 Markdown 本地链接                                 |
-| `corepack pnpm run docs:typecheck`      | 编译文档引用的完整 TypeScript 集成示例                     |
-| `corepack pnpm test:browser`            | Chromium source browser suite                              |
-| `corepack pnpm test:browser:firefox`    | Firefox source browser suite                               |
-| `corepack pnpm test:browser:webkit`     | WebKit capability/profile 公共合约 smoke                   |
-| `corepack pnpm test:browser:mobile`     | 390×844、3× DPR、touch 目标 smoke                          |
-| `corepack pnpm test:golden`             | 确定性像素 Golden                                          |
-| `corepack pnpm test:security`           | Project/媒体 fuzz、Package trust 与资源预算                |
-| `corepack pnpm test:soak`               | 十分钟音频模拟和大工程增量编译/长时间线求值                |
-| `corepack pnpm bench`                   | 固定 benchmark                                             |
-| `corepack pnpm test:pack`               | 真实 `.tgz` Node consumer                                  |
-| `corepack pnpm test:consumer`           | 真实 `.tgz` Vite/browser consumer                          |
-| `corepack pnpm release:dry-run`         | 13 个公开包的发布前检查                                    |
-| `corepack pnpm release:reproducibility` | 连续两次打包并验证 tarball 字节完全一致                    |
-| `corepack pnpm dev:lab`                 | Capability / Material Lab                                  |
-| `corepack pnpm dev:editor`              | 只使用公开包 API 的参考剪辑器                              |
+| 命令                                      | 用途                                                       |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `corepack pnpm run ci`                    | format、Schema、lint、typecheck、unit、build、API snapshot |
+| `corepack pnpm run docs:check`            | 检查全部 Markdown 本地链接                                 |
+| `corepack pnpm run docs:typecheck`        | 编译文档引用的完整 TypeScript 集成示例                     |
+| `corepack pnpm test:browser`              | Chromium source browser suite                              |
+| `corepack pnpm test:browser:firefox`      | Firefox source browser suite                               |
+| `corepack pnpm test:browser:webkit`       | WebKit capability/profile 公共合约 smoke                   |
+| `corepack pnpm test:browser:mobile`       | 390×844、3× DPR、touch 目标 smoke                          |
+| `corepack pnpm test:golden`               | 确定性像素 Golden                                          |
+| `corepack pnpm test:security`             | Project/媒体 fuzz、Package trust 与资源预算                |
+| `corepack pnpm test:soak`                 | 十分钟音频模拟和大工程增量编译/长时间线求值                |
+| `corepack pnpm bench`                     | 固定 benchmark                                             |
+| `corepack pnpm test:pack`                 | 真实 `.tgz` Node consumer                                  |
+| `corepack pnpm test:consumer`             | 真实 `.tgz` Vite/browser consumer                          |
+| `corepack pnpm release:dry-run`           | 13 个公开包的发布前检查                                    |
+| `corepack pnpm release:reproducibility`   | 连续两次打包并验证 tarball 字节完全一致                    |
+| `corepack pnpm release:version -- <版本>` | 原子同步工作区版本、内部依赖、锁文件、文档和 API 快照      |
+| `corepack pnpm release:version:check`     | 检查所有版本化位置是否与根版本一致                         |
+| `corepack pnpm dev:lab`                   | Capability / Material Lab                                  |
+| `corepack pnpm dev:editor`                | 只使用公开包 API 的参考剪辑器                              |
 
 证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
 
@@ -130,6 +132,15 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 - Project/Material migration 必须是确定性纯数据变换，可 canonical hash 和测试。
 - Beta 允许有记录、可迁移的 API 变化，但仍需 CHANGELOG、迁移说明和 declaration
   snapshot review。
+- 预发布版本（alpha、beta、rc）发布到 npm `next` 并创建 GitHub prerelease；不带
+  prerelease 标识的版本发布到 npm `latest` 并创建正式 GitHub Release。脚本会根据
+  版本自动选择渠道，调用者不能覆盖。
+- 弃用必须先在类型、运行时 diagnostic、CHANGELOG 和迁移指南中同时声明。Beta
+  至少保留一个后续 minor；1.0 后至少保留一个 minor 或 90 天（取更长者），才可在
+  下一个 major 删除。
+- 发布版本先更新 `Unreleased` 内容并审核兼容性，再运行
+  `corepack pnpm release:version -- <版本>`。命令失败会恢复所有已修改文件；成功后
+  仍需审阅生成的锁文件和 API snapshot。
 
 ## 发布门禁
 
@@ -142,7 +153,7 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 - Golden、性能和资源报告没有未解释回退；
 - npm、provenance、Tag 和 Release 只在对应外部动作真实成功后声明。
 
-公开 Beta 使用 npm `next` tag。发布提交必须先进入 `main`，并由
+预发布版本使用 npm `next`，稳定版本使用 npm `latest`。发布提交必须先进入 `main`，并由
 `corepack pnpm test:phase1:final` 生成与同一源码身份绑定的完整门禁记录。独立审阅
 通过后，创建与根 `package.json` 版本完全一致的 `v*` Tag；Tag 会触发
 `.github/workflows/release.yml`：
@@ -150,7 +161,8 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 1. 先验证已提交的独立 blocker review，再用仓库锁定的 Node 20/pnpm 构建、复核并生成 13 个不可变 tarball；
 2. 在 Node 24 的 GitHub-hosted runner 上发布并自动生成 provenance；
 3. 从官方 registry 重新安装全部包并执行 Node import 与 Vite runtime-assets build；
-4. 只有 registry smoke 成功后才创建附带 release manifest 与 tarball 的 GitHub prerelease。
+4. 只有 registry smoke 成功后才创建附带 release manifest 与 tarball 的 GitHub
+   Release；是否标记 prerelease 由版本自动决定。
 
 全新 npm 包尚不能预先配置 Trusted Publisher。首发前，`@aelionsdk` 组织 owner 必须
 创建仅覆盖这些包、允许发布的 granular access token，并暂存为仓库

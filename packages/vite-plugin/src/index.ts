@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import type { Plugin } from 'vite';
 
+export * from './runtime-assets.js';
+
 const virtualPrefix = '\0@aelionsdk/vite-plugin:runtime-asset:';
 const publicPrefix = '/@aelionsdk/vite-plugin/runtime-assets';
 

@@ -159,6 +159,68 @@ describe('resumable muxed export', () => {
     expect((await createSampleIndex(sink.finalize())).container).toBe('mp4');
   });
 
+  it('checkpoints a 30-minute job in bounded units and resumes at the first missing frame', async () => {
+    const store = new MemoryResumableMuxedExportStore();
+    const base = {
+      key: 'thirty-minute-checkpoint',
+      contentId: 'thirty-minute-source-v1',
+      profile: 'webm-vp9-opus' as const,
+      store,
+      durationUs: 30 * 60 * 1_000_000,
+      segmentDurationUs: 2_000_000,
+      width: 96,
+      height: 54,
+      frameRate: { numerator: 30, denominator: 1 },
+      sampleRate: 48_000,
+      channelCount: 2,
+      videoBitrate: 300_000,
+      audioBitrate: 128_000,
+      renderFrame,
+      renderAudio,
+    } as const;
+
+    await expect(
+      exportResumableMuxed({
+        ...base,
+        sink: new SeekableMemorySink().writable,
+        onUnitCommitted: completed => {
+          if (completed === 1) throw new Error('thirty-minute checkpoint captured');
+        },
+      }),
+    ).rejects.toThrow('thirty-minute checkpoint captured');
+
+    const manifest = await store.loadManifest(base.key);
+    expect(manifest).toMatchObject({
+      durationUs: 1_800_000_000,
+      totalUnits: 900,
+      completedUnits: 1,
+      units: [
+        {
+          index: 0,
+          videoStartFrame: 0,
+          videoEndFrameExclusive: 60,
+          audioStartFrame: 0,
+          audioEndFrameExclusive: 96_000,
+        },
+      ],
+    });
+    expect((await store.loadUnit(base.key, 0))?.media.byteLength).toBeGreaterThan(0);
+    expect(await store.loadUnit(base.key, 1)).toBeUndefined();
+
+    const resumedFrames: number[] = [];
+    await expect(
+      exportResumableMuxed({
+        ...base,
+        sink: new SeekableMemorySink().writable,
+        renderFrame: request => {
+          resumedFrames.push(request.frameIndex);
+          throw new Error('resume boundary observed');
+        },
+      }),
+    ).rejects.toThrow('resume boundary observed');
+    expect(resumedFrames).toEqual([60]);
+  });
+
   it.each([
     { profile: 'webm-vp9-opus' as const, container: 'webm' },
     { profile: 'mp4-h264-aac' as const, container: 'mp4' },

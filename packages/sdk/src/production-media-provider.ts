@@ -719,6 +719,10 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     };
   }
 
+  public getDiagnosticSnapshot(): JsonObject {
+    return this.snapshot() as unknown as JsonObject;
+  }
+
   public dispose(): void {
     if (this.#disposed) return;
     this.#disposed = true;

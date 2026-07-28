@@ -3,6 +3,7 @@ import type { StreamTargetChunk } from 'mediabunny';
 
 import { createSampleIndex, decodeVideoFrameAt } from '@aelionsdk/media';
 import type { RenderIr } from '@aelionsdk/render-ir';
+import { RenderIrFrameRenderer, type IrFrameSource } from '@aelionsdk/renderer-worker';
 
 import {
   exportGif,
@@ -13,6 +14,7 @@ import {
   exportStillImage,
   exportWebM,
   OpfsSeekableSink,
+  probeAudioExportMatrix,
   preflightAv1Mp4Export,
   preflightHevcMp4Export,
   preflightMp4Export,
@@ -32,6 +34,14 @@ function frozenIr(revision = 7n): RenderIr {
     sampleRate: 48_000,
     channelLayout: 'stereo',
     workingColorSpace: 'srgb-linear',
+    colorPrimaries: 'bt709',
+    transferFunction: 'srgb',
+    matrixCoefficients: 'rgb',
+    colorRange: 'full',
+    chromaSubsampling: '4:4:4',
+    alphaMode: 'premultiplied',
+    toneMapping: 'none',
+    bitDepth: 8,
     durationUs: 200_000,
     tracks: [],
     transitions: [],
@@ -39,7 +49,28 @@ function frozenIr(revision = 7n): RenderIr {
   };
 }
 
+const noMediaSource: IrFrameSource = {
+  frameAt: () => Promise.reject(new Error('Color parity fixture has no media clips')),
+};
+
 describe('offline WebCodecs + streaming WebM export', () => {
+  it('reports the real 44.1/48/96 kHz mono, stereo and 5.1 audio encoder matrix', async () => {
+    const matrix = await probeAudioExportMatrix();
+    expect(matrix).toHaveLength(18);
+    expect(matrix.map(entry => [entry.codec, entry.sampleRate, entry.channelCount])).toEqual(
+      ['opus', 'aac'].flatMap(codec =>
+        [44_100, 48_000, 96_000].flatMap(sampleRate =>
+          [1, 2, 6].map(channelCount => [codec, sampleRate, channelCount]),
+        ),
+      ),
+    );
+    for (const entry of matrix) {
+      expect(entry.supported).toBe(entry.declaredSupported && entry.runtimeSupported);
+      if (entry.supported) expect(entry.reason).toBeUndefined();
+      else expect(entry.reason).toMatch(/^EXPORT_AUDIO_/u);
+    }
+  });
+
   it('exports still PNG and bounded-frame animated GIF profiles', async () => {
     const renderFrame = (request: {
       readonly timestampUs: number;
@@ -135,7 +166,16 @@ describe('offline WebCodecs + streaming WebM export', () => {
     expect(bytes.byteLength).toBeGreaterThan(1_000);
     const index = await createSampleIndex(bytes);
     expect(index.container).toBe('mp4');
-    expect(index.tracks.find(track => track.kind === 'video')?.codecFamily).toBe('avc');
+    const video = index.tracks.find(track => track.kind === 'video');
+    expect(video?.codecFamily).toBe('avc');
+    expect(video?.color).toEqual({
+      primaries: 'bt709',
+      transfer: 'bt709',
+      matrix: 'bt709',
+      fullRange: false,
+      highDynamicRange: false,
+      canBeTransparent: false,
+    });
     expect(index.tracks.find(track => track.kind === 'audio')?.codecFamily).toBe('aac');
   });
 
@@ -256,6 +296,21 @@ describe('offline WebCodecs + streaming WebM export', () => {
     expect(video?.codecFamily).toBe('vp9');
     expect(audio?.codecFamily).toBe('opus');
     if (video === undefined || audio === undefined) throw new Error('Export tracks are missing');
+    expect(result.encoderConfiguration.video.sourceColorSpace).toEqual({
+      primaries: 'bt709',
+      transfer: 'iec61966-2-1',
+      matrix: 'rgb',
+      fullRange: true,
+    });
+    expect(video.color).toMatchObject({
+      fullRange: false,
+      highDynamicRange: false,
+      canBeTransparent: false,
+    });
+    expect([
+      ['bt709', 'bt709', 'bt709'],
+      ['smpte170m', 'smpte170m', 'smpte170m'],
+    ]).toContainEqual([video.color.primaries, video.color.transfer, video.color.matrix]);
     expect(index.samples[video.id]).toHaveLength(30);
     expect(index.samples[audio.id]?.length).toBeGreaterThan(0);
     const decoded = await decodeVideoFrameAt(bytes, 500_000);
@@ -272,6 +327,79 @@ describe('offline WebCodecs + streaming WebM export', () => {
       result,
       sink: sink.snapshot(),
     });
+  });
+
+  it('keeps preview and decoded export pixels within the SDR color tolerance', async () => {
+    const ir: RenderIr = {
+      ...frozenIr(),
+      width: 64,
+      height: 64,
+      backgroundColor: {
+        space: 'srgb-linear',
+        rgba: [0.2, 0.4, 0.6, 1],
+      },
+    };
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const preview = await renderer.render({
+        ir,
+        timeUs: 0,
+        source: noMediaSource,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+      });
+      const previewCanvas = new OffscreenCanvas(ir.width, ir.height);
+      const previewContext = previewCanvas.getContext('2d');
+      if (previewContext === null) throw new Error('2D preview readback is unavailable');
+      previewContext.drawImage(preview.bitmap, 0, 0);
+      preview.bitmap.close();
+      const previewPixel = [...previewContext.getImageData(ir.width / 2, ir.height / 2, 1, 1).data];
+
+      const sink = new SeekableMemorySink();
+      await exportFrozenRenderIrWebM({
+        ir,
+        projectRevision: ir.revision,
+        videoBitrate: 300_000,
+        audioBitrate: 64_000,
+        sink: sink.writable,
+        renderFrame: async request => {
+          const rendered = await renderer.render({
+            ir,
+            timeUs: request.timestampUs,
+            source: noMediaSource,
+            mode: 'export',
+            preferredBackend: 'webgl2',
+          });
+          try {
+            return new VideoFrame(rendered.bitmap, {
+              timestamp: request.timestampUs,
+              duration: request.durationUs,
+            });
+          } finally {
+            rendered.bitmap.close();
+          }
+        },
+        renderAudio: request =>
+          Promise.resolve(new Float32Array(request.frameCount * request.channelCount)),
+      });
+      const decoded = await decodeVideoFrameAt(sink.finalize(), 0);
+      try {
+        const rgba = new Uint8Array(ir.width * ir.height * 4);
+        await decoded.frame.copyTo(rgba, { format: 'RGBA' });
+        const offset = ((ir.height / 2) * ir.width + ir.width / 2) * 4;
+        const exportedPixel = [...rgba.subarray(offset, offset + 4)];
+        expect(exportedPixel).toHaveLength(4);
+        for (let channel = 0; channel < 4; channel += 1) {
+          expect(
+            Math.abs((exportedPixel[channel] ?? 0) - (previewPixel[channel] ?? 0)),
+          ).toBeLessThanOrEqual(8);
+        }
+      } finally {
+        decoded.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
   });
 
   it('does not resolve a muxed export before an asynchronous sink close completes', async () => {
@@ -610,6 +738,12 @@ describe('offline WebCodecs + streaming WebM export', () => {
         frameRate: 30,
         bitrateMode: 'variable',
         targetBitrate: 500_000,
+        sourceColorSpace: {
+          primaries: 'bt709',
+          transfer: 'iec61966-2-1',
+          matrix: 'rgb',
+          fullRange: true,
+        },
       },
       audio: {
         codec: 'opus',

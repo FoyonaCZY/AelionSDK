@@ -178,6 +178,7 @@ export async function exportWav(session: AelionSessionApi): Promise<File> {
 /** Type contract expected from a host remote rendering service. */
 export function createRemoteAdapters(api: {
   token(signal?: AbortSignal): Promise<{ value: string; expiresAtMs: number }>;
+  negotiate: RemoteExportProvider['negotiate'];
   start: RemoteExportProvider['start'];
 }): { authorizer: RemoteExportAuthorizer; provider: RemoteExportProvider } {
   return {
@@ -187,6 +188,10 @@ export function createRemoteAdapters(api: {
         return { scheme: 'Bearer', token: token.value, expiresAtMs: token.expiresAtMs };
       },
     },
-    provider: { id: 'example-render-service', start: api.start },
+    provider: {
+      id: 'example-render-service',
+      negotiate: api.negotiate,
+      start: api.start,
+    },
   };
 }

@@ -16,6 +16,7 @@ import {
   probeReferenceDevice,
   publishValidatedJson,
 } from './evidence-runtime.mjs';
+import { ffmpegCommand } from './ffmpeg-command.mjs';
 import { validateRecoveryEvidence } from './phase-1-evidence-lib.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -164,8 +165,7 @@ try {
     throw new Error('Browser recovery artifact matrix is incomplete');
   }
 
-  const ffmpeg = process.env.AELION_FFMPEG_PATH ?? 'ffmpeg';
-  const version = await run(ffmpeg, ['-version']);
+  const version = await run(ffmpegCommand, ['-version']);
   const externalDecoder = version.stdout.toString('utf8').split(/\r?\n/u)[0]?.trim() ?? 'ffmpeg';
   temporaryDirectory = await mkdtemp(join(tmpdir(), 'aelion-recovery-'));
   const decoded = [];
@@ -175,7 +175,7 @@ try {
     const path = join(temporaryDirectory, `${artifact.id}.${extension}`);
     await writeFile(path, bytes);
     const readback = await ffmpegReadback(
-      ffmpeg,
+      ffmpegCommand,
       path,
       browserEvidence.sampleRate,
       browserEvidence.channelCount,

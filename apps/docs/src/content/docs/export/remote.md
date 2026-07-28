@@ -9,9 +9,11 @@ AelionSDK 不包含托管渲染服务。Remote Export 是一组适配接口：SD
 
 启动时 SDK 会准备：
 
+- `aelion.remote-export/1.0.0` 协议握手和服务端预算；
 - canonical 的冻结 Project manifest；
 - 选中的 profile ID；
 - content ID 和 idempotency key；
+- content-addressed Asset 清单及握手成功后签发的逐素材短期授权；
 - 当前任务的 AbortSignal；
 - Authorizer 返回的短期授权。
 
@@ -44,6 +46,10 @@ import type { RemoteExportProvider } from '@aelionsdk/export';
 const provider: RemoteExportProvider = {
   id: 'my-render-service',
 
+  async negotiate(request, authorization, signal) {
+    return api.negotiateRender(request, authorization, signal);
+  },
+
   async start(request, authorization, signal) {
     const response = await api.startRender(request, authorization, signal);
 
@@ -57,6 +63,10 @@ const provider: RemoteExportProvider = {
 };
 ```
 
+`negotiate()` 必须在上传素材前返回共同协议版本、可接受的 profile 和单素材字节上限。
+SDK 会先拒绝版本/profile/预算不兼容，再请求素材 token，避免把原片上传给注定无法执行的
+Provider。
+
 `api.watchRender()` 返回异步事件流。Progress 必须单调前进，completed 只能出现一次。完成结果里的 `providerJobId`、`contentId` 和 `profileId` 必须与请求对应；SDK 会拒绝串任务或被篡改的结果。
 
 ## 启动远程任务
@@ -66,6 +76,18 @@ const job = session.export.startRemote({
   profile: 'mp4-h264-aac',
   provider,
   authorizer,
+  assets: [
+    {
+      assetId: 'camera-original',
+      contentId: sourceContentId,
+      byteLength: sourceBytes,
+      sha256: sourceSha256,
+      locator: { type: 'business-key', key: 'camera-original' },
+    },
+  ],
+  assetAuthorizer: {
+    authorizeAsset: (asset, signal) => issueAssetReadToken(asset.assetId, signal),
+  },
   onProgress: (value, stage) => {
     remoteTaskStore.update({ progress: value, stage });
   },
@@ -80,6 +102,9 @@ try {
 ```
 
 默认 manifest 来自当前冻结 Project。只有服务协议确实需要额外 JSON 绑定时才传 `manifest`。默认 idempotency key 按内容生成，重复点击或网络重试应落到同一个服务端任务；除非对接已有协议，不要自己随意覆盖。
+
+完成事件还必须返回输出 `sha256` 和 `byteLength`。下载端要同时验证二者；素材授权和
+output token 都不能写回 Project、canonical manifest、遥测或持久日志。
 
 ## 服务端至少要做的检查
 

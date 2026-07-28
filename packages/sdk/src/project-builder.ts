@@ -32,6 +32,15 @@ export interface CreateProjectOptions {
   readonly frameRate?: Rational;
   readonly sampleRate?: 44_100 | 48_000 | 96_000;
   readonly channelLayout?: 'mono' | 'stereo' | '5.1';
+  readonly workingColorSpace?: 'srgb-linear' | 'display-p3-linear' | 'rec2020-linear';
+  readonly colorPrimaries?: 'bt709' | 'display-p3' | 'bt2020';
+  readonly transferFunction?: 'srgb' | 'gamma22' | 'pq' | 'hlg';
+  readonly matrixCoefficients?: 'rgb' | 'bt709' | 'bt2020-ncl';
+  readonly colorRange?: 'full' | 'limited';
+  readonly chromaSubsampling?: 'rgb' | '4:4:4' | '4:2:2' | '4:2:0';
+  readonly alphaMode?: 'opaque' | 'premultiplied';
+  readonly toneMapping?: 'none' | 'bt2390' | 'reinhard';
+  readonly bitDepth?: 8 | 10;
   readonly backgroundColor?: string | readonly [number, number, number, number];
   /** Omit for content-derived duration. */
   readonly durationUs?: number;
@@ -356,7 +365,15 @@ export class ProjectBuilder {
             frameRate: { numerator: frameRate.numerator, denominator: frameRate.denominator },
             sampleRate: options.sampleRate ?? 48_000,
             channelLayout: options.channelLayout ?? 'stereo',
-            workingColorSpace: 'srgb-linear',
+            workingColorSpace: options.workingColorSpace ?? 'srgb-linear',
+            colorPrimaries: options.colorPrimaries ?? 'bt709',
+            transferFunction: options.transferFunction ?? 'srgb',
+            matrixCoefficients: options.matrixCoefficients ?? 'rgb',
+            colorRange: options.colorRange ?? 'full',
+            chromaSubsampling: options.chromaSubsampling ?? '4:4:4',
+            alphaMode: options.alphaMode ?? 'premultiplied',
+            toneMapping: options.toneMapping ?? 'none',
+            bitDepth: options.bitDepth ?? 8,
             backgroundColor:
               options.backgroundColor === undefined
                 ? { space: 'srgb-linear', rgba: [0, 0, 0, 1] }

@@ -4,7 +4,12 @@ import { fileURLToPath } from 'node:url';
 
 import { build, createServer } from 'vite';
 
-import { aelion } from '../dist/index.js';
+import {
+  AelionWebpackPlugin,
+  aelion,
+  aelionRuntimeAssetUrls,
+  loadAelionRuntimeAssets,
+} from '../dist/index.js';
 
 const fixtureRoot = fileURLToPath(new URL('./fixtures/app', import.meta.url));
 const audioDist = fileURLToPath(new URL('../../audio/dist', import.meta.url));
@@ -85,9 +90,70 @@ async function testDevelopmentServer() {
   }
 }
 
+async function testBundlerNeutralRuntimeAssets() {
+  const urls = aelionRuntimeAssetUrls('https://cdn.example.invalid/sdk/0.1.0/');
+  assert.equal(
+    urls.rendererWorker,
+    'https://cdn.example.invalid/sdk/0.1.0/aelion/renderer-worker/webgl2-worker.js',
+  );
+  assert.equal(
+    urls.transferableAudioWorklet,
+    'https://cdn.example.invalid/sdk/0.1.0/aelion/audio/pcm-message-player.worklet.js',
+  );
+
+  const loaded = await loadAelionRuntimeAssets('runtime/aelion');
+  assert.equal(loaded.length, 4);
+  assert(loaded.every(asset => asset.bytes.byteLength > 100));
+
+  let processAssets;
+  const emitted = new Map();
+  const plugin = new AelionWebpackPlugin({ outputDirectory: 'runtime/aelion' });
+  plugin.apply({
+    webpack: {
+      Compilation: { PROCESS_ASSETS_STAGE_ADDITIONAL: 1 },
+      sources: {
+        RawSource: class RawSource {
+          constructor(bytes) {
+            this.bytes = bytes;
+          }
+
+          source() {
+            return this.bytes;
+          }
+        },
+      },
+    },
+    hooks: {
+      thisCompilation: {
+        tap(_name, callback) {
+          callback({
+            hooks: {
+              processAssets: {
+                tapPromise(_options, callback) {
+                  processAssets = callback;
+                },
+              },
+            },
+            emitAsset(name, source) {
+              emitted.set(name, source);
+            },
+          });
+        },
+      },
+    },
+  });
+  await processAssets();
+  assert.equal(emitted.size, 4);
+  assert(emitted.has('runtime/aelion/export/mux-export-worker.js'));
+}
+
 await testProductionBuild();
 await testDevelopmentServer();
+await testBundlerNeutralRuntimeAssets();
+// Vite/esbuild closes Windows async handles on the next libuv turns. Exiting
+// from the stdout callback can race that close on newer Node releases.
+await new Promise(resolve => globalThis.setTimeout(resolve, 250));
 process.stdout.write(
-  '@aelionsdk/vite-plugin tests passed: production build, development server\n',
+  '@aelionsdk/vite-plugin tests passed: Vite, Webpack/Rspack, and explicit CDN assets\n',
   () => process.exit(0),
 );

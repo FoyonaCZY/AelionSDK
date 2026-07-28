@@ -15,6 +15,7 @@ import {
   probeReferenceDevice,
   publishValidatedJson,
 } from './evidence-runtime.mjs';
+import { ffmpegCommand } from './ffmpeg-command.mjs';
 import { validatePerformanceEvidence } from './phase-1-evidence-lib.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -81,10 +82,9 @@ try {
   try {
     const mp4Path = join(temporaryDirectory, 'session-1080p.mp4');
     await writeFile(mp4Path, mp4Bytes);
-    const ffmpeg = process.env.AELION_FFMPEG_PATH ?? 'ffmpeg';
     const [version, video, audio] = await Promise.all([
-      run(ffmpeg, ['-version']),
-      run(ffmpeg, [
+      run(ffmpegCommand, ['-version']),
+      run(ffmpegCommand, [
         '-hide_banner',
         '-loglevel',
         'error',
@@ -96,7 +96,7 @@ try {
         'framemd5',
         '-',
       ]),
-      run(ffmpeg, [
+      run(ffmpegCommand, [
         '-hide_banner',
         '-loglevel',
         'error',

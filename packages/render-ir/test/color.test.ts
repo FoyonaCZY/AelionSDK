@@ -18,7 +18,13 @@ function ir(overrides: Partial<RenderIr> = {}): RenderIr {
     sampleRate: 48_000,
     channelLayout: 'stereo',
     workingColorSpace: 'srgb-linear',
+    colorPrimaries: 'bt709',
     transferFunction: 'srgb',
+    matrixCoefficients: 'rgb',
+    colorRange: 'full',
+    chromaSubsampling: '4:4:4',
+    alphaMode: 'premultiplied',
+    toneMapping: 'none',
     bitDepth: 8,
     durationUs: 1_000_000,
     tracks: [],
@@ -30,14 +36,15 @@ function ir(overrides: Partial<RenderIr> = {}): RenderIr {
 
 describe('color pipeline contract', () => {
   it('accepts SDR/P3/Rec.2020 contracts and fail-closes unsupported local HDR output', () => {
-    expect(
-      preflightColorPipeline(
-        ir({ workingColorSpace: 'display-p3-linear' }),
-        LOCAL_RGBA8_COLOR_CAPABILITY,
-      ).ok,
-    ).toBe(true);
+    const p3 = ir({
+      workingColorSpace: 'display-p3-linear',
+      colorPrimaries: 'display-p3',
+    });
+    validateColorPipelineContract(p3);
+    expect(preflightColorPipeline(p3, LOCAL_RGBA8_COLOR_CAPABILITY).ok).toBe(false);
     const hdr = ir({
       workingColorSpace: 'rec2020-linear',
+      colorPrimaries: 'bt2020',
       transferFunction: 'pq',
       bitDepth: 10,
     });
@@ -56,7 +63,12 @@ describe('color pipeline contract', () => {
   it('rejects invalid HDR contracts before rendering or export', () => {
     expect(() =>
       validateColorPipelineContract(
-        ir({ workingColorSpace: 'display-p3-linear', transferFunction: 'hlg', bitDepth: 8 }),
+        ir({
+          workingColorSpace: 'display-p3-linear',
+          colorPrimaries: 'display-p3',
+          transferFunction: 'hlg',
+          bitDepth: 8,
+        }),
       ),
     ).toThrow('COLOR_HDR_REQUIRES_REC2020');
   });

@@ -24,6 +24,8 @@ import type {
   FrameGraphInput,
   FrameGraphNode,
   RendererWorkerDiagnostic,
+  RendererWorkerResourceSnapshot,
+  RendererWorkerTiming,
 } from './protocol.js';
 
 export type RenderMode = 'preview' | 'export';
@@ -59,6 +61,10 @@ export interface RenderIrFrameResult {
   readonly bitmap: ImageBitmap;
   readonly backend: 'webgpu' | 'webgl2';
   readonly diagnostics?: readonly RendererWorkerDiagnostic[];
+  /** Measured Worker and backend-completion time for this frame. */
+  readonly timing?: RendererWorkerTiming;
+  /** Transient resources after composition; the returned bitmap remains caller-owned. */
+  readonly resources?: RendererWorkerResourceSnapshot;
   readonly materialIds: readonly string[];
   readonly width: number;
   readonly height: number;
@@ -1388,6 +1394,8 @@ export class RenderIrFrameRenderer implements Disposable {
           bitmap: await presentationBitmap(outputFrame, options.signal),
           backend: result.backend,
           diagnostics: result.diagnostics,
+          timing: result.timing,
+          resources: result.resources,
           materialIds: appliedMaterialIds,
           width,
           height,

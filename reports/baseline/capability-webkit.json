@@ -2,9 +2,548 @@
   "evidenceVersion": "1.0.0",
   "command": "pnpm report:capability:matrix",
   "engine": "webkit",
-  "blocked": true,
-  "diagnostic": {
-    "code": "COMPATIBILITY_RUNTIME_BLOCKED",
-    "message": "browserType.launch: Executable doesn't exist at /Users/zhongyu/Library/Caches/ms-playwright/webkit-2191/pw_run.sh\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     pnpm exec playwright install                                        ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+  "report": {
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-07-28T01:25:21.725Z",
+    "tier": "c",
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "platform": "unknown",
+      "language": "zh-CN",
+      "hardwareConcurrency": 8,
+      "deviceMemoryGiB": null,
+      "crossOriginIsolated": true,
+      "secureContext": true,
+      "origin": "http://127.0.0.1:4174"
+    },
+    "codecs": [
+      {
+        "id": "decode-h264-1080p",
+        "kind": "video-decoder",
+        "codec": "avc1.42001e",
+        "supported": false,
+        "config": {
+          "codec": "avc1.42001e",
+          "codedWidth": 1920,
+          "codedHeight": 1080
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "decode-vp9-1080p",
+        "kind": "video-decoder",
+        "codec": "vp09.00.10.08",
+        "supported": false,
+        "config": {
+          "codec": "vp09.00.10.08",
+          "codedWidth": 1920,
+          "codedHeight": 1080
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "decode-av1-1080p",
+        "kind": "video-decoder",
+        "codec": "av01.0.08M.08",
+        "supported": false,
+        "config": {
+          "codec": "av01.0.08M.08",
+          "codedWidth": 1920,
+          "codedHeight": 1080
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "decode-hevc-1080p",
+        "kind": "video-decoder",
+        "codec": "hvc1.1.6.L120.B0",
+        "supported": false,
+        "config": {
+          "codec": "hvc1.1.6.L120.B0",
+          "codedWidth": 1920,
+          "codedHeight": 1080
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-h264-1080p30",
+        "kind": "video-encoder",
+        "codec": "avc1.42001e",
+        "supported": false,
+        "config": {
+          "codec": "avc1.42001e",
+          "width": 1920,
+          "height": 1080,
+          "bitrate": 8000000,
+          "framerate": 30,
+          "avc": {
+            "format": "avc"
+          }
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-vp9-1080p30",
+        "kind": "video-encoder",
+        "codec": "vp09.00.10.08",
+        "supported": false,
+        "config": {
+          "codec": "vp09.00.10.08",
+          "width": 1920,
+          "height": 1080,
+          "bitrate": 8000000,
+          "framerate": 30
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-av1-1080p30",
+        "kind": "video-encoder",
+        "codec": "av01.0.08M.08",
+        "supported": false,
+        "config": {
+          "codec": "av01.0.08M.08",
+          "width": 1920,
+          "height": 1080,
+          "bitrate": 8000000,
+          "framerate": 30
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-hevc-1080p30",
+        "kind": "video-encoder",
+        "codec": "hvc1.1.6.L120.B0",
+        "supported": false,
+        "config": {
+          "codec": "hvc1.1.6.L120.B0",
+          "width": 1920,
+          "height": 1080,
+          "bitrate": 8000000,
+          "framerate": 30,
+          "hevc": {
+            "format": "hevc"
+          }
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "VideoEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "decode-aac-stereo",
+        "kind": "audio-decoder",
+        "codec": "mp4a.40.2",
+        "supported": false,
+        "config": {
+          "codec": "mp4a.40.2",
+          "sampleRate": 48000,
+          "numberOfChannels": 2
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "decode-opus-stereo",
+        "kind": "audio-decoder",
+        "codec": "opus",
+        "supported": false,
+        "config": {
+          "codec": "opus",
+          "sampleRate": 48000,
+          "numberOfChannels": 2
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioDecoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-aac-stereo",
+        "kind": "audio-encoder",
+        "codec": "mp4a.40.2",
+        "supported": false,
+        "config": {
+          "codec": "mp4a.40.2",
+          "sampleRate": 48000,
+          "numberOfChannels": 2,
+          "bitrate": 192000
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "id": "encode-opus-stereo",
+        "kind": "audio-encoder",
+        "codec": "opus",
+        "supported": false,
+        "config": {
+          "codec": "opus",
+          "sampleRate": 48000,
+          "numberOfChannels": 2,
+          "bitrate": 192000
+        },
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioEncoder is unavailable",
+            "recoverable": true
+          }
+        ]
+      }
+    ],
+    "gpu": {
+      "worker": {
+        "status": "supported",
+        "available": true
+      },
+      "offscreenCanvas": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE",
+            "severity": "warning",
+            "message": "OffscreenCanvas is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "webgl2": {
+        "status": "supported",
+        "available": true,
+        "details": {
+          "renderer": "WebKit WebGL"
+        }
+      },
+      "webgpu": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_WEBGPU_UNAVAILABLE",
+            "severity": "warning",
+            "message": "WebGPU is unavailable",
+            "recoverable": true
+          }
+        ]
+      }
+    },
+    "audio": {
+      "audioContext": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_AUDIO_CONTEXT_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioContext is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "audioWorklet": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_AUDIO_WORKLET_UNAVAILABLE",
+            "severity": "warning",
+            "message": "AudioWorklet is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "sharedArrayBuffer": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "storage": {
+      "opfs": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_OPFS_UNAVAILABLE",
+            "severity": "warning",
+            "message": "OPFS is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "fileSystemAccess": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_FILE_SYSTEM_ACCESS_UNAVAILABLE",
+            "severity": "warning",
+            "message": "File System Access save picker is unavailable",
+            "recoverable": true
+          }
+        ]
+      },
+      "transferableStreams": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "color": {
+      "displayP3Gamut": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE",
+            "severity": "warning",
+            "message": "The current display does not advertise Display-P3 gamut",
+            "recoverable": true
+          }
+        ]
+      },
+      "highDynamicRange": {
+        "status": "unsupported",
+        "available": false,
+        "diagnostics": [
+          {
+            "code": "CAPABILITY_HDR_DISPLAY_UNAVAILABLE",
+            "severity": "warning",
+            "message": "The current display does not advertise high dynamic range",
+            "recoverable": true
+          }
+        ]
+      },
+      "localExecution": {
+        "workingColorSpaces": [
+          "srgb-linear"
+        ],
+        "colorPrimaries": [
+          "bt709"
+        ],
+        "transferFunctions": [
+          "srgb"
+        ],
+        "matrixCoefficients": [
+          "rgb"
+        ],
+        "colorRanges": [
+          "full"
+        ],
+        "chromaSubsamplings": [
+          "rgb",
+          "4:4:4"
+        ],
+        "alphaModes": [
+          "opaque",
+          "premultiplied"
+        ],
+        "toneMappings": [
+          "none"
+        ],
+        "bitDepths": [
+          8
+        ],
+        "hdrPresentation": false
+      }
+    },
+    "wasm": {
+      "available": {
+        "status": "supported",
+        "available": true
+      }
+    },
+    "diagnostics": [
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "VideoEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioDecoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_CODEC_API_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioEncoder is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_WEBGPU_UNAVAILABLE",
+        "severity": "warning",
+        "message": "WebGPU is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE",
+        "severity": "warning",
+        "message": "OffscreenCanvas is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_AUDIO_CONTEXT_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioContext is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_AUDIO_WORKLET_UNAVAILABLE",
+        "severity": "warning",
+        "message": "AudioWorklet is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_OPFS_UNAVAILABLE",
+        "severity": "warning",
+        "message": "OPFS is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_FILE_SYSTEM_ACCESS_UNAVAILABLE",
+        "severity": "warning",
+        "message": "File System Access save picker is unavailable",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_DISPLAY_P3_GAMUT_UNAVAILABLE",
+        "severity": "warning",
+        "message": "The current display does not advertise Display-P3 gamut",
+        "recoverable": true
+      },
+      {
+        "code": "CAPABILITY_HDR_DISPLAY_UNAVAILABLE",
+        "severity": "warning",
+        "message": "The current display does not advertise high dynamic range",
+        "recoverable": true
+      }
+    ]
   }
 }

@@ -586,6 +586,7 @@ describe('@aelionsdk/sdk session facade', () => {
           profileId: request.profileId,
           mimeType: 'video/mp4',
           byteLength: 42,
+          sha256: 'a'.repeat(64),
           outputToken: 'opaque-token',
         },
       };
@@ -598,6 +599,12 @@ describe('@aelionsdk/sdk session facade', () => {
       },
       provider: {
         id: 'test-provider',
+        negotiate: () =>
+          Promise.resolve({
+            protocolVersion: '1.0.0',
+            acceptedProfileIds: ['mp4-h264-aac'],
+            maxAssetBytes: 1_024,
+          }),
         start: request => {
           submitted = request;
           const remoteSession: RemoteExportSession = {
@@ -626,6 +633,9 @@ describe('@aelionsdk/sdk session facade', () => {
         protocol: 'aelion.remote-export/1',
         project: { projectId: project.projectId },
       },
+      protocolVersion: '1.0.0',
+      assets: [],
+      assetAuthorizations: [],
     });
     expect(progress).toEqual(['0.4:upload', '1:completed']);
     expect(session.getStats().export.jobsCompleted).toBe(1);

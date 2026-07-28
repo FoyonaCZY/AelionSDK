@@ -23,8 +23,14 @@ describe('browser capability report', () => {
       expect(report.storage.transferableStreams.available).toBe(true);
     }
     expect(report.color.localExecution).toEqual({
-      workingColorSpaces: ['srgb-linear', 'display-p3-linear', 'rec2020-linear'],
-      transferFunctions: ['srgb', 'gamma22'],
+      workingColorSpaces: ['srgb-linear'],
+      colorPrimaries: ['bt709'],
+      transferFunctions: ['srgb'],
+      matrixCoefficients: ['rgb'],
+      colorRanges: ['full'],
+      chromaSubsamplings: ['rgb', '4:4:4'],
+      alphaModes: ['opaque', 'premultiplied'],
+      toneMappings: ['none'],
       bitDepths: [8],
       hdrPresentation: false,
     });
