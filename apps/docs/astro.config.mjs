@@ -12,7 +12,8 @@ export default defineConfig({
       favicon: '/favicon.svg',
       defaultLocale: 'root',
       locales: {
-        root: { label: '简体中文', lang: 'zh-CN' },
+        root: { label: 'English', lang: 'en' },
+        zh: { label: '简体中文', lang: 'zh-CN' },
       },
       customCss: ['./src/styles/custom.css'],
       plugins: [
@@ -50,18 +51,18 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: '开始使用',
+          label: 'Getting started',
           items: [
-            { label: '认识 AelionSDK', slug: '' },
-            { label: '从本地视频到 MP4', slug: 'start/getting-started' },
-            { label: '安装与工程配置', slug: 'start/installation' },
-            { label: '我需要安装哪些包', slug: 'start/packages' },
-            { label: '运行参考编辑器', slug: 'start/reference-editor' },
-            { label: '当前已经支持什么', slug: 'start/capabilities' },
+            { label: 'What is AelionSDK?', slug: '' },
+            { label: 'From a local video to MP4', slug: 'start/getting-started' },
+            { label: 'Install and configure', slug: 'start/installation' },
+            { label: 'Choose packages', slug: 'start/packages' },
+            { label: 'Run the reference editor', slug: 'start/reference-editor' },
+            { label: 'Capabilities and limits', slug: 'start/capabilities' },
           ],
         },
         {
-          label: '核心概念',
+          label: 'Core concepts',
           items: [
             { label: 'Project 和时间线数据', slug: 'concepts/project-timeline' },
             { label: '时间、帧率和素材时间', slug: 'concepts/time-model' },
@@ -72,7 +73,7 @@ export default defineConfig({
           ],
         },
         {
-          label: '构建剪辑器',
+          label: 'Build an editor',
           items: [
             { label: '使用 Composition API 创作', slug: 'guides/composition-api' },
             { label: '导入与管理媒体', slug: 'guides/media-import' },
@@ -88,7 +89,7 @@ export default defineConfig({
           ],
         },
         {
-          label: '导出',
+          label: 'Export',
           items: [
             { label: '选择导出格式', slug: 'export/overview' },
             { label: '导出 MP4 和 WebM', slug: 'export/video' },
@@ -99,7 +100,7 @@ export default defineConfig({
           ],
         },
         {
-          label: '生产环境',
+          label: 'Production',
           items: [
             { label: '检查设备可用功能', slug: 'production/capability-preflight' },
             { label: '浏览器兼容性与部署', slug: 'production/compatibility' },
@@ -111,7 +112,7 @@ export default defineConfig({
           ],
         },
         {
-          label: '参考',
+          label: 'Reference',
           items: [
             { label: '包和公开入口', slug: 'reference/packages' },
             { label: 'Project v1 字段', slug: 'reference/project-schema' },
@@ -126,7 +127,7 @@ export default defineConfig({
         },
         typeDocSidebarGroup,
         {
-          label: '项目',
+          label: 'Project',
           items: [
             { label: '当前版本状态', slug: 'project/status' },
             { label: '维护仓库与准备发布', slug: 'project/development' },

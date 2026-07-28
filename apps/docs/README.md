@@ -1,6 +1,20 @@
 # AelionSDK 文档站
 
-基于 Astro Starlight 的产品文档，随 SDK 源码一起维护并部署到 GitHub Pages。线上地址：<https://foyonaczy.github.io/AelionSDK/>。
+# AelionSDK documentation
+
+Astro Starlight documentation for AelionSDK, maintained next to the SDK source and deployed to GitHub Pages.
+
+- English (default): <https://foyonaczy.github.io/AelionSDK/>
+- 简体中文: <https://foyonaczy.github.io/AelionSDK/zh/>
+
+The site uses Starlight's locale switcher. English is the default locale; the complete Chinese documentation is kept under `src/content/docs/zh/` so translated pages can evolve independently.
+
+## Local development
+
+```bash
+corepack pnpm --filter @aelionsdk/docs dev
+corepack pnpm --filter @aelionsdk/docs build
+```
 
 ```bash
 corepack pnpm dev:docs
