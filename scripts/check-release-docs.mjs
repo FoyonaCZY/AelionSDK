@@ -19,9 +19,10 @@ for (const entry of await readdir(packageRoot, { withFileTypes: true })) {
 
 const versionedFiles = [
   resolve(root, 'README.md'),
-  resolve(root, 'apps/docs/src/content/docs/project/status.md'),
-  resolve(root, 'apps/docs/src/content/docs/reference/packages.md'),
+  resolve(root, 'apps/docs/src/content/docs/zh/project/status.md'),
+  resolve(root, 'apps/docs/src/content/docs/zh/reference/packages.md'),
   resolve(root, 'apps/docs/src/content/docs/start/installation.md'),
+  resolve(root, 'apps/docs/src/content/docs/zh/start/installation.md'),
   resolve(root, 'packages/vite-plugin/README.md'),
   ...packageReadmes,
 ];
@@ -35,7 +36,7 @@ for (const path of versionedFiles) {
 }
 
 const installSource = sources.get(
-  resolve(root, 'apps/docs/src/content/docs/start/installation.md'),
+  resolve(root, 'apps/docs/src/content/docs/zh/start/installation.md'),
 );
 for (const expected of [
   `aelionsdk/${version}/`,
@@ -58,7 +59,7 @@ const review = JSON.parse(
 if (review.decision === 'approved') {
   const publishedStatus = [
     sources.get(resolve(root, 'README.md')),
-    sources.get(resolve(root, 'apps/docs/src/content/docs/project/status.md')),
+    sources.get(resolve(root, 'apps/docs/src/content/docs/zh/project/status.md')),
     await readFile(resolve(root, 'docs/status.md'), 'utf8'),
   ].join('\n');
   for (const staleClaim of [

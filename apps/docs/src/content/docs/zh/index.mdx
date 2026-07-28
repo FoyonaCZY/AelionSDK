@@ -1,0 +1,87 @@
+﻿---
+title: AelionSDK
+description: 在浏览器中完成时间线编辑、实时预览和音视频导出。
+template: splash
+hero:
+  title: '把视频剪辑器做进浏览器'
+  tagline: AelionSDK 负责时间线、媒体解码、实时预览、播放和导出，你只需要专注产品界面与业务。
+  actions:
+    - text: 跑通第一个工程
+      link: /AelionSDK/zh/start/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: 查看现有功能
+      link: /AelionSDK/zh/start/capabilities/
+      icon: open-book
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 你可以用它做什么
+
+AelionSDK 是一个运行在浏览器里的视频编辑与渲染引擎。它不提供固定界面，也不要求你采用某个前端框架。React、Vue、Svelte 或原生 DOM 都可以接入。
+
+你的应用把素材注册给 SDK，再加载一份 Project JSON。此后可以控制播放、请求任意时间点的画面、修改时间线，并把当前工程导出成 MP4、WebM、GIF、图片或 WAV。
+
+<CardGrid>
+  <Card title="编辑时间线">
+    移动、裁剪、切分、联动音视频、ripple、roll、slip、slide、Marker、关键帧和变速都通过可撤销的命令完成。
+  </Card>
+  <Card title="实时预览与播放">
+    SDK 管理解码、GPU 合成、音频时钟和过期帧取消；上层界面只需要维护播放头和交互状态。
+  </Card>
+  <Card title="浏览器本地导出">
+    支持 H.264/AAC MP4、VP9/Opus WebM、PNG、JPEG、WebP、GIF 和 WAV/RF64。长文件可以直接写入 OPFS。
+  </Card>
+  <Card title="按需扩展">
+    可以添加自定义 Material、代理素材、持久缓存、自有媒体读取器，以及接入服务端渲染。
+  </Card>
+</CardGrid>
+
+## 第一次接入，按这个顺序读
+
+1. [安装与工程配置](/AelionSDK/zh/start/installation/)：先把仓库和 Quickstart 跑起来。
+2. [快速开始](/AelionSDK/zh/start/getting-started/)：跟着一个本地视频走完导入、预览、编辑和 MP4 导出。
+3. [导入与管理媒体](/AelionSDK/zh/guides/media-import/)：根据 File、URL、OPFS 或代理素材选择注册方式。
+4. [剪辑 UI 集成](/AelionSDK/zh/guides/editor-ui/)：把 Session 接进自己的状态管理、时间线和 Inspector。
+5. [能力探测与导出检查](/AelionSDK/zh/production/capability-preflight/)：在真实设备上判断哪些功能可以开放。
+
+如果你只想先看效果，运行仓库里的 Quickstart。它没有框架和状态管理库，核心逻辑集中在一个 TypeScript 文件中：
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev:quickstart
+```
+
+页面打开后，选择一个 MP4 或 WebM 文件。你应该能看到第一帧，拖动播放头，播放素材，把片段右移一秒并撤销，最后尝试导出 H.264 MP4。
+
+## 接入时会用到的四个对象
+
+| 对象                      | 用来做什么                                           | 是否需要保存                   |
+| ------------------------- | ---------------------------------------------------- | ------------------------------ |
+| `Project`                 | 记录素材 ID、轨道、片段、效果和输出规格              | 保存为 JSON                    |
+| `ProductionMediaProvider` | 把 Project 中的素材 ID 绑定到 File、URL 或 OPFS 文件 | 不保存，打开工程时重建         |
+| `Session`                 | 加载 Project，并提供编辑、预览、播放、导出和诊断接口 | 不保存，一个编辑器实例通常一个 |
+| `PreviewCanvasController` | 把 Session 产生的画面绘制到 Canvas                   | 不保存，离开页面时释放         |
+
+这四者的关系并不复杂：Project 说明“剪什么”，Media Provider 说明“素材到哪里读”，Session 负责执行，Preview Controller 负责把结果显示出来。
+
+:::note[当前发布状态]
+AelionSDK 当前 1.0 Release Candidate 是 `1.0.0-rc.1`，通过 npm `next` tag 分发。普通应用安装
+`@aelionsdk/sdk@next`；Vite 应用同时安装 `@aelionsdk/vite-plugin@next`。RC API 在首个
+稳定版本前仍可能按迁移规则调整。
+:::
+
+## SDK 管什么，你的应用管什么
+
+AelionSDK 管理工程校验、编辑命令、撤销记录、媒体读取、解码、合成、播放和导出。你的应用仍然需要实现界面、账号、权限、素材库、自动保存、快捷键、协作和任务服务。
+
+如果你要做完整剪辑产品，可以先把[参考编辑器](/AelionSDK/zh/start/reference-editor/)当作功能样例，再按照自己的产品结构拆分状态和组件。
+
+<div class="doc-cta">
+  <div>
+    <strong>从一个真实视频开始</strong>
+    <span>先跑通，再逐段替换成自己的界面和业务。</span>
+  </div>
+  <a href="/AelionSDK/zh/start/getting-started/">打开快速开始 →</a>
+</div>
