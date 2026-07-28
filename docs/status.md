@@ -46,15 +46,27 @@ freshness window.
   non-Vite runtime assets, HDR/10-bit fail-closed execution contracts,
   competitor benchmarks, migration guides, and public API snapshots.
 
-## Remaining release authority
+## Release outcome
 
-The automated candidate gates are complete. The repository's release policy
-still requires an independent human blocker review bound to this exact source
-manifest, gate record, and artifact set. Until that review is signed:
+The independent blocker review bound to this source manifest, gate record, and
+artifact set is signed `approved` in
+`reports/baseline/phase-1-blocker-review.json`. The reviewer accepted resource
+bounds, cancellation and cleanup, Material transport integrity, public
+API/distribution, and evidence integrity with no open blockers.
 
-- `reports/baseline/phase-1-blocker-review.json` must remain `not-approved`;
-- npm publishing/provenance, Git tag, and GitHub Release must not be performed;
-- this candidate must not be described as a published 1.0 release.
+Version `1.0.0-rc.1` was subsequently published as:
 
-The independent reviewer must audit resource bounds, cancellation and cleanup,
-material transport integrity, public API/distribution, and evidence integrity.
+- all 13 `@aelionsdk/*` packages on npm under the `next` dist-tag, with
+  provenance;
+- Git tag `v1.0.0-rc.1`;
+- a GitHub prerelease after registry smoke completed.
+
+The immutable release record is the
+[`v1.0.0-rc.1` tag](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1),
+[release workflow run](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270),
+and [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1).
+This file is a concise evidence index; the canonical user-facing status,
+current limitations, and verification commands live in the
+[documentation status page](https://foyonaczy.github.io/AelionSDK/project/status/).
+Post-release documentation changes on `main` do not alter the evidence captured
+at the release tag.

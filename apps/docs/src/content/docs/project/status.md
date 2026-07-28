@@ -1,6 +1,6 @@
 ---
 title: 当前版本状态
-description: 查看源码版本、已经验证的范围、已知限制和仍需仓库之外完成的发布工作。
+description: 查看已发布版本、验证证据、已知限制和后续认证工作。
 ---
 
 > 当前版本：`1.0.0-rc.1`
@@ -28,10 +28,28 @@ SLA，仍需完成本页后半部分列出的认证工作。
 仓库还保存 Chromium、Firefox、Golden 和性能专项报告。可以重新生成的数据位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)，本页不复制容易过期的测试计数。
 
 最终发布候选由 `corepack pnpm test:phase1:final` 串行执行，并把命令结果、源身份和
-产物 postflight 写入 `reports/baseline/phase-1-gate-results.json`。当前自动化候选
-门禁已经通过，但正式发布仍要求独立人员审阅同一份源身份与产物集；
-`phase-1-blocker-review.json` 在签字前必须保持 `not-approved`。实现者不能为自己的
-候选自签，也不能因此声称 npm 1.0 已发布。
+产物 postflight 写入 `reports/baseline/phase-1-gate-results.json`。独立审阅者随后
+对同一份源清单、门禁记录和证据集完成五项 blocker review，并在
+`phase-1-blocker-review.json` 中签署 `approved`。
+
+`1.0.0-rc.1` 已发布为 13 个 npm 包、Git Tag
+[`v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1) 和
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1)；
+发布工作流同时生成 npm provenance 并完成 registry smoke。发布时的源代码、审阅
+记录和证据以该不可变 Tag 为准；`main` 后续的文档或开发变更不改写这次发布结论。
+
+## 发布身份
+
+| 项目         | 值                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| 版本         | `1.0.0-rc.1`                                                                                      |
+| npm dist-tag | `next`                                                                                            |
+| 源提交       | `02b185d405dbb030df046cd6f58465e1ba1896f0`                                                        |
+| 发布合并提交 | `5fb3b7743465c437c883a57012d7d7382f5f9ae2`                                                        |
+| 发布工作流   | [GitHub Actions run 30343884270](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270) |
+| 独立审阅结果 | `approved`                                                                                        |
+
+安装和校验 registry/provenance 的命令见[安装与工程配置](/AelionSDK/start/installation/#验证发布身份)。
 
 ## 在哪里复核测试结果
 

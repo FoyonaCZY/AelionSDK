@@ -93,7 +93,7 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 
 - 一个应用内的所有 `@aelionsdk/*` 包使用完全相同的版本；
 - 只从 package exports 导入，不使用 `/src` 或 `/dist` 路径；
-- alpha 升级时审阅 API Snapshot 和 CHANGELOG；
+- 预发布版本升级时审阅 API Snapshot 和 CHANGELOG；
 - 升级后至少重新跑一次媒体导入、预览、编辑和目标导出格式。
 
 高层创作从[使用 Composition API 创作](/AelionSDK/guides/composition-api/)开始。

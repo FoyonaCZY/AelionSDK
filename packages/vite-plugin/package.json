@@ -1,7 +1,7 @@
 {
   "name": "@aelionsdk/vite-plugin",
   "version": "1.0.0-rc.1",
-  "description": "Official Vite integration for AelionSDK Worker and AudioWorklet assets",
+  "description": "Build integrations for AelionSDK Worker and AudioWorklet assets",
   "license": "MIT",
   "repository": {
     "type": "git",

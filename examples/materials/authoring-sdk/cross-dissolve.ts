@@ -35,7 +35,7 @@ const packed = await packMaterialPackage({
     displayName: 'Example Transitions',
     publisher: { id: 'dev.example', name: 'Example Publisher' },
     license: 'MIT',
-    engines: { aelion: '>=0.1.0 <1.0.0', nodeSet: 'aelion.visual.nodes/1.0.0' },
+    engines: { aelion: '>=1.0.0-rc.1 <2.0.0', nodeSet: 'aelion.visual.nodes/1.0.0' },
     trust: 'declarative',
   },
   materials: [material],
