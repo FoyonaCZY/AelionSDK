@@ -965,7 +965,7 @@ interface MaterialInstance {
 
 实例的结构 Schema 位于 `schemas/material/v1/instance.schema.json`；具体 parameters/resourceBindings/inputBindings 还必须结合其 Material Definition 做第二阶段语义校验，单独的通用 Schema 无法判断动态参数 ID 和端口类型。
 
-从首个公开 Beta 起，Project 顶层 collection 名称固定为 `materialInstances`。所有
+从首个公开预发布版本起，Project 顶层 collection 名称固定为 `materialInstances`。所有
 滤镜、特效、转场、生成器都使用该 collection，不接受历史 `effects` 别名。
 
 ### 12.2 引用方式

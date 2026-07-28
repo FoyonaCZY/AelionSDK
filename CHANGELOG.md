@@ -1,8 +1,26 @@
 # Changelog
 
-本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/project/development.md#版本与迁移)。`0.x` 允许有记录的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
+本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/project/development.md#版本与迁移)。首个稳定版本前的预发布版本允许有记录、可迁移的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
 
 ## Unreleased
+
+### Added
+
+- Added committed package-level README files for every public package, including
+  audience, primary surface, lifecycle boundaries and direct API links.
+- Added release-document synchronization checks and a per-package TypeDoc
+  narrative coverage baseline that rejects new undocumented public
+  declarations.
+
+### Changed
+
+- Updated the documentation from pre-release approval language to the actual
+  `1.0.0-rc.1` npm/provenance, tag and GitHub prerelease outcome, with registry
+  verification commands and immutable evidence links.
+- TypeDoc generation now removes its previous projection before every build,
+  preventing duplicate content IDs and stale pages.
+- Updated current-version CDN and Material engine-range examples, prerelease
+  terminology and Trusted Publisher maintenance guidance.
 
 ## 1.0.0-rc.1 — 2026-07-28
 

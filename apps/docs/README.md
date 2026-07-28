@@ -30,6 +30,6 @@ corepack pnpm build:docs
 - 不复制会快速过期的测试数量、浏览器版本和 API 签名。
 - 新公开 API 同时更新相应 Guide/Reference；API Reference 由 TypeDoc 自动生成。
 - 站内链接统一使用 `/AelionSDK/.../` 目录路由，不写 `.md`、`.mdx` 或跨目录相对地址。
-- 合并前依次运行 `corepack pnpm run docs:check`、`corepack pnpm run build:docs` 和 `corepack pnpm run docs:check:built`；最后一步会检查所有生成页面的真实 `href`。
+- 合并前依次运行 `corepack pnpm run docs:check`、`corepack pnpm run build:docs` 和 `corepack pnpm run docs:check:built`；最后一步会检查所有生成页面的真实 `href`，并拒绝 API narrative 覆盖率低于按包基线。
 
-API 生成使用与当前 Node 20 / Starlight 兼容的 `starlight-typedoc` 版本，入口为 `packages/*/src/index.ts`。生成目录已加入 `.gitignore`。
+API 生成使用与当前 Node 20 / Starlight 兼容的 `starlight-typedoc` 版本，入口为 `packages/*/src/index.ts`。生成目录已加入 `.gitignore`，每次构建前会清理，避免删除或重命名符号后残留旧页面。新增公开声明应带 TSDoc narrative；现有缺口记录在 `api-doc-coverage-baseline.json`，只能减少，不能增加。

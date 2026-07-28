@@ -341,10 +341,12 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 字节可复现性、golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出
 外部 FFmpeg readback 均通过。
 
-完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态投影见
-`docs/status.md`。这些结果证明当前提交候选满足仓库的自动化发布门禁；发布还受
-独立人工 blocker review 约束，是否已经完成发布以 npm registry 与 GitHub
-Release 为准。
+完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态索引见
+`docs/status.md`。绑定于相同源清单、门禁记录和证据集的独立 blocker review 已签署
+`approved`；`1.0.0-rc.1` 已作为 13 个带 provenance 的 npm 包发布到 `next`，并创建
+[`v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1) 和
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1)。
+精确安装与 registry 验证命令见[安装文档](https://foyonaczy.github.io/AelionSDK/start/installation/#验证发布身份)。
 
 ## License
 

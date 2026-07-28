@@ -1,7 +1,7 @@
 {
   "name": "@aelionsdk/export",
   "version": "1.0.0-rc.1",
-  "description": "Streaming WebCodecs and WebM export pipeline for AelionSDK",
+  "description": "Streaming WebCodecs export, muxing, sinks and recovery for AelionSDK",
   "license": "MIT",
   "repository": {
     "type": "git",

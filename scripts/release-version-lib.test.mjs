@@ -68,5 +68,21 @@ test('curated release documents replace every current-version occurrence', () =>
   );
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/sdk/api-snapshot.md'));
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/material-sdk/README.md'));
+  for (const packageName of [
+    'audio',
+    'capability',
+    'core',
+    'export',
+    'material-compiler',
+    'media',
+    'project-schema',
+    'renderer-worker',
+    'render-ir',
+    'sdk',
+    'transaction',
+    'vite-plugin',
+  ]) {
+    assert.ok(RELEASE_VERSION_DOCUMENTS.includes(`packages/${packageName}/README.md`));
+  }
   assert.ok(!RELEASE_VERSION_DOCUMENTS.includes('CHANGELOG.md'));
 });

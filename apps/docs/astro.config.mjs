@@ -28,6 +28,8 @@ export default defineConfig({
             packageOptions: {
               entryPoints: ['src/index.ts'],
               entryFileName: 'overview',
+              // Existing declarations are tracked by check-api-doc-coverage.mjs.
+              // Keep TypeDoc generation non-blocking while that baseline is reduced.
               validation: { notDocumented: false, notExported: false },
             },
             categorizeByGroup: true,

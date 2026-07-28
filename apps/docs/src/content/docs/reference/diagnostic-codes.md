@@ -71,7 +71,7 @@ interface Diagnostic {
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `PROJECT_SCHEMA_INVALID`                 | Project 不符合 v1 JSON Schema；查看 `path` 和校验 details                                                                                                         |
 | `PROJECT_INPUT_INVALID`                  | Project 在 Schema 前包含非纯 JSON/不安全结构，例如 accessor、稀疏数组、symbol、循环/对象别名或非 canonical number；SDK 不调用 getter/iterator，并返回一条有界诊断 |
-| `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过 Beta 不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                                |
+| `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过当前不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                                  |
 | `PROJECT_ENTITY_KEY_MISMATCH`            | normalized map key 与实体 `id` 不一致                                                                                                                             |
 | `PROJECT_REFERENCE_MISSING`              | ID 引用的实体不存在；不可用“忽略”修复编辑语义                                                                                                                     |
 | `PROJECT_DUPLICATE_REFERENCE`            | 有序 ID list 含重复引用                                                                                                                                           |
@@ -171,7 +171,7 @@ Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_
 | `CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE`           | OffscreenCanvas 不可用                                        |
 | `CAPABILITY_WEBGL2_UNAVAILABLE`                     | 无法创建 WebGL2 context                                       |
 | `CAPABILITY_WEBGL2_PROBE_FAILED`                    | WebGL2 probe 异常失败                                         |
-| `CAPABILITY_WEBGPU_UNAVAILABLE`                     | `navigator.gpu` 不可用；Beta 默认可回退 WebGL2                |
+| `CAPABILITY_WEBGPU_UNAVAILABLE`                     | `navigator.gpu` 不可用；当前默认可回退 WebGL2                 |
 | `CAPABILITY_WEBGPU_ADAPTER_UNAVAILABLE`             | API 存在但没有 adapter                                        |
 | `CAPABILITY_WEBGPU_PROBE_FAILED`                    | WebGPU probe 异常失败                                         |
 | `CAPABILITY_AUDIO_CONTEXT_UNAVAILABLE`              | AudioContext 不可用                                           |

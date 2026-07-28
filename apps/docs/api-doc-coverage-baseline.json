@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "metric": "Maximum declaration pages without narrative text between the TypeDoc source link and the next level-two heading.",
+  "packages": {
+    "audio": 50,
+    "capability": 14,
+    "core": 27,
+    "export": 91,
+    "material-compiler": 31,
+    "material-sdk": 91,
+    "media": 53,
+    "project-schema": 32,
+    "render-ir": 63,
+    "renderer-worker": 28,
+    "sdk": 132,
+    "transaction": 45,
+    "vite-plugin": 3
+  }
+}

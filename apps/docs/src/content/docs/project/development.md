@@ -22,7 +22,8 @@ corepack pnpm run ci
 | 命令                                      | 用途                                                       |
 | ----------------------------------------- | ---------------------------------------------------------- |
 | `corepack pnpm run ci`                    | format、Schema、lint、typecheck、unit、build、API snapshot |
-| `corepack pnpm run docs:check`            | 检查全部 Markdown 本地链接                                 |
+| `corepack pnpm run docs:check`            | 检查 Markdown 链接、发布状态和 13 个包 README              |
+| `corepack pnpm run docs:check:built`      | 检查构建链接与 API 文档覆盖率防回退基线                    |
 | `corepack pnpm run docs:typecheck`        | 编译文档引用的完整 TypeScript 集成示例                     |
 | `corepack pnpm test:browser`              | Chromium source browser suite                              |
 | `corepack pnpm test:browser:firefox`      | Firefox source browser suite                               |
@@ -130,13 +131,13 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 - Patch 不改变现有字段、参数或错误码语义。
 - 向后兼容的新可选字段通常属于 minor；删除、重命名、单位变化和默认语义变化属于 breaking change。
 - Project/Material migration 必须是确定性纯数据变换，可 canonical hash 和测试。
-- Beta 允许有记录、可迁移的 API 变化，但仍需 CHANGELOG、迁移说明和 declaration
+- 预发布版本允许有记录、可迁移的 API 变化，但仍需 CHANGELOG、迁移说明和 declaration
   snapshot review。
 - 预发布版本（alpha、beta、rc）发布到 npm `next` 并创建 GitHub prerelease；不带
   prerelease 标识的版本发布到 npm `latest` 并创建正式 GitHub Release。脚本会根据
   版本自动选择渠道，调用者不能覆盖。
-- 弃用必须先在类型、运行时 diagnostic、CHANGELOG 和迁移指南中同时声明。Beta
-  至少保留一个后续 minor；1.0 后至少保留一个 minor 或 90 天（取更长者），才可在
+- 弃用必须先在类型、运行时 diagnostic、CHANGELOG 和迁移指南中同时声明。alpha、
+  beta、rc 至少保留一个后续预发布版本；1.0 后至少保留一个 minor 或 90 天（取更长者），才可在
   下一个 major 删除。
 - 发布版本先更新 `Unreleased` 内容并审核兼容性，再运行
   `corepack pnpm release:version -- <版本>`。命令失败会恢复所有已修改文件；成功后
@@ -164,11 +165,14 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 4. 只有 registry smoke 成功后才创建附带 release manifest 与 tarball 的 GitHub
    Release；是否标记 prerelease 由版本自动决定。
 
-全新 npm 包尚不能预先配置 Trusted Publisher。首发前，`@aelionsdk` 组织 owner 必须
-创建仅覆盖这些包、允许发布的 granular access token，并暂存为仓库
-`NPM_TOKEN` secret；GitHub Actions 中的 `--provenance` 仍会把首发 tarball 绑定到
-本工作流。首发成功后，立即为每个包把 Trusted Publisher 精确绑定到
-`FoyonaCZY/AelionSDK` 和 `release.yml`，再删除 `NPM_TOKEN`。后续发布只使用 OIDC。
+现有 13 个 npm 包已经完成首发。后续发布应为每个包把 Trusted Publisher 精确绑定到
+`FoyonaCZY/AelionSDK` 和 `release.yml`，由 GitHub Actions OIDC 发布并生成
+provenance；确认全部绑定生效后，不应继续保留发布用 `NPM_TOKEN`。
+
+新增包无法在首次发布前预配置 Trusted Publisher。只有这种 bootstrap 场景才创建
+最小范围、短期有效的 granular access token 并暂存为 `NPM_TOKEN`；首发成功后立即
+配置该包的 Trusted Publisher、验证 OIDC 发布路径并删除 token。不要把 bootstrap
+token 当作常规发布凭据。
 
 发布脚本会核对 tarball SHA-256/SHA-512；重跑时只接受 registry 上字节完全一致的
 既有版本，不能覆盖已发布版本。
@@ -179,4 +183,6 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 - 长期架构约束更新[架构与执行模型](/AelionSDK/concepts/architecture/)，不再创建零散 ADR 文件。
 - 当前支持范围只更新[兼容性与部署](/AelionSDK/production/compatibility/)。
 - 阶段结果和可复现证据只更新[项目状态](/AelionSDK/project/status/)与 reports 索引。
+- 公开包必须提交包级 README；TypeDoc 每次生成前会清理旧投影，生成后按包检查
+  declaration narrative 覆盖率，新增无说明的公开符号会让 CI 失败。
 - 已过期计划依靠 Git 历史追溯，避免现行文档同时存在多套口径。
