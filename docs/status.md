@@ -5,12 +5,12 @@ Updated: 2026-07-28 (Asia/Shanghai)
 ## Bound final gate run
 
 - Source manifest:
-  `9c3a60f09fc4b888feb3272eabf4319727d5df1d5eb2a3006a925fa8fd41932c`
-- Source commit: `4cab4ea2a07cdf9e37e4bdc0a1ba19e0ca686617`.
+  `714daf26de8ae2ba230da483be50c6faf1ae9f0c38544097f1a4f034b2d79be4`
+- Source commit: `02b185d405dbb030df046cd6f58465e1ba1896f0`.
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: 40 of 40 semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 79/79 and Firefox 67/67, with zero failed,
+- Browser conformance: Chromium 83/83 and Firefox 69/69, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
