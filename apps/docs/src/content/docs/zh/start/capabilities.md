@@ -1,9 +1,9 @@
-﻿---
+---
 title: 当前已经支持什么
 description: 按开发者会用到的功能查看编辑、预览、媒体、音频、导出和 Material 的完成情况。
 ---
 
-本页回答两个问题：现在能用 AelionSDK 做什么，以及哪些地方还不能当作跨平台承诺。具体类型以 [`@aelionsdk/sdk` API Snapshot](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/packages/sdk/api-snapshot.md) 和站内 API Reference 为准。
+本页回答两个问题：现在能用 AelionSDK 做什么，以及哪些地方还不能当作跨平台承诺。具体类型以 [`@aelionsdk/sdk` API Snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 和站内 API Reference 为准。
 
 ## 做一个基础剪辑器
 

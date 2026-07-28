@@ -19,7 +19,10 @@ for (const entry of await readdir(packageRoot, { withFileTypes: true })) {
 
 const versionedFiles = [
   resolve(root, 'README.md'),
+  resolve(root, 'README.zh-CN.md'),
+  resolve(root, 'apps/docs/src/content/docs/project/status.md'),
   resolve(root, 'apps/docs/src/content/docs/zh/project/status.md'),
+  resolve(root, 'apps/docs/src/content/docs/reference/packages.md'),
   resolve(root, 'apps/docs/src/content/docs/zh/reference/packages.md'),
   resolve(root, 'apps/docs/src/content/docs/start/installation.md'),
   resolve(root, 'apps/docs/src/content/docs/zh/start/installation.md'),

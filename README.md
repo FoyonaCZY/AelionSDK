@@ -1,3 +1,5 @@
+**Languages:** **English** · [简体中文](README.zh-CN.md)
+
 # AelionSDK
 
 Browser-first video editing, real-time preview, playback and export SDK for building web-based editors and media products.
@@ -95,4 +97,5 @@ release and will be recorded in the repository changelog and migration guide.
 
 AelionSDK is licensed under the MIT License.
 
-The Chinese README is available at [README.zh-CN.md](README.zh-CN.md). Contributions and security reports are documented in [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+Contributions and security reports are documented in [CONTRIBUTING.md](CONTRIBUTING.md) and
+[SECURITY.md](SECURITY.md).

@@ -1,4 +1,4 @@
-﻿---
+---
 title: 包和公开入口
 description: 查询 13 个 @aelionsdk 包的职责、主要导出和使用对象。
 ---
@@ -125,4 +125,4 @@ Application
 
 应用不应把 SDK 内部依赖关系复制成自己的横向调用网络。能从 Session 获得的功能就从 Session 使用，这样升级时只需要跟踪公共接口。
 
-每个符号的参数、返回类型和源码链接见侧栏 API Reference。RC 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/packages/sdk/api-snapshot.md) 的导出变化。
+每个符号的参数、返回类型和源码链接见侧栏 API Reference。RC 升级时还可以查看 [`packages/sdk/api-snapshot.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 的导出变化。

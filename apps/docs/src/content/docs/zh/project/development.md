@@ -1,9 +1,9 @@
-﻿---
+---
 title: 维护仓库与准备发布
 description: 给仓库贡献者的环境、常用命令、变更检查、CI 和发布前验收。
 ---
 
-这篇文档面向修改 AelionSDK 本身的开发者。只接入 SDK 的产品团队不需要运行所有门禁；先看[安装与工程配置](/AelionSDK/zh/start/installation/)。代码风格、提交和贡献流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/CONTRIBUTING.md)。
+这篇文档面向修改 AelionSDK 本身的开发者。只接入 SDK 的产品团队不需要运行所有门禁；先看[安装与工程配置](/AelionSDK/zh/start/installation/)。代码风格、提交和贡献流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/CONTRIBUTING.md)。
 
 ## 准备开发环境
 
@@ -42,7 +42,7 @@ corepack pnpm run ci
 | `corepack pnpm dev:lab`                   | Capability / Material Lab                                  |
 | `corepack pnpm dev:editor`                | 只使用公开包 API 的参考剪辑器                              |
 
-证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/zh/tree/main/reports/baseline)。
+证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
 
 ## 开发一个引擎功能
 

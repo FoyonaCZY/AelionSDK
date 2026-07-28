@@ -1,4 +1,4 @@
-﻿---
+---
 title: 浏览器兼容性与部署要求
 description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/Worklet 和平台限制。
 ---
@@ -17,7 +17,7 @@ description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/
 Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前，需要你自己完成目标设备测试。
 
 机器可读的版本化矩阵位于
-[`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/compatibility/matrix.v1.json)。
+[`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/compatibility/matrix.v1.json)。
 CI 会校验它与 SDK 版本一致、覆盖 codec/container/GPU/AudioWorklet/OPFS/
 SharedArrayBuffer 轴，并要求每个 `tested` 结论都指向仓库内真实证据。`blocked` 或
 `uncertified` 不能计作通过。
