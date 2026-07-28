@@ -51,19 +51,27 @@ describe('privacy-safe Session diagnostic reports', () => {
   });
 
   it('excludes capability fingerprints and probe details unless full output is requested', async () => {
+    const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    Reflect.deleteProperty(globalThis, 'navigator');
     const session = new AelionSession();
-    await session.probeCapabilities();
+    try {
+      await session.probeCapabilities();
 
-    const safeJson = JSON.stringify(session.createDiagnosticReport().capability);
-    expect(safeJson).not.toContain('userAgent');
-    expect(safeJson).not.toContain('"platform"');
-    expect(safeJson).not.toContain('"adapter"');
-    expect(safeJson).not.toContain('"details"');
-    expect(safeJson).not.toContain('"diagnostics"');
+      const safeJson = JSON.stringify(session.createDiagnosticReport().capability);
+      expect(safeJson).not.toContain('userAgent');
+      expect(safeJson).not.toContain('"platform"');
+      expect(safeJson).not.toContain('"adapter"');
+      expect(safeJson).not.toContain('"details"');
+      expect(safeJson).not.toContain('"diagnostics"');
 
-    const fullJson = JSON.stringify(session.createDiagnosticReport({ privacy: 'full' }));
-    expect(fullJson).toContain('"userAgent"');
-    expect(fullJson).toContain('"platform"');
-    await session.dispose();
+      const fullJson = JSON.stringify(session.createDiagnosticReport({ privacy: 'full' }));
+      expect(fullJson).toContain('"userAgent":"unavailable"');
+      expect(fullJson).toContain('"platform":"unknown"');
+    } finally {
+      await session.dispose();
+      if (navigatorDescriptor !== undefined) {
+        Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
+      }
+    }
   });
 });

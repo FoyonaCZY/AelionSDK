@@ -296,14 +296,21 @@ describe('offline WebCodecs + streaming WebM export', () => {
     expect(video?.codecFamily).toBe('vp9');
     expect(audio?.codecFamily).toBe('opus');
     if (video === undefined || audio === undefined) throw new Error('Export tracks are missing');
-    expect(video.color).toEqual({
+    expect(result.encoderConfiguration.video.sourceColorSpace).toEqual({
       primaries: 'bt709',
-      transfer: 'bt709',
-      matrix: 'bt709',
+      transfer: 'iec61966-2-1',
+      matrix: 'rgb',
+      fullRange: true,
+    });
+    expect(video.color).toMatchObject({
       fullRange: false,
       highDynamicRange: false,
       canBeTransparent: false,
     });
+    expect([
+      ['bt709', 'bt709', 'bt709'],
+      ['smpte170m', 'smpte170m', 'smpte170m'],
+    ]).toContainEqual([video.color.primaries, video.color.transfer, video.color.matrix]);
     expect(index.samples[video.id]).toHaveLength(30);
     expect(index.samples[audio.id]?.length).toBeGreaterThan(0);
     const decoded = await decodeVideoFrameAt(bytes, 500_000);

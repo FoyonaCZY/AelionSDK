@@ -34,6 +34,10 @@ interface CodecConstructor {
   isConfigSupported(config: object): Promise<CodecSupportResult>;
 }
 
+function currentNavigator(): NavigatorWithMemory | undefined {
+  return Reflect.get(globalThis, 'navigator') as NavigatorWithMemory | undefined;
+}
+
 function diagnostic(
   code: string,
   message: string,
@@ -278,25 +282,35 @@ async function probeGpu(includeAdapterDetails: boolean): Promise<GpuCapability> 
     const canvas =
       typeof OffscreenCanvas === 'function'
         ? new OffscreenCanvas(1, 1)
-        : document.createElement('canvas');
-    const context = canvas.getContext('webgl2');
-    webgl2 =
-      context === null
-        ? unsupported('CAPABILITY_WEBGL2_UNAVAILABLE', 'WebGL2 context creation failed')
-        : supported({
-            renderer:
-              context instanceof WebGL2RenderingContext
-                ? (context.getParameter(context.RENDERER) as string)
-                : 'offscreen-webgl2',
-          });
-    if (context instanceof WebGL2RenderingContext) {
-      context.getExtension('WEBGL_lose_context')?.loseContext();
+        : typeof document === 'object'
+          ? document.createElement('canvas')
+          : undefined;
+    if (canvas === undefined) {
+      webgl2 = unsupported('CAPABILITY_WEBGL2_UNAVAILABLE', 'WebGL2 is unavailable');
+    } else {
+      const context = canvas.getContext('webgl2');
+      webgl2 =
+        context === null
+          ? unsupported('CAPABILITY_WEBGL2_UNAVAILABLE', 'WebGL2 context creation failed')
+          : supported({
+              renderer:
+                typeof WebGL2RenderingContext === 'function' &&
+                context instanceof WebGL2RenderingContext
+                  ? (context.getParameter(context.RENDERER) as string)
+                  : 'offscreen-webgl2',
+            });
+      if (
+        typeof WebGL2RenderingContext === 'function' &&
+        context instanceof WebGL2RenderingContext
+      ) {
+        context.getExtension('WEBGL_lose_context')?.loseContext();
+      }
     }
   } catch (cause) {
     webgl2 = failed('CAPABILITY_WEBGL2_PROBE_FAILED', 'WebGL2 probe failed', cause);
   }
 
-  const gpu = (navigator as NavigatorWithMemory).gpu;
+  const gpu = currentNavigator()?.gpu;
   if (gpu === undefined) {
     return {
       worker,
@@ -380,9 +394,11 @@ function probeAudio(): AudioCapability {
 }
 
 function probeStorage(): StorageCapability {
-  const storage = Reflect.get(navigator, 'storage') as
-    | { readonly getDirectory?: unknown }
-    | undefined;
+  const navigator = currentNavigator();
+  const storage =
+    navigator === undefined
+      ? undefined
+      : (Reflect.get(navigator, 'storage') as { readonly getDirectory?: unknown } | undefined);
   const opfs =
     storage !== undefined && typeof storage.getDirectory === 'function'
       ? supported()
@@ -405,21 +421,24 @@ function probeStorage(): StorageCapability {
 }
 
 function environment(): CapabilityEnvironment {
-  const navigatorWithMemory = navigator as NavigatorWithMemory;
-  const userAgentData = Reflect.get(navigator, 'userAgentData') as
-    | { readonly platform?: string }
-    | undefined;
+  const navigator = currentNavigator();
+  const userAgentData =
+    navigator === undefined
+      ? undefined
+      : (Reflect.get(navigator, 'userAgentData') as { readonly platform?: string } | undefined);
   return {
-    userAgent: navigator.userAgent,
+    userAgent: navigator?.userAgent ?? 'unavailable',
     platform: userAgentData?.platform ?? 'unknown',
-    language: navigator.language,
+    language: navigator?.language ?? 'unknown',
     hardwareConcurrency:
-      Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency > 0
+      navigator !== undefined &&
+      Number.isFinite(navigator.hardwareConcurrency) &&
+      navigator.hardwareConcurrency > 0
         ? navigator.hardwareConcurrency
         : null,
-    deviceMemoryGiB: navigatorWithMemory.deviceMemory ?? null,
-    crossOriginIsolated: globalThis.crossOriginIsolated,
-    secureContext: globalThis.isSecureContext,
+    deviceMemoryGiB: navigator?.deviceMemory ?? null,
+    crossOriginIsolated: Boolean(globalThis.crossOriginIsolated),
+    secureContext: Boolean(globalThis.isSecureContext),
     origin: typeof globalThis.location === 'undefined' ? 'unknown' : globalThis.location.origin,
   };
 }
