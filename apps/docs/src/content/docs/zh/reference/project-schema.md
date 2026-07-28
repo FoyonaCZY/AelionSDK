@@ -1,9 +1,9 @@
-﻿---
+---
 title: Project v1 字段参考
 description: 查询 Project 顶层集合、实体关系、ID、Sequence、Track、Item、Asset 和加载校验。
 ---
 
-机器可读的完整定义是 [`schemas/project/v1/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/schemas/project/v1/project.schema.json)。本页用于日常查询；创建普通工程时优先用 `createProject()`，不要从空对象手写整份 JSON。
+机器可读的完整定义是 [`schemas/project/v1/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1/project.schema.json)。本页用于日常查询；创建普通工程时优先用 `createProject()`，不要从空对象手写整份 JSON。
 
 ## 顶层字段
 

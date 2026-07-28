@@ -1,11 +1,11 @@
-﻿---
+---
 title: 快速开始：从本地视频到 MP4
 description: 跟着可运行的 Quickstart 认识 Project、Media Provider、Session、预览、编辑和导出。
 ---
 
 这篇教程会用一个本地视频完成六件事：读取素材、创建 Project、显示第一帧、播放和拖动、把片段右移一秒、导出 H.264 MP4。
 
-教程对应的完整应用在仓库 [`apps/quickstart`](https://github.com/FoyonaCZY/AelionSDK/zh/tree/main/apps/quickstart)。你可以先运行它，再对照下面的解释看 `src/main.ts`。
+教程对应的完整应用在仓库 [`apps/quickstart`](https://github.com/FoyonaCZY/AelionSDK/tree/main/apps/quickstart)。你可以先运行它，再对照下面的解释看 `src/main.ts`。
 
 ```bash
 corepack pnpm install --frozen-lockfile

@@ -44,11 +44,49 @@ AelionSDK is a framework-agnostic browser editing and rendering engine. Register
 
 1. [Install and configure](/AelionSDK/start/installation/) the workspace or your application.
 2. Follow [From a local video to MP4](/AelionSDK/start/getting-started/).
-3. Choose the right [packages](/AelionSDK/start/packages/) and run [capability preflight](/AelionSDK/zh/production/capability-preflight/).
-4. Connect the Session to your own timeline, Inspector and persistence layer.
+3. Learn how to [import and manage media](/AelionSDK/guides/media-import/).
+4. Connect the Session to your own [timeline and Inspector UI](/AelionSDK/guides/editor-ui/).
+5. Run [capability and export preflight](/AelionSDK/production/capability-preflight/) on the actual device.
+
+If you only want to see the complete flow first, run the repository Quickstart:
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev:quickstart
+```
+
+Choose an MP4 or WebM file, render the first frame, scrub and play, move the clip, undo the edit,
+then try H.264 MP4 export.
+
+## The four objects used by an editor
+
+| Object                    | Responsibility                                              | Persist it?    |
+| ------------------------- | ----------------------------------------------------------- | -------------- |
+| `Project`                 | Asset IDs, tracks, items, effects, and output settings      | Yes, as JSON   |
+| `ProductionMediaProvider` | Runtime binding from Asset ID to File, URL, or OPFS         | No; rebuild it |
+| `Session`                 | Editing, preview, playback, export, events, and diagnostics | No             |
+| `PreviewCanvasController` | Draw Session frames into a Canvas                           | No; dispose it |
+
+Project describes what to edit, the media provider supplies bytes, Session executes the project,
+and the preview controller presents frames.
 
 :::note[Release status]
 AelionSDK `1.0.0-rc.1` is published to npm under the `next` tag. The API may still change before the first stable release.
 :::
 
-The [简体中文](/AelionSDK/zh/) site contains the complete Chinese documentation set. Use the language selector in the header to switch at any time.
+## What the SDK owns
+
+AelionSDK owns Project validation, editing commands and undo, media I/O and decoding, Render IR,
+preview, playback, and export. Your application still owns UI, accounts, permissions, asset
+library, collaboration, autosave policy, keyboard shortcuts, and durable job services.
+
+Use the language selector in the header to switch to the matching
+[简体中文 page](/AelionSDK/zh/). Every narrative route is available in both languages.
+
+<div class="doc-cta">
+  <div>
+    <strong>Start with a real video</strong>
+    <span>Run the complete path first, then replace the example UI with your product.</span>
+  </div>
+  <a href="/AelionSDK/start/getting-started/">Open the quickstart →</a>
+</div>

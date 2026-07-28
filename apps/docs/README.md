@@ -1,13 +1,15 @@
-# AelionSDK 文档站
-
 # AelionSDK documentation
 
-Astro Starlight documentation for AelionSDK, maintained next to the SDK source and deployed to GitHub Pages.
+Astro Starlight documentation for AelionSDK, maintained next to the SDK source and deployed to
+GitHub Pages.
 
 - English (default): <https://foyonaczy.github.io/AelionSDK/>
 - 简体中文: <https://foyonaczy.github.io/AelionSDK/zh/>
 
-The site uses Starlight's locale switcher. English is the default locale; the complete Chinese documentation is kept under `src/content/docs/zh/` so translated pages can evolve independently.
+The site uses Starlight's locale switcher. English is the default locale. Every narrative route has
+an English page under `src/content/docs/` and a matching Simplified Chinese page under
+`src/content/docs/zh/`. The shared sidebar uses locale-aware slugs, so both languages expose the
+same complete information architecture while displaying their own page titles.
 
 ## Local development
 
@@ -21,29 +23,35 @@ corepack pnpm dev:docs
 corepack pnpm build:docs
 ```
 
-内容位于 `src/content/docs`。面向用户的 Guide 按任务组织；Reference 精确定义协议、诊断码和底层语义。合并到 `main` 后，`.github/workflows/docs.yml` 会构建并发布站点。
+Content lives in `src/content/docs`. Guides are task-oriented; Reference pages define protocols,
+diagnostics, and low-level semantics. After a merge to `main`, `.github/workflows/docs.yml` builds
+and deploys the site.
 
-## 信息架构
+## Information architecture
 
-| 目录         | 用途                                         |
-| ------------ | -------------------------------------------- |
-| `start`      | 安装、快速开始、包选择、参考编辑器、能力概览 |
-| `concepts`   | Project、时间、事务、媒体生命周期和执行模型  |
-| `guides`     | 构建剪辑器时可直接完成的用户任务             |
-| `export`     | 本地/远程格式、Job、Sink 和清理              |
-| `production` | 能力探测、兼容性、性能、安全、恢复和排障     |
-| `reference`  | 稳定字段、命令、Profile、事件、协议和术语    |
-| `project`    | 仓库状态、开发和发布流程                     |
-| `api`        | 构建时从 13 个公开包生成，不提交 Git         |
+| Directory    | Purpose                                                            |
+| ------------ | ------------------------------------------------------------------ |
+| `start`      | Installation, quickstart, packages, reference editor, capabilities |
+| `concepts`   | Project, time, transactions, media lifecycle, execution            |
+| `guides`     | Task-oriented editor integration                                   |
+| `export`     | Local/remote formats, jobs, sinks, cleanup                         |
+| `production` | Capability, compatibility, performance, security, recovery         |
+| `reference`  | Stable fields, commands, profiles, events, protocols, terminology  |
+| `project`    | Repository status, development, and release process                |
+| `api`        | Generated from 13 public packages during build; not committed      |
 
-## 写作规则
+## Writing rules
 
-- 一个页面只解决一个明确问题；先给可执行路径，再解释边界。
-- Guide 使用公开包入口，示例参数与当前 TypeScript 类型一致。
-- 精确字段写入 Reference；长期机制写入 Concepts；兼容声明只写入 Production。
-- 不复制会快速过期的测试数量、浏览器版本和 API 签名。
-- 新公开 API 同时更新相应 Guide/Reference；API Reference 由 TypeDoc 自动生成。
-- 站内链接统一使用 `/AelionSDK/.../` 目录路由，不写 `.md`、`.mdx` 或跨目录相对地址。
-- 合并前依次运行 `corepack pnpm run docs:check`、`corepack pnpm run build:docs` 和 `corepack pnpm run docs:check:built`；最后一步会检查所有生成页面的真实 `href`，并拒绝 API narrative 覆盖率低于按包基线。
+- Solve one clear problem per page; show the executable path before the boundary explanation.
+- Keep Guide examples on public package entry points and current TypeScript signatures.
+- Put exact fields in Reference, long-lived mechanisms in Concepts, and compatibility claims in
+  Production.
+- Every English narrative path must have a matching Chinese path and vice versa.
+- Use `/AelionSDK/.../` for English internal routes and `/AelionSDK/zh/.../` for Chinese routes.
+- Update the corresponding Guide/Reference with a new public API; TypeDoc generates API pages.
+- Before merge, run `corepack pnpm run docs:check`, `corepack pnpm run build:docs`, and
+  `corepack pnpm run docs:check:built`.
 
-API 生成使用与当前 Node 20 / Starlight 兼容的 `starlight-typedoc` 版本，入口为 `packages/*/src/index.ts`。生成目录已加入 `.gitignore`，每次构建前会清理，避免删除或重命名符号后残留旧页面。新增公开声明应带 TSDoc narrative；现有缺口记录在 `api-doc-coverage-baseline.json`，只能减少，不能增加。
+API generation uses `packages/*/src/index.ts`. The build clears generated TypeDoc and Astro caches
+first. New public declarations should include TSDoc narrative; existing gaps are recorded in
+`api-doc-coverage-baseline.json` and may only decrease.
