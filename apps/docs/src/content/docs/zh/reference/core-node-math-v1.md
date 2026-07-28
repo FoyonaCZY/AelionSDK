@@ -1,4 +1,4 @@
----
+﻿---
 title: Core Node Math 1.0.0
 description: 查询 Material Core Node 的计算公式、颜色和 alpha 前提，以及 Golden 容差。
 ---

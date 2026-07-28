@@ -1,4 +1,4 @@
----
+﻿---
 title: Export Profiles 速查
 description: 查询本地和远程导出的 profile ID、codec、MIME、扩展名、参数和结果类型。
 ---
@@ -68,4 +68,4 @@ const exact = await session.export.preflightProfile(options);
 执行真实 encode/flush canary，是开始任务前的最终依据。AV1/HEVC profile 出现在
 公共 API 中不代表当前设备一定支持；unsupported 是正常、可观测的协商结果。
 
-完整调用见[选择导出格式](/AelionSDK/export/overview/)和[导出任务、进度和文件写入](/AelionSDK/export/jobs-sinks/)。
+完整调用见[选择导出格式](/AelionSDK/zh/export/overview/)和[导出任务、进度和文件写入](/AelionSDK/zh/export/jobs-sinks/)。

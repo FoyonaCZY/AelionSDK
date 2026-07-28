@@ -1,4 +1,4 @@
----
+﻿---
 title: 错误处理、恢复和日志
 description: 区分 Diagnostic、参数错误和取消，处理 revision 冲突、GPU/Player 恢复与崩溃后的任务。
 ---
@@ -202,4 +202,4 @@ const unsubscribers = [
 - 普通本地 Job 不能跨刷新恢复；需要恢复的 MP4/WebM 必须显式使用
   `exportResumableMuxed()`，不能复用已失败 Job 或旧 Sink。
 
-事件字段见[事件与统计](/AelionSDK/reference/events-stats/)，错误码见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。
+事件字段见[事件与统计](/AelionSDK/zh/reference/events-stats/)，错误码见 [Diagnostic Codes](/AelionSDK/zh/reference/diagnostic-codes/)。

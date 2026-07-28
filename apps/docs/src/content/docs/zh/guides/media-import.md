@@ -1,4 +1,4 @@
----
+﻿---
 title: 导入与管理媒体
 description: 把 File、URL、OPFS 文件和代理素材绑定到 Project，并处理重新授权与释放。
 ---
@@ -241,4 +241,4 @@ Provider dispose 后不能重新注册素材。先销毁仍在请求画面的 Pr
 | 代理画面时间不对         | proxy 时长、`sourceStartUs` 和转码时间戳        |
 | 多次打开工程越来越慢     | 旧 Preview/Session/Provider 是否按顺序释放      |
 
-保存和重新绑定素材的完整流程见[保存、恢复与迁移](/AelionSDK/guides/persistence/)。
+保存和重新绑定素材的完整流程见[保存、恢复与迁移](/AelionSDK/zh/guides/persistence/)。

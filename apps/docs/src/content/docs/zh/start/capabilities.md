@@ -1,9 +1,9 @@
----
+﻿---
 title: 当前已经支持什么
 description: 按开发者会用到的功能查看编辑、预览、媒体、音频、导出和 Material 的完成情况。
 ---
 
-本页回答两个问题：现在能用 AelionSDK 做什么，以及哪些地方还不能当作跨平台承诺。具体类型以 [`@aelionsdk/sdk` API Snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 和站内 API Reference 为准。
+本页回答两个问题：现在能用 AelionSDK 做什么，以及哪些地方还不能当作跨平台承诺。具体类型以 [`@aelionsdk/sdk` API Snapshot](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/packages/sdk/api-snapshot.md) 和站内 API Reference 为准。
 
 ## 做一个基础剪辑器
 
@@ -28,7 +28,7 @@ File / URL / OPFS
 - Session events 驱动 UI、自动保存、诊断和统计；
 - 本地或远程导出。
 
-完整最短示例见[从本地视频到 MP4](/AelionSDK/start/getting-started/)。
+完整最短示例见[从本地视频到 MP4](/AelionSDK/zh/start/getting-started/)。
 
 ## 时间线编辑
 
@@ -145,7 +145,7 @@ Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式�
 
 Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者和内容完整，宿主仍要按 publisher、租户和执行预算授权。
 
-从实际 builder 开始见 [Material 创作与接入](/AelionSDK/guides/materials/)。
+从实际 builder 开始见 [Material 创作与接入](/AelionSDK/zh/guides/materials/)。
 
 ## 当前不能直接承诺的范围
 
@@ -158,4 +158,4 @@ Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者
 - 公开包通过 npm `next` tag 发布，版本仍是 1.0 RC；
 - RC API 可能变化，Project/Material 协议变化必须配迁移。
 
-浏览器和平台细节见[兼容性与部署](/AelionSDK/production/compatibility/)。
+浏览器和平台细节见[兼容性与部署](/AelionSDK/zh/production/compatibility/)。

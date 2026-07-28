@@ -1,4 +1,4 @@
----
+﻿---
 title: 保存、恢复与素材重连
 description: 保存 Project JSON，重新绑定 File 或 URL，处理自动保存、缺失素材和版本迁移。
 ---
@@ -188,4 +188,4 @@ function migrateProject(input: unknown): unknown {
 - 临时 OPFS 文件有清理策略；
 - 日志和保存记录中没有 token 或签名 URL。
 
-Project 字段参考见 [Project Schema](/AelionSDK/reference/project-schema/)，输入预算和服务端复检见[安全与部署清单](/AelionSDK/production/security-deployment/)。
+Project 字段参考见 [Project Schema](/AelionSDK/zh/reference/project-schema/)，输入预算和服务端复检见[安全与部署清单](/AelionSDK/zh/production/security-deployment/)。

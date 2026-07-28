@@ -1,4 +1,4 @@
----
+﻿---
 title: Transaction、revision 和撤销
 description: 理解编辑命令如何原子修改 Project，以及如何合并拖拽历史和处理版本冲突。
 ---
@@ -136,4 +136,4 @@ Listener 是提交完成后的观察者。不要在同一个同步回调里立�
 - Link Group / Transition 引用冲突；
 - 字段路径不符合 Schema。
 
-失败时 Project 和 history 都不变。取消 UI 的乐观状态，读取最新 snapshot，把 Diagnostic code 映射成明确提示。完整命令参考见 [Editing Commands](/AelionSDK/reference/editing-commands/)。
+失败时 Project 和 history 都不变。取消 UI 的乐观状态，读取最新 snapshot，把 Diagnostic code 映射成明确提示。完整命令参考见 [Editing Commands](/AelionSDK/zh/reference/editing-commands/)。

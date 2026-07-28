@@ -1,4 +1,4 @@
----
+﻿---
 title: 浏览器兼容性与部署要求
 description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/Worklet 和平台限制。
 ---
@@ -17,7 +17,7 @@ description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/
 Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前，需要你自己完成目标设备测试。
 
 机器可读的版本化矩阵位于
-[`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/compatibility/matrix.v1.json)。
+[`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/compatibility/matrix.v1.json)。
 CI 会校验它与 SDK 版本一致、覆盖 codec/container/GPU/AudioWorklet/OPFS/
 SharedArrayBuffer 轴，并要求每个 `tested` 结论都指向仓库内真实证据。`blocked` 或
 `uncertified` 不能计作通过。
@@ -138,7 +138,7 @@ AudioWorklet JavaScript。非 Vite 宿主通过 `AelionSessionOptions.runtimeAss
 - base path 和 CDN public path 正确；
 - 缓存升级不会让主包和 Worker 版本错配。
 
-CSP 起点见[安全与部署清单](/AelionSDK/production/security-deployment/)。不要为了让 Worker 运行而开放任意远程 script。
+CSP 起点见[安全与部署清单](/AelionSDK/zh/production/security-deployment/)。不要为了让 Worker 运行而开放任意远程 script。
 
 ## 4K、移动端和 HDR 的边界
 
@@ -148,4 +148,4 @@ CSP 起点见[安全与部署清单](/AelionSDK/production/security-deployment/)
 - 当前本地画面执行为 RGBA8 SDR，HDR/PQ/HLG/10-bit 会明确失败；
 - Material 的 Shader/WASM 能执行，不代表已经获得安全授权。
 
-当前源码测试和基线报告见[项目状态](/AelionSDK/project/status/)。
+当前源码测试和基线报告见[项目状态](/AelionSDK/zh/project/status/)。

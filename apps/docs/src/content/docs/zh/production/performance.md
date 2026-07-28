@@ -1,4 +1,4 @@
----
+﻿---
 title: 预览性能和资源预算
 description: 为解码、Canvas、GPU、缩略图、Material、播放和导出设置可测量的上限。
 ---

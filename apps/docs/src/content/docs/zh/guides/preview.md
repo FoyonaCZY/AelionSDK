@@ -1,4 +1,4 @@
----
+﻿---
 title: 实时预览与拖动播放头
 description: 把 Session 连接到 Canvas，处理快速拖动、画质调整、缩略图和帧资源。
 ---
@@ -261,4 +261,4 @@ preview.dispose();
 
 它会取消当前请求，断开 ResizeObserver、visibility listener 和 Player 帧订阅。之后再调用 `render()` 会失败；新工程应创建新的 Controller。
 
-如果画面正常但播放没有声音，继续看[播放与音频](/AelionSDK/guides/player-audio/)。
+如果画面正常但播放没有声音，继续看[播放与音频](/AelionSDK/zh/guides/player-audio/)。

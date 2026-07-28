@@ -1,4 +1,4 @@
----
+﻿---
 title: 在真实设备上检查可用功能
 description: 使用 Session capability 和 Export preflight 决定预览后端、音频模式、存储和导出选项。
 ---
@@ -104,7 +104,7 @@ Preflight 会考虑当前 revision 的 width、height、frameRate、声道、色
 | `EXPORT_SINK_LOCKED`                                | 创建新的 Sink 后重试                                         |
 | `EXPORT_STORAGE_WRITE_FAILED`                       | 清理半成品，检查空间和权限，再允许用户重试                   |
 
-业务分支依赖 `issue.code`，不要解析英文 message。完整 code 列表见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。
+业务分支依赖 `issue.code`，不要解析英文 message。完整 code 列表见 [Diagnostic Codes](/AelionSDK/zh/reference/diagnostic-codes/)。
 
 ## 什么时候禁用按钮，什么时候点后再检查
 

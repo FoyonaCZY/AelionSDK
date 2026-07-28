@@ -1,4 +1,4 @@
----
+﻿---
 title: Session 事件、Snapshot 和统计
 description: 查询事件触发时机、读取一致快照，并监控 Preview、Player、Export 和资源终态。
 ---

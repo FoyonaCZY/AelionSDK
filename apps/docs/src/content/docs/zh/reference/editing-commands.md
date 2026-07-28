@@ -1,4 +1,4 @@
----
+﻿---
 title: Editing Commands 速查
 description: 查询时间线命令的关键参数、返回值、共同选项和常见拒绝原因。
 ---
@@ -103,4 +103,4 @@ Mute/Solo 只适用于有 audio mixer 属性的音频轨。Locked 轨会拒绝�
 
 命令会检查实体存在、轨道类型、锁定、时间、source handle、Transition、引用、所有权和 no-op。失败时抛出带 Diagnostic 的 `AelionError`，Project、revision 和 history 都不变化。
 
-选项的精确 TypeScript 类型见 API Reference 的 `@aelionsdk/transaction`，实际拖拽模式见[时间线编辑](/AelionSDK/guides/timeline-editing/)。
+选项的精确 TypeScript 类型见 API Reference 的 `@aelionsdk/transaction`，实际拖拽模式见[时间线编辑](/AelionSDK/zh/guides/timeline-editing/)。

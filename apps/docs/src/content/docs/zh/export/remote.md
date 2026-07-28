@@ -1,4 +1,4 @@
----
+﻿---
 title: 接入服务端导出
 description: 实现 Authorizer 和 Provider，把冻结 Project 安全提交给自己的渲染服务。
 ---
@@ -127,4 +127,4 @@ output token 都不能写回 Project、canonical manifest、遥测或持久日�
 
 服务端不是把浏览器 UI 复刻一遍。它需要实现兼容的 Project、Render IR、Material 和字体/素材解析，并固定引擎版本。遇到未知版本或不支持的 Material 时应明确失败，不能静默忽略效果。
 
-本地和远程的选择策略见[选择导出格式](/AelionSDK/export/overview/)，鉴权和日志要求见[安全与部署清单](/AelionSDK/production/security-deployment/)。
+本地和远程的选择策略见[选择导出格式](/AelionSDK/zh/export/overview/)，鉴权和日志要求见[安全与部署清单](/AelionSDK/zh/production/security-deployment/)。

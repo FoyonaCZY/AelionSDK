@@ -1,4 +1,4 @@
----
+﻿---
 title: Revision 持久化与扩展隔离
 description: 用有序快照恢复 Project，并通过受限 Worker RPC 执行扩展逻辑。
 ---

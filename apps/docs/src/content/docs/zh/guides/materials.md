@@ -1,4 +1,4 @@
----
+﻿---
 title: 创建和安装 Material
 description: 用真实的 Material SDK builder 创建转场，分析 Graph，打包并在宿主中执行信任检查。
 ---
@@ -18,7 +18,7 @@ Material 用来扩展画面处理，包括 Filter、Effect、Transition 和 Gene
 
 ## 创建一个 Cross Dissolve 转场
 
-下面代码来自仓库的可运行示例 [`examples/materials/authoring-sdk/cross-dissolve.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/examples/materials/authoring-sdk/cross-dissolve.ts)：
+下面代码来自仓库的可运行示例 [`examples/materials/authoring-sdk/cross-dissolve.ts`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/examples/materials/authoring-sdk/cross-dissolve.ts)：
 
 ```ts
 import {
@@ -193,4 +193,4 @@ await registry.install(packedTrustedPackage, {
 - 图片、字体、LUT 和代码许可证完整；
 - trusted implementation 有独立安全评审和撤销策略。
 
-完整字段定义见 [Material Protocol v1](/AelionSDK/reference/material-protocol-v1/)，Core Node 数学见 [Core Node Math](/AelionSDK/reference/core-node-math-v1/)。
+完整字段定义见 [Material Protocol v1](/AelionSDK/zh/reference/material-protocol-v1/)，Core Node 数学见 [Core Node Math](/AelionSDK/zh/reference/core-node-math-v1/)。

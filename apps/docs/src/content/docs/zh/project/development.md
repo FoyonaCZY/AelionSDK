@@ -1,9 +1,9 @@
----
+﻿---
 title: 维护仓库与准备发布
 description: 给仓库贡献者的环境、常用命令、变更检查、CI 和发布前验收。
 ---
 
-这篇文档面向修改 AelionSDK 本身的开发者。只接入 SDK 的产品团队不需要运行所有门禁；先看[安装与工程配置](/AelionSDK/start/installation/)。代码风格、提交和贡献流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/blob/main/CONTRIBUTING.md)。
+这篇文档面向修改 AelionSDK 本身的开发者。只接入 SDK 的产品团队不需要运行所有门禁；先看[安装与工程配置](/AelionSDK/zh/start/installation/)。代码风格、提交和贡献流程另见 [`CONTRIBUTING.md`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/CONTRIBUTING.md)。
 
 ## 准备开发环境
 
@@ -42,7 +42,7 @@ corepack pnpm run ci
 | `corepack pnpm dev:lab`                   | Capability / Material Lab                                  |
 | `corepack pnpm dev:editor`                | 只使用公开包 API 的参考剪辑器                              |
 
-证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/tree/main/reports/baseline)。
+证据生成命令和产物说明位于 [`reports/baseline`](https://github.com/FoyonaCZY/AelionSDK/zh/tree/main/reports/baseline)。
 
 ## 开发一个引擎功能
 
@@ -180,9 +180,9 @@ token 当作常规发布凭据。
 ## 文档规则
 
 - 新的用户任务优先补充 Guide，不为每个 Issue 新建 Goal 文档。
-- 长期架构约束更新[架构与执行模型](/AelionSDK/concepts/architecture/)，不再创建零散 ADR 文件。
-- 当前支持范围只更新[兼容性与部署](/AelionSDK/production/compatibility/)。
-- 阶段结果和可复现证据只更新[项目状态](/AelionSDK/project/status/)与 reports 索引。
+- 长期架构约束更新[架构与执行模型](/AelionSDK/zh/concepts/architecture/)，不再创建零散 ADR 文件。
+- 当前支持范围只更新[兼容性与部署](/AelionSDK/zh/production/compatibility/)。
+- 阶段结果和可复现证据只更新[项目状态](/AelionSDK/zh/project/status/)与 reports 索引。
 - 公开包必须提交包级 README；TypeDoc 每次生成前会清理旧投影，生成后按包检查
   declaration narrative 覆盖率，新增无说明的公开符号会让 CI 失败。
 - 已过期计划依靠 Git 历史追溯，避免现行文档同时存在多套口径。

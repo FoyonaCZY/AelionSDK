@@ -1,4 +1,4 @@
----
+﻿---
 title: 素材表示、缓存和生命周期
 description: 理解 Asset、original/proxy、Range 读取、SampleIndex、资源上限和释放顺序。
 ---
@@ -131,4 +131,4 @@ media.dispose();
 
 切换 Project 不会自动释放业务创建的 Provider。最简单的做法是一个打开的工程拥有一套 runtime，切换时整套销毁后重建。
 
-注册方法和错误排查见[导入与管理媒体](/AelionSDK/guides/media-import/)，长会话资源检查见[性能与资源预算](/AelionSDK/production/performance/)。
+注册方法和错误排查见[导入与管理媒体](/AelionSDK/zh/guides/media-import/)，长会话资源检查见[性能与资源预算](/AelionSDK/zh/production/performance/)。

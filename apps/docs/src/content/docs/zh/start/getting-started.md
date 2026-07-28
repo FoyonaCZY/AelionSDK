@@ -1,11 +1,11 @@
----
+﻿---
 title: 快速开始：从本地视频到 MP4
 description: 跟着可运行的 Quickstart 认识 Project、Media Provider、Session、预览、编辑和导出。
 ---
 
 这篇教程会用一个本地视频完成六件事：读取素材、创建 Project、显示第一帧、播放和拖动、把片段右移一秒、导出 H.264 MP4。
 
-教程对应的完整应用在仓库 [`apps/quickstart`](https://github.com/FoyonaCZY/AelionSDK/tree/main/apps/quickstart)。你可以先运行它，再对照下面的解释看 `src/main.ts`。
+教程对应的完整应用在仓库 [`apps/quickstart`](https://github.com/FoyonaCZY/AelionSDK/zh/tree/main/apps/quickstart)。你可以先运行它，再对照下面的解释看 `src/main.ts`。
 
 ```bash
 corepack pnpm install --frozen-lockfile
@@ -112,7 +112,7 @@ const project = builder.build();
 
 本教程需要先探测并导入用户选择的真实媒体，所以使用 `ProjectBuilder`。如果素材 ID
 和时间线结构已经由模板或业务代码确定，可以改从
-[Composition API](/AelionSDK/guides/composition-api/)开始，用 Layer 和 Clip 创建
+[Composition API](/AelionSDK/zh/guides/composition-api/)开始，用 Layer 和 Clip 创建
 图片、文字、形状、效果、遮罩、关键帧与转场；两种入口生成相同的 Project v1。
 
 ## 4. 创建 Session 并显示第一帧
@@ -260,4 +260,4 @@ media.dispose();
 - 支持 H.264/AAC 的浏览器能下载并播放 MP4；
 - 切换素材或刷新页面后，不会继续占用旧的播放和解码资源。
 
-下一步通常是把这条主线接进自己的 UI。继续阅读[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)；如果素材来自 CDN，先看[导入与管理媒体](/AelionSDK/guides/media-import/)。
+下一步通常是把这条主线接进自己的 UI。继续阅读[剪辑 UI 集成](/AelionSDK/zh/guides/editor-ui/)；如果素材来自 CDN，先看[导入与管理媒体](/AelionSDK/zh/guides/media-import/)。

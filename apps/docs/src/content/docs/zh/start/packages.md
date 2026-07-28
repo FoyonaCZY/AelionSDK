@@ -1,4 +1,4 @@
----
+﻿---
 title: 我需要安装哪些包
 description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK 包。
 ---
@@ -27,7 +27,7 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 | `@aelionsdk/export`      | 创建内存或 OPFS Sink；定义远程导出适配器                             |
 | `@aelionsdk/vite-plugin` | 可选；让 Vite 正确打包 Renderer/Export Worker 和 AudioWorklet        |
 
-非 Vite 宿主只安装 runtime 依赖，并按[安装与工程配置](/AelionSDK/start/installation/)
+非 Vite 宿主只安装 runtime 依赖，并按[安装与工程配置](/AelionSDK/zh/start/installation/)
 显式部署 `runtimeAssets`；不需要安装或模拟 Vite 插件。
 
 业务组件里大部分导入都应该来自 `@aelionsdk/sdk`：
@@ -96,5 +96,5 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 - 预发布版本升级时审阅 API Snapshot 和 CHANGELOG；
 - 升级后至少重新跑一次媒体导入、预览、编辑和目标导出格式。
 
-高层创作从[使用 Composition API 创作](/AelionSDK/guides/composition-api/)开始。
-每个包的主要导出见[包与入口参考](/AelionSDK/reference/packages/)，单个函数和类型签名见侧栏中的 API Reference。
+高层创作从[使用 Composition API 创作](/AelionSDK/zh/guides/composition-api/)开始。
+每个包的主要导出见[包与入口参考](/AelionSDK/zh/reference/packages/)，单个函数和类型签名见侧栏中的 API Reference。

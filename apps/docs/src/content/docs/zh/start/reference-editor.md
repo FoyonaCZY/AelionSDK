@@ -1,4 +1,4 @@
----
+﻿---
 title: 运行参考编辑器
 description: 启动仓库中的完整示例，并知道应该从哪些源码位置学习接入方式。
 ---
@@ -33,11 +33,11 @@ corepack pnpm dev:editor
 
 参考编辑器没有隐藏 API，核心都在公开包中。建议按调用顺序阅读：
 
-| 文件                                                                                                                  | 可以学到什么                                                 |
-| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`apps/editor-demo/vite.config.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/vite.config.ts) | Vite 插件、Worker/Worklet 和跨源隔离响应头                   |
-| [`apps/editor-demo/src/main.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/main.ts)       | Provider、Project、Session、Preview 和 Export 的完整生命周期 |
-| [`apps/editor-demo/src/style.css`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/style.css)   | Demo 的布局；这部分不是 SDK 接口                             |
+| 文件                                                                                                                     | 可以学到什么                                                 |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`apps/editor-demo/vite.config.ts`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/apps/editor-demo/vite.config.ts) | Vite 插件、Worker/Worklet 和跨源隔离响应头                   |
+| [`apps/editor-demo/src/main.ts`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/apps/editor-demo/src/main.ts)       | Provider、Project、Session、Preview 和 Export 的完整生命周期 |
+| [`apps/editor-demo/src/style.css`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/apps/editor-demo/src/style.css)   | Demo 的布局；这部分不是 SDK 接口                             |
 
 `main.ts` 中值得重点找的函数：
 
@@ -84,4 +84,4 @@ corepack pnpm dev:editor
 corepack pnpm run build:editor
 ```
 
-产物位于 `apps/editor-demo/dist`。接下来阅读[剪辑 UI 集成](/AelionSDK/guides/editor-ui/)，把 Demo 中的单文件状态拆成自己的产品架构。
+产物位于 `apps/editor-demo/dist`。接下来阅读[剪辑 UI 集成](/AelionSDK/zh/guides/editor-ui/)，把 Demo 中的单文件状态拆成自己的产品架构。

@@ -1,4 +1,4 @@
----
+﻿---
 title: 安装与工程配置
 description: 从 npm 安装 AelionSDK 1.0 Release Candidate，启动 Quickstart，并配置自己的 Vite 应用。
 ---
@@ -49,7 +49,7 @@ corepack pnpm dev:quickstart
 - 浏览器可以读取并探测素材；
 - Canvas 预览链路可用。
 
-如果页面能打开但选完文件没有画面，先看[故障排查](/AelionSDK/production/troubleshooting/)中的“预览黑屏”。
+如果页面能打开但选完文件没有画面，先看[故障排查](/AelionSDK/zh/production/troubleshooting/)中的“预览黑屏”。
 
 ## 在仓库中创建自己的应用
 
@@ -243,7 +243,7 @@ pnpm add -D @aelionsdk/vite-plugin@1.0.0-rc.1
 ```
 
 `npm install @aelionsdk/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
-RC。接下来打开[快速开始](/AelionSDK/start/getting-started/)，从素材导入开始接代码。
+RC。接下来打开[快速开始](/AelionSDK/zh/start/getting-started/)，从素材导入开始接代码。
 
 ## 验证发布身份
 
@@ -260,9 +260,9 @@ npm view @aelionsdk/sdk dist-tags --json
 预期精确版本为 `1.0.0-rc.1`，`next` 指向该版本，`dist.attestations` 包含来自
 GitHub Actions 的 provenance。完整发布还应交叉核对：
 
-- [Git Tag `v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1)；
-- [发布工作流](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270)；
-- [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1)。
+- [Git Tag `v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/zh/tree/v1.0.0-rc.1)；
+- [发布工作流](https://github.com/FoyonaCZY/AelionSDK/zh/actions/runs/30343884270)；
+- [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/zh/releases/tag/v1.0.0-rc.1)。
 
 使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.0.0-rc.1 version
 dist.integrity dist.attestations --json`。不要混用不同 RC，也不要把可移动的 `next`

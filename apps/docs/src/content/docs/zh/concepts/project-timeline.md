@@ -1,4 +1,4 @@
----
+﻿---
 title: Project 和时间线数据
 description: 看懂 Aelion Project v1 中的 Sequence、Track、Item、Asset、Link Group 和 Marker。
 ---
@@ -192,4 +192,4 @@ const session = await Aelion.createSession();
 await session.loadProject(project);
 ```
 
-`build()` 会先检查 Builder 生成的结构，`loadProject()` 还会做完整输入、引用和执行检查。业务代码通常不需要手写完整 Project；需要查看字段时再查 [Project Schema](/AelionSDK/reference/project-schema/)。
+`build()` 会先检查 Builder 生成的结构，`loadProject()` 还会做完整输入、引用和执行检查。业务代码通常不需要手写完整 Project；需要查看字段时再查 [Project Schema](/AelionSDK/zh/reference/project-schema/)。

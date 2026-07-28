@@ -1,4 +1,4 @@
----
+﻿---
 title: 从 WebAV 与 Diffusion Studio 迁移
 description: 用严格迁移器把 WebAV Sprite 或 Diffusion checkpoint 转成 Aelion Project，并显式处理无法等价表达的功能。
 ---

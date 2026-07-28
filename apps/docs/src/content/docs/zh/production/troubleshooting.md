@@ -1,4 +1,4 @@
----
+﻿---
 title: 按现象排查问题
 description: 定位素材导入、预览、拖动、播放、音画同步、导出、OPFS 和资源泄漏。
 ---
@@ -150,4 +150,4 @@ GC 不保证立刻回落到完全相同数值，重点看多轮打开/关闭后�
 - 是否能在 Quickstart 或参考编辑器复现；
 - 开发构建与生产构建是否不同。
 
-完整错误码见 [Diagnostic Codes](/AelionSDK/reference/diagnostic-codes/)。
+完整错误码见 [Diagnostic Codes](/AelionSDK/zh/reference/diagnostic-codes/)。

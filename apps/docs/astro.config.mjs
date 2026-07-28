@@ -62,7 +62,7 @@ export default defineConfig({
           ],
         },
         typeDocSidebarGroup,
-        { label: '中文完整文档', link: 'zh/' },
+        { label: '中文完整文档', link: 'https://foyonaczy.github.io/AelionSDK/zh/' },
       ],
     }),
   ],

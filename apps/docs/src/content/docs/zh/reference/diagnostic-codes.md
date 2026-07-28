@@ -1,4 +1,4 @@
----
+﻿---
 title: Diagnostic 错误码
 description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---

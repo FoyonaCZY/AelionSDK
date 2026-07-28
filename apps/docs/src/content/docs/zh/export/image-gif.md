@@ -1,4 +1,4 @@
----
+﻿---
 title: 导出静帧和 GIF
 description: 从指定时间点保存 PNG、JPEG、WebP，或把 Sequence 生成循环 GIF。
 ---

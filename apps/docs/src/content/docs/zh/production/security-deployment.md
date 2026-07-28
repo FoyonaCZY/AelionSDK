@@ -1,4 +1,4 @@
----
+﻿---
 title: 上线前安全检查
 description: 配置 HTTPS、CSP、COOP/COEP、媒体授权、Project 输入限制、Material 信任和本地文件清理。
 ---
@@ -116,4 +116,4 @@ OPFS 在当前 origin 下，换域名或清站点数据都会失去访问。它�
 - [ ] 自动保存、工程恢复和缺失素材重连演练通过；
 - [ ] SDK、服务端引擎、Project Schema 和 Material 版本可追踪。
 
-部署兼容信息见[浏览器兼容性与部署要求](/AelionSDK/production/compatibility/)。
+部署兼容信息见[浏览器兼容性与部署要求](/AelionSDK/zh/production/compatibility/)。

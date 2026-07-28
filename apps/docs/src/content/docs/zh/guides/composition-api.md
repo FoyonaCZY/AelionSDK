@@ -1,4 +1,4 @@
----
+﻿---
 title: 使用 Composition API 创作
 description: 用 Composition、Layer 和 Clip 创建图片、文字、形状、字幕、效果、遮罩、关键帧和转场。
 ---
@@ -180,5 +180,5 @@ composition.advanced().addMarker({
 ```
 
 `advanced()` 不是绕过校验的后门。它和高层 API 修改同一个 Project，并由同一次
-`build()` 校验。导入真实媒体请继续阅读[导入与管理媒体](/AelionSDK/guides/media-import/)，
-加载后的交互编辑请阅读[时间线编辑](/AelionSDK/guides/timeline-editing/)。
+`build()` 校验。导入真实媒体请继续阅读[导入与管理媒体](/AelionSDK/zh/guides/media-import/)，
+加载后的交互编辑请阅读[时间线编辑](/AelionSDK/zh/guides/timeline-editing/)。

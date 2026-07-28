@@ -1,4 +1,4 @@
----
+﻿---
 title: WebAV 与 Diffusion 同机基准
 description: 在同一个 Chromium 页面中对 Aelion、WebAV 和 Diffusion Studio Core 执行可复现的预览与 seek 基准。
 ---

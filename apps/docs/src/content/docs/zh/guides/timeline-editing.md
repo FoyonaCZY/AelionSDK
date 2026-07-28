@@ -1,4 +1,4 @@
----
+﻿---
 title: 时间线编辑
 description: 把移动、裁剪、切分、联动编辑和拖拽手势接到 Transaction Commands。
 ---
@@ -217,4 +217,4 @@ const unsubscribe = session.subscribe('project-changed', event => {
 
 不要在 listener 中同步发起另一个事务。需要连锁动作时排入微任务，或在产品命令层中把多个字段改动放进同一次 `transaction.edit()`。
 
-所有命令参数和返回值见 [Editing Commands](/AelionSDK/reference/editing-commands/)。
+所有命令参数和返回值见 [Editing Commands](/AelionSDK/zh/reference/editing-commands/)。

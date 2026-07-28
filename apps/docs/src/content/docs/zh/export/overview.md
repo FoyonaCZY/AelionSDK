@@ -1,4 +1,4 @@
----
+﻿---
 title: 选择导出格式
 description: 根据交付场景选择 MP4、WebM、图片、GIF、WAV、本地或远程导出。
 ---
@@ -94,4 +94,4 @@ Memory Sink 的峰值不只是最终文件大小：它保存写入块，`finaliz
 6. 成功后下载/读取文件；失败或取消后清理半成品；
 7. 记录 profile、revision、结果和 diagnostic code。
 
-详细 Job 和落盘行为见[导出任务与文件写入](/AelionSDK/export/jobs-sinks/)。视频参数见[导出 MP4 和 WebM](/AelionSDK/export/video/)。
+详细 Job 和落盘行为见[导出任务与文件写入](/AelionSDK/zh/export/jobs-sinks/)。视频参数见[导出 MP4 和 WebM](/AelionSDK/zh/export/video/)。

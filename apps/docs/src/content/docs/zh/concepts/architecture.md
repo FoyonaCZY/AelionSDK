@@ -1,9 +1,9 @@
----
+﻿---
 title: 引擎如何执行一个 Project
 description: 从 Session 的公开接口深入到 Transaction、Render IR、Worker、AudioWorklet 和 Export。
 ---
 
-这篇文档面向需要排查引擎问题、开发底层扩展或评估运行成本的开发者。普通产品接入不必先读完；先完成[快速开始](/AelionSDK/start/getting-started/)会更容易理解下面各层的作用。
+这篇文档面向需要排查引擎问题、开发底层扩展或评估运行成本的开发者。普通产品接入不必先读完；先完成[快速开始](/AelionSDK/zh/start/getting-started/)会更容易理解下面各层的作用。
 
 从应用视角看，入口只有 Session：加载 Project，提交编辑，获取预览、播放和导出。Session 内部再把持久化数据、编辑状态和执行资源拆开管理。
 
@@ -31,7 +31,7 @@ flowchart LR
 
 Project 是规范化的 JSON snapshot。实体以稳定 ID 存储，关系通过 ID 引用，顺序通过明确的 ID 数组表达。它适合保存、同步、diff 和迁移，不保存实时命令、文件对象和运行时缓存。
 
-Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1/project.schema.json)。加载时先复制成 SDK 自己持有的纯 JSON，再检查 Schema、引用、时间和执行条件。不可信输入在进入 Ajv 前还会限制深度、节点数、数组长度、对象属性数和字符串字节，避免一个异常大对象先耗尽页面资源。
+Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/schemas/project/v1/project.schema.json)。加载时先复制成 SDK 自己持有的纯 JSON，再检查 Schema、引用、时间和执行条件。不可信输入在进入 Ajv 前还会限制深度、节点数、数组长度、对象属性数和字符串字节，避免一个异常大对象先耗尽页面资源。
 
 ### Transaction：修改工程的唯一入口
 
@@ -146,4 +146,4 @@ Profile 不会被静默替换。Preflight 在创建 encoder、GPU 或大文件�
 | `material-*`      | Material 协议、编译、创作、信任和工具                               |
 | `sdk`             | 生命周期、公开 facade、事件、诊断和模块编排                         |
 
-更细的公开类型以各 package `src/index.ts` 和 [SDK API Snapshot](https://github.com/FoyonaCZY/AelionSDK/blob/main/packages/sdk/api-snapshot.md) 为准。
+更细的公开类型以各 package `src/index.ts` 和 [SDK API Snapshot](https://github.com/FoyonaCZY/AelionSDK/zh/blob/main/packages/sdk/api-snapshot.md) 为准。

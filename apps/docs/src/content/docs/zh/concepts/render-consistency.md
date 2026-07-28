@@ -1,4 +1,4 @@
----
+﻿---
 title: 为什么预览和导出应当一致
 description: 理解 Render IR、代理素材、预览降质和导出冻结 revision 之间的关系。
 ---
@@ -79,4 +79,4 @@ Remote Export 会发送 canonical、冻结的 Project manifest 和稳定 content
 
 低分辨率预览不要求和导出逐像素相同，但物体位置、片段边界、效果进度和声音时间应一致。需要像素对比时，使用 full/1.0 预览和固定字体、素材、backend。
 
-Render IR 的完整线程与资源模型见[架构与执行模型](/AelionSDK/concepts/architecture/)。
+Render IR 的完整线程与资源模型见[架构与执行模型](/AelionSDK/zh/concepts/architecture/)。

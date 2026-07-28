@@ -1,4 +1,4 @@
----
+﻿---
 title: 把 SDK 接进剪辑器 UI
 description: 组织工程状态、视图状态、Session 生命周期、产品命令和异步任务。
 ---
@@ -240,4 +240,4 @@ type TaskState =
 5. dispose Media Provider；
 6. 清空只属于这个工程的 UI state。
 
-参考实现见[Quickstart](/AelionSDK/start/getting-started/)和[参考编辑器](/AelionSDK/start/reference-editor/)。工程保存请继续阅读[保存、恢复与迁移](/AelionSDK/guides/persistence/)。
+参考实现见[Quickstart](/AelionSDK/zh/start/getting-started/)和[参考编辑器](/AelionSDK/zh/start/reference-editor/)。工程保存请继续阅读[保存、恢复与迁移](/AelionSDK/zh/guides/persistence/)。

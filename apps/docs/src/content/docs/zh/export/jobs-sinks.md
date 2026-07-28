@@ -1,4 +1,4 @@
----
+﻿---
 title: 导出任务、进度和文件写入
 description: 管理可取消 Job，正确使用 Memory/OPFS Sink，并清理失败或取消的半成品。
 ---

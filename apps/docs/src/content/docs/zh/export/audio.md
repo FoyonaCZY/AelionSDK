@@ -1,4 +1,4 @@
----
+﻿---
 title: 导出 WAV 音频
 description: 把 Sequence 混音结果写成 s16 或 f32 WAV，并处理 RF64 和大文件。
 ---
