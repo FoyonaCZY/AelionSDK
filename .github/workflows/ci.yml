@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
+  checks:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -31,7 +31,52 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run ci
+      - run: pnpm run release:version:check
+      - run: pnpm run compatibility:check
+      - run: pnpm run format:check
+      - run: pnpm run schemas:check
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      - run: pnpm run test:schema
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run docs:check
+      - run: pnpm run docs:typecheck
+      - run: pnpm run build:docs
+      - run: pnpm run docs:check:built
+
+  artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run build:quickstart
+      - run: pnpm run build:editor
+      - run: pnpm run api:snapshot
       - run: pnpm run test:pack
       - run: pnpm run release:dry-run
       - run: pnpm run release:reproducibility

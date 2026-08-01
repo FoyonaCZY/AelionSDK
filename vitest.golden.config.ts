@@ -1,15 +1,10 @@
-import { fileURLToPath } from 'node:url';
-
 import { defineConfig } from 'vitest/config';
+
+import { buildViteAliases } from './scripts/package-aliases';
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@aelionsdk/core': fileURLToPath(new URL('./packages/core/src/index.ts', import.meta.url)),
-      '@aelionsdk/material-compiler': fileURLToPath(
-        new URL('./packages/material-compiler/src/index.ts', import.meta.url),
-      ),
-    },
+    alias: buildViteAliases(),
   },
   test: {
     environment: 'node',
