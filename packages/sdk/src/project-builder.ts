@@ -104,6 +104,12 @@ export interface AddImageClipOptions {
   readonly opacity?: number;
 }
 
+/**
+ * Options for adding an image-sequence Clip. Registers an `image-sequence`
+ * Asset whose frame manifest references the given `image` Assets, then adds an
+ * image Item that samples the sequence deterministically through the frame
+ * mapping (see `imageSequenceFrameIndex`).
+ */
 export interface AddImageSequenceClipOptions {
   readonly id?: string;
   /** Ordered `image` Assets, one per frame. */

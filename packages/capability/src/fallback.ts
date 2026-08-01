@@ -1,6 +1,8 @@
 import type { Diagnostic } from '@aelionsdk/core';
 
+/** Whether the codec operation is a decode or an encode. */
 export type CodecOperation = 'decode' | 'encode';
+/** Whether the codec path is video or audio. */
 export type CodecClass = 'video' | 'audio';
 
 /** The codec execution the SDK is being asked to perform. */
@@ -34,6 +36,11 @@ export type CodecExecutionPath =
   | { readonly path: 'fallback'; readonly providerId: string }
   | { readonly path: 'unavailable' };
 
+/**
+ * Negotiated execution path for a single codec operation plus any diagnostics
+ * the negotiation produced (for example a `CAPABILITY_CODEC_FALLBACK_USED`
+ * warning or a `CAPABILITY_CODEC_NO_BACKEND` error).
+ */
 export type CodecExecutionDecision = CodecExecutionPath & {
   readonly diagnostics: readonly Diagnostic[];
 };
