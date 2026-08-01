@@ -63,7 +63,7 @@ TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段�
 - 多条 visual 轨按 Project 顺序合成；
 - WebGL2 和 WebGPU 共享 12 种 blend mode 定义；
 - 支持 alpha/luma mask、invert、feather 和 consumed matte；
-- 支持文字和字幕布局、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、SRT/WebVTT；
+- 支持文字和字幕布局、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、SRT/WebVTT 导入导出和静音感知对齐；
 - 字体加载有数量、字节和生命周期上限；
 - Generator 支持纯色和线性渐变；
 - Adjustment 可以作用于已经合成的下层画面；

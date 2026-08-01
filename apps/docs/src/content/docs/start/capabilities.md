@@ -31,7 +31,9 @@ closed.
 Project/Composition can represent media, images, text, shapes, captions, nested sequences, masks,
 effects, transitions, generators, transforms, blend/composite behavior, and Materials. Image
 sequences (uniform-duration still frames) are modeled as `image-sequence` Assets and sampled
-deterministically through the frame mapping. Preview and export share Render IR semantics.
+deterministically through the frame mapping. Captions are first-class: SRT and WebVTT import and
+export, caption tracks with styled clips, and silence-aware cue alignment. Preview and export share
+Render IR semantics.
 
 Current local color execution is RGBA8 SDR. P3/HDR metadata and capability contracts exist, but
 production HDR output is not yet certified and must not be inferred from API presence.
