@@ -1,0 +1,36 @@
+---
+title: 1.5 Intelligence
+description: ASR captions, human segmentation, smart cut suggestions, auto color and TTS narration through a provider abstraction.
+---
+
+## Goal
+
+Add AI-powered editing workflows behind an abstracted provider interface so the engine stays
+provider-neutral, on-device where privacy demands it and cloud-swappable where quality wins.
+
+## Scope
+
+| # | Item | Priority | Size | Notes |
+|---|------|----------|------|-------|
+| 1.5-1 | **ASR caption generation** | P0 | L | Speech-to-text on-device (WASM whisper class) and via a cloud provider abstraction, with timeline alignment, confidence and editability. Feeds the 1.2 subtitle track. |
+| 1.5-2 | **Human segmentation** | P1 | L | Portrait matting for background replacement and person-as-layer, built on the WebGPU/shader pipeline. |
+| 1.5-3 | **Smart cut suggestions** | P2 | L | Rough-cut suggestions from scene/beat/silence analysis plus auto-assembly, on top of the 1.2 analysis pipeline. |
+| 1.5-4 | **Auto color suggestions** | P2 | M | Content analysis plus style-driven LUT recommendations. |
+| 1.5-5 | **TTS narration** | P2 | M | Text-to-speech as a timeline node. |
+| 1.5-6 | **Semantic asset search** | P2 | L | Embedding index and natural-language search over the media library. |
+
+## Acceptance
+
+- Every intelligence feature is exposed as a provider interface with at least one reference
+  implementation; the engine never depends on a single model vendor.
+- ASR output lands as validated subtitle entities with confidence metadata and manual correction.
+- On-device paths respect the resource budgets; cloud paths ride the existing remote protocol
+  security model (content-addressed assets, ephemeral authorization).
+- Privacy, license and data-retention constraints are documented for every provider.
+
+## Risks and dependencies
+
+- Depends on the **intelligence shape** decision (on-device versus cloud) and on the 1.2 analysis
+  pipeline and 1.1 WebGPU tier.
+- Model size conflicts with the 1.3 package-size budget; on-device models need a load-on-demand path.
+- Segmentation quality must be covered by reference/golden evaluation, not anecdote.

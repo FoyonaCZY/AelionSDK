@@ -1,0 +1,39 @@
+---
+title: 2.0 Stabilization
+description: Schema v2 and Render IR consolidation, API freeze, the first stable `latest` release, and v1 to v2 migration.
+---
+
+## Goal
+
+`2.0.0` is the first **stable** AelionSDK release. It applies the breaking changes deferred through
+the `1.x` minors, freezes the public API, and ships a first-class migration path from 1.x. After
+2.0, breaking changes follow a documented deprecation window instead of a per-major land-grab.
+
+## Scope
+
+| # | Item | Priority | Size | Notes |
+|---|------|----------|------|-------|
+| 2.0-1 | **Project schema v2 and Render IR consolidation** | P0 | L | Integrate the schema/IR additions accumulated across 1.x (subtitles, time remap, effect chains, templates, multicam) into a coherent model; remove deprecated 1.x-only shapes. |
+| 2.0-2 | **Package and API-surface cleanup** | P0 | L | One-time breaking cleanup of exports, type names and package boundaries; the API snapshot gate freezes the result. |
+| 2.0-3 | **Certification finale** | P0 | M | HDR and WebGPU certification closed out across the full device matrix; the remaining 1.0 "uncertified" boundaries are either certified or explicitly removed. |
+| 2.0-4 | **Stable release semantics** | P0 | S | First `latest` dist-tag release with a written API-stability and deprecation-window policy. |
+| 2.0-5 | **v1 → v2 migration tooling** | P0 | L | Upgrade `aelion-migrate` to produce validated v2 Projects and versioned loss reports from v1, reusing the existing strict-mode philosophy. |
+| 2.0-6 | **Full re-certification** | P0 | L | Regenerate the entire evidence set for the frozen source manifest, including the device matrix, golden data, soak and package reproducibility. |
+
+## Acceptance
+
+- Every 1.x feature has a documented v2 representation; nothing ships with a silent semantic change.
+- The v1 → v2 migration is deterministic, reversible where possible, and loss-reporting like the
+  existing WebAV/Diffusion adapters.
+- `2.0.0` passes the full release gate and is published on `latest` with provenance.
+- Post-2.0 policy is enforced from the first 2.x minor: deprecation windows, changelog and migration
+  docs are mandatory for any breaking change.
+
+## Risks and dependencies
+
+- 2.0-1 is the riskiest consolidation: schema/IR changes must preserve render semantics or fail
+  closed. Golden data and migration replay are the safety net.
+- 2.0-2 touches every package; the API snapshot, narrative-coverage and package README gates keep
+  the surface honest.
+- 2.0-3 depends on the 1.x certification work (1.1 real-device matrix, 1.2 WebGPU tier) actually
+  landing and staying green.

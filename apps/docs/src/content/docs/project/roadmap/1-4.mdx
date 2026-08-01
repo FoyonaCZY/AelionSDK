@@ -1,0 +1,36 @@
+---
+title: 1.4 Editing: audio and arrangement
+description: Multicam editing, per-track audio effect chains, voice enhancement and project templates.
+---
+
+## Goal
+
+Deepen the arrangement and audio-engineering surface so products can cover multicam shoots and
+serious audio cleanup without leaving the SDK.
+
+## Scope
+
+| # | Item | Priority | Size | Notes |
+|---|------|----------|------|-------|
+| 1.4-1 | **Multicam editing** | P1 | L | Sync groups (waveform/timecode alignment), angle switching and a multicam playback mode, built on the existing time-mapping and track model. |
+| 1.4-2 | **Per-track audio effect chains** | P1 | M | EQ, compressor and de-noiser as pluggable per-track processing nodes beyond the current fades/ducking/master settings. |
+| 1.4-3 | **Voice enhancement and de-noising** | P1 | M | Real-time denoise and dereverberation as a node type in the effect chain; provider-based so the on-device/cloud decision stays open. |
+| 1.4-4 | **Project templates** | P2 | M | Parameterized Project instantiation: a Project acts as a template with editable template parameters. |
+| 1.4-5 | **Advanced clip waveform/metadata** | P2 | S | Richer per-clip analysis metadata surfaced to the timeline and preview. |
+
+## Acceptance
+
+- Multicam sync produces sample-accurate alignment with validated timecode handling; angle switches
+  are transactional.
+- Effect-chain nodes share one processing interface, bounded memory and cancellation semantics with
+  the rest of the audio pipeline.
+- Template instantiation is deterministic: the same template and parameters always yield the same
+  Project.
+- All new entities follow the complete execution path (builders, validation, migration, IR, preview,
+  export, types, docs).
+
+## Risks and dependencies
+
+- 1.4-1 depends on 1.2 analysis outputs for waveform/timecode sync and on the Render IR structure.
+- Audio effect graphs grow CPU cost; the 1.1 resource-budget and soak work must be in place.
+- Template parameters may require an additive schema extension; keep it optional and validated.

@@ -134,7 +134,25 @@ export default defineConfig({
         {
           label: 'Project',
           translations: { 'zh-CN': '项目' },
-          items: [{ slug: 'project/status' }, { slug: 'project/development' }],
+          items: [
+            { slug: 'project/status' },
+            { slug: 'project/development' },
+            {
+              label: 'Roadmap',
+              translations: { 'zh-CN': '路线图' },
+              collapsed: true,
+              items: [
+                { slug: 'project/roadmap' },
+                { slug: 'project/roadmap/1-1' },
+                { slug: 'project/roadmap/1-2' },
+                { slug: 'project/roadmap/1-3' },
+                { slug: 'project/roadmap/1-4' },
+                { slug: 'project/roadmap/1-5' },
+                { slug: 'project/roadmap/1-6' },
+                { slug: 'project/roadmap/2-0' },
+              ],
+            },
+          ],
         },
         typeDocSidebarGroup,
       ],

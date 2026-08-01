@@ -1,0 +1,34 @@
+---
+title: 1.6 Collaboration and protocols
+description: Collaborative editing, Remote Export Protocol 2.0, a plugin/material market protocol and semantic search.
+---
+
+## Goal
+
+Turn single-page editing into a collaborative, service-connected platform while keeping the engine
+deterministic and the public contracts explicit.
+
+## Scope
+
+| # | Item | Priority | Size | Notes |
+|---|------|----------|------|-------|
+| 1.6-1 | **Collaborative editing layer** | P1 | L | CRDT/OT operation sync, presence, live cursors/selection and comments, joined to the existing transaction/undo/revision system. |
+| 1.6-2 | **Remote Export Protocol 2.0** | P1 | L | Resumable transfer, bandwidth adaptation, multi-provider orchestration and a reference cloud-rendering contract, extending the existing content-addressed, idempotent 1.0 protocol. |
+| 1.6-3 | **Plugin/material market protocol** | P2 | M | Public catalog protocol, version-range resolution and signed distribution for third-party effects, on the existing Material signature/trust/registry model. |
+| 1.6-4 | **Semantic asset search** | P2 | L | Embedding index and natural-language search over the media library (shared surface with 1.5-6). |
+
+## Acceptance
+
+- Collaboration preserves the transaction invariants: every remote operation is a validated,
+  reversible change with conflict detection matching the local rules.
+- Presence and comment features degrade gracefully without the collaboration backend.
+- Protocol versions are negotiated and versioned; 1.0 clients keep a documented migration path.
+- Remote export resumes exactly at the last durable checkpoint and verifies result bytes/hashes.
+
+## Risks and dependencies
+
+- Depends on the **collaboration technology** decision (CRDT versus OT) and on how it reconciles
+  with the existing revision-bound persistence.
+- Collaborative sync work is where determinism risk is highest; golden/soak evidence must cover
+  concurrent editing replay.
+- 1.6-4 is shared with 1.5; sequence it so the provider abstraction lands once.

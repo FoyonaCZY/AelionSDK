@@ -1,0 +1,37 @@
+---
+title: 1.3 Ecosystem: frameworks and UI
+description: Official React, Vue and Svelte bindings, CDN and headless usage, reference UI components and build-integration parity.
+---
+
+## Goal
+
+Make the engine product-ready by providing the framework bindings, deployment paths and reference
+UI building blocks that applications need, without building a full product.
+
+## Scope
+
+| # | Item | Priority | Size | Notes |
+|---|------|----------|------|-------|
+| 1.3-1 | **Official framework bindings** | P0 | L | `@aelionsdk/react`, `@aelionsdk/vue` and `@aelionsdk/svelte` with Composition/session lifecycle hooks and reactive state bridges. The README promises framework-agnostic usage; this delivers first-class bindings on top. |
+| 1.3-2 | **CDN and headless usage** | P1 | M | No-build ESM CDN entry, safe Node/SSR degradation and verified tree-shaking. |
+| 1.3-3 | **Reference UI components** | P1 | L | Composable timeline, properties panel, media browser, player controls and subtitle editor — not a full product, but drop-in building blocks evolved from `editor-demo`. |
+| 1.3-4 | **Build-integration parity** | P2 | S | Bring the Webpack/Rspack/Next.js/CDN runtime-asset support to parity with the Vite plugin. |
+| 1.3-5 | **Package-size budget** | P1 | M | Per-package gzip budgets, subpath exports, side-effect declaration audit and bundle-size enforcement in CI. |
+| 1.3-6 | **Hot-path SIMD/WASM optimization** | P1 | M | Rewrite resampling, matrix and color hot paths with SIMD/WASM behind the existing APIs. |
+
+## Acceptance
+
+- Each binding package publishes with the same release discipline (contract, docs, evidence,
+  artifact) as the engine packages.
+- Reference components are keyboard-accessible and document their ARIA contract.
+- Bundle-size enforcement fails CI on regression, mirroring the existing api:snapshot gate.
+- SIMD/WASM hot paths are behind the current public APIs; behavior is unchanged and benchmarks
+  ship with the release.
+
+## Risks and dependencies
+
+- 1.3-5 needs a baseline audit before budgets are set; retrofitting budgets too early blocks the
+  capability minors.
+- 1.3-6 depends on the 1.1 codec/backend decisions so optimization targets are stable.
+- Framework bindings multiply maintenance; the API snapshot and narrative-coverage gates apply to
+  each new package.
