@@ -167,6 +167,8 @@ Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_
 | `CAPABILITY_CODEC_API_UNAVAILABLE`                  | 当前环境没有相应 WebCodecs constructor                        |
 | `CAPABILITY_CODEC_CONFIG_UNSUPPORTED`               | API 存在但指定 codec/config 不支持；选择明确 fallback/profile |
 | `CAPABILITY_CODEC_PROBE_FAILED`                     | config probe 自身抛错；保留 cause 并按 unsupported 处理       |
+| `CAPABILITY_CODEC_FALLBACK_USED`                    | 该 codec 由已注册软件回退（如 WASM）执行；仅标记低层级        |
+| `CAPABILITY_CODEC_NO_BACKEND`                       | 无硬件且未注册可用软件回退；该 codec 路径失败关闭             |
 | `CAPABILITY_WORKER_UNAVAILABLE`                     | Worker 不可用                                                 |
 | `CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE`           | OffscreenCanvas 不可用                                        |
 | `CAPABILITY_WEBGL2_UNAVAILABLE`                     | 无法创建 WebGL2 context                                       |

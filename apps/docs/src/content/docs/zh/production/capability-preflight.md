@@ -111,3 +111,7 @@ Preflight 会考虑当前 revision 的 width、height、frameRate、声道、色
 页面打开后就能确定的环境限制可以提前禁用，例如完全没有 OPFS。与当前 Project 相关的导出配置则适合在打开导出面板或点击“开始导出”时检查，并显示原因。
 
 即使按钮此前可用，启动任务前仍要再检查一次，因为 Project revision 和 Sink 状态可能已经变化。
+
+## 软件编解码回退契约
+
+当硬件编解码不支持时，SDK 通过 `@aelionsdk/capability` 的 `CodecFallbackProvider` 契约（`CodecFallbackRegistry`、`selectCodecExecution`）协商软件回退。应用用 `codecFallbackRegistry.register(provider)` 注册后端（例如 WASM 解码器）；1.1 引擎自身不内置 WASM 后端，由应用选定编解码策略并提供。协商优先硬件，其次第一个 `supports()` 该 codec identity 且 `ready` 的 provider，否则以 `CAPABILITY_CODEC_NO_BACKEND` 失败关闭。`CAPABILITY_CODEC_FALLBACK_USED` 标记低层级执行；preview 与 export 语义在硬件与回退路径间必须保持一致。
