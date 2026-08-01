@@ -9,7 +9,7 @@
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
 [![npm next](https://img.shields.io/npm/v/@aelionsdk/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelionsdk/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
-[![Node.js 20](https://img.shields.io/badge/node-20.19%2B-43853d.svg)](package.json)
+[![Node.js 24](https://img.shields.io/badge/node-24-43853d.svg)](package.json)
 
 [文档](https://foyonaczy.github.io/AelionSDK/zh/) · [快速开始](https://foyonaczy.github.io/AelionSDK/zh/start/getting-started/) · [参考编辑器](https://foyonaczy.github.io/AelionSDK/zh/start/reference-editor/) · [API](https://foyonaczy.github.io/AelionSDK/zh/api/overview/)
 
@@ -277,7 +277,7 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
-1.0 RC 阶段。使用前需要了解这些边界：
+1.1 RC 阶段。使用前需要了解这些边界：
 
 - 13 个公开包通过 npm `next` tag 发布；RC API 在首个稳定版本前仍可能按迁移规则调整；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
@@ -335,19 +335,19 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 
 ## 最新验证状态
 
-2026-07-28 在 Windows 参考机上完成了与源清单
-`714daf26de8ae2ba230da483be50c6faf1ae9f0c38544097f1a4f034b2d79be4`
-绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，40 项产物 postflight
-语义校验通过。Chromium 83 项和 Firefox 69 项浏览器测试均为零失败、零跳过；
+2026-08-01 完成了与源清单
+`9c49a096435e7f733f781408b09b742487598f2b3bb4904cd3d680317da008d8`
+绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，全部产物 postflight
+语义校验通过。Chromium 84 项和 Firefox 69 项浏览器测试均为零失败、零跳过；
 13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包
 字节可复现性、golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出
 外部 FFmpeg readback 均通过。
 
 完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态索引见
 `docs/status.md`。绑定于相同源清单、门禁记录和证据集的独立 blocker review 已签署
-`approved`；`1.0.0-rc.1` 已作为 13 个带 provenance 的 npm 包发布到 `next`，并创建
-[`v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1) 和
-[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1)。
+`approved`；`1.1.0-rc.1` 已作为 13 个带 provenance 的 npm 包发布到 `next`，并创建
+[`v1.1.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1) 和
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1)。
 精确安装与 registry 验证命令见[安装文档](https://foyonaczy.github.io/AelionSDK/zh/start/installation/#验证发布身份)。
 
 ## License

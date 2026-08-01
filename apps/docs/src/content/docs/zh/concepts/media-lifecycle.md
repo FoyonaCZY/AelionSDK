@@ -38,6 +38,10 @@ media.registerUrl('asset_camera_a', proxyUrl, {
 
 ## Range 读取为什么重要
 
+MP4/MOV/MKV/TS 与 WebM 的索引通常需要读取文件头部和尾部的字节。HTTP 源应支持
+`Range`、`Content-Range` 和 CORS；有界整文件下载回退只适合小文件，较大的不可 seek
+响应应明确失败。
+
 打开长视频时，不应该先把完整文件复制进 JavaScript 内存。`ProductionMediaProvider` 通过 RangeReader 按区间读取容器和媒体数据，支持：
 
 - `File` / `Blob`；

@@ -22,7 +22,7 @@ AelionSDK is framework-agnostic: React, Vue, Svelte and plain DOM applications c
 
 The public package surface is split into focused `@aelionsdk/*` packages; most applications start with `@aelionsdk/sdk` and add `@aelionsdk/export` or the Vite plugin when needed.
 
-## Install the 1.0 Release Candidate
+## Install the 1.1 Release Candidate
 
 ```bash
 npm install @aelionsdk/sdk@next

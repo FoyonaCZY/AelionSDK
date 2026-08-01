@@ -3,7 +3,7 @@ title: What is supported today?
 description: Review editing, preview, media, audio, export, and Material capabilities and boundaries.
 ---
 
-This page answers what can be built with `1.0.0-rc.1` and what is still a negotiated or uncertified
+This page answers what can be built with `1.1.0-rc.1` and what is still a negotiated or uncertified
 boundary. Exact symbols are in the generated API Reference and SDK API snapshot.
 
 ## Basic editor

@@ -11,7 +11,7 @@
 
 ## 本地开发
 
-需要 Node.js 20.19.x 和仓库锁定的 pnpm 版本：
+需要 Node.js `>=24 <25` 和仓库锁定的 pnpm 版本：
 
 ```bash
 corepack pnpm install --frozen-lockfile

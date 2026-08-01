@@ -2,7 +2,7 @@
 
 Browser-first video editing, preview, playback and export APIs for AelionSDK.
 
-## Install the 1.0 Release Candidate
+## Install the 1.1 Release Candidate
 
 ```bash
 npm install @aelionsdk/sdk@next

@@ -5,7 +5,7 @@ Updated: 2026-08-01 (Asia/Shanghai)
 ## Bound final gate run
 
 - Source manifest:
-  `a0bc1d83d3bed1285bbf1dc996553219c7359f72a252949328fdff08851511c7`
+  `9c49a096435e7f733f781408b09b742487598f2b3bb4904cd3d680317da008d8`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: all semantic, freshness, and binding checks passed.

@@ -1,11 +1,11 @@
 ---
 title: Install and configure
-description: Install the AelionSDK 1.0 release candidate, run the examples, and configure a production host.
+description: Install the AelionSDK 1.1 release candidate, run the examples, and configure a production host.
 ---
 
 ## Requirements
 
-- Node.js `20.19.x` for repository development.
+- Node.js `>=24 <25` for repository development.
 - Corepack and the repository-pinned pnpm `10.13.1`.
 - A modern secure-context browser for runtime features.
 - Vite 6/7 for the first-party Vite integration, or a host that can deploy ESM Worker/Worklet assets.

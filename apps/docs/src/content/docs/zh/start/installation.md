@@ -1,9 +1,9 @@
 ---
 title: 安装与工程配置
-description: 从 npm 安装 AelionSDK 1.0 Release Candidate，启动 Quickstart，并配置自己的 Vite 应用。
+description: 从 npm 安装 AelionSDK 1.1 Release Candidate，启动 Quickstart，并配置自己的 Vite 应用。
 ---
 
-AelionSDK 的 1.0 Release Candidate 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
+AelionSDK 的 1.1 Release Candidate 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
 使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
 
 ```bash
