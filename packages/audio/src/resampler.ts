@@ -1,22 +1,9 @@
+import { concat, positiveInteger } from './pcm-utils.js';
+
 export interface StreamingPcmResamplerOptions {
   readonly inputSampleRate: number;
   readonly outputSampleRate: number;
   readonly channelCount: number;
-}
-
-function positiveInteger(value: number, name: string): void {
-  if (!Number.isSafeInteger(value) || value <= 0) {
-    throw new RangeError(`${name} must be a positive safe integer`);
-  }
-}
-
-function concat(left: Float32Array, right: Float32Array): Float32Array {
-  if (left.length === 0) return right.slice();
-  if (right.length === 0) return left;
-  const result = new Float32Array(left.length + right.length);
-  result.set(left);
-  result.set(right, left.length);
-  return result;
 }
 
 /**

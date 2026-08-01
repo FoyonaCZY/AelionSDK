@@ -1,6 +1,5 @@
-import type { JsonValue } from '@aelionsdk/core';
-
 import { buildMaterialExecutionPlan, compileMaterialGraph } from './compiler.js';
+import { graphHash, identifier, literal } from './codegen-common.js';
 import type {
   CompileMaterialOptions,
   GraphBinding,
@@ -8,27 +7,6 @@ import type {
   MaterialUniformBinding,
   WebGpuMaterialProgram,
 } from './types.js';
-
-function identifier(value: string): string {
-  return value.replaceAll(/[^a-zA-Z0-9_]/gu, '_');
-}
-
-function literal(value: JsonValue): string {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw new TypeError('WebGPU material expressions only support finite numeric literals');
-  }
-  return Number.isInteger(value) ? `${value.toString()}.0` : value.toString();
-}
-
-function graphHash(graph: MaterialGraph): string {
-  const serialized = JSON.stringify(graph);
-  let hash = 2_166_136_261;
-  for (let index = 0; index < serialized.length; index += 1) {
-    hash ^= serialized.charCodeAt(index);
-    hash = Math.imul(hash, 16_777_619);
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0');
-}
 
 function uniformExpression(
   binding: GraphBinding,
@@ -52,7 +30,7 @@ function bindingExpression(
   inputPorts: Set<string>,
   uniforms: Map<string, MaterialUniformBinding>,
 ): string {
-  if ('value' in binding) return literal(binding.value);
+  if ('value' in binding) return literal(binding.value, 'WebGPU');
   const uniform = uniformExpression(binding, uniforms);
   if (uniform !== undefined) return uniform;
   if ('inputPort' in binding) {
