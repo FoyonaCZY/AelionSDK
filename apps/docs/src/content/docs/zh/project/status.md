@@ -3,17 +3,17 @@ title: 当前版本状态
 description: 查看已发布版本、验证证据、已知限制和后续认证工作。
 ---
 
-> 当前版本：`1.1.0-rc.1`
+> 当前版本：`1.2.0-rc.1`
 >
 > 源码状态：核心编辑、预览、播放和导出链路已实现
 >
-> 发布渠道：npm `next`、Git Tag `v1.1.0-rc.1` 和 GitHub prerelease
+> 发布渠道：npm `next`、Git Tag `v1.2.0-rc.1` 和 GitHub prerelease
 
 ## 现在可以怎么使用
 
 当前源码可以运行一个完整浏览器剪辑流程：注册素材，创建和加载 Project，预览与播放，修改时间线并撤销，最后本地或远程导出。Project Builder、ProductionMediaProvider、Preview Canvas Controller 和参考编辑器都只使用公开包入口。
 
-当前版本是 1.1 Release Candidate，适合产品集成、功能验证和目标设备测试。RC 不等于所有
+当前版本是 1.2 Release Candidate，适合产品集成、功能验证和目标设备测试。RC 不等于所有
 浏览器和设备都获得产品认证；如果要对外承诺更广浏览器矩阵、长期 API 兼容或商业
 SLA，仍需完成本页后半部分列出的认证工作。
 
@@ -32,9 +32,9 @@ SLA，仍需完成本页后半部分列出的认证工作。
 对同一份源清单、门禁记录和证据集完成五项 blocker review，并在
 `phase-1-blocker-review.json` 中签署 `approved`。
 
-`1.1.0-rc.1` 已发布为 13 个 npm 包、Git Tag
-[`v1.1.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1) 和
-[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1)；
+`1.2.0-rc.1` 已发布为 13 个 npm 包、Git Tag
+[`v1.2.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0-rc.1) 和
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0-rc.1)；
 发布工作流同时生成 npm provenance 并完成 registry smoke。发布时的源代码、审阅
 记录和证据以该不可变 Tag 为准；`main` 后续的文档或开发变更不改写这次发布结论。
 
@@ -42,7 +42,7 @@ SLA，仍需完成本页后半部分列出的认证工作。
 
 | 项目         | 值                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------- |
-| 版本         | `1.1.0-rc.1`                                                                                      |
+| 版本         | `1.2.0-rc.1`                                                                                      |
 | npm dist-tag | `next`                                                                                            |
 | 源提交       | `02b185d405dbb030df046cd6f58465e1ba1896f0`                                                        |
 | 发布合并提交 | `5fb3b7743465c437c883a57012d7d7382f5f9ae2`                                                        |
@@ -85,7 +85,7 @@ SLA，仍需完成本页后半部分列出的认证工作。
 
 ## 源码完成不等于已经交付的事项
 
-下面这些事情不属于本次 1.1 RC 的承诺，不能因为 main 分支测试通过就对外宣称
+下面这些事情不属于本次 1.2 RC 的承诺，不能因为 main 分支测试通过就对外宣称
 已经具备：
 
 - Safari、iOS、Android 以及更广 OS/GPU 矩阵；

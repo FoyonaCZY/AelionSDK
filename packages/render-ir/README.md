@@ -9,7 +9,7 @@ evaluation for AelionSDK.
 npm install @aelionsdk/render-ir@next
 ```
 
-`next` currently resolves to `1.1.0-rc.1`. Product applications should use
+`next` currently resolves to `1.2.0-rc.1`. Product applications should use
 `@aelionsdk/sdk`; direct use is for custom renderers, exporters and engine
 instrumentation.
 

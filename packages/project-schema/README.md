@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/project-schema@next
 ```
 
-`next` currently resolves to `1.1.0-rc.1`. Use this package in importers,
+`next` currently resolves to `1.2.0-rc.1`. Use this package in importers,
 services and Project tooling that must validate data without creating a browser
 Session.
 

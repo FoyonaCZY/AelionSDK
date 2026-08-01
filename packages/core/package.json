@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/core",
-  "version": "1.1.0-rc.1",
+  "version": "1.2.0-rc.1",
   "description": "Core time, diagnostics and resource primitives for AelionSDK",
   "license": "MIT",
   "repository": {

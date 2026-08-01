@@ -17,11 +17,11 @@ npm install @aelionsdk/sdk@next @aelionsdk/export@next
 npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
-`next` currently resolves to `1.1.0-rc.1`. After validation, pin the exact version:
+`next` currently resolves to `1.2.0-rc.1`. After validation, pin the exact version:
 
 ```bash
-npm install @aelionsdk/sdk@1.1.0-rc.1 @aelionsdk/export@1.1.0-rc.1
-npm install --save-dev @aelionsdk/vite-plugin@1.1.0-rc.1
+npm install @aelionsdk/sdk@1.2.0-rc.1 @aelionsdk/export@1.2.0-rc.1
+npm install --save-dev @aelionsdk/vite-plugin@1.2.0-rc.1
 ```
 
 All `@aelionsdk/*` packages in one application should use the same release.
@@ -84,7 +84,7 @@ four runtime assets to your static deployment, then pass absolute URLs through
 - `loadAelionRuntimeAssets()` for a custom copy pipeline;
 - `aelionRuntimeAssetUrls()` for a Next client boundary or pinned CDN layout.
 
-CDN paths must pin the exact SDK version, for example `@aelionsdk/sdk/1.1.0-rc.1/`.
+CDN paths must pin the exact SDK version, for example `@aelionsdk/sdk/1.2.0-rc.1/`.
 
 ## TypeScript
 
@@ -117,13 +117,13 @@ Commit the lockfile and use frozen installs in CI. RC APIs can change before sta
 ## Verify release identity
 
 ```bash
-npm view @aelionsdk/sdk@1.1.0-rc.1 \
+npm view @aelionsdk/sdk@1.2.0-rc.1 \
   version dist.integrity dist.attestations --json
 npm view @aelionsdk/sdk dist-tags --json
 ```
 
-Cross-check the [Git tag `v1.1.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1),
+Cross-check the [Git tag `v1.2.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0-rc.1),
 the [release workflow](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270), and the
-[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1).
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0-rc.1).
 
 Continue with [From a local video to MP4](/AelionSDK/start/getting-started/).

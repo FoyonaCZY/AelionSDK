@@ -50,5 +50,5 @@ import {
 See the [Material guide](https://foyonaczy.github.io/AelionSDK/guides/materials/)
 and [AMP v1 reference](https://foyonaczy.github.io/AelionSDK/reference/material-protocol-v1/).
 
-Version `1.1.0-rc.1` is a prerelease. Public changes before 1.0 are recorded
+Version `1.2.0-rc.1` is a prerelease. Public changes before 1.0 are recorded
 in the repository changelog and migration documentation. Licensed under MIT.

@@ -2,6 +2,36 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。首个稳定版本前的预发布版本允许有记录、可迁移的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
 
+## 1.2.0-rc.1 — 2026-08-01
+
+### Added
+
+- Added subtitle track I/O: `importSubtitleTrack` parses SRT/WebVTT into
+  caption clips (fail-closed on overlaps), `exportSubtitleTrack` writes a
+  caption track back to SRT/VTT preserving cue settings, and
+  `alignCueToSilenceUs`/`frameRangeToUs` support silence-aware cue alignment.
+  Reuses the render-ir caption codecs; no schema change.
+- Added curve time mapping and rate envelopes: `addMediaClip` accepts
+  `curvePoints` (mutually exclusive with `rate`) producing a schema-valid
+  curve timeMapping, and `buildRateEnvelope` compiles a segmented rate
+  envelope into equivalent monotonic curve points.
+- Added Bézier keyframe handles: Project keyframes gain optional
+  `handleIn`/`handleOut` value-space tangents, persisted by `setKeyframes` and
+  evaluated as a value-space cubic Bézier in render-ir, falling back to the
+  existing easing path otherwise.
+- Added offline beat and scene-boundary analysis: `detectBeats` (energy
+  envelope onsets) and `detectScenes` (audio-energy discontinuities) in
+  `@aelionsdk/audio`, driven by a `readFrames` source with bounded memory,
+  AbortSignal and progress; exposed as
+  `SessionAudioController.analyzeBeats`/`analyzeScenes`.
+- Added automatic proxy registration: `registerAutomaticProxy` generates a
+  low-resolution proxy from an original representation through an injected
+  encoder and registers it as a proxy representation, so the provider serves
+  it for preview while keeping the original for export.
+- Verified and documented WebGPU/WebGL2 Material single-pass parity; multi-pass
+  `blur.gaussian` compiles on WebGL2 and fails closed on WebGPU (which lacks
+  the multi-pass pipeline), now an explicit capability gate.
+
 ## 1.1.0-rc.1 — 2026-08-01
 
 ### Added

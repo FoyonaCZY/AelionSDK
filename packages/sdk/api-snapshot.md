@@ -1,6 +1,6 @@
 # `@aelionsdk/sdk` public API snapshot
 
-Version: `1.1.0-rc.1`
+Version: `1.2.0-rc.1`
 
 This checked-in manifest is intentionally structural. `check-api-snapshot.mjs`
 extracts the public declarations reachable from `dist/index.d.ts`, compares the
@@ -12,7 +12,7 @@ baseline in the same change.
 {
   "schemaVersion": "1.0.0",
   "package": "@aelionsdk/sdk",
-  "version": "1.1.0-rc.1",
+  "version": "1.2.0-rc.1",
   "entrypoint": "dist/index.d.ts",
   "files": {
     "dist/audio-controller.d.ts": "138ac581b598ca00686fb45e4196187f3beed4a8e633db8a89a2fbd61de3abbd",

@@ -9,7 +9,7 @@ npm install @aelionsdk/sdk@next
 npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
-`next` currently resolves to `1.1.0-rc.1`. Pin the exact version after
+`next` currently resolves to `1.2.0-rc.1`. Pin the exact version after
 validation instead of following a moving prerelease tag.
 
 ## Vite setup

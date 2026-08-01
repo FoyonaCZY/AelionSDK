@@ -46,7 +46,7 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前 1.1 Release Candidate 是 `1.1.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
+当前 1.2 Release Candidate 是 `1.2.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
 导出入口和运行时资源插件：
 
 ```bash
@@ -277,7 +277,7 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 ## 当前边界
 
 AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
-1.1 RC 阶段。使用前需要了解这些边界：
+1.2 RC 阶段。使用前需要了解这些边界：
 
 - 13 个公开包通过 npm `next` tag 发布；RC API 在首个稳定版本前仍可能按迁移规则调整；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari

@@ -3,7 +3,7 @@ title: Packages and public entry points
 description: Understand the responsibilities and intended consumers of the 13 @aelionsdk packages.
 ---
 
-All public packages are currently `1.1.0-rc.1` under npm `next`. Only paths declared by a
+All public packages are currently `1.2.0-rc.1` under npm `next`. Only paths declared by a
 package's `exports` field are public API; `src/*`, `dist/*`, tests, and internal helpers are not.
 
 ## Stability tiers
