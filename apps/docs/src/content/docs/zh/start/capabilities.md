@@ -47,7 +47,7 @@ File / URL / OPFS
 ## 时间、变速和关键帧
 
 - API 使用整数微秒，帧率使用有理数；
-- TimeMap 支持线性速度、反向、hold/freeze 和分段曲线；
+- TimeMap 支持线性速度、反向、hold/freeze 和分段曲线（可用 `buildRateEnvelope` 把速率包络编译为等价的曲线点）；
 - Preview、seek、音频和 Export 使用同一套素材时间映射；
 - Automation 支持 step、linear 和 cubic-bezier；
 - 标量和 JSON vector/object 可以递归插值；

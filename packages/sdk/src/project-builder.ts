@@ -83,6 +83,12 @@ export interface AddMediaClipOptions {
   readonly streamIndex?: number;
   readonly boundary?: 'error' | 'hold' | 'loop' | 'transparent';
   readonly rate?: Rational;
+  /** Curve time-mapping points, mutually exclusive with `rate`. */
+  readonly curvePoints?: readonly {
+    readonly itemTimeUs: number;
+    readonly sourceTimeUs: number;
+    readonly interpolation?: 'linear' | 'hold' | 'cubic';
+  }[];
   readonly name?: string;
   readonly fit?: 'contain' | 'cover' | 'fill' | 'none';
   readonly opacity?: number;
@@ -518,17 +524,32 @@ export class ProjectBuilder {
     if ((options.fadeInUs ?? 0) + (options.fadeOutUs ?? 0) > options.durationUs) {
       throw new RangeError('audio fades cannot overlap past the Clip duration');
     }
+    if (options.curvePoints !== undefined && options.rate !== undefined) {
+      throw new TypeError('curvePoints and rate are mutually exclusive');
+    }
 
+    const timeMapping: JsonObject =
+      options.curvePoints === undefined
+        ? {
+            type: 'linear',
+            rate: { numerator: rate.numerator, denominator: rate.denominator },
+            reverse: false,
+            boundary: options.boundary ?? 'hold',
+          }
+        : {
+            type: 'curve',
+            points: options.curvePoints.map(point => ({
+              itemTimeUs: point.itemTimeUs,
+              sourceTimeUs: point.sourceTimeUs,
+              interpolation: point.interpolation ?? 'linear',
+            })),
+            boundary: options.boundary ?? 'hold',
+          };
     const source = {
       assetId: options.assetId,
       stream: { type: options.kind, index: streamIndex },
       sourceRange: { startUs: sourceStartUs, durationUs: sourceDurationUs },
-      timeMapping: {
-        type: 'linear' as const,
-        rate: { numerator: rate.numerator, denominator: rate.denominator },
-        reverse: false,
-        boundary: options.boundary ?? 'hold',
-      },
+      timeMapping,
     };
     const item: ItemEntity =
       options.kind === 'video'

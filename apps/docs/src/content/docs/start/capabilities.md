@@ -22,9 +22,9 @@ ownership, locks, transitions, or mapping rules cannot be preserved.
 ## Time, animation, and rate
 
 Time is integer microseconds with rational frame rates and half-open ranges. Items support source
-mapping, linear rate and the declared curve/time-map forms, transforms/opacity, keyframes/easing,
-and validated transition intervals. Unsupported edit policies for complex mapping/animation fail
-closed.
+mapping, linear rate, curve time-mapping (authored through the builder or compiled from a rate
+envelope via `buildRateEnvelope`), transforms/opacity, keyframes/easing, and validated transition
+intervals. Unsupported edit policies for complex mapping/animation fail closed.
 
 ## Visual composition
 
