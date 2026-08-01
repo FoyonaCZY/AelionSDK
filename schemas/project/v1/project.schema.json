@@ -144,7 +144,10 @@
     "rational": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["numerator", "denominator"],
+      "required": [
+        "numerator",
+        "denominator"
+      ],
       "properties": {
         "numerator": {
           "type": "integer",
@@ -161,7 +164,10 @@
     "range": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["startUs", "durationUs"],
+      "required": [
+        "startUs",
+        "durationUs"
+      ],
       "properties": {
         "startUs": {
           "$ref": "#/$defs/timeUs"
@@ -174,10 +180,17 @@
     "color": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["space", "rgba"],
+      "required": [
+        "space",
+        "rgba"
+      ],
       "properties": {
         "space": {
-          "enum": ["srgb-linear", "display-p3-linear", "rec2020-linear"]
+          "enum": [
+            "srgb-linear",
+            "display-p3-linear",
+            "rec2020-linear"
+          ]
         },
         "rgba": {
           "type": "array",
@@ -192,7 +205,10 @@
     "vec2": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y"],
+      "required": [
+        "x",
+        "y"
+      ],
       "properties": {
         "x": {
           "type": "number"
@@ -205,21 +221,43 @@
     "animation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["animation"],
+      "required": [
+        "animation"
+      ],
       "properties": {
         "animation": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["timeSpace", "preInfinity", "postInfinity", "keyframes"],
+          "required": [
+            "timeSpace",
+            "preInfinity",
+            "postInfinity",
+            "keyframes"
+          ],
           "properties": {
             "timeSpace": {
-              "enum": ["item", "sequence"]
+              "enum": [
+                "item",
+                "sequence"
+              ]
             },
             "preInfinity": {
-              "enum": ["hold", "linear", "none", "cycle", "ping-pong"]
+              "enum": [
+                "hold",
+                "linear",
+                "none",
+                "cycle",
+                "ping-pong"
+              ]
             },
             "postInfinity": {
-              "enum": ["hold", "linear", "none", "cycle", "ping-pong"]
+              "enum": [
+                "hold",
+                "linear",
+                "none",
+                "cycle",
+                "ping-pong"
+              ]
             },
             "keyframes": {
               "type": "array",
@@ -228,7 +266,11 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["timeUs", "value", "interpolation"],
+                "required": [
+                  "timeUs",
+                  "value",
+                  "interpolation"
+                ],
                 "properties": {
                   "timeUs": {
                     "$ref": "#/$defs/timeUs"
@@ -237,21 +279,34 @@
                     "$ref": "#/$defs/jsonValue"
                   },
                   "interpolation": {
-                    "enum": ["hold", "linear", "cubic-bezier"]
+                    "enum": [
+                      "hold",
+                      "linear",
+                      "cubic-bezier"
+                    ]
                   },
                   "easing": {
                     "type": "object",
-                    "required": ["type"],
+                    "required": [
+                      "type"
+                    ],
                     "properties": {
                       "type": {
-                        "enum": ["linear", "steps", "cubic-bezier"]
+                        "enum": [
+                          "linear",
+                          "steps",
+                          "cubic-bezier"
+                        ]
                       },
                       "count": {
                         "type": "integer",
                         "minimum": 1
                       },
                       "position": {
-                        "enum": ["start", "end"]
+                        "enum": [
+                          "start",
+                          "end"
+                        ]
                       },
                       "x1": {
                         "type": "number"
@@ -267,6 +322,38 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "handleIn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "handleOut": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    }
                   }
                 }
               }
@@ -323,13 +410,22 @@
           "maxLength": 128
         },
         "missingAssetPolicy": {
-          "enum": ["placeholder", "error"]
+          "enum": [
+            "placeholder",
+            "error"
+          ]
         },
         "missingMaterialPolicy": {
-          "enum": ["placeholder", "error"]
+          "enum": [
+            "placeholder",
+            "error"
+          ]
         },
         "missingPluginPolicy": {
-          "enum": ["placeholder", "error"]
+          "enum": [
+            "placeholder",
+            "error"
+          ]
         }
       }
     },
@@ -338,7 +434,10 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "uri"],
+          "required": [
+            "type",
+            "uri"
+          ],
           "properties": {
             "type": {
               "const": "url"
@@ -353,7 +452,10 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "bindingId"],
+          "required": [
+            "type",
+            "bindingId"
+          ],
           "properties": {
             "type": {
               "const": "runtime-binding"
@@ -366,7 +468,10 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "path"],
+          "required": [
+            "type",
+            "path"
+          ],
           "properties": {
             "type": {
               "const": "opfs"
@@ -381,7 +486,11 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "mimeType", "base64"],
+          "required": [
+            "type",
+            "mimeType",
+            "base64"
+          ],
           "properties": {
             "type": {
               "const": "data"
@@ -402,13 +511,25 @@
     "asset": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "locator"],
+      "required": [
+        "id",
+        "kind",
+        "locator"
+      ],
       "properties": {
         "id": {
           "$ref": "#/$defs/entityId"
         },
         "kind": {
-          "enum": ["video", "audio", "image", "font", "lut", "binary", "image-sequence"]
+          "enum": [
+            "video",
+            "audio",
+            "image",
+            "font",
+            "lut",
+            "binary",
+            "image-sequence"
+          ]
         },
         "name": {
           "type": "string",
@@ -420,7 +541,10 @@
         "contentHash": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["algorithm", "value"],
+          "required": [
+            "algorithm",
+            "value"
+          ],
           "properties": {
             "algorithm": {
               "const": "sha256"
@@ -448,13 +572,22 @@
             "type": "object",
             "maxProperties": 4096,
             "additionalProperties": true,
-            "required": ["id", "role", "locator"],
+            "required": [
+              "id",
+              "role",
+              "locator"
+            ],
             "properties": {
               "id": {
                 "$ref": "#/$defs/entityId"
               },
               "role": {
-                "enum": ["original", "proxy", "thumbnail", "waveform"]
+                "enum": [
+                  "original",
+                  "proxy",
+                  "thumbnail",
+                  "waveform"
+                ]
               },
               "locator": {
                 "$ref": "#/$defs/assetLocator"
@@ -498,7 +631,10 @@
         "imageSequence": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["frameDurationUs", "frameAssetIds"],
+          "required": [
+            "frameDurationUs",
+            "frameAssetIds"
+          ],
           "properties": {
             "frameDurationUs": {
               "$ref": "#/$defs/positiveDurationUs"
@@ -576,44 +712,87 @@
               "$ref": "#/$defs/rational"
             },
             "sampleRate": {
-              "enum": [44100, 48000, 96000]
+              "enum": [
+                44100,
+                48000,
+                96000
+              ]
             },
             "channelLayout": {
-              "enum": ["mono", "stereo", "5.1"]
+              "enum": [
+                "mono",
+                "stereo",
+                "5.1"
+              ]
             },
             "workingColorSpace": {
-              "enum": ["srgb-linear", "display-p3-linear", "rec2020-linear"]
+              "enum": [
+                "srgb-linear",
+                "display-p3-linear",
+                "rec2020-linear"
+              ]
             },
             "transferFunction": {
-              "enum": ["srgb", "gamma22", "pq", "hlg"],
+              "enum": [
+                "srgb",
+                "gamma22",
+                "pq",
+                "hlg"
+              ],
               "default": "srgb"
             },
             "colorPrimaries": {
-              "enum": ["bt709", "display-p3", "bt2020"],
+              "enum": [
+                "bt709",
+                "display-p3",
+                "bt2020"
+              ],
               "default": "bt709"
             },
             "matrixCoefficients": {
-              "enum": ["rgb", "bt709", "bt2020-ncl"],
+              "enum": [
+                "rgb",
+                "bt709",
+                "bt2020-ncl"
+              ],
               "default": "rgb"
             },
             "colorRange": {
-              "enum": ["full", "limited"],
+              "enum": [
+                "full",
+                "limited"
+              ],
               "default": "full"
             },
             "chromaSubsampling": {
-              "enum": ["rgb", "4:4:4", "4:2:2", "4:2:0"],
+              "enum": [
+                "rgb",
+                "4:4:4",
+                "4:2:2",
+                "4:2:0"
+              ],
               "default": "4:4:4"
             },
             "alphaMode": {
-              "enum": ["opaque", "premultiplied"],
+              "enum": [
+                "opaque",
+                "premultiplied"
+              ],
               "default": "premultiplied"
             },
             "toneMapping": {
-              "enum": ["none", "bt2390", "reinhard"],
+              "enum": [
+                "none",
+                "bt2390",
+                "reinhard"
+              ],
               "default": "none"
             },
             "bitDepth": {
-              "enum": [8, 10],
+              "enum": [
+                8,
+                10
+              ],
               "default": 8
             },
             "backgroundColor": {
@@ -626,7 +805,9 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["mode"],
+              "required": [
+                "mode"
+              ],
               "properties": {
                 "mode": {
                   "const": "content"
@@ -636,7 +817,11 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["mode", "durationUs", "overflow"],
+              "required": [
+                "mode",
+                "durationUs",
+                "overflow"
+              ],
               "properties": {
                 "mode": {
                   "const": "fixed"
@@ -645,7 +830,10 @@
                   "$ref": "#/$defs/timeUs"
                 },
                 "overflow": {
-                  "enum": ["clip", "allow"]
+                  "enum": [
+                    "clip",
+                    "allow"
+                  ]
                 }
               }
             }
@@ -706,7 +894,11 @@
           "$ref": "#/$defs/entityId"
         },
         "kind": {
-          "enum": ["visual", "audio", "caption"]
+          "enum": [
+            "visual",
+            "audio",
+            "caption"
+          ]
         },
         "name": {
           "type": "string",
@@ -727,7 +919,11 @@
         "audio": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["gainDb", "pan", "muted"],
+          "required": [
+            "gainDb",
+            "pan",
+            "muted"
+          ],
           "properties": {
             "gainDb": {
               "$ref": "#/$defs/animatableNumber"
@@ -761,7 +957,14 @@
     },
     "baseItem": {
       "type": "object",
-      "required": ["id", "trackId", "type", "enabled", "range", "materialInstanceIds"],
+      "required": [
+        "id",
+        "trackId",
+        "type",
+        "enabled",
+        "range",
+        "materialInstanceIds"
+      ],
       "properties": {
         "id": {
           "$ref": "#/$defs/entityId"
@@ -813,7 +1016,12 @@
     "mediaSource": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["assetId", "stream", "sourceRange", "timeMapping"],
+      "required": [
+        "assetId",
+        "stream",
+        "sourceRange",
+        "timeMapping"
+      ],
       "properties": {
         "assetId": {
           "$ref": "#/$defs/entityId"
@@ -821,10 +1029,16 @@
         "stream": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "index"],
+          "required": [
+            "type",
+            "index"
+          ],
           "properties": {
             "type": {
-              "enum": ["video", "audio"]
+              "enum": [
+                "video",
+                "audio"
+              ]
             },
             "index": {
               "type": "integer",
@@ -841,7 +1055,12 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["type", "rate", "reverse", "boundary"],
+              "required": [
+                "type",
+                "rate",
+                "reverse",
+                "boundary"
+              ],
               "properties": {
                 "type": {
                   "const": "linear"
@@ -853,14 +1072,23 @@
                   "type": "boolean"
                 },
                 "boundary": {
-                  "enum": ["error", "hold", "loop", "transparent"]
+                  "enum": [
+                    "error",
+                    "hold",
+                    "loop",
+                    "transparent"
+                  ]
                 }
               }
             },
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["type", "points", "boundary"],
+              "required": [
+                "type",
+                "points",
+                "boundary"
+              ],
               "properties": {
                 "type": {
                   "const": "curve"
@@ -873,7 +1101,11 @@
                     "type": "object",
                     "maxProperties": 4096,
                     "additionalProperties": true,
-                    "required": ["itemTimeUs", "sourceTimeUs", "interpolation"],
+                    "required": [
+                      "itemTimeUs",
+                      "sourceTimeUs",
+                      "interpolation"
+                    ],
                     "properties": {
                       "itemTimeUs": {
                         "$ref": "#/$defs/timeUs"
@@ -882,13 +1114,22 @@
                         "$ref": "#/$defs/timeUs"
                       },
                       "interpolation": {
-                        "enum": ["linear", "hold", "cubic"]
+                        "enum": [
+                          "linear",
+                          "hold",
+                          "cubic"
+                        ]
                       }
                     }
                   }
                 },
                 "boundary": {
-                  "enum": ["error", "hold", "loop", "transparent"]
+                  "enum": [
+                    "error",
+                    "hold",
+                    "loop",
+                    "transparent"
+                  ]
                 }
               }
             }
@@ -899,15 +1140,32 @@
     "visual": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fit", "transform", "crop", "opacity", "blendMode"],
+      "required": [
+        "fit",
+        "transform",
+        "crop",
+        "opacity",
+        "blendMode"
+      ],
       "properties": {
         "fit": {
-          "enum": ["contain", "cover", "fill", "none"]
+          "enum": [
+            "contain",
+            "cover",
+            "fill",
+            "none"
+          ]
         },
         "transform": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["positionPx", "anchor", "scale", "rotationDeg", "skewDeg"],
+          "required": [
+            "positionPx",
+            "anchor",
+            "scale",
+            "rotationDeg",
+            "skewDeg"
+          ],
           "properties": {
             "positionPx": {
               "$ref": "#/$defs/animatableVec2"
@@ -931,7 +1189,12 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["left", "top", "right", "bottom"],
+              "required": [
+                "left",
+                "top",
+                "right",
+                "bottom"
+              ],
               "properties": {
                 "left": {
                   "type": "number",
@@ -982,13 +1245,23 @@
         "mask": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["sourceItemId", "channel", "invert", "featherPx", "space", "consumeSource"],
+          "required": [
+            "sourceItemId",
+            "channel",
+            "invert",
+            "featherPx",
+            "space",
+            "consumeSource"
+          ],
           "properties": {
             "sourceItemId": {
               "$ref": "#/$defs/entityId"
             },
             "channel": {
-              "enum": ["alpha", "luma"]
+              "enum": [
+                "alpha",
+                "luma"
+              ]
             },
             "invert": {
               "type": "boolean"
@@ -999,7 +1272,10 @@
               "maximum": 4096
             },
             "space": {
-              "enum": ["source", "canvas"]
+              "enum": [
+                "source",
+                "canvas"
+              ]
             },
             "consumeSource": {
               "type": "boolean"
@@ -1011,7 +1287,10 @@
     "audioProperties": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["gainDb", "pan"],
+      "required": [
+        "gainDb",
+        "pan"
+      ],
       "properties": {
         "gainDb": {
           "$ref": "#/$defs/animatableNumber"
@@ -1026,7 +1305,10 @@
           "$ref": "#/$defs/timeUs"
         },
         "pitchPolicy": {
-          "enum": ["varispeed", "preserve"],
+          "enum": [
+            "varispeed",
+            "preserve"
+          ],
           "description": "Varispeed follows source time directly; preserve uses deterministic overlap-add time stretching."
         },
         "channelMap": {
@@ -1050,7 +1332,10 @@
         },
         {
           "type": "object",
-          "required": ["source", "visual"],
+          "required": [
+            "source",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "video"
@@ -1074,7 +1359,10 @@
         },
         {
           "type": "object",
-          "required": ["source", "audio"],
+          "required": [
+            "source",
+            "audio"
+          ],
           "properties": {
             "type": {
               "const": "audio"
@@ -1098,7 +1386,10 @@
         },
         {
           "type": "object",
-          "required": ["source", "visual"],
+          "required": [
+            "source",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "image"
@@ -1122,7 +1413,13 @@
         },
         {
           "type": "object",
-          "required": ["box", "overflow", "writingMode", "paragraphs", "visual"],
+          "required": [
+            "box",
+            "overflow",
+            "writingMode",
+            "paragraphs",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "text"
@@ -1130,7 +1427,12 @@
             "box": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["x", "y", "width", "height"],
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
               "properties": {
                 "x": {
                   "type": "number"
@@ -1149,10 +1451,19 @@
               }
             },
             "overflow": {
-              "enum": ["clip", "ellipsis", "visible", "auto-fit"]
+              "enum": [
+                "clip",
+                "ellipsis",
+                "visible",
+                "auto-fit"
+              ]
             },
             "writingMode": {
-              "enum": ["horizontal-tb", "vertical-rl", "vertical-lr"]
+              "enum": [
+                "horizontal-tb",
+                "vertical-rl",
+                "vertical-lr"
+              ]
             },
             "paragraphs": {
               "type": "array",
@@ -1161,7 +1472,10 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["style", "runs"],
+                "required": [
+                  "style",
+                  "runs"
+                ],
                 "properties": {
                   "style": {
                     "$ref": "#/$defs/jsonObject"
@@ -1173,7 +1487,10 @@
                     "items": {
                       "type": "object",
                       "additionalProperties": false,
-                      "required": ["text", "style"],
+                      "required": [
+                        "text",
+                        "style"
+                      ],
                       "properties": {
                         "text": {
                           "type": "string",
@@ -1204,7 +1521,12 @@
         },
         {
           "type": "object",
-          "required": ["text", "box", "style", "visual"],
+          "required": [
+            "text",
+            "box",
+            "style",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "caption"
@@ -1216,7 +1538,12 @@
             "box": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["x", "y", "width", "height"],
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
               "properties": {
                 "x": {
                   "type": "number"
@@ -1238,7 +1565,10 @@
               "$ref": "#/$defs/jsonObject"
             },
             "overflow": {
-              "enum": ["clip", "auto-fit"]
+              "enum": [
+                "clip",
+                "auto-fit"
+              ]
             },
             "cueSettings": {
               "$ref": "#/$defs/jsonObject"
@@ -1259,7 +1589,10 @@
         },
         {
           "type": "object",
-          "required": ["source", "visual"],
+          "required": [
+            "source",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "nested-sequence"
@@ -1267,7 +1600,11 @@
             "source": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["sequenceId", "sourceRange", "timeMapping"],
+              "required": [
+                "sequenceId",
+                "sourceRange",
+                "timeMapping"
+              ],
               "properties": {
                 "sequenceId": {
                   "$ref": "#/$defs/entityId"
@@ -1296,7 +1633,10 @@
         },
         {
           "type": "object",
-          "required": ["generator", "visual"],
+          "required": [
+            "generator",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "generator"
@@ -1304,10 +1644,16 @@
             "generator": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["kind", "colors"],
+              "required": [
+                "kind",
+                "colors"
+              ],
               "properties": {
                 "kind": {
-                  "enum": ["solid", "linear-gradient"]
+                  "enum": [
+                    "solid",
+                    "linear-gradient"
+                  ]
                 },
                 "colors": {
                   "type": "array",
@@ -1338,7 +1684,9 @@
         },
         {
           "type": "object",
-          "required": ["visual"],
+          "required": [
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "adjustment"
@@ -1359,7 +1707,10 @@
         },
         {
           "type": "object",
-          "required": ["shape", "visual"],
+          "required": [
+            "shape",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "shape"
@@ -1367,15 +1718,28 @@
             "shape": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["kind", "box", "fill"],
+              "required": [
+                "kind",
+                "box",
+                "fill"
+              ],
               "properties": {
                 "kind": {
-                  "enum": ["rectangle", "ellipse", "polygon"]
+                  "enum": [
+                    "rectangle",
+                    "ellipse",
+                    "polygon"
+                  ]
                 },
                 "box": {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["x", "y", "width", "height"],
+                  "required": [
+                    "x",
+                    "y",
+                    "width",
+                    "height"
+                  ],
                   "properties": {
                     "x": {
                       "type": "number"
@@ -1435,7 +1799,10 @@
         },
         {
           "type": "object",
-          "required": ["materialInstanceId", "visual"],
+          "required": [
+            "materialInstanceId",
+            "visual"
+          ],
           "properties": {
             "type": {
               "const": "material-content"
@@ -1519,7 +1886,10 @@
           "$ref": "#/$defs/entityId"
         },
         "kind": {
-          "enum": ["visual", "audio"]
+          "enum": [
+            "visual",
+            "audio"
+          ]
         },
         "fromItemId": {
           "$ref": "#/$defs/entityId"
@@ -1551,7 +1921,12 @@
     "marker": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "owner", "timeUs", "durationUs"],
+      "required": [
+        "id",
+        "owner",
+        "timeUs",
+        "durationUs"
+      ],
       "properties": {
         "id": {
           "$ref": "#/$defs/entityId"
@@ -1559,10 +1934,16 @@
         "owner": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["type", "id"],
+          "required": [
+            "type",
+            "id"
+          ],
           "properties": {
             "type": {
-              "enum": ["sequence", "item"]
+              "enum": [
+                "sequence",
+                "item"
+              ]
             },
             "id": {
               "$ref": "#/$defs/entityId"
@@ -1601,13 +1982,20 @@
     "linkGroup": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "itemIds"],
+      "required": [
+        "id",
+        "kind",
+        "itemIds"
+      ],
       "properties": {
         "id": {
           "$ref": "#/$defs/entityId"
         },
         "kind": {
-          "enum": ["av-sync", "edit-group"]
+          "enum": [
+            "av-sync",
+            "edit-group"
+          ]
         },
         "itemIds": {
           "$ref": "#/$defs/idList"

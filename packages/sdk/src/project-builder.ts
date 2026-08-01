@@ -245,6 +245,10 @@ export interface Keyframe<T extends JsonValue = JsonValue> {
   readonly value: T;
   readonly interpolation?: 'hold' | 'linear' | 'cubic-bezier';
   readonly easing?: JsonObject;
+  /** Outgoing Bézier handle (value-space tangent) for the graph editor. */
+  readonly handleOut?: { readonly x: number; readonly y: number };
+  /** Incoming Bézier handle for the next keyframe's control point. */
+  readonly handleIn?: { readonly x: number; readonly y: number };
 }
 
 export type ClipAnimatableProperty = 'opacity' | 'position' | 'scale' | 'rotation' | 'gain' | 'pan';
@@ -1072,6 +1076,12 @@ export class ProjectBuilder {
           value: keyframe.value,
           interpolation: keyframe.interpolation ?? 'linear',
           ...(keyframe.easing === undefined ? {} : { easing: keyframe.easing }),
+          ...(keyframe.handleOut === undefined
+            ? {}
+            : { handleOut: { x: keyframe.handleOut.x, y: keyframe.handleOut.y } }),
+          ...(keyframe.handleIn === undefined
+            ? {}
+            : { handleIn: { x: keyframe.handleIn.x, y: keyframe.handleIn.y } }),
         })),
       },
     };

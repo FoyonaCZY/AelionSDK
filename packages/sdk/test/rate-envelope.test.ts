@@ -80,7 +80,9 @@ describe('addMediaClip curve time mapping', () => {
       ],
     });
     const project = builder.build();
-    const item = project.items[itemId];
+    const item = project.items[itemId] as unknown as {
+      source?: { timeMapping?: unknown };
+    };
     expect(item?.source?.timeMapping).toEqual({
       type: 'curve',
       points: [
@@ -123,6 +125,9 @@ describe('addMediaClip curve time mapping', () => {
       curvePoints: points,
     });
     const project = builder.build();
-    expect(project.items[itemId]?.source?.timeMapping).toMatchObject({ type: 'curve' });
+    const item = project.items[itemId] as unknown as {
+      source?: { timeMapping?: unknown };
+    };
+    expect(item?.source?.timeMapping).toMatchObject({ type: 'curve' });
   });
 });
