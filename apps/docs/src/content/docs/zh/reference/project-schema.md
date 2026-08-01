@@ -135,6 +135,10 @@ Marker 的 owner 是 Sequence 或 Item，带 `timeUs`、`durationUs`、label、c
 
 Link Group kind 是 `av-sync` 或 `edit-group`，保存 `itemIds` 和可选 `syncOffsetsUs`。联动编辑使用 group-aware 命令。
 
+## Asset 与图像序列
+
+Asset 描述持久的媒体身份和 representations，绝不包含 `File` 或凭据。`image-sequence` 素材带可选 `imageSequence` 帧清单（`frameDurationUs` + 有序 `frameAssetIds`，引用 `image` 素材）；每个帧引用必须解析到现有的 `image` 素材，否则校验以 `PROJECT_IMAGE_SEQUENCE_FRAME_MISSING` / `PROJECT_IMAGE_SEQUENCE_FRAME_KIND_INVALID` 失败关闭。图像序列通过帧映射确定性采样。
+
 ## `loadProject()` 会做什么
 
 ```ts

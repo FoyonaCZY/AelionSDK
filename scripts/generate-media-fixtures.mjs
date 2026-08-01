@@ -529,6 +529,30 @@ for (const definition of definitions) {
   });
 }
 
+// Still-image fixtures are not container fixtures, so they are not part of the
+// media manifest. Generate one AVIF still for the image-decode certification.
+const avifPath = join(mediaDirectory, 'avif-still.avif');
+await run(ffmpegPath, [
+  '-hide_banner',
+  '-loglevel',
+  'error',
+  '-y',
+  '-f',
+  'lavfi',
+  '-i',
+  'testsrc2=size=64x36:rate=1:duration=1',
+  '-frames:v',
+  '1',
+  '-c:v',
+  'libaom-av1',
+  '-crf',
+  '30',
+  '-f',
+  'avif',
+  avifPath,
+]);
+const avifBytes = await readFile(avifPath);
+
 const manifest = {
   manifestVersion: '1.0.0',
   generator: {
@@ -539,4 +563,6 @@ const manifest = {
 };
 
 await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-console.log('Generated ' + String(fixtures.length) + ' media fixtures and ' + manifestPath);
+console.log(
+  `Generated ${String(fixtures.length)} media fixtures, 1 AVIF still (${avifBytes.byteLength} bytes), and ${manifestPath}`,
+);

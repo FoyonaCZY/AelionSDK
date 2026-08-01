@@ -242,4 +242,57 @@ describe('ProjectBuilder', () => {
       materialInstanceId: transitionMaterial,
     });
   });
+
+  it('builds a schema-valid image-sequence clip from image frame assets', () => {
+    const builder = createProject({ sequenceId: 'main', width: 320, height: 180 });
+    const trackId = builder.addTrack({ kind: 'visual' });
+    builder.addAsset({ id: 'frame_a', kind: 'image' });
+    builder.addAsset({ id: 'frame_b', kind: 'image' });
+    builder.addAsset({ id: 'frame_c', kind: 'image' });
+
+    const itemId = builder.addImageSequenceClip({
+      trackId,
+      frameAssetIds: ['frame_a', 'frame_b', 'frame_c'],
+      frameDurationUs: 40_000,
+    });
+    const project = builder.build();
+
+    const sequenceAsset = Object.values(project.assets).find(
+      asset => asset.kind === 'image-sequence',
+    );
+    expect(sequenceAsset).toBeDefined();
+    expect(sequenceAsset?.imageSequence).toEqual({
+      frameDurationUs: 40_000,
+      frameAssetIds: ['frame_a', 'frame_b', 'frame_c'],
+    });
+    expect(project.items[itemId]).toMatchObject({
+      type: 'image',
+      range: { startUs: 0, durationUs: 120_000 },
+    });
+  });
+
+  it('rejects an image-sequence clip referencing a missing or non-image frame', () => {
+    const builder = createProject({ sequenceId: 'main', width: 320, height: 180 });
+    const trackId = builder.addTrack({ kind: 'visual' });
+    builder.addAsset({ id: 'frame_a', kind: 'image' });
+    builder.addAsset({ id: 'asset_video', kind: 'video' });
+
+    expect(() =>
+      builder.addImageSequenceClip({
+        trackId,
+        frameAssetIds: ['frame_a', 'missing'],
+        frameDurationUs: 40_000,
+      }),
+    ).toThrow(/Unknown frame Asset/);
+    expect(() =>
+      builder.addImageSequenceClip({
+        trackId,
+        frameAssetIds: ['frame_a', 'asset_video'],
+        frameDurationUs: 40_000,
+      }),
+    ).toThrow(/must be an image Asset/);
+    expect(() =>
+      builder.addImageSequenceClip({ trackId, frameAssetIds: [], frameDurationUs: 40_000 }),
+    ).toThrow(/at least one frame/);
+  });
 });

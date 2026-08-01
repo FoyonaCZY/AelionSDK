@@ -11,6 +11,7 @@ import type {
   CodecConfigProbe,
   ColorCapability,
   GpuCapability,
+  ImageFormatCapability,
   StorageCapability,
 } from './types.js';
 
@@ -485,6 +486,42 @@ function probeColor(): ColorCapability {
   };
 }
 
+async function probeImageFormat(format: string): Promise<CapabilityProbe> {
+  const mime = `image/${format}`;
+  // ImageDecoder is typed as always-present by the DOM lib, but runtime
+  // availability varies; read it through globalThis so the guard is real.
+  const imageDecoder = (
+    globalThis as unknown as { ImageDecoder?: { isTypeSupported(mime: string): Promise<boolean> } }
+  ).ImageDecoder;
+  if (imageDecoder === undefined) {
+    // No decoder-capability API: report unknown rather than guessing. The
+    // createImageBitmap path used by decodeStillImage may still support the
+    // format, so claiming unsupported here would be wrong.
+    return failed(
+      'CAPABILITY_IMAGE_FORMAT_UNKNOWN',
+      `ImageDecoder is unavailable; ${mime} decode support is unknown`,
+      undefined,
+    );
+  }
+  try {
+    return (await imageDecoder.isTypeSupported(mime))
+      ? supported({ mime })
+      : unsupported('CAPABILITY_IMAGE_FORMAT_UNSUPPORTED', `${mime} decode is unsupported`);
+  } catch (cause) {
+    return failed('CAPABILITY_IMAGE_FORMAT_PROBE_FAILED', `Failed to probe ${mime}`, cause);
+  }
+}
+
+async function probeImages(): Promise<ImageFormatCapability> {
+  const [avif, jpeg, png, webp] = await Promise.all([
+    probeImageFormat('avif'),
+    probeImageFormat('jpeg'),
+    probeImageFormat('png'),
+    probeImageFormat('webp'),
+  ]);
+  return { avif, jpeg, png, webp };
+}
+
 function tier(
   codecs: readonly CodecConfigProbe[],
   gpu: GpuCapability,
@@ -520,6 +557,7 @@ export async function probeCapabilities(
   const audio = probeAudio();
   const storage = probeStorage();
   const color = probeColor();
+  const images = await probeImages();
   const diagnostics = [
     ...codecs.flatMap(codec => codec.diagnostics),
     ...(gpu.webgpu.diagnostics ?? []),
@@ -534,6 +572,10 @@ export async function probeCapabilities(
     ...(storage.transferableStreams.diagnostics ?? []),
     ...(color.displayP3Gamut.diagnostics ?? []),
     ...(color.highDynamicRange.diagnostics ?? []),
+    ...(images.avif.diagnostics ?? []),
+    ...(images.jpeg.diagnostics ?? []),
+    ...(images.png.diagnostics ?? []),
+    ...(images.webp.diagnostics ?? []),
   ];
   return {
     schemaVersion: '1.0.0',
@@ -545,6 +587,7 @@ export async function probeCapabilities(
     audio,
     storage,
     color,
+    images,
     wasm:
       typeof WebAssembly === 'object'
         ? { available: supported() }

@@ -9,7 +9,9 @@ import {
 import {
   ProjectValidator,
   canonicalClone,
+  imageSequenceDurationUs,
   type AelionProject,
+  type ImageSequenceReference,
   type ItemEntity,
   type MaterialInstanceEntity,
   type MarkerEntity,
@@ -56,7 +58,7 @@ export interface AddTrackOptions {
 
 export interface AddAssetOptions {
   readonly id: string;
-  readonly kind: 'video' | 'audio' | 'image' | 'font' | 'lut' | 'binary';
+  readonly kind: 'video' | 'audio' | 'image' | 'font' | 'lut' | 'binary' | 'image-sequence';
   readonly locator?: JsonObject;
   readonly name?: string;
   readonly mimeType?: string;
@@ -65,6 +67,8 @@ export interface AddAssetOptions {
   readonly probeHint?: JsonObject;
   readonly representations?: readonly JsonObject[];
   readonly metadata?: JsonObject;
+  /** Required for `kind: 'image-sequence'`; ignored for other kinds. */
+  readonly imageSequence?: ImageSequenceReference;
 }
 
 export interface AddMediaClipOptions {
@@ -92,6 +96,19 @@ export interface AddMediaClipOptions {
 export interface AddImageClipOptions {
   readonly id?: string;
   readonly assetId: string;
+  readonly trackId: string;
+  readonly atUs?: number;
+  readonly durationUs?: number;
+  readonly name?: string;
+  readonly fit?: 'contain' | 'cover' | 'fill' | 'none';
+  readonly opacity?: number;
+}
+
+export interface AddImageSequenceClipOptions {
+  readonly id?: string;
+  /** Ordered `image` Assets, one per frame. */
+  readonly frameAssetIds: readonly string[];
+  readonly frameDurationUs: number;
   readonly trackId: string;
   readonly atUs?: number;
   readonly durationUs?: number;
@@ -434,6 +451,9 @@ export class ProjectBuilder {
       throw new TypeError('contentHash must be a lowercase SHA-256 value');
     }
     if (options.byteLength !== undefined) assertTime(options.byteLength, 'byteLength');
+    if (options.kind === 'image-sequence' && options.imageSequence === undefined) {
+      throw new TypeError('image-sequence assets require an imageSequence frame manifest');
+    }
     this.#project.assets[options.id] = {
       id: options.id,
       kind: options.kind,
@@ -449,6 +469,14 @@ export class ProjectBuilder {
         ? {}
         : { representations: [...options.representations] }),
       ...(options.metadata === undefined ? {} : { metadata: options.metadata }),
+      ...(options.imageSequence === undefined
+        ? {}
+        : {
+            imageSequence: {
+              ...options.imageSequence,
+              frameAssetIds: [...options.imageSequence.frameAssetIds],
+            },
+          }),
     };
     return options.id;
   }
@@ -602,6 +630,67 @@ export class ProjectBuilder {
     this.#project.items[id] = item;
     track.itemIds.push(id);
     return id;
+  }
+
+  /**
+   * Add an image-sequence Clip: registers an `image-sequence` Asset whose frame
+   * manifest references existing `image` Assets, then adds an image Clip that
+   * samples the sequence deterministically through the frame mapping.
+   */
+  public addImageSequenceClip(options: AddImageSequenceClipOptions): string {
+    const track = this.#project.tracks[options.trackId];
+    if (track === undefined) throw new ReferenceError(`Unknown Track: ${options.trackId}`);
+    if (track.kind !== 'visual') throw new TypeError('image-sequence clips require a visual Track');
+    if (options.frameAssetIds.length === 0) {
+      throw new RangeError('frameAssetIds must contain at least one frame');
+    }
+    assertTime(options.frameDurationUs, 'frameDurationUs', true);
+    for (const frameAssetId of options.frameAssetIds) {
+      const frameAsset = this.#project.assets[frameAssetId];
+      if (frameAsset === undefined)
+        throw new ReferenceError(`Unknown frame Asset: ${frameAssetId}`);
+      if (frameAsset.kind !== 'image') {
+        throw new TypeError(`frame Asset ${frameAssetId} must be an image Asset`);
+      }
+    }
+    const assetId = options.id ?? this.#nextId('asset_image_sequence');
+    this.#assertUnused(assetId);
+    const sequence: ImageSequenceReference = {
+      frameDurationUs: options.frameDurationUs,
+      frameAssetIds: [...options.frameAssetIds],
+    };
+    this.addAsset({ id: assetId, kind: 'image-sequence', imageSequence: sequence });
+
+    const itemId = this.#nextId('item_image_sequence');
+    this.#assertUnused(itemId);
+    const atUs = options.atUs ?? 0;
+    const durationUs = options.durationUs ?? imageSequenceDurationUs(sequence);
+    assertTime(atUs, 'atUs');
+    assertTime(durationUs, 'durationUs', true);
+    const item: ItemEntity = {
+      id: itemId,
+      trackId: track.id,
+      type: 'image',
+      ...(options.name === undefined ? {} : { name: options.name }),
+      enabled: true,
+      range: { startUs: atUs, durationUs },
+      source: {
+        assetId,
+        stream: { type: 'video', index: 0 },
+        sourceRange: { startUs: 0, durationUs },
+        timeMapping: {
+          type: 'linear',
+          rate: { numerator: 1, denominator: 1 },
+          reverse: false,
+          boundary: 'hold',
+        },
+      },
+      visual: this.#visual(options.fit ?? 'contain', options.opacity ?? 1),
+      materialInstanceIds: [],
+    };
+    this.#project.items[itemId] = item;
+    track.itemIds.push(itemId);
+    return itemId;
   }
 
   public addTextClip(options: AddTextClipOptions): string {

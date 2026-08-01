@@ -780,6 +780,42 @@ function validateColorSemantics(project: AelionProject, diagnostics: DiagnosticS
   }
 }
 
+function validateImageSequenceReferences(
+  project: AelionProject,
+  diagnostics: DiagnosticSink,
+): void {
+  for (const asset of Object.values(project.assets)) {
+    if (asset.kind !== 'image-sequence') continue;
+    const sequence = asset.imageSequence as
+      | { readonly frameAssetIds?: readonly string[] }
+      | undefined;
+    const frameAssetIds = sequence?.frameAssetIds;
+    if (frameAssetIds === undefined) continue;
+    frameAssetIds.forEach((frameAssetId, index) => {
+      const frameAsset = project.assets[frameAssetId];
+      if (frameAsset === undefined) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_IMAGE_SEQUENCE_FRAME_MISSING',
+            `Image sequence ${asset.id} references missing frame Asset ${frameAssetId}`,
+            ['assets', asset.id, 'imageSequence', 'frameAssetIds', index],
+            asset.id,
+          ),
+        );
+      } else if (frameAsset.kind !== 'image') {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_IMAGE_SEQUENCE_FRAME_KIND_INVALID',
+            `Frame Asset ${frameAssetId} of image sequence ${asset.id} must be an image Asset`,
+            ['assets', asset.id, 'imageSequence', 'frameAssetIds', index],
+            asset.id,
+          ),
+        );
+      }
+    });
+  }
+}
+
 export class ProjectValidator {
   readonly #schemaValidator: ValidateFunction;
 
@@ -840,6 +876,7 @@ export class ProjectValidator {
     validateTimeMappingSemantics(project, diagnostics);
     validateAudioSemantics(project, diagnostics);
     validateColorSemantics(project, diagnostics);
+    validateImageSequenceReferences(project, diagnostics);
     return diagnostics.diagnostics.length === 0 ? ok({ project }) : err(...diagnostics.diagnostics);
   }
 }

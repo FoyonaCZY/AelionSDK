@@ -44,6 +44,10 @@ animation, effects, and transitions; audio items carry media/source and mix beha
 ## Assets and relationships
 
 Assets describe persistent media identity and representations, never `File` or credentials.
+An `image-sequence` Asset carries an optional `imageSequence` frame manifest
+(`frameDurationUs` + ordered `frameAssetIds`) referencing `image` Assets; each frame reference must
+resolve to an existing `image` Asset or validation fails closed with
+`PROJECT_IMAGE_SEQUENCE_FRAME_MISSING` / `PROJECT_IMAGE_SEQUENCE_FRAME_KIND_INVALID`.
 Transitions bind compatible visual hosts over non-overlapping valid ranges. Link groups bind
 co-edited items. Markers annotate sequence/item time without rendering.
 
