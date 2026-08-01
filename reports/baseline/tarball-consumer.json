@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "1.1.0-rc.1",
-  "generatedAt": "2026-08-01T13:21:52.325Z",
+  "generatedAt": "2026-08-01T14:05:06.784Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelionsdk/vite-plugin",
     "package": "@aelionsdk/vite-plugin",
     "version": "1.1.0-rc.1",
-    "packageSha256": "19870fdfc84359cafa5f8a6ad4963e020291109a4eb2025b2b270eb96bd961f8",
+    "packageSha256": "da468edb6ef7f08ce84a3fbd0d88f5fc14209271f2e1efcaff1a963a21a00576",
     "contractSha256": "0bb25c8cc63954339ba45a2abdb88f3d6e70b97b49766fc31e1a3f70750aaabb",
     "public": true,
     "zeroConfigVite": false,
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.3.6.tgz"
     },
-    "packageJsonSha256": "51019cc9f4495ea0950c062b719592efe2f4160981bc156808a595c7605696c2",
+    "packageJsonSha256": "a6d95fe4b5abaf243cb7e9afcd1605ca438bb5ae20b85eec2751b1fa1f84bbb4",
     "sourceSha256": "e9e9008eb3a07329afc5e1c1ca679b59203ea88106d8731782c1edb772eb3e76",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -73,74 +73,74 @@
       "status": "passed",
       "dryRun": true,
       "projectSha256": "234ccff53e8943387f2a723563f3ae5c0f72563e251b5fcf2ab0ab2f6585e522",
-      "reportSha256": "f8ca0c612bfd452084268adecd731efad298a70094e7b7110738f1e843284dfc"
+      "reportSha256": "a6ccd7c6a94fa0b9e0feca95af07336ff9198dd70f942d6fb8ccf385859b23f1"
     }
   },
   "packages": [
     {
       "name": "@aelionsdk/audio",
       "version": "1.1.0-rc.1",
-      "sha256": "081a9c1e2625f8aeacb49ceef1aae468a802178fddbef70ffa2553ed6196fbee"
+      "sha256": "2b6032e39de9ffeffa66ea9552ed4a7692174acc56a1c4c5895cd00ae4940e9c"
     },
     {
       "name": "@aelionsdk/capability",
       "version": "1.1.0-rc.1",
-      "sha256": "64445fe2f69835b76f849e4eb83c4c84f70cc2d87ddf9775d0f4019f0b343f76"
+      "sha256": "33cbcecca52f4363afb15035be969900828170fdce5e0d50614a481fd7e5606b"
     },
     {
       "name": "@aelionsdk/core",
       "version": "1.1.0-rc.1",
-      "sha256": "ff3bc50d207232363d68fc411c64e20dc00d9507c6db5df3002af72c21a5f0fd"
+      "sha256": "cb156adf16c0cb5e34177c6f43d132f08d09669fb5c15d3739783081cbea3fd8"
     },
     {
       "name": "@aelionsdk/export",
       "version": "1.1.0-rc.1",
-      "sha256": "8d38cfe0c97fa569ad08b8693cb23f6fc53b5e5e054ae07fefc5fdb7ffff27bd"
+      "sha256": "6ba0304967ae4c815f4febcc5f1108b3b717370cb870804b117ccb5d4c8f7cb9"
     },
     {
       "name": "@aelionsdk/material-compiler",
       "version": "1.1.0-rc.1",
-      "sha256": "74c00af1b405f068283888765b554ab5c18565c29534fa5256d6e933e0bcc971"
+      "sha256": "040542a27d23a54aa342f2f291db3321b9501b92ab332479745bffef0a531179"
     },
     {
       "name": "@aelionsdk/material-sdk",
       "version": "1.1.0-rc.1",
-      "sha256": "2465ab5192360ebb182c759b328d2292b30a022315e1f97561e1500aa3111d7f"
+      "sha256": "f98f820e3bd650a811256af2df251257bfb8f688fed2b50eea8be88267c2684f"
     },
     {
       "name": "@aelionsdk/media",
       "version": "1.1.0-rc.1",
-      "sha256": "0553d7d28f127f903980d0bafb657f075316f6440ac5f3f87f22377b8351624a"
+      "sha256": "5e534f4249b6dccb8ae09011a0e224a85cf0b02caa1d3c55ac1c6c0c28151a1b"
     },
     {
       "name": "@aelionsdk/project-schema",
       "version": "1.1.0-rc.1",
-      "sha256": "5c85c46a50130b77499fbbcd4a7d6cc855f8ca1b8e0be19392f5ad46685cf287"
+      "sha256": "9f4ff3e079aed94e50379175660abd7958f93d348618399a8e9e5b11c96250db"
     },
     {
       "name": "@aelionsdk/render-ir",
       "version": "1.1.0-rc.1",
-      "sha256": "b0e82fe63f834dfc8114fc499b16cb78b1e85c9b0dd3e8174550f2a1f8d84b03"
+      "sha256": "427fa2d5c9f7af0cb1c5805417063ff540330abe6b25d58643b23d2bc3e4077b"
     },
     {
       "name": "@aelionsdk/renderer-worker",
       "version": "1.1.0-rc.1",
-      "sha256": "7d7aa149acdb5129df83dbc0504d5a2e71ab6f2803320427e7ca5fcbf07bf259"
+      "sha256": "54aee7529d291d098bee6cb22d6b8a9cfe1ebc8206907de32cdccb67d1ecbd39"
     },
     {
       "name": "@aelionsdk/sdk",
       "version": "1.1.0-rc.1",
-      "sha256": "2570b817aaaa70d33d098a376f33dec14923c8d6390573fb074e1b9217262820"
+      "sha256": "7c57134e29caf5ada65dd33d12558edc22ac16668dbb4a725ad33e09227dd07d"
     },
     {
       "name": "@aelionsdk/transaction",
       "version": "1.1.0-rc.1",
-      "sha256": "704332d321b52096bc91ce4bfc138aea5d78b88bcca3761995b731d86fc699b8"
+      "sha256": "7e1f7558a125122097a865dfd76b349f5e158843ddc2416259916b983e28cb55"
     },
     {
       "name": "@aelionsdk/vite-plugin",
       "version": "1.1.0-rc.1",
-      "sha256": "19870fdfc84359cafa5f8a6ad4963e020291109a4eb2025b2b270eb96bd961f8"
+      "sha256": "da468edb6ef7f08ce84a3fbd0d88f5fc14209271f2e1efcaff1a963a21a00576"
     }
   ],
   "runtimeAssets": [
@@ -188,7 +188,7 @@
             225,
             255
           ],
-          "workerTimingUs": 85305
+          "workerTimingUs": 90240
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -196,10 +196,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22464,
-          "playedFrames": 1536,
+          "availableReadFrames": 22080,
+          "playedFrames": 1920,
           "underrunFrames": 0,
-          "timeUs": 32000
+          "timeUs": 40000
         },
         "sessionFacade": {
           "revision": "3",
@@ -218,7 +218,7 @@
               225,
               255
             ],
-            "workerTimingUs": 7230
+            "workerTimingUs": 6740
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -262,7 +262,7 @@
             225,
             255
           ],
-          "workerTimingUs": 9320
+          "workerTimingUs": 10360
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -270,10 +270,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23232,
-          "playedFrames": 768,
+          "availableReadFrames": 23616,
+          "playedFrames": 384,
           "underrunFrames": 0,
-          "timeUs": 16000
+          "timeUs": 8000
         },
         "sessionFacade": {
           "revision": "3",
@@ -292,7 +292,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6620
+            "workerTimingUs": 6100
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -300,10 +300,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 23872,
-            "playedFrames": 128,
+            "availableReadFrames": 23616,
+            "playedFrames": 384,
             "underrunFrames": 0,
-            "timeUs": 2667
+            "timeUs": 8000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {

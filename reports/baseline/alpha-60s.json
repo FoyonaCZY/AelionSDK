@@ -61,7 +61,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-d58ed55f-2a59-45c6-8871-e4bbf99fffcd.webm",
+    "fileName": "aelion-alpha-4eac40af-6da0-48da-b24f-07dc0b37a7f2.webm",
     "writes": 135,
     "bytesWritten": 4756115,
     "maxInFlightWrites": 1,
@@ -4786,8 +4786,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 2025,
-          "gpuCompletionUs": 1915
+          "totalWorkerUs": 2000,
+          "gpuCompletionUs": 1895
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4843,8 +4843,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 2025,
-          "gpuCompletionUs": 1915
+          "totalWorkerUs": 2000,
+          "gpuCompletionUs": 1895
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4929,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 17608685,
-      "totalJsHeapBytes": 21028397
+      "usedJsHeapBytes": 17661841,
+      "totalJsHeapBytes": 21814829
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 43776093,
-      "totalJsHeapBytes": 89862285
+      "usedJsHeapBytes": 35910037,
+      "totalJsHeapBytes": 82151321
     }
   },
-  "elapsedMs": 10259.539999991655,
+  "elapsedMs": 10126.04999999702,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-08-01T13:24:20.240Z",
+  "generatedAt": "2026-08-01T14:07:24.390Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
