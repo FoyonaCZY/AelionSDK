@@ -64,7 +64,7 @@
     "test:browser:mobile": "vitest run --config vitest.mobile.config.ts",
     "test:golden": "vitest run --config vitest.golden.config.ts",
     "test:security": "vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts",
-    "test:soak": "vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts",
+    "test:soak": "vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts",
     "bench": "vitest bench --run",
     "bench:competitors": "node scripts/benchmark-competitors.mjs",
     "dev:lab": "vite --config apps/capability-lab/vite.config.ts",
