@@ -48,7 +48,9 @@ scheduling, diagnostics, and cleanup.
 ## Audio
 
 Supported paths include source decode, PCM mix, gain/fades, track mixing, playback timing,
-waveforms/analysis, silence workflows, ducking/master settings, and WAV/RF64 export. Exact encoded
+waveforms/analysis, silence workflows, ducking/master settings, and WAV/RF64 export. Offline
+analysis adds beat detection (energy-envelope onsets) and scene-boundary detection (audio-energy
+discontinuities) through `SessionAudioController.analyzeBeats`/`analyzeScenes`. Exact encoded
 audio support is negotiated inside MP4/WebM profiles.
 
 ## Media input and cache

@@ -1,9 +1,13 @@
 import {
   StreamingLoudnessAnalyzer,
   buildWaveformPeaks,
+  detectBeats,
+  detectScenes,
   detectSilence,
   renderIrAudio,
+  type BeatDetectionResult,
   type LoudnessReport,
+  type SceneDetectionResult,
   type SilenceDetectionResult,
   type WaveformPeakResult,
 } from '@aelionsdk/audio';
@@ -148,6 +152,40 @@ export class SessionAudioController implements AelionAudioApi {
     }
     if (frames === 0) options.onProgress?.(1);
     return analyzer.finish();
+  }
+
+  public async analyzeBeats(
+    options: AelionAudioAnalysisOptions = {},
+  ): Promise<BeatDetectionResult> {
+    const ir = this.host.ir();
+    const channels = channelCount(ir.channelLayout);
+    const frames = totalFrames(ir);
+    return detectBeats({
+      sampleRate: ir.sampleRate,
+      channelCount: channels,
+      totalFrames: frames,
+      ...(options.signal === undefined ? {} : { signal: options.signal }),
+      ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
+      readFrames: (startFrame, frameCount, signal) =>
+        readSelection(this.host, options, startFrame, frameCount, signal),
+    });
+  }
+
+  public async analyzeScenes(
+    options: AelionAudioAnalysisOptions = {},
+  ): Promise<SceneDetectionResult> {
+    const ir = this.host.ir();
+    const channels = channelCount(ir.channelLayout);
+    const frames = totalFrames(ir);
+    return detectScenes({
+      sampleRate: ir.sampleRate,
+      channelCount: channels,
+      totalFrames: frames,
+      ...(options.signal === undefined ? {} : { signal: options.signal }),
+      ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
+      readFrames: (startFrame, frameCount, signal) =>
+        readSelection(this.host, options, startFrame, frameCount, signal),
+    });
   }
 
   public waveform(options: AelionAudioWaveformOptions = {}): Promise<WaveformPeakResult> {

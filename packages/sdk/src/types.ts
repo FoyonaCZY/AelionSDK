@@ -1,6 +1,8 @@
 import type {
+  BeatDetectionResult,
   LoudnessReport,
   PcmSourceBlock,
+  SceneDetectionResult,
   SilenceDetectionResult,
   WaveformPeakResult,
 } from '@aelionsdk/audio';
@@ -158,6 +160,8 @@ export interface AelionAudioApi {
   analyze(options?: AelionAudioAnalysisOptions): Promise<LoudnessReport>;
   waveform(options?: AelionAudioWaveformOptions): Promise<WaveformPeakResult>;
   detectSilence(options: AelionAudioRemoveSilenceOptions): Promise<SilenceDetectionResult>;
+  analyzeBeats(options?: AelionAudioAnalysisOptions): Promise<BeatDetectionResult>;
+  analyzeScenes(options?: AelionAudioAnalysisOptions): Promise<SceneDetectionResult>;
   removeSilence(options: AelionAudioRemoveSilenceOptions): Promise<AelionAudioRemoveSilenceResult>;
   configureMastering(options: AelionAudioMasteringOptions): TransactionCommit;
   getMastering(): AelionAudioMasteringOptions | undefined;

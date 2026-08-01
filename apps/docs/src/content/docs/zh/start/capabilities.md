@@ -103,7 +103,8 @@ Project/Render IR 可以显式描述 BT.709、Display-P3、BT.2020、PQ、HLG、
 时长误差小于 1 ms。`StreamingPitchPreservingTimeStretch` 保留跨块输入与
 overlap 状态，适合自定义音频宿主按小块连续拉取。
 
-基础播放通过 Session Player 使用；产品层的分析、波形、静音移除和母带通过
+基础播放通过 Session Player 使用；产品层的分析、波形、静音移除、节拍检测（`analyzeBeats`）、
+场景边界检测（`analyzeScenes`，基于音频能量突变）和母带通过
 `session.audio` 使用。只有自定义音频宿主或处理链时才需要直接依赖
 `@aelionsdk/audio`。
 

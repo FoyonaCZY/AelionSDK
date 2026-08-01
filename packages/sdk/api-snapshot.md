@@ -15,7 +15,7 @@ baseline in the same change.
   "version": "1.1.0-rc.1",
   "entrypoint": "dist/index.d.ts",
   "files": {
-    "dist/audio-controller.d.ts": "c7df5868c1cf972228f796d6abaea32b794921cf6b65ff0b4a545347df2a3bbf",
+    "dist/audio-controller.d.ts": "138ac581b598ca00686fb45e4196187f3beed4a8e633db8a89a2fbd61de3abbd",
     "dist/audio-mastering.d.ts": "4be6be012fb10e3b1b805b61fa3e118a4cb1f2a9af3bef0cbae3e26046b54458",
     "dist/composition.d.ts": "1148a276594c5e66cd9e6b020aa371558488b10fc36ccdd6e84fe0e0167cda90",
     "dist/default-schemas.d.ts": "60956845e621cd1a663df4807d6073666e2062b106d2d967f529a2ac703f2ab8",
@@ -34,7 +34,7 @@ baseline in the same change.
     "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
     "dist/session.d.ts": "fcf02f0975a9b85ef6dadd8e2afe4542a3a674851fba9d75a3d59a519a5bbe2b",
     "dist/subtitle-io.d.ts": "1f3aea368baf3541a03545c856e0c776547ac79621b41250217d535da2ae5ce7",
-    "dist/types.d.ts": "a1c8b603618e1d698fdc21b8683fe512b7dc04820c165fd4967e36385944ee19"
+    "dist/types.d.ts": "8e277526b01b7a7fdad18fae8a63609a8aafff5cdd929e4354984c657166f42a"
   },
   "exports": [
     "AELION_EXTENSION_PROTOCOL",
