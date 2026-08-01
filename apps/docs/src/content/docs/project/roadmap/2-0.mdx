@@ -11,14 +11,14 @@ the `1.x` minors, freezes the public API, and ships a first-class migration path
 
 ## Scope
 
-| # | Item | Priority | Size | Notes |
-|---|------|----------|------|-------|
-| 2.0-1 | **Project schema v2 and Render IR consolidation** | P0 | L | Integrate the schema/IR additions accumulated across 1.x (subtitles, time remap, effect chains, templates, multicam) into a coherent model; remove deprecated 1.x-only shapes. |
-| 2.0-2 | **Package and API-surface cleanup** | P0 | L | One-time breaking cleanup of exports, type names and package boundaries; the API snapshot gate freezes the result. |
-| 2.0-3 | **Certification finale** | P0 | M | HDR and WebGPU certification closed out across the full device matrix; the remaining 1.0 "uncertified" boundaries are either certified or explicitly removed. |
-| 2.0-4 | **Stable release semantics** | P0 | S | First `latest` dist-tag release with a written API-stability and deprecation-window policy. |
-| 2.0-5 | **v1 → v2 migration tooling** | P0 | L | Upgrade `aelion-migrate` to produce validated v2 Projects and versioned loss reports from v1, reusing the existing strict-mode philosophy. |
-| 2.0-6 | **Full re-certification** | P0 | L | Regenerate the entire evidence set for the frozen source manifest, including the device matrix, golden data, soak and package reproducibility. |
+| #     | Item                                              | Priority | Size | Notes                                                                                                                                                                          |
+| ----- | ------------------------------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2.0-1 | **Project schema v2 and Render IR consolidation** | P0       | L    | Integrate the schema/IR additions accumulated across 1.x (subtitles, time remap, effect chains, templates, multicam) into a coherent model; remove deprecated 1.x-only shapes. |
+| 2.0-2 | **Package and API-surface cleanup**               | P0       | L    | One-time breaking cleanup of exports, type names and package boundaries; the API snapshot gate freezes the result.                                                             |
+| 2.0-3 | **Certification finale**                          | P0       | M    | HDR and WebGPU certification closed out across the full device matrix; the remaining 1.0 "uncertified" boundaries are either certified or explicitly removed.                  |
+| 2.0-4 | **Stable release semantics**                      | P0       | S    | First `latest` dist-tag release with a written API-stability and deprecation-window policy.                                                                                    |
+| 2.0-5 | **v1 → v2 migration tooling**                     | P0       | L    | Upgrade `aelion-migrate` to produce validated v2 Projects and versioned loss reports from v1, reusing the existing strict-mode philosophy.                                     |
+| 2.0-6 | **Full re-certification**                         | P0       | L    | Regenerate the entire evidence set for the frozen source manifest, including the device matrix, golden data, soak and package reproducibility.                                 |
 
 ## Acceptance
 

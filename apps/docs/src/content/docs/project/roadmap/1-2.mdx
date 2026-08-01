@@ -1,5 +1,5 @@
 ---
-title: 1.2 Editing: image and time
+title: '1.2 Editing: image and time'
 description: Subtitle tracks, time remapping, keyframe graphs, offline analysis, proxy automation and the WebGPU tier.
 ---
 
@@ -10,14 +10,14 @@ require, and make WebGPU a first-class backend.
 
 ## Scope
 
-| # | Item | Priority | Size | Notes |
-|---|------|----------|------|-------|
-| 1.2-1 | **Subtitle tracks** | P0 | M | SRT/VTT/ASS import and export, styled subtitle entities, Render IR integration and auto-alignment helpers. |
-| 1.2-2 | **Time remapping and speed ramps** | P1 | M | Productize the existing linear-rate and curve time-map forms into a rate envelope with bidirectional speed. |
-| 1.2-3 | **Keyframe graph editor model** | P1 | M | Bézier handles and curve interpolation as first-class graph entities with validated curve evaluation in Render IR. |
-| 1.2-4 | **Offline analysis pipeline** | P1 | L | Scene detection, beat detection and loudness envelopes that feed Render IR and material metadata for smart editing and snapping. Builds on the existing loudness/waveform/silence tooling. |
-| 1.2-5 | **Proxy workflow automation** | P1 | M | Automatic low-resolution proxy generation, switch-over during editing and proxy-to-original swap at export, on top of the existing proxy representation support. |
-| 1.2-6 | **WebGPU first-class tier** | P0 | M | Full capability parity with WebGL2, performance baseline and a documented backend fallback strategy, covered by the golden and browser matrix. |
+| #     | Item                               | Priority | Size | Notes                                                                                                                                                                                      |
+| ----- | ---------------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.2-1 | **Subtitle tracks**                | P0       | M    | SRT/VTT/ASS import and export, styled subtitle entities, Render IR integration and auto-alignment helpers.                                                                                 |
+| 1.2-2 | **Time remapping and speed ramps** | P1       | M    | Productize the existing linear-rate and curve time-map forms into a rate envelope with bidirectional speed.                                                                                |
+| 1.2-3 | **Keyframe graph editor model**    | P1       | M    | Bézier handles and curve interpolation as first-class graph entities with validated curve evaluation in Render IR.                                                                         |
+| 1.2-4 | **Offline analysis pipeline**      | P1       | L    | Scene detection, beat detection and loudness envelopes that feed Render IR and material metadata for smart editing and snapping. Builds on the existing loudness/waveform/silence tooling. |
+| 1.2-5 | **Proxy workflow automation**      | P1       | M    | Automatic low-resolution proxy generation, switch-over during editing and proxy-to-original swap at export, on top of the existing proxy representation support.                           |
+| 1.2-6 | **WebGPU first-class tier**        | P0       | M    | Full capability parity with WebGL2, performance baseline and a documented backend fallback strategy, covered by the golden and browser matrix.                                             |
 
 ## Acceptance
 
