@@ -7,7 +7,7 @@ description: 给仓库贡献者的环境、常用命令、变更检查、CI 和�
 
 ## 准备开发环境
 
-- Node.js `>=20.19 <21`
+- Node.js `>=24 <25`
 - pnpm `10.13.1`（由 Corepack 和 `packageManager` 锁定）
 - Chromium/Firefox browser suite 需要可启动本机浏览器
 - Capability Lab 和 SharedArrayBuffer 路径需要安全上下文与 COOP/COEP
@@ -159,7 +159,7 @@ Nightly/手动工作流额外运行 Golden、benchmark、capability、seek、per
 通过后，创建与根 `package.json` 版本完全一致的 `v*` Tag；Tag 会触发
 `.github/workflows/release.yml`：
 
-1. 先验证已提交的独立 blocker review，再用仓库锁定的 Node 20/pnpm 构建、复核并生成 13 个不可变 tarball；
+1. 先验证已提交的独立 blocker review，再用仓库锁定的 Node 24/pnpm 构建、复核并生成 13 个不可变 tarball；
 2. 在 Node 24 的 GitHub-hosted runner 上发布并自动生成 provenance；
 3. 从官方 registry 重新安装全部包并执行 Node import 与 Vite runtime-assets build；
 4. 只有 registry smoke 成功后才创建附带 release manifest 与 tarball 的 GitHub

@@ -5,6 +5,7 @@ pnpm-lock.yaml
 fixtures/media
 benchmarks/reports
 reports
+.claude
 
 examples
 schemas/material

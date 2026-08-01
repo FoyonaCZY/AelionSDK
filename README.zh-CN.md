@@ -316,7 +316,7 @@ MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，�
 
 ## 本地开发
 
-需要 Node.js `>=20.19 <21` 和 Corepack：
+需要 Node.js `>=24 <25` 和 Corepack：
 
 ```bash
 corepack pnpm install --frozen-lockfile

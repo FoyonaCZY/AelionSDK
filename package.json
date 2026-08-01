@@ -23,7 +23,7 @@
   "type": "module",
   "packageManager": "pnpm@10.13.1",
   "engines": {
-    "node": ">=20.19 <21"
+    "node": ">=24 <25"
   },
   "scripts": {
     "build": "tsc -b",
