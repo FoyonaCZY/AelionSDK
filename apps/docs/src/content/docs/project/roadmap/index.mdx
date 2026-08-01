@@ -1,0 +1,58 @@
+---
+title: 2.0 roadmap
+description: How AelionSDK evolves from the 1.0 release candidate to 2.0 through backward-compatible 1.x increments.
+---
+
+## Scope
+
+AelionSDK `1.0.0-rc.1` ships a browser-first editing, preview, playback and export engine with a
+certified automation matrix. The path to `2.0` is a sequence of **backward-compatible `1.x` minor
+releases** that add capability and certification, followed by a single **`2.0` stabilization
+release** that applies the breaking changes collected along the way and freezes the API.
+
+## Versioning rules
+
+- `1.x` minors are strictly **additive**: new capabilities, formats, bindings, backends and
+  certification, without breaking the public API, the Project/Material protocol, or resource
+  ownership rules. A minor may extend the schema with optional, validated fields.
+- Breaking changes are **deferred and collected** for `2.0`. They include schema/IR consolidation,
+  API-surface cleanup, and any decision that cannot preserve semantics under the 1.x rules.
+- Each release keeps the existing discipline: code, public contract, docs, CI/evidence and published
+  artifacts must all land together (see [current status](/AelionSDK/project/status/)).
+- Prerelease cadence (`alpha` → `beta` → `rc` on the `next` dist-tag) applies to every minor. The
+  first `latest` stable release is `2.0.0`.
+
+## Release plan
+
+| Version                                | Theme                          | Backward compatible | Leading work                                                                     |
+| -------------------------------------- | ------------------------------ | ------------------- | -------------------------------------------------------------------------------- |
+| [1.1](/AelionSDK/project/roadmap/1-1/) | Certification and fallback     | Yes                 | Real-device matrix, WASM codec fallback, long-session durability, new containers |
+| [1.2](/AelionSDK/project/roadmap/1-2/) | Editing: image and time        | Yes                 | Subtitle tracks, time remapping, keyframe graphs, offline analysis, WebGPU tier  |
+| [1.3](/AelionSDK/project/roadmap/1-3/) | Ecosystem: frameworks and UI   | Yes                 | React/Vue/Svelte bindings, CDN/headless, reference UI components                 |
+| [1.4](/AelionSDK/project/roadmap/1-4/) | Editing: audio and arrangement | Yes                 | Multicam, per-track effect chains, templates                                     |
+| [1.5](/AelionSDK/project/roadmap/1-5/) | Intelligence                   | Yes                 | ASR captions, segmentation, smart editing                                        |
+| [1.6](/AelionSDK/project/roadmap/1-6/) | Collaboration and protocols    | Yes                 | Collaborative editing, Remote Export Protocol 2.0, plugin market                 |
+| [2.0](/AelionSDK/project/roadmap/2-0/) | Stabilization                  | No                  | Schema v2 / Render IR consolidation, API freeze, v1→v2 migration                 |
+
+## Cross-version decisions
+
+These choices span several releases and should be settled before the affected minor starts:
+
+1. **Software codec strategy** — self-built WASM decoders/encoders versus a heavy dependency
+   (ffmpeg.wasm class) versus relying on platform codecs with an explicit fallback contract. It
+   drives [1.1](/AelionSDK/project/roadmap/1-1/) fallback work and the package-size budget.
+2. **Intelligence shape** — on-device first (privacy, offline) versus cloud first (model quality).
+   It defines the provider boundary in [1.5](/AelionSDK/project/roadmap/1-5/) and whether remote
+   protocols carry model inference.
+3. **Collaboration technology** — CRDT (Yjs class) versus server-side OT. It determines how the
+   collaborative layer in [1.6](/AelionSDK/project/roadmap/1-6/) joins the existing transaction
+   and revision system.
+4. **Stable semantics** — `2.0.0` is the first `latest` release and freezes the API. Decide the
+   deprecation window and migration contract before the 1.6 prerelease window closes.
+
+## Acceptance
+
+A roadmap item is delivered only when code, public contract, documentation, CI/evidence and
+published artifacts all exist. Certification claims follow the vocabulary in
+[Compatibility and deployment](/AelionSDK/production/compatibility/): automated, supported and
+certified are distinct, and evidence must match the claim.
