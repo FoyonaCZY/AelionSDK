@@ -40,6 +40,8 @@
     "migrate": "corepack pnpm --filter @aelionsdk/sdk run migrate --",
     "report:capability": "node scripts/capture-capability-report.mjs",
     "report:capability:matrix": "node scripts/capture-capability-matrix.mjs",
+    "report:device-matrix": "node scripts/capture-device-matrix-evidence.mjs --capture",
+    "report:device-matrix:check": "node scripts/capture-device-matrix-evidence.mjs",
     "report:export": "node scripts/capture-export-evidence.mjs",
     "report:vertical": "node scripts/capture-vertical-slice-evidence.mjs",
     "report:alpha": "node scripts/capture-alpha-evidence.mjs",

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.0.0",
+  "sdkVersion": "1.0.0-rc.1",
+  "generatedAt": "2026-08-01",
+  "policy": {
+    "statusVocabulary": {
+      "automated": "Runs in a checked repository workflow; evidence exists for this source revision.",
+      "emulated": "A browser engine/viewport profile run in CI; not a physical device.",
+      "pending-capture": "Profile is wired and will emit evidence on the next nightly capture run.",
+      "pending-credentials": "Requires a device farm (e.g. BrowserStack/Sauce) credential; not yet executable here.",
+      "certified": "Requires the documented physical-device and long-session evidence; not yet certified."
+    }
+  },
+  "devices": [
+    {
+      "id": "desktop-chromium-reference",
+      "category": "emulated",
+      "status": "automated",
+      "description": "Reference desktop Chromium browser suite and package consumer",
+      "captureCommand": "pnpm test:browser",
+      "evidence": [
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    },
+    {
+      "id": "desktop-firefox-reference",
+      "category": "emulated",
+      "status": "automated",
+      "description": "Reference desktop Firefox browser suite and package consumer",
+      "captureCommand": "pnpm test:browser:firefox",
+      "evidence": [
+        "reports/baseline/browser-smoke-firefox.json",
+        "reports/baseline/capability-firefox.json",
+        "reports/baseline/tarball-consumer.json"
+      ]
+    },
+    {
+      "id": "desktop-webkit-contract",
+      "category": "emulated",
+      "status": "automated",
+      "description": "Public capability/profile contract only; this is not Safari device certification",
+      "captureCommand": "pnpm test:browser:webkit",
+      "evidence": ["reports/baseline/capability-webkit.json"]
+    },
+    {
+      "id": "mobile-chromium-viewport",
+      "category": "emulated",
+      "status": "pending-capture",
+      "description": "Mobile Chromium viewport contract (390x844, device-scale 3)",
+      "captureCommand": "pnpm test:browser:mobile",
+      "evidence": ["reports/baseline/device-mobile-chromium.json"]
+    },
+    {
+      "id": "macos-safari-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "description": "Physical macOS Safari codec, GPU, audio, storage and export evidence",
+      "evidence": [],
+      "evidenceChecklist": ["codec", "gpu", "audio", "storage", "export"]
+    },
+    {
+      "id": "ios-ipados-safari-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "description": "Physical iOS/iPadOS Safari foreground/background, interruption, memory, thermal and export evidence",
+      "evidence": [],
+      "evidenceChecklist": ["codec", "gpu", "audio", "storage", "export", "lifecycle"]
+    },
+    {
+      "id": "android-chrome-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "description": "Physical Android Chrome codec, GPU, memory, storage, background and export evidence",
+      "evidence": [],
+      "evidenceChecklist": ["codec", "gpu", "audio", "storage", "export", "lifecycle"]
+    },
+    {
+      "id": "windows-gpu-matrix",
+      "category": "physical",
+      "status": "pending-credentials",
+      "description": "Representative Intel, AMD and NVIDIA driver evidence",
+      "evidence": [],
+      "evidenceChecklist": ["gpu"]
+    },
+    {
+      "id": "linux-gpu-matrix",
+      "category": "physical",
+      "status": "pending-credentials",
+      "description": "Distribution and driver product certification (CI smoke is not certification)",
+      "evidence": [],
+      "evidenceChecklist": ["gpu"]
+    }
+  ]
+}
