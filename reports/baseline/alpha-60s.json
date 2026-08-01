@@ -61,7 +61,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-4eac40af-6da0-48da-b24f-07dc0b37a7f2.webm",
+    "fileName": "aelion-alpha-51ead782-888f-407d-aacb-ccd744e76a52.webm",
     "writes": 135,
     "bytesWritten": 4756115,
     "maxInFlightWrites": 1,
@@ -4786,8 +4786,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 2000,
-          "gpuCompletionUs": 1895
+          "totalWorkerUs": 1815,
+          "gpuCompletionUs": 1725
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4843,8 +4843,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 2000,
-          "gpuCompletionUs": 1895
+          "totalWorkerUs": 1815,
+          "gpuCompletionUs": 1725
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4929,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 17661841,
+      "usedJsHeapBytes": 15958909,
       "totalJsHeapBytes": 21814829
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 35910037,
-      "totalJsHeapBytes": 82151321
+      "usedJsHeapBytes": 28930086,
+      "totalJsHeapBytes": 92404466
     }
   },
-  "elapsedMs": 10126.04999999702,
+  "elapsedMs": 10186.199999988079,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-08-01T14:07:24.390Z",
+  "generatedAt": "2026-08-01T14:18:43.938Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
