@@ -5,6 +5,7 @@ export * from './runtime-material-registry.js';
 export * from './media-provider.js';
 export * from './production-media-provider.js';
 export * from './project-builder.js';
+export * from './proxy-automation.js';
 export * from './rate-envelope.js';
 export * from './subtitle-io.js';
 export * from './composition.js';

@@ -115,7 +115,7 @@ overlap 状态，适合自定义音频宿主按小块连续拉取。
 - 支持 MP4 moov 在头/尾、fragmented MP4、B-frame、非零 PTS、MOV、MKV、MPEG-TS 和 WebM VFR 固定语料；
 - 损坏、截断和随机输入会有上限地失败；
 - SampleIndex 有 resident LRU，也可以注入持久 CacheStore；
-- 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；
+- 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；支持通过注入的编码器自动注册低分辨率代理（`registerAutomaticProxy`）；
 - 页面级资源 Governor 控制 decoder、GPU 和 cache 预算；
 - SegmentedIndex 支持长媒体按时间段加载。
 
