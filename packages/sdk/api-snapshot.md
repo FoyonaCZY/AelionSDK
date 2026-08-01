@@ -29,7 +29,7 @@ baseline in the same change.
     "dist/player.d.ts": "d7627e6d681fd05e5b268b1be9021619af3020f121a540d0c0b9e04fefdb949e",
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
     "dist/production-media-provider.d.ts": "f87a2b3118b5ceaee396840d8327edcec69c17887a25fc80f95134a8e3ce5dee",
-    "dist/project-builder.d.ts": "3c2825f3583648bad36704040c5b66c11d6e14b13c4af54319ab6c2e76f71184",
+    "dist/project-builder.d.ts": "0b9fc067d6ebeba640f695b40ec13ad9342efe28fe01bf8016520094a29da328",
     "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
     "dist/session.d.ts": "fcf02f0975a9b85ef6dadd8e2afe4542a3a674851fba9d75a3d59a519a5bbe2b",
     "dist/types.d.ts": "a1c8b603618e1d698fdc21b8683fe512b7dc04820c165fd4967e36385944ee19"

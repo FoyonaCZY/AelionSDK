@@ -8,10 +8,9 @@ export type DiagnosticLocale = string;
  * interpolate `{key}` placeholders from the diagnostic's `details` object; a
  * placeholder with no matching detail renders as an empty string.
  */
-export interface DiagnosticCatalog {
-  readonly [code: string]: Readonly<Record<DiagnosticLocale, string>>;
-}
-
+export type DiagnosticCatalog = Readonly<
+  Record<string, Readonly<Record<DiagnosticLocale, string>>>
+>;
 /**
  * Return a copy of `diagnostic` whose `message` is the localized template for
  * `locale`, or the original `diagnostic` unchanged when the catalog has no
@@ -29,7 +28,10 @@ export function localizeDiagnostic<T extends Diagnostic>(
   const details = diagnostic.details;
   const message = template.replace(/\{([a-zA-Z0-9_]+)\}/gu, (_, key: string) => {
     const value = details?.[key];
-    return value === undefined ? '' : String(value);
+    // Interpolate primitives only; objects would render as '[object Object]'.
+    return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+      ? String(value)
+      : '';
   });
   return { ...diagnostic, message };
 }

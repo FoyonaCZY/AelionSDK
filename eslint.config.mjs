@@ -12,6 +12,7 @@ export default tseslint.config(
       'apps/*/vite.config.js',
       'benchmarks/reports/**',
       'reports/**',
+      'fixtures/**',
     ],
   },
   eslint.configs.recommended,

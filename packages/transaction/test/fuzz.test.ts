@@ -79,14 +79,10 @@ describe('transaction sequence round-trip', () => {
           }
           const finalHash = await canonicalHash(engine.getSnapshot());
 
-          for (let index = 0; index < operations.length; index += 1) {
-            history.undo();
-          }
+          operations.forEach(() => history.undo());
           expect(await canonicalHash(engine.getSnapshot())).toBe(initialHash);
 
-          for (let index = 0; index < operations.length; index += 1) {
-            history.redo();
-          }
+          operations.forEach(() => history.redo());
           expect(await canonicalHash(engine.getSnapshot())).toBe(finalHash);
         },
       ),
