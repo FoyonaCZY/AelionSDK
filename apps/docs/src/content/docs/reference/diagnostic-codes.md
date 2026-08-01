@@ -155,6 +155,26 @@ Color failures use `COLOR_WORKING_SPACE_UNSUPPORTED`, `COLOR_TRANSFER_FUNCTION_U
 `COLOR_BIT_DEPTH_UNSUPPORTED`, and `COLOR_HDR_PRESENTATION_UNSUPPORTED`; they must not silently
 change the requested color/HDR contract.
 
+## Localization
+
+`Diagnostic.message` is the canonical English text and is safe to display. Products that need
+localized text use `localizeDiagnostic(diagnostic, catalog, locale)` from `@aelionsdk/core` (plus
+`localizeDiagnostics` for a result array) with a `DiagnosticCatalog` of `code → locale → template`
+strings. Templates interpolate `{key}` placeholders from `diagnostic.details`. `@aelionsdk/core`
+ships `defaultDiagnosticCatalog` (English) covering the most common codes; extend it with more
+locales. Branch on `code` and structured fields, never on the rendered `message`. A missing
+template for a code/locale leaves the original English message unchanged.
+
+```ts
+import { localizeDiagnostic, defaultDiagnosticCatalog } from '@aelionsdk/core';
+
+const zhCatalog = {
+  ...defaultDiagnosticCatalog,
+  PROJECT_REFERENCE_MISSING: { 'zh-CN': '引用 {id} 在 {collection} 中不存在' },
+};
+const localized = localizeDiagnostic(diagnostic, zhCatalog, 'zh-CN');
+```
+
 ## Logging
 
 Log package/browser versions, Project/IR revision, code/severity/recoverable, entity/range/path,

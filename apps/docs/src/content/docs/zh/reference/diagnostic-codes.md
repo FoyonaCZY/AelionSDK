@@ -280,6 +280,20 @@ Worker 取消可能直接返回 `DOMException('AbortError')`，不会产生 `REN
 
 同一 Session 并发启动第二个 export 会抛出 `AelionError`，其 `diagnostics` 包含稳定的 `EXPORT_JOB_ACTIVE`；上层仍可先检查 `session.export.activeJob`，或等待/取消当前 job。英文 `message` 只用于展示，业务分支必须使用 diagnostic code。
 
+## 本地化
+
+`Diagnostic.message` 是规范英文文案，可直接展示。需要本地化文案的产品使用 `@aelionsdk/core` 的 `localizeDiagnostic(diagnostic, catalog, locale)`（结果数组用 `localizeDiagnostics`），配合 `DiagnosticCatalog`（`code → locale → 模板`）。模板用 `{key}` 占位符从 `diagnostic.details` 插值。`@aelionsdk/core` 内置 `defaultDiagnosticCatalog`（英文，覆盖最常见 code），可按 locale 扩展。分支判断永远用 `code` 和结构化字段，不要依赖渲染后的 `message`；某个 code/locale 没有模板时，原英文 message 保持不变。
+
+```ts
+import { localizeDiagnostic, defaultDiagnosticCatalog } from '@aelionsdk/core';
+
+const zhCatalog = {
+  ...defaultDiagnosticCatalog,
+  PROJECT_REFERENCE_MISSING: { 'zh-CN': '引用 {id} 在 {collection} 中不存在' },
+};
+const localized = localizeDiagnostic(diagnostic, zhCatalog, 'zh-CN');
+```
+
 ## 10. 日志与遥测建议
 
 记录：SDK/package version、Project/IR revision、code/severity/recoverable、entity/range/path、backend/codec config、浏览器版本、操作 stage、是否由用户取消。不要记录媒体 URL token、Project 文案、完整 Shader source、用户文件内容或跨会话稳定设备指纹。
