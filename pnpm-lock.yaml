@@ -140,16 +140,16 @@ importers:
   packages/audio:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/render-ir':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../render-ir
 
   packages/capability:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
 
   packages/core: {}
@@ -157,13 +157,13 @@ importers:
   packages/export:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/media':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../media
       '@aelionsdk/render-ir':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../render-ir
       mediabunny:
         specifier: 1.50.8
@@ -172,16 +172,16 @@ importers:
   packages/material-compiler:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
 
   packages/material-sdk:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/material-compiler':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../material-compiler
       ajv:
         specifier: 8.18.0
@@ -193,7 +193,7 @@ importers:
   packages/media:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       mediabunny:
         specifier: 1.50.8
@@ -202,7 +202,7 @@ importers:
   packages/project-schema:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       ajv:
         specifier: 8.18.0
@@ -214,79 +214,79 @@ importers:
   packages/render-ir:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/material-compiler':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../material-compiler
       '@aelionsdk/project-schema':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../project-schema
 
   packages/renderer-worker:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/material-compiler':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../material-compiler
       '@aelionsdk/render-ir':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../render-ir
 
   packages/sdk:
     dependencies:
       '@aelionsdk/audio':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../audio
       '@aelionsdk/capability':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../capability
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/export':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../export
       '@aelionsdk/material-compiler':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../material-compiler
       '@aelionsdk/media':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../media
       '@aelionsdk/project-schema':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../project-schema
       '@aelionsdk/render-ir':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../render-ir
       '@aelionsdk/renderer-worker':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../renderer-worker
       '@aelionsdk/transaction':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../transaction
 
   packages/transaction:
     dependencies:
       '@aelionsdk/core':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../core
       '@aelionsdk/project-schema':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../project-schema
 
   packages/vite-plugin:
     dependencies:
       '@aelionsdk/audio':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../audio
       '@aelionsdk/export':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../export
       '@aelionsdk/renderer-worker':
-        specifier: 1.0.0-rc.1
+        specifier: 1.1.0-rc.1
         version: link:../renderer-worker
       vite:
         specifier: ^7.3.6

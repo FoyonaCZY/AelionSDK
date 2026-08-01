@@ -10,11 +10,11 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 ```json
 {
   "dependencies": {
-    "@aelionsdk/sdk": "1.0.0-rc.1",
-    "@aelionsdk/export": "1.0.0-rc.1"
+    "@aelionsdk/sdk": "1.1.0-rc.1",
+    "@aelionsdk/export": "1.1.0-rc.1"
   },
   "devDependencies": {
-    "@aelionsdk/vite-plugin": "1.0.0-rc.1"
+    "@aelionsdk/vite-plugin": "1.1.0-rc.1"
   }
 }
 ```
@@ -59,7 +59,7 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 ```json
 {
   "dependencies": {
-    "@aelionsdk/material-sdk": "1.0.0-rc.1"
+    "@aelionsdk/material-sdk": "1.1.0-rc.1"
   }
 }
 ```

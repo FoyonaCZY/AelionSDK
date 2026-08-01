@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/capability@next
 ```
 
-`next` currently resolves to `1.0.0-rc.1`. Product applications should normally
+`next` currently resolves to `1.1.0-rc.1`. Product applications should normally
 use the capability APIs exposed by `@aelionsdk/sdk`; this package is for custom
 preflight screens and execution hosts.
 

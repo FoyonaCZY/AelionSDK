@@ -1,16 +1,15 @@
 # AelionSDK release-candidate status
 
-Updated: 2026-07-28 (Asia/Shanghai)
+Updated: 2026-08-01 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `714daf26de8ae2ba230da483be50c6faf1ae9f0c38544097f1a4f034b2d79be4`
-- Source commit: `02b185d405dbb030df046cd6f58465e1ba1896f0`.
+  `a0bc1d83d3bed1285bbf1dc996553219c7359f72a252949328fdff08851511c7`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
-- Artifact postflight: 40 of 40 semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 83/83 and Firefox 69/69, with zero failed,
+- Artifact postflight: all semantic, freshness, and binding checks passed.
+- Browser conformance: Chromium 84/84 and Firefox 69/69, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
@@ -19,8 +18,9 @@ Updated: 2026-07-28 (Asia/Shanghai)
   interruption recovery, golden rendering, and the 60-second browser export
   with FFmpeg video-frame and audio-PCM readback all passed.
 - Resource evidence: bounded decoder/cache/worker queues, cancellation,
-  disposal, provider drain, OPFS cleanup, ten-minute-equivalent audio ring, and
-  the 1,000-clip incremental compilation soak passed.
+  disposal, provider drain, OPFS cleanup, ten-minute-equivalent audio ring, the
+  400-iteration transaction restart-recovery soak, and the 1,000-clip
+  incremental compilation soak passed.
 
 The authoritative machine-readable record is
 `reports/baseline/phase-1-gate-results.json`. Generated evidence in
@@ -29,22 +29,15 @@ freshness window.
 
 ## Implemented candidate scope
 
-- Persistent sequential/GOP WebCodecs decoding and bounded frame/image caches.
-- Whole-frame WebGL2/WebGPU frame graphs with direct WebGPU presentation,
-  adaptive backend selection, masks,
-  effects, transitions, text, captions, shapes, generators, and all declared
-  content types without silent drops.
-- Public Composition/Layer/Clip APIs, canvas interaction and capture stream,
-  plus strict WebAV and Diffusion Studio migration adapters.
-- Silence removal transactions, waveform analysis, loudness/true-peak
-  measurement, limiting, ducking, deterministic pitch-preserving time-stretch,
-  deterministic 44.1/48/96 kHz streaming resampling for 1–8 channels, and
-  capability-negotiated AVC/AV1/HEVC export profiles.
-- Revision-bound persistence/recovery, isolated Worker extension RPC, reference
-  editor autosave/restore, durable WebM/fMP4 unit checkpoints with IndexedDB
-  resume and FFmpeg semantic readback, explicit
-  non-Vite runtime assets, HDR/10-bit fail-closed execution contracts,
-  competitor benchmarks, migration guides, and public API snapshots.
+- 1.0 engine scope: persistent sequential/GOP WebCodecs decoding, whole-frame
+  WebGL2/WebGPU frame graphs, public Composition/Layer/Clip APIs, strict
+  WebAV and Diffusion Studio migration, audio mastering tooling, revision-bound
+  persistence/recovery, Material protocol, and HDR fail-closed contracts.
+- 1.1 additions: QuickTime/MOV, Matroska/MKV and MPEG-TS container import;
+  AVIF still decode and image-sequence assets; diagnostic message
+  localization; export/transaction property fuzz and restart-recovery soak;
+  a software codec fallback contract; a device-matrix certification scaffold;
+  and a long-session operation guide.
 
 ## Release outcome
 
@@ -54,17 +47,17 @@ artifact set is signed `approved` in
 bounds, cancellation and cleanup, Material transport integrity, public
 API/distribution, and evidence integrity with no open blockers.
 
-Version `1.0.0-rc.1` was subsequently published as:
+Version `1.1.0-rc.1` is published as:
 
 - all 13 `@aelionsdk/*` packages on npm under the `next` dist-tag, with
   provenance;
-- Git tag `v1.0.0-rc.1`;
+- Git tag `v1.1.0-rc.1`;
 - a GitHub prerelease after registry smoke completed.
 
 The immutable release record is the
-[`v1.0.0-rc.1` tag](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1),
-[release workflow run](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270),
-and [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1).
+[`v1.1.0-rc.1` tag](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1),
+the release workflow run, and the
+[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1).
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the
 [documentation status page](https://foyonaczy.github.io/AelionSDK/project/status/).

@@ -169,7 +169,7 @@ import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
 
 const session = await Aelion.createSession({
   media,
-  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/1.0.0-rc.1/'),
+  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/1.1.0-rc.1/'),
 });
 ```
 
@@ -238,8 +238,8 @@ corepack pnpm --filter @example/my-editor build
 生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 RC：
 
 ```bash
-pnpm add @aelionsdk/sdk@1.0.0-rc.1 @aelionsdk/export@1.0.0-rc.1
-pnpm add -D @aelionsdk/vite-plugin@1.0.0-rc.1
+pnpm add @aelionsdk/sdk@1.1.0-rc.1 @aelionsdk/export@1.1.0-rc.1
+pnpm add -D @aelionsdk/vite-plugin@1.1.0-rc.1
 ```
 
 `npm install @aelionsdk/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
@@ -252,18 +252,18 @@ RC。接下来打开[快速开始](/AelionSDK/zh/start/getting-started/)，从�
 锁文件：
 
 ```bash
-npm install @aelionsdk/sdk@1.0.0-rc.1
-npm view @aelionsdk/sdk@1.0.0-rc.1 version dist.integrity dist.attestations --json
+npm install @aelionsdk/sdk@1.1.0-rc.1
+npm view @aelionsdk/sdk@1.1.0-rc.1 version dist.integrity dist.attestations --json
 npm view @aelionsdk/sdk dist-tags --json
 ```
 
-预期精确版本为 `1.0.0-rc.1`，`next` 指向该版本，`dist.attestations` 包含来自
+预期精确版本为 `1.1.0-rc.1`，`next` 指向该版本，`dist.attestations` 包含来自
 GitHub Actions 的 provenance。完整发布还应交叉核对：
 
-- [Git Tag `v1.0.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.0.0-rc.1)；
+- [Git Tag `v1.1.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1)；
 - [发布工作流](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270)；
-- [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.0.0-rc.1)。
+- [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1)。
 
-使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.0.0-rc.1 version
+使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.1.0-rc.1 version
 dist.integrity dist.attestations --json`。不要混用不同 RC，也不要把可移动的 `next`
 tag 写入生产锁定策略。

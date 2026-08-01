@@ -3,7 +3,7 @@ title: Diagnostic 错误码
 description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---
 
-本表对应源码版本 `1.0.0-rc.1`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
+本表对应源码版本 `1.1.0-rc.1`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
 
 产品代码只依赖 `code` 和结构化字段，不解析英文 `message`：
 

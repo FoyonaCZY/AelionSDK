@@ -5,7 +5,7 @@ description: Review the published version, verification evidence, known boundari
 
 ## What is available
 
-AelionSDK `1.0.0-rc.1` is published as 13 `@aelionsdk/*` packages on npm under the `next` dist-tag.
+AelionSDK `1.1.0-rc.1` is published as 13 `@aelionsdk/*` packages on npm under the `next` dist-tag.
 The Git tag and GitHub prerelease identify the reviewed source. Applications normally begin with
 `@aelionsdk/sdk@next` and add the Vite plugin or export package as needed.
 

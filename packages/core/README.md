@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/core@next
 ```
 
-`next` currently resolves to `1.0.0-rc.1`. Most applications receive these
+`next` currently resolves to `1.1.0-rc.1`. Most applications receive these
 types through `@aelionsdk/sdk`; direct use is intended for extensions and
 custom engine hosts.
 

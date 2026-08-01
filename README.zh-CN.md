@@ -46,7 +46,7 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前 1.0 Release Candidate 是 `1.0.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
+当前 1.1 Release Candidate 是 `1.1.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
 导出入口和运行时资源插件：
 
 ```bash

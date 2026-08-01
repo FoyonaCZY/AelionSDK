@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/transaction@next
 ```
 
-`next` currently resolves to `1.0.0-rc.1`. Product applications should edit
+`next` currently resolves to `1.1.0-rc.1`. Product applications should edit
 through an `@aelionsdk/sdk` Session; direct use is intended for custom hosts and
 engine integrations.
 
