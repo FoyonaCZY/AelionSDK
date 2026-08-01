@@ -15,7 +15,7 @@ when opening a project.
 
 ## Why range reads matter
 
-MP4 and WebM indexing often needs bytes near both the start and end of a file. HTTP sources should
+MP4/MOV/MKV/TS and WebM indexing often needs bytes near both the start and end of a file. HTTP sources should
 support `Range`, `Content-Range`, and CORS. A bounded full-download fallback is suitable only for
 small files. Large non-seekable responses should fail clearly.
 

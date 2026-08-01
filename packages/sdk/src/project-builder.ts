@@ -1012,7 +1012,17 @@ export class ProjectBuilder {
         ...(options.name === undefined ? {} : { name: options.name }),
         mimeType:
           options.mimeType ??
-          `${importVideo ? 'video' : 'audio'}/${probe.index.container === 'mp4' ? 'mp4' : 'webm'}`,
+          `${importVideo ? 'video' : 'audio'}/${
+            probe.index.container === 'mp4'
+              ? 'mp4'
+              : probe.index.container === 'mov'
+                ? 'quicktime'
+                : probe.index.container === 'mkv'
+                  ? 'x-matroska'
+                  : probe.index.container === 'ts'
+                    ? 'mp2t'
+                    : 'webm'
+          }`,
         probeHint: {
           durationUs: probe.index.durationUs,
           ...(video === undefined

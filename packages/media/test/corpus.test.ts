@@ -22,6 +22,9 @@ const fixtures = [
   ['mp4-audio-tail-h264-aac.mp4', 'mp4', 'avc', 'aac'],
   ['mp4-sparse-30m-h264-aac.mp4', 'mp4', 'avc', 'aac'],
   ['webm-vp9-opus-vfr.webm', 'webm', 'vp9', 'opus'],
+  ['mov-h264-aac.mov', 'mov', 'avc', 'aac'],
+  ['mkv-h264-aac.mkv', 'mkv', 'avc', 'aac'],
+  ['ts-h264-aac.ts', 'ts', 'avc', 'aac'],
 ] as const;
 
 describe('media corpus normalization', () => {
@@ -44,11 +47,14 @@ describe('media corpus normalization', () => {
         expect(index.presentationOrder[video.id]).toHaveLength(
           index.samples[video.id]?.length ?? 0,
         );
+        // QuickTime (MOV) video sample descriptions do not always carry the
+        // full-range bit that mediabunny maps to `false`; the fixture reports
+        // `null` (unspecified), which the SDK treats as fail-closed.
         expect(video.color).toEqual({
           primaries: 'bt709',
           transfer: 'bt709',
           matrix: 'bt709',
-          fullRange: false,
+          fullRange: container === 'mov' ? null : false,
           highDynamicRange: false,
           canBeTransparent: false,
         });

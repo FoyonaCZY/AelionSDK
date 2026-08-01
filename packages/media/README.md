@@ -16,7 +16,7 @@ custom media providers, cache implementations and decode hosts.
 ## Public surface
 
 - HTTP/file range readers and proxy contracts;
-- MP4/WebM indexing and exact seek;
+- MP4/MOV/MKV/TS/WebM indexing and exact seek;
 - video, audio and image adapters;
 - content-addressed cache and OPFS storage;
 - shared decoder, cache and request resource governance.

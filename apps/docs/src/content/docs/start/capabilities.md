@@ -50,7 +50,7 @@ audio support is negotiated inside MP4/WebM profiles.
 
 ## Media input and cache
 
-Production media supports File, URL/Range, OPFS, custom byte sources, MP4/WebM indexing,
+Production media supports File, URL/Range, OPFS, custom byte sources, MP4/MOV/MKV/TS/WebM indexing,
 VideoFrame/PCM decode, proxy representations, cache budgets, admission queues, cancellation, and
 resource statistics. CDN CORS/range correctness remains a deployment responsibility.
 
