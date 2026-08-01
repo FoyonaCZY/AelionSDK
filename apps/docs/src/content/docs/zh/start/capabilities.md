@@ -109,8 +109,9 @@ overlap 状态，适合自定义音频宿主按小块连续拉取。
 
 ## 媒体输入和缓存
 
-- MP4/H.264/AAC 与 WebM/VP9/Opus 的容器索引、seek、VideoFrame 和 PCM decode；
-- 支持 MP4 moov 在头/尾、fragmented MP4、B-frame、非零 PTS 和 WebM VFR 固定语料；
+- MP4/H.264/AAC、MOV/H.264/AAC、MKV/H.264/AAC、MPEG-TS/H.264/AAC 与 WebM/VP9/Opus 的容器索引、seek、VideoFrame 和 PCM decode；
+- AVIF/JPEG/PNG/WebP 静帧解码；图像序列建模为 `image-sequence` 素材，通过帧映射确定性采样；
+- 支持 MP4 moov 在头/尾、fragmented MP4、B-frame、非零 PTS、MOV、MKV、MPEG-TS 和 WebM VFR 固定语料；
 - 损坏、截断和随机输入会有上限地失败；
 - SampleIndex 有 resident LRU，也可以注入持久 CacheStore；
 - 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；

@@ -142,8 +142,10 @@ jobs:
       - run: pnpm test:browser:webkit
       - run: pnpm test:browser:mobile
       - run: pnpm test:golden
+      - run: pnpm run test:soak
       - run: pnpm bench
       - run: pnpm report:capability:matrix
+      - run: pnpm report:device-matrix
       - run: pnpm report:seek
       - run: pnpm report:performance
       - run: pnpm report:recovery

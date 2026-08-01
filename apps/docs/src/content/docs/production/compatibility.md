@@ -10,6 +10,12 @@ fallback contract is implemented. **Certified** requires the documented physical
 long-session evidence. An API existing in a browser is not the same as an exact configuration
 passing preflight.
 
+The [device matrix](/AelionSDK/production/compatibility/#device-matrix) records the status of each
+profile. **Emulated** profiles run a browser engine/viewport in CI and are not a physical device.
+**Pending-capture** profiles are wired and emit evidence on the next nightly capture. **Pending
+credentials** profiles (physical devices, driver matrices) require a device-farm credential and
+must never be reported as certified until their evidence checklist is complete.
+
 ## Current automated coverage
 
 The repository runs type, unit, schema, API, package, Chromium browser, Firefox browser, and
@@ -55,3 +61,14 @@ Use real-device preflight and budgets. Mobile backgrounding, thermal throttling,
 screen lock, and browser lifecycle can end long jobs. HDR requires compatible Project metadata,
 working space, renderer, surface, encoder, container, display, and validation; never silently
 present SDR as certified HDR.
+
+## Device matrix
+
+`compatibility/device-matrix.json` lists every profile and its status. Automated emulated profiles
+(reference desktop Chromium/Firefox, WebKit contract, mobile viewport) emit browser evidence bound
+to the source revision. Physical profiles (macOS/iOS Safari, Android Chrome, GPU driver matrices)
+are `pending-credentials`: they require a device farm and their evidence checklist (codec, GPU,
+audio, storage, export, lifecycle as applicable) must be complete before any certified claim.
+`pnpm report:device-matrix` captures the emulated evidence and writes
+`reports/baseline/device-matrix-evidence.json`; `report:device-matrix:check` validates the matrix
+without recapturing.

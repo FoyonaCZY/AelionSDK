@@ -69,6 +69,12 @@ function report(
         hdrPresentation: false,
       },
     },
+    images: {
+      avif: probe(true),
+      jpeg: probe(true),
+      png: probe(true),
+      webp: probe(true),
+    },
     wasm: { available: probe(true) },
     diagnostics: [],
   };

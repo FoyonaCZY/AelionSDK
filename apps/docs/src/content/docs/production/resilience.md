@@ -46,3 +46,23 @@ with a short-lived task/session ID without creating a cross-session device finge
 
 Log versions, revision, code/severity/recoverable, stage, safe codec/backend settings, and cleanup
 result. Do not log URL tokens, user media, Project text, or complete custom shader sources.
+
+## Long-session operation guide
+
+A browser page is not a guaranteed long-running background service. Persist durable state
+(revision-bound Project snapshots, asset locators, remote job IDs, resumable export checkpoints) so
+a page termination can resume from the last durable point; never persist live workers, frames,
+credentials, object URLs, or assumed decoder state. The restart-recovery evidence
+(`reports/baseline/recovery-chromium.json`) and the transaction restart soak demonstrate the
+canonical checkpoint → discard → re-admit → resume path.
+
+What a service worker can do: cache static assets, keep the registration alive, serve a shell page,
+and fetch-intercept. What it cannot do: run the WebGL2/WebGPU compositor, execute AudioWorklet
+timing, or own a `VideoDecoder`/`VideoEncoder` — GPU and media-encoder state cannot survive a
+terminated page. Background rendering therefore stays inside the page lifetime and should lower
+interactive fidelity under memory/thermal pressure.
+
+For jobs that must outlive the page, use the remote export provider as the durability ceiling:
+durable job IDs, per-asset authorization, progress/cancellation, and result byte/hash verification
+are the contract. Autosave and remote hand-off must not run unbounded competing work against
+interactive preview.

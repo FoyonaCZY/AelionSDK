@@ -29,8 +29,9 @@ closed.
 ## Visual composition
 
 Project/Composition can represent media, images, text, shapes, captions, nested sequences, masks,
-effects, transitions, generators, transforms, blend/composite behavior, and Materials. Preview and
-export share Render IR semantics.
+effects, transitions, generators, transforms, blend/composite behavior, and Materials. Image
+sequences (uniform-duration still frames) are modeled as `image-sequence` Assets and sampled
+deterministically through the frame mapping. Preview and export share Render IR semantics.
 
 Current local color execution is RGBA8 SDR. P3/HDR metadata and capability contracts exist, but
 production HDR output is not yet certified and must not be inferred from API presence.
@@ -50,9 +51,10 @@ audio support is negotiated inside MP4/WebM profiles.
 
 ## Media input and cache
 
-Production media supports File, URL/Range, OPFS, custom byte sources, MP4/WebM indexing,
-VideoFrame/PCM decode, proxy representations, cache budgets, admission queues, cancellation, and
-resource statistics. CDN CORS/range correctness remains a deployment responsibility.
+Production media supports File, URL/Range, OPFS, custom byte sources, MP4/MOV/MKV/TS/WebM indexing,
+VideoFrame/PCM decode, AVIF/JPEG/PNG/WebP stills, proxy representations, cache budgets, admission
+queues, cancellation, and resource statistics. CDN CORS/range correctness remains a deployment
+responsibility.
 
 ## Export
 

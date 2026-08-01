@@ -6,7 +6,10 @@ import {
   CustomSource,
   EncodedPacketSink,
   Input,
+  MATROSKA,
   MP4,
+  MPEG_TS,
+  QTFF,
   VideoSampleSink,
   WEBM,
   type EncodedPacket,
@@ -275,7 +278,18 @@ export async function createSampleIndex(
 
     return {
       schemaVersion: '1.0.0',
-      container: format === MP4 ? 'mp4' : format === WEBM ? 'webm' : 'unknown',
+      container:
+        format === MP4
+          ? 'mp4'
+          : format === QTFF
+            ? 'mov'
+            : format === MATROSKA
+              ? 'mkv'
+              : format === MPEG_TS
+                ? 'ts'
+                : format === WEBM
+                  ? 'webm'
+                  : 'unknown',
       durationUs: secondsToUs(durationSeconds, 'media duration'),
       tracks: trackInfos,
       capabilities: {
@@ -318,7 +332,18 @@ export async function createSampleIndexFromReader(
     }
     return {
       schemaVersion: '1.0.0',
-      container: format === MP4 ? 'mp4' : format === WEBM ? 'webm' : 'unknown',
+      container:
+        format === MP4
+          ? 'mp4'
+          : format === QTFF
+            ? 'mov'
+            : format === MATROSKA
+              ? 'mkv'
+              : format === MPEG_TS
+                ? 'ts'
+                : format === WEBM
+                  ? 'webm'
+                  : 'unknown',
       durationUs: secondsToUs(durationSeconds, 'media duration'),
       tracks: trackInfos,
       capabilities: {

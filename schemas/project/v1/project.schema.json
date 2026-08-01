@@ -21,27 +21,55 @@
     "extensions"
   ],
   "properties": {
-    "$schema": { "const": "https://schemas.aelion.dev/project/v1.json" },
-    "schemaVersion": { "const": "1.0.0" },
-    "projectId": { "$ref": "#/$defs/entityId" },
-    "metadata": { "$ref": "#/$defs/jsonObject" },
-    "settings": { "$ref": "#/$defs/settings" },
-    "assets": { "$ref": "#/$defs/assetMap" },
-    "sequences": { "$ref": "#/$defs/sequenceMap" },
-    "tracks": { "$ref": "#/$defs/trackMap" },
-    "items": { "$ref": "#/$defs/itemMap" },
+    "$schema": {
+      "const": "https://schemas.aelion.dev/project/v1.json"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "projectId": {
+      "$ref": "#/$defs/entityId"
+    },
+    "metadata": {
+      "$ref": "#/$defs/jsonObject"
+    },
+    "settings": {
+      "$ref": "#/$defs/settings"
+    },
+    "assets": {
+      "$ref": "#/$defs/assetMap"
+    },
+    "sequences": {
+      "$ref": "#/$defs/sequenceMap"
+    },
+    "tracks": {
+      "$ref": "#/$defs/trackMap"
+    },
+    "items": {
+      "$ref": "#/$defs/itemMap"
+    },
     "materialInstances": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
       "additionalProperties": {
         "$ref": "https://schemas.aelion.dev/material/instance/v1.json"
       }
     },
-    "transitions": { "$ref": "#/$defs/transitionMap" },
-    "markers": { "$ref": "#/$defs/markerMap" },
-    "linkGroups": { "$ref": "#/$defs/linkGroupMap" },
-    "extensions": { "$ref": "#/$defs/extensions" }
+    "transitions": {
+      "$ref": "#/$defs/transitionMap"
+    },
+    "markers": {
+      "$ref": "#/$defs/markerMap"
+    },
+    "linkGroups": {
+      "$ref": "#/$defs/linkGroupMap"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
   },
   "$defs": {
     "entityId": {
@@ -67,26 +95,40 @@
     },
     "jsonValue": {
       "oneOf": [
-        { "type": "null" },
-        { "type": "boolean" },
-        { "type": "number" },
-        { "type": "string" },
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
         {
           "type": "array",
           "maxItems": 16384,
-          "items": { "$ref": "#/$defs/jsonValue" }
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
         },
         {
           "type": "object",
           "maxProperties": 4096,
-          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
         }
       ]
     },
     "jsonObject": {
       "type": "object",
       "maxProperties": 4096,
-      "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
     },
     "extensions": {
       "type": "object",
@@ -95,7 +137,9 @@
         "type": "string",
         "pattern": "^[a-z0-9]+(?:\\.[a-z0-9-]+)+$"
       },
-      "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
     },
     "rational": {
       "type": "object",
@@ -119,8 +163,12 @@
       "additionalProperties": false,
       "required": ["startUs", "durationUs"],
       "properties": {
-        "startUs": { "$ref": "#/$defs/timeUs" },
-        "durationUs": { "$ref": "#/$defs/positiveDurationUs" }
+        "startUs": {
+          "$ref": "#/$defs/timeUs"
+        },
+        "durationUs": {
+          "$ref": "#/$defs/positiveDurationUs"
+        }
       }
     },
     "color": {
@@ -135,7 +183,9 @@
           "type": "array",
           "minItems": 4,
           "maxItems": 4,
-          "items": { "type": "number" }
+          "items": {
+            "type": "number"
+          }
         }
       }
     },
@@ -144,8 +194,12 @@
       "additionalProperties": false,
       "required": ["x", "y"],
       "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" }
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
       }
     },
     "animation": {
@@ -158,9 +212,15 @@
           "additionalProperties": false,
           "required": ["timeSpace", "preInfinity", "postInfinity", "keyframes"],
           "properties": {
-            "timeSpace": { "enum": ["item", "sequence"] },
-            "preInfinity": { "enum": ["hold", "linear", "none", "cycle", "ping-pong"] },
-            "postInfinity": { "enum": ["hold", "linear", "none", "cycle", "ping-pong"] },
+            "timeSpace": {
+              "enum": ["item", "sequence"]
+            },
+            "preInfinity": {
+              "enum": ["hold", "linear", "none", "cycle", "ping-pong"]
+            },
+            "postInfinity": {
+              "enum": ["hold", "linear", "none", "cycle", "ping-pong"]
+            },
             "keyframes": {
               "type": "array",
               "minItems": 1,
@@ -170,8 +230,12 @@
                 "additionalProperties": false,
                 "required": ["timeUs", "value", "interpolation"],
                 "properties": {
-                  "timeUs": { "$ref": "#/$defs/timeUs" },
-                  "value": { "$ref": "#/$defs/jsonValue" },
+                  "timeUs": {
+                    "$ref": "#/$defs/timeUs"
+                  },
+                  "value": {
+                    "$ref": "#/$defs/jsonValue"
+                  },
                   "interpolation": {
                     "enum": ["hold", "linear", "cubic-bezier"]
                   },
@@ -182,12 +246,25 @@
                       "type": {
                         "enum": ["linear", "steps", "cubic-bezier"]
                       },
-                      "count": { "type": "integer", "minimum": 1 },
-                      "position": { "enum": ["start", "end"] },
-                      "x1": { "type": "number" },
-                      "y1": { "type": "number" },
-                      "x2": { "type": "number" },
-                      "y2": { "type": "number" }
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "position": {
+                        "enum": ["start", "end"]
+                      },
+                      "x1": {
+                        "type": "number"
+                      },
+                      "y1": {
+                        "type": "number"
+                      },
+                      "x2": {
+                        "type": "number"
+                      },
+                      "y2": {
+                        "type": "number"
+                      }
                     },
                     "additionalProperties": false
                   }
@@ -199,10 +276,24 @@
       }
     },
     "animatableNumber": {
-      "oneOf": [{ "type": "number" }, { "$ref": "#/$defs/animation" }]
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/animation"
+        }
+      ]
     },
     "animatableVec2": {
-      "oneOf": [{ "$ref": "#/$defs/vec2" }, { "$ref": "#/$defs/animation" }]
+      "oneOf": [
+        {
+          "$ref": "#/$defs/vec2"
+        },
+        {
+          "$ref": "#/$defs/animation"
+        }
+      ]
     },
     "settings": {
       "type": "object",
@@ -215,13 +306,31 @@
         "missingPluginPolicy"
       ],
       "properties": {
-        "defaultSequenceId": { "$ref": "#/$defs/entityId" },
-        "defaultStillDurationUs": { "$ref": "#/$defs/positiveDurationUs" },
-        "locale": { "type": "string", "minLength": 1, "maxLength": 128 },
-        "timezone": { "type": "string", "minLength": 1, "maxLength": 128 },
-        "missingAssetPolicy": { "enum": ["placeholder", "error"] },
-        "missingMaterialPolicy": { "enum": ["placeholder", "error"] },
-        "missingPluginPolicy": { "enum": ["placeholder", "error"] }
+        "defaultSequenceId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "defaultStillDurationUs": {
+          "$ref": "#/$defs/positiveDurationUs"
+        },
+        "locale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "missingAssetPolicy": {
+          "enum": ["placeholder", "error"]
+        },
+        "missingMaterialPolicy": {
+          "enum": ["placeholder", "error"]
+        },
+        "missingPluginPolicy": {
+          "enum": ["placeholder", "error"]
+        }
       }
     },
     "assetLocator": {
@@ -231,8 +340,14 @@
           "additionalProperties": false,
           "required": ["type", "uri"],
           "properties": {
-            "type": { "const": "url" },
-            "uri": { "type": "string", "minLength": 1, "maxLength": 8192 }
+            "type": {
+              "const": "url"
+            },
+            "uri": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            }
           }
         },
         {
@@ -240,8 +355,12 @@
           "additionalProperties": false,
           "required": ["type", "bindingId"],
           "properties": {
-            "type": { "const": "runtime-binding" },
-            "bindingId": { "$ref": "#/$defs/entityId" }
+            "type": {
+              "const": "runtime-binding"
+            },
+            "bindingId": {
+              "$ref": "#/$defs/entityId"
+            }
           }
         },
         {
@@ -249,8 +368,14 @@
           "additionalProperties": false,
           "required": ["type", "path"],
           "properties": {
-            "type": { "const": "opfs" },
-            "path": { "type": "string", "minLength": 1, "maxLength": 4096 }
+            "type": {
+              "const": "opfs"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
           }
         },
         {
@@ -258,9 +383,18 @@
           "additionalProperties": false,
           "required": ["type", "mimeType", "base64"],
           "properties": {
-            "type": { "const": "data" },
-            "mimeType": { "type": "string", "minLength": 1, "maxLength": 256 },
-            "base64": { "type": "string", "maxLength": 349528 }
+            "type": {
+              "const": "data"
+            },
+            "mimeType": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "base64": {
+              "type": "string",
+              "maxLength": 349528
+            }
           }
         }
       ]
@@ -270,16 +404,27 @@
       "additionalProperties": false,
       "required": ["id", "kind", "locator"],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "kind": { "enum": ["video", "audio", "image", "font", "lut", "binary"] },
-        "name": { "type": "string", "maxLength": 256 },
-        "locator": { "$ref": "#/$defs/assetLocator" },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "kind": {
+          "enum": ["video", "audio", "image", "font", "lut", "binary", "image-sequence"]
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "locator": {
+          "$ref": "#/$defs/assetLocator"
+        },
         "contentHash": {
           "type": "object",
           "additionalProperties": false,
           "required": ["algorithm", "value"],
           "properties": {
-            "algorithm": { "const": "sha256" },
+            "algorithm": {
+              "const": "sha256"
+            },
             "value": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
@@ -291,7 +436,11 @@
           "minimum": 0,
           "maximum": 9007199254740991
         },
-        "mimeType": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
         "representations": {
           "type": "array",
           "maxItems": 32,
@@ -301,9 +450,15 @@
             "additionalProperties": true,
             "required": ["id", "role", "locator"],
             "properties": {
-              "id": { "$ref": "#/$defs/entityId" },
-              "role": { "enum": ["original", "proxy", "thumbnail", "waveform"] },
-              "locator": { "$ref": "#/$defs/assetLocator" }
+              "id": {
+                "$ref": "#/$defs/entityId"
+              },
+              "role": {
+                "enum": ["original", "proxy", "thumbnail", "waveform"]
+              },
+              "locator": {
+                "$ref": "#/$defs/assetLocator"
+              }
             }
           }
         },
@@ -311,22 +466,64 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "durationUs": { "$ref": "#/$defs/positiveDurationUs" },
-            "width": { "type": "integer", "minimum": 1, "maximum": 65535 },
-            "height": { "type": "integer", "minimum": 1, "maximum": 65535 },
-            "videoCodec": { "type": "string", "maxLength": 256 },
-            "audioCodec": { "type": "string", "maxLength": 256 }
+            "durationUs": {
+              "$ref": "#/$defs/positiveDurationUs"
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "videoCodec": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "audioCodec": {
+              "type": "string",
+              "maxLength": 256
+            }
           }
         },
-        "metadata": { "$ref": "#/$defs/jsonObject" },
-        "extensions": { "$ref": "#/$defs/extensions" }
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "imageSequence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["frameDurationUs", "frameAssetIds"],
+          "properties": {
+            "frameDurationUs": {
+              "$ref": "#/$defs/positiveDurationUs"
+            },
+            "frameAssetIds": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/entityId"
+              }
+            }
+          }
+        }
       }
     },
     "assetMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/asset" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/asset"
+      }
     },
     "sequence": {
       "type": "object",
@@ -341,8 +538,13 @@
         "markerIds"
       ],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "name": { "type": "string", "maxLength": 256 },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 256
+        },
         "format": {
           "type": "object",
           "additionalProperties": false,
@@ -357,12 +559,28 @@
             "backgroundColor"
           ],
           "properties": {
-            "width": { "type": "integer", "minimum": 1, "maximum": 65535 },
-            "height": { "type": "integer", "minimum": 1, "maximum": 65535 },
-            "pixelAspectRatio": { "$ref": "#/$defs/rational" },
-            "frameRate": { "$ref": "#/$defs/rational" },
-            "sampleRate": { "enum": [44100, 48000, 96000] },
-            "channelLayout": { "enum": ["mono", "stereo", "5.1"] },
+            "width": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "pixelAspectRatio": {
+              "$ref": "#/$defs/rational"
+            },
+            "frameRate": {
+              "$ref": "#/$defs/rational"
+            },
+            "sampleRate": {
+              "enum": [44100, 48000, 96000]
+            },
+            "channelLayout": {
+              "enum": ["mono", "stereo", "5.1"]
+            },
             "workingColorSpace": {
               "enum": ["srgb-linear", "display-p3-linear", "rec2020-linear"]
             },
@@ -378,7 +596,10 @@
               "enum": ["rgb", "bt709", "bt2020-ncl"],
               "default": "rgb"
             },
-            "colorRange": { "enum": ["full", "limited"], "default": "full" },
+            "colorRange": {
+              "enum": ["full", "limited"],
+              "default": "full"
+            },
             "chromaSubsampling": {
               "enum": ["rgb", "4:4:4", "4:2:2", "4:2:0"],
               "default": "4:4:4"
@@ -391,8 +612,13 @@
               "enum": ["none", "bt2390", "reinhard"],
               "default": "none"
             },
-            "bitDepth": { "enum": [8, 10], "default": 8 },
-            "backgroundColor": { "$ref": "#/$defs/color" }
+            "bitDepth": {
+              "enum": [8, 10],
+              "default": 8
+            },
+            "backgroundColor": {
+              "$ref": "#/$defs/color"
+            }
           }
         },
         "duration": {
@@ -401,38 +627,64 @@
               "type": "object",
               "additionalProperties": false,
               "required": ["mode"],
-              "properties": { "mode": { "const": "content" } }
+              "properties": {
+                "mode": {
+                  "const": "content"
+                }
+              }
             },
             {
               "type": "object",
               "additionalProperties": false,
               "required": ["mode", "durationUs", "overflow"],
               "properties": {
-                "mode": { "const": "fixed" },
-                "durationUs": { "$ref": "#/$defs/timeUs" },
-                "overflow": { "enum": ["clip", "allow"] }
+                "mode": {
+                  "const": "fixed"
+                },
+                "durationUs": {
+                  "$ref": "#/$defs/timeUs"
+                },
+                "overflow": {
+                  "enum": ["clip", "allow"]
+                }
               }
             }
           ]
         },
-        "trackIds": { "$ref": "#/$defs/idList" },
-        "transitionIds": { "$ref": "#/$defs/idList" },
-        "materialInstanceIds": { "$ref": "#/$defs/idList" },
-        "markerIds": { "$ref": "#/$defs/idList" },
-        "extensions": { "$ref": "#/$defs/extensions" }
+        "trackIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "transitionIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "materialInstanceIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "markerIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
       }
     },
     "sequenceMap": {
       "type": "object",
       "minProperties": 1,
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/sequence" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/sequence"
+      }
     },
     "idList": {
       "type": "array",
       "maxItems": 16384,
-      "items": { "$ref": "#/$defs/entityId" }
+      "items": {
+        "$ref": "#/$defs/entityId"
+      }
     },
     "track": {
       "type": "object",
@@ -447,40 +699,76 @@
         "materialInstanceIds"
       ],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "sequenceId": { "$ref": "#/$defs/entityId" },
-        "kind": { "enum": ["visual", "audio", "caption"] },
-        "name": { "type": "string", "maxLength": 256 },
-        "enabled": { "type": "boolean" },
-        "locked": { "type": "boolean" },
-        "itemIds": { "$ref": "#/$defs/idList" },
-        "materialInstanceIds": { "$ref": "#/$defs/idList" },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "sequenceId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "kind": {
+          "enum": ["visual", "audio", "caption"]
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "itemIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "materialInstanceIds": {
+          "$ref": "#/$defs/idList"
+        },
         "audio": {
           "type": "object",
           "additionalProperties": false,
           "required": ["gainDb", "pan", "muted"],
           "properties": {
-            "gainDb": { "$ref": "#/$defs/animatableNumber" },
-            "pan": { "$ref": "#/$defs/animatableNumber" },
-            "muted": { "type": "boolean" },
-            "solo": { "type": "boolean", "default": false }
+            "gainDb": {
+              "$ref": "#/$defs/animatableNumber"
+            },
+            "pan": {
+              "$ref": "#/$defs/animatableNumber"
+            },
+            "muted": {
+              "type": "boolean"
+            },
+            "solo": {
+              "type": "boolean",
+              "default": false
+            }
           }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
       }
     },
     "trackMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/track" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/track"
+      }
     },
     "baseItem": {
       "type": "object",
       "required": ["id", "trackId", "type", "enabled", "range", "materialInstanceIds"],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "trackId": { "$ref": "#/$defs/entityId" },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "trackId": {
+          "$ref": "#/$defs/entityId"
+        },
         "type": {
           "enum": [
             "video",
@@ -495,14 +783,31 @@
             "material-content"
           ]
         },
-        "name": { "type": "string", "maxLength": 256 },
-        "enabled": { "type": "boolean" },
-        "range": { "$ref": "#/$defs/range" },
-        "materialInstanceIds": { "$ref": "#/$defs/idList" },
-        "linkGroupId": { "$ref": "#/$defs/entityId" },
-        "markerIds": { "$ref": "#/$defs/idList" },
-        "metadata": { "$ref": "#/$defs/jsonObject" },
-        "extensions": { "$ref": "#/$defs/extensions" }
+        "name": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "range": {
+          "$ref": "#/$defs/range"
+        },
+        "materialInstanceIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "linkGroupId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "markerIds": {
+          "$ref": "#/$defs/idList"
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonObject"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
       }
     },
     "mediaSource": {
@@ -510,17 +815,27 @@
       "additionalProperties": false,
       "required": ["assetId", "stream", "sourceRange", "timeMapping"],
       "properties": {
-        "assetId": { "$ref": "#/$defs/entityId" },
+        "assetId": {
+          "$ref": "#/$defs/entityId"
+        },
         "stream": {
           "type": "object",
           "additionalProperties": false,
           "required": ["type", "index"],
           "properties": {
-            "type": { "enum": ["video", "audio"] },
-            "index": { "type": "integer", "minimum": 0, "maximum": 1024 }
+            "type": {
+              "enum": ["video", "audio"]
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1024
+            }
           }
         },
-        "sourceRange": { "$ref": "#/$defs/range" },
+        "sourceRange": {
+          "$ref": "#/$defs/range"
+        },
         "timeMapping": {
           "oneOf": [
             {
@@ -528,9 +843,15 @@
               "additionalProperties": false,
               "required": ["type", "rate", "reverse", "boundary"],
               "properties": {
-                "type": { "const": "linear" },
-                "rate": { "$ref": "#/$defs/rational" },
-                "reverse": { "type": "boolean" },
+                "type": {
+                  "const": "linear"
+                },
+                "rate": {
+                  "$ref": "#/$defs/rational"
+                },
+                "reverse": {
+                  "type": "boolean"
+                },
                 "boundary": {
                   "enum": ["error", "hold", "loop", "transparent"]
                 }
@@ -541,7 +862,9 @@
               "additionalProperties": false,
               "required": ["type", "points", "boundary"],
               "properties": {
-                "type": { "const": "curve" },
+                "type": {
+                  "const": "curve"
+                },
                 "points": {
                   "type": "array",
                   "minItems": 2,
@@ -552,9 +875,15 @@
                     "additionalProperties": true,
                     "required": ["itemTimeUs", "sourceTimeUs", "interpolation"],
                     "properties": {
-                      "itemTimeUs": { "$ref": "#/$defs/timeUs" },
-                      "sourceTimeUs": { "$ref": "#/$defs/timeUs" },
-                      "interpolation": { "enum": ["linear", "hold", "cubic"] }
+                      "itemTimeUs": {
+                        "$ref": "#/$defs/timeUs"
+                      },
+                      "sourceTimeUs": {
+                        "$ref": "#/$defs/timeUs"
+                      },
+                      "interpolation": {
+                        "enum": ["linear", "hold", "cubic"]
+                      }
                     }
                   }
                 },
@@ -572,17 +901,29 @@
       "additionalProperties": false,
       "required": ["fit", "transform", "crop", "opacity", "blendMode"],
       "properties": {
-        "fit": { "enum": ["contain", "cover", "fill", "none"] },
+        "fit": {
+          "enum": ["contain", "cover", "fill", "none"]
+        },
         "transform": {
           "type": "object",
           "additionalProperties": false,
           "required": ["positionPx", "anchor", "scale", "rotationDeg", "skewDeg"],
           "properties": {
-            "positionPx": { "$ref": "#/$defs/animatableVec2" },
-            "anchor": { "$ref": "#/$defs/animatableVec2" },
-            "scale": { "$ref": "#/$defs/animatableVec2" },
-            "rotationDeg": { "$ref": "#/$defs/animatableNumber" },
-            "skewDeg": { "$ref": "#/$defs/animatableVec2" }
+            "positionPx": {
+              "$ref": "#/$defs/animatableVec2"
+            },
+            "anchor": {
+              "$ref": "#/$defs/animatableVec2"
+            },
+            "scale": {
+              "$ref": "#/$defs/animatableVec2"
+            },
+            "rotationDeg": {
+              "$ref": "#/$defs/animatableNumber"
+            },
+            "skewDeg": {
+              "$ref": "#/$defs/animatableVec2"
+            }
           }
         },
         "crop": {
@@ -592,16 +933,36 @@
               "additionalProperties": false,
               "required": ["left", "top", "right", "bottom"],
               "properties": {
-                "left": { "type": "number", "minimum": 0, "maximum": 1 },
-                "top": { "type": "number", "minimum": 0, "maximum": 1 },
-                "right": { "type": "number", "minimum": 0, "maximum": 1 },
-                "bottom": { "type": "number", "minimum": 0, "maximum": 1 }
+                "left": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "top": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "right": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "bottom": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
               }
             },
-            { "$ref": "#/$defs/animation" }
+            {
+              "$ref": "#/$defs/animation"
+            }
           ]
         },
-        "opacity": { "$ref": "#/$defs/animatableNumber" },
+        "opacity": {
+          "$ref": "#/$defs/animatableNumber"
+        },
         "blendMode": {
           "enum": [
             "normal",
@@ -623,12 +984,26 @@
           "additionalProperties": false,
           "required": ["sourceItemId", "channel", "invert", "featherPx", "space", "consumeSource"],
           "properties": {
-            "sourceItemId": { "$ref": "#/$defs/entityId" },
-            "channel": { "enum": ["alpha", "luma"] },
-            "invert": { "type": "boolean" },
-            "featherPx": { "type": "number", "minimum": 0, "maximum": 4096 },
-            "space": { "enum": ["source", "canvas"] },
-            "consumeSource": { "type": "boolean" }
+            "sourceItemId": {
+              "$ref": "#/$defs/entityId"
+            },
+            "channel": {
+              "enum": ["alpha", "luma"]
+            },
+            "invert": {
+              "type": "boolean"
+            },
+            "featherPx": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "space": {
+              "enum": ["source", "canvas"]
+            },
+            "consumeSource": {
+              "type": "boolean"
+            }
           }
         }
       }
@@ -638,10 +1013,18 @@
       "additionalProperties": false,
       "required": ["gainDb", "pan"],
       "properties": {
-        "gainDb": { "$ref": "#/$defs/animatableNumber" },
-        "pan": { "$ref": "#/$defs/animatableNumber" },
-        "fadeInUs": { "$ref": "#/$defs/timeUs" },
-        "fadeOutUs": { "$ref": "#/$defs/timeUs" },
+        "gainDb": {
+          "$ref": "#/$defs/animatableNumber"
+        },
+        "pan": {
+          "$ref": "#/$defs/animatableNumber"
+        },
+        "fadeInUs": {
+          "$ref": "#/$defs/timeUs"
+        },
+        "fadeOutUs": {
+          "$ref": "#/$defs/timeUs"
+        },
         "pitchPolicy": {
           "enum": ["varispeed", "preserve"],
           "description": "Varispeed follows source time directly; preserve uses deterministic overlap-add time stretching."
@@ -652,7 +1035,9 @@
           "items": {
             "type": "array",
             "maxItems": 16384,
-            "items": { "type": "number" }
+            "items": {
+              "type": "number"
+            }
           }
         }
       }
@@ -660,14 +1045,22 @@
     "videoItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["source", "visual"],
           "properties": {
-            "type": { "const": "video" },
-            "source": { "$ref": "#/$defs/mediaSource" },
-            "visual": { "$ref": "#/$defs/visual" }
+            "type": {
+              "const": "video"
+            },
+            "source": {
+              "$ref": "#/$defs/mediaSource"
+            },
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -676,14 +1069,22 @@
     "audioItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["source", "audio"],
           "properties": {
-            "type": { "const": "audio" },
-            "source": { "$ref": "#/$defs/mediaSource" },
-            "audio": { "$ref": "#/$defs/audioProperties" }
+            "type": {
+              "const": "audio"
+            },
+            "source": {
+              "$ref": "#/$defs/mediaSource"
+            },
+            "audio": {
+              "$ref": "#/$defs/audioProperties"
+            }
           }
         }
       ],
@@ -692,14 +1093,22 @@
     "imageItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["source", "visual"],
           "properties": {
-            "type": { "const": "image" },
-            "source": { "$ref": "#/$defs/mediaSource" },
-            "visual": { "$ref": "#/$defs/visual" }
+            "type": {
+              "const": "image"
+            },
+            "source": {
+              "$ref": "#/$defs/mediaSource"
+            },
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -708,24 +1117,40 @@
     "textItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["box", "overflow", "writingMode", "paragraphs", "visual"],
           "properties": {
-            "type": { "const": "text" },
+            "type": {
+              "const": "text"
+            },
             "box": {
               "type": "object",
               "additionalProperties": false,
               "required": ["x", "y", "width", "height"],
               "properties": {
-                "x": { "type": "number" },
-                "y": { "type": "number" },
-                "width": { "type": "number", "exclusiveMinimum": 0 },
-                "height": { "type": "number", "exclusiveMinimum": 0 }
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
               }
             },
-            "overflow": { "enum": ["clip", "ellipsis", "visible", "auto-fit"] },
+            "overflow": {
+              "enum": ["clip", "ellipsis", "visible", "auto-fit"]
+            },
             "writingMode": {
               "enum": ["horizontal-tb", "vertical-rl", "vertical-lr"]
             },
@@ -738,7 +1163,9 @@
                 "additionalProperties": false,
                 "required": ["style", "runs"],
                 "properties": {
-                  "style": { "$ref": "#/$defs/jsonObject" },
+                  "style": {
+                    "$ref": "#/$defs/jsonObject"
+                  },
                   "runs": {
                     "type": "array",
                     "minItems": 1,
@@ -748,15 +1175,22 @@
                       "additionalProperties": false,
                       "required": ["text", "style"],
                       "properties": {
-                        "text": { "type": "string", "maxLength": 1000000 },
-                        "style": { "$ref": "#/$defs/jsonObject" }
+                        "text": {
+                          "type": "string",
+                          "maxLength": 1000000
+                        },
+                        "style": {
+                          "$ref": "#/$defs/jsonObject"
+                        }
                       }
                     }
                   }
                 }
               }
             },
-            "visual": { "$ref": "#/$defs/visual" }
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -765,28 +1199,53 @@
     "captionItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["text", "box", "style", "visual"],
           "properties": {
-            "type": { "const": "caption" },
-            "text": { "type": "string", "maxLength": 1000000 },
+            "type": {
+              "const": "caption"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 1000000
+            },
             "box": {
               "type": "object",
               "additionalProperties": false,
               "required": ["x", "y", "width", "height"],
               "properties": {
-                "x": { "type": "number" },
-                "y": { "type": "number" },
-                "width": { "type": "number", "exclusiveMinimum": 0 },
-                "height": { "type": "number", "exclusiveMinimum": 0 }
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
               }
             },
-            "style": { "$ref": "#/$defs/jsonObject" },
-            "overflow": { "enum": ["clip", "auto-fit"] },
-            "cueSettings": { "$ref": "#/$defs/jsonObject" },
-            "visual": { "$ref": "#/$defs/visual" }
+            "style": {
+              "$ref": "#/$defs/jsonObject"
+            },
+            "overflow": {
+              "enum": ["clip", "auto-fit"]
+            },
+            "cueSettings": {
+              "$ref": "#/$defs/jsonObject"
+            },
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -795,23 +1254,35 @@
     "nestedSequenceItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["source", "visual"],
           "properties": {
-            "type": { "const": "nested-sequence" },
+            "type": {
+              "const": "nested-sequence"
+            },
             "source": {
               "type": "object",
               "additionalProperties": false,
               "required": ["sequenceId", "sourceRange", "timeMapping"],
               "properties": {
-                "sequenceId": { "$ref": "#/$defs/entityId" },
-                "sourceRange": { "$ref": "#/$defs/range" },
-                "timeMapping": { "$ref": "#/$defs/mediaSource/properties/timeMapping" }
+                "sequenceId": {
+                  "$ref": "#/$defs/entityId"
+                },
+                "sourceRange": {
+                  "$ref": "#/$defs/range"
+                },
+                "timeMapping": {
+                  "$ref": "#/$defs/mediaSource/properties/timeMapping"
+                }
               }
             },
-            "visual": { "$ref": "#/$defs/visual" }
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -820,28 +1291,40 @@
     "generatorItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["generator", "visual"],
           "properties": {
-            "type": { "const": "generator" },
+            "type": {
+              "const": "generator"
+            },
             "generator": {
               "type": "object",
               "additionalProperties": false,
               "required": ["kind", "colors"],
               "properties": {
-                "kind": { "enum": ["solid", "linear-gradient"] },
+                "kind": {
+                  "enum": ["solid", "linear-gradient"]
+                },
                 "colors": {
                   "type": "array",
                   "minItems": 1,
                   "maxItems": 16,
-                  "items": { "$ref": "#/$defs/color" }
+                  "items": {
+                    "$ref": "#/$defs/color"
+                  }
                 },
-                "angleDeg": { "type": "number" }
+                "angleDeg": {
+                  "type": "number"
+                }
               }
             },
-            "visual": { "$ref": "#/$defs/visual" }
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -850,13 +1333,19 @@
     "adjustmentItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["visual"],
           "properties": {
-            "type": { "const": "adjustment" },
-            "visual": { "$ref": "#/$defs/visual" }
+            "type": {
+              "const": "adjustment"
+            },
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -865,42 +1354,74 @@
     "shapeItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["shape", "visual"],
           "properties": {
-            "type": { "const": "shape" },
+            "type": {
+              "const": "shape"
+            },
             "shape": {
               "type": "object",
               "additionalProperties": false,
               "required": ["kind", "box", "fill"],
               "properties": {
-                "kind": { "enum": ["rectangle", "ellipse", "polygon"] },
+                "kind": {
+                  "enum": ["rectangle", "ellipse", "polygon"]
+                },
                 "box": {
                   "type": "object",
                   "additionalProperties": false,
                   "required": ["x", "y", "width", "height"],
                   "properties": {
-                    "x": { "type": "number" },
-                    "y": { "type": "number" },
-                    "width": { "type": "number", "exclusiveMinimum": 0 },
-                    "height": { "type": "number", "exclusiveMinimum": 0 }
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "width": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "height": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
                   }
                 },
-                "fill": { "$ref": "#/$defs/color" },
-                "stroke": { "$ref": "#/$defs/color" },
-                "strokeWidthPx": { "type": "number", "minimum": 0, "maximum": 4096 },
-                "cornerRadiusPx": { "type": "number", "minimum": 0, "maximum": 32768 },
+                "fill": {
+                  "$ref": "#/$defs/color"
+                },
+                "stroke": {
+                  "$ref": "#/$defs/color"
+                },
+                "strokeWidthPx": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 4096
+                },
+                "cornerRadiusPx": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 32768
+                },
                 "points": {
                   "type": "array",
                   "minItems": 3,
                   "maxItems": 1024,
-                  "items": { "$ref": "#/$defs/vec2" }
+                  "items": {
+                    "$ref": "#/$defs/vec2"
+                  }
                 }
               }
             },
-            "visual": { "$ref": "#/$defs/visual" }
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -909,14 +1430,22 @@
     "materialContentItem": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/$defs/baseItem" },
+        {
+          "$ref": "#/$defs/baseItem"
+        },
         {
           "type": "object",
           "required": ["materialInstanceId", "visual"],
           "properties": {
-            "type": { "const": "material-content" },
-            "materialInstanceId": { "$ref": "#/$defs/entityId" },
-            "visual": { "$ref": "#/$defs/visual" }
+            "type": {
+              "const": "material-content"
+            },
+            "materialInstanceId": {
+              "$ref": "#/$defs/entityId"
+            },
+            "visual": {
+              "$ref": "#/$defs/visual"
+            }
           }
         }
       ],
@@ -924,23 +1453,47 @@
     },
     "item": {
       "oneOf": [
-        { "$ref": "#/$defs/videoItem" },
-        { "$ref": "#/$defs/audioItem" },
-        { "$ref": "#/$defs/imageItem" },
-        { "$ref": "#/$defs/textItem" },
-        { "$ref": "#/$defs/captionItem" },
-        { "$ref": "#/$defs/nestedSequenceItem" },
-        { "$ref": "#/$defs/generatorItem" },
-        { "$ref": "#/$defs/adjustmentItem" },
-        { "$ref": "#/$defs/materialContentItem" },
-        { "$ref": "#/$defs/shapeItem" }
+        {
+          "$ref": "#/$defs/videoItem"
+        },
+        {
+          "$ref": "#/$defs/audioItem"
+        },
+        {
+          "$ref": "#/$defs/imageItem"
+        },
+        {
+          "$ref": "#/$defs/textItem"
+        },
+        {
+          "$ref": "#/$defs/captionItem"
+        },
+        {
+          "$ref": "#/$defs/nestedSequenceItem"
+        },
+        {
+          "$ref": "#/$defs/generatorItem"
+        },
+        {
+          "$ref": "#/$defs/adjustmentItem"
+        },
+        {
+          "$ref": "#/$defs/materialContentItem"
+        },
+        {
+          "$ref": "#/$defs/shapeItem"
+        }
       ]
     },
     "itemMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/item" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/item"
+      }
     },
     "transition": {
       "type": "object",
@@ -956,74 +1509,127 @@
         "materialInstanceId"
       ],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "sequenceId": { "$ref": "#/$defs/entityId" },
-        "trackId": { "$ref": "#/$defs/entityId" },
-        "kind": { "enum": ["visual", "audio"] },
-        "fromItemId": { "$ref": "#/$defs/entityId" },
-        "toItemId": { "$ref": "#/$defs/entityId" },
-        "range": { "$ref": "#/$defs/range" },
-        "materialInstanceId": { "$ref": "#/$defs/entityId" },
-        "extensions": { "$ref": "#/$defs/extensions" }
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "sequenceId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "trackId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "kind": {
+          "enum": ["visual", "audio"]
+        },
+        "fromItemId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "toItemId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "range": {
+          "$ref": "#/$defs/range"
+        },
+        "materialInstanceId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
       }
     },
     "transitionMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/transition" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/transition"
+      }
     },
     "marker": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "owner", "timeUs", "durationUs"],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
         "owner": {
           "type": "object",
           "additionalProperties": false,
           "required": ["type", "id"],
           "properties": {
-            "type": { "enum": ["sequence", "item"] },
-            "id": { "$ref": "#/$defs/entityId" }
+            "type": {
+              "enum": ["sequence", "item"]
+            },
+            "id": {
+              "$ref": "#/$defs/entityId"
+            }
           }
         },
-        "timeUs": { "$ref": "#/$defs/timeUs" },
-        "durationUs": { "$ref": "#/$defs/timeUs" },
-        "label": { "type": "string", "maxLength": 1024 },
+        "timeUs": {
+          "$ref": "#/$defs/timeUs"
+        },
+        "durationUs": {
+          "$ref": "#/$defs/timeUs"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 1024
+        },
         "color": {
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$"
         },
-        "payload": { "$ref": "#/$defs/jsonValue" }
+        "payload": {
+          "$ref": "#/$defs/jsonValue"
+        }
       }
     },
     "markerMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/marker" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/marker"
+      }
     },
     "linkGroup": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "kind", "itemIds"],
       "properties": {
-        "id": { "$ref": "#/$defs/entityId" },
-        "kind": { "enum": ["av-sync", "edit-group"] },
-        "itemIds": { "$ref": "#/$defs/idList" },
+        "id": {
+          "$ref": "#/$defs/entityId"
+        },
+        "kind": {
+          "enum": ["av-sync", "edit-group"]
+        },
+        "itemIds": {
+          "$ref": "#/$defs/idList"
+        },
         "syncOffsetsUs": {
           "type": "object",
           "maxProperties": 4096,
-          "additionalProperties": { "$ref": "#/$defs/safeInteger" }
+          "additionalProperties": {
+            "$ref": "#/$defs/safeInteger"
+          }
         }
       }
     },
     "linkGroupMap": {
       "type": "object",
       "maxProperties": 4096,
-      "propertyNames": { "$ref": "#/$defs/entityId" },
-      "additionalProperties": { "$ref": "#/$defs/linkGroup" }
+      "propertyNames": {
+        "$ref": "#/$defs/entityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/linkGroup"
+      }
     }
   }
 }

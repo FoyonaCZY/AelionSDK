@@ -1,0 +1,109 @@
+{
+  "evidenceVersion": "1.0.0",
+  "command": "pnpm report:device-matrix",
+  "captured": false,
+  "generatedAt": "2026-08-01T12:04:43.102Z",
+  "summary": {
+    "emulated": 4,
+    "physical": 5,
+    "automated": 3,
+    "pendingCapture": 1,
+    "pendingCredentials": 5
+  },
+  "devices": [
+    {
+      "id": "desktop-chromium-reference",
+      "category": "emulated",
+      "status": "automated",
+      "evidencePresent": [
+        "reports/baseline/browser-smoke-chromium.json",
+        "reports/baseline/capability-chromium.json",
+        "reports/baseline/tarball-consumer.json"
+      ],
+      "missingEvidence": []
+    },
+    {
+      "id": "desktop-firefox-reference",
+      "category": "emulated",
+      "status": "automated",
+      "evidencePresent": [
+        "reports/baseline/browser-smoke-firefox.json",
+        "reports/baseline/capability-firefox.json",
+        "reports/baseline/tarball-consumer.json"
+      ],
+      "missingEvidence": []
+    },
+    {
+      "id": "desktop-webkit-contract",
+      "category": "emulated",
+      "status": "automated",
+      "evidencePresent": [
+        "reports/baseline/capability-webkit.json"
+      ],
+      "missingEvidence": []
+    },
+    {
+      "id": "mobile-chromium-viewport",
+      "category": "emulated",
+      "status": "pending-capture",
+      "evidencePresent": [],
+      "missingEvidence": [
+        "reports/baseline/device-mobile-chromium.json"
+      ]
+    },
+    {
+      "id": "macos-safari-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "evidenceChecklist": [
+        "codec",
+        "gpu",
+        "audio",
+        "storage",
+        "export"
+      ]
+    },
+    {
+      "id": "ios-ipados-safari-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "evidenceChecklist": [
+        "codec",
+        "gpu",
+        "audio",
+        "storage",
+        "export",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "android-chrome-device",
+      "category": "physical",
+      "status": "pending-credentials",
+      "evidenceChecklist": [
+        "codec",
+        "gpu",
+        "audio",
+        "storage",
+        "export",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "windows-gpu-matrix",
+      "category": "physical",
+      "status": "pending-credentials",
+      "evidenceChecklist": [
+        "gpu"
+      ]
+    },
+    {
+      "id": "linux-gpu-matrix",
+      "category": "physical",
+      "status": "pending-credentials",
+      "evidenceChecklist": [
+        "gpu"
+      ]
+    }
+  ]
+}

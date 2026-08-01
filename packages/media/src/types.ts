@@ -73,7 +73,7 @@ export type TrackInfo = VideoTrackInfo | AudioTrackInfo;
 
 export interface SampleIndex {
   readonly schemaVersion: '1.0.0';
-  readonly container: 'mp4' | 'webm' | 'unknown';
+  readonly container: 'mp4' | 'mov' | 'mkv' | 'ts' | 'webm' | 'unknown';
   readonly durationUs: number;
   readonly tracks: readonly TrackInfo[];
   readonly capabilities: {

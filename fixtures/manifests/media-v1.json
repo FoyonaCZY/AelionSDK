@@ -224,6 +224,78 @@
           "channels": 1
         }
       }
+    },
+    {
+      "id": "mov-h264-aac",
+      "file": "fixtures\\media\\mov-h264-aac.mov",
+      "sha256": "4c09cab0a519647cb3f5afcdbf978f8879221bd7f7351d3328062c07156d8e99",
+      "bytes": 151602,
+      "license": "CC0-1.0",
+      "container": "mov",
+      "features": ["quicktime", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "mkv-h264-aac",
+      "file": "fixtures\\media\\mkv-h264-aac.mkv",
+      "sha256": "c0f53612c6a82a08848a15b858babc12647e4ed41804e2b440d8b7d2afefd104",
+      "bytes": 149540,
+      "license": "CC0-1.0",
+      "container": "mkv",
+      "features": ["matroska", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "id": "ts-h264-aac",
+      "file": "fixtures\\media\\ts-h264-aac.ts",
+      "sha256": "2de3ef44f55458ad7406d425fc31d53ea6ad545ff88401b1886f2f4648008761",
+      "bytes": 177660,
+      "license": "CC0-1.0",
+      "container": "ts",
+      "features": ["mpeg-ts", "b-frames", "cfr", "audio-video"],
+      "expected": {
+        "durationUs": 3000000,
+        "video": {
+          "codecFamily": "avc",
+          "width": 320,
+          "height": 180,
+          "variableFrameRate": false,
+          "hasBFrames": true
+        },
+        "audio": {
+          "codecFamily": "aac",
+          "sampleRate": 48000,
+          "channels": 1
+        }
+      }
     }
   ]
 }

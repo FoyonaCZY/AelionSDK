@@ -26,6 +26,19 @@ export interface ProjectSettings extends JsonObject {
   timezone?: string;
 }
 
+/**
+ * Frame manifest of an `image-sequence` asset. Frames are uniform-duration
+ * stills; each `frameAssetIds` entry references an `image` Asset in the same
+ * Project. Sampling a sequence at an item time maps to the frame whose
+ * interval contains that time (see {@link imageSequenceFrameIndex}).
+ */
+export interface ImageSequenceReference extends JsonObject {
+  /** Duration of every frame in microseconds. */
+  readonly frameDurationUs: number;
+  /** Ordered image Asset ids, one per frame, referencing `image` kind Assets. */
+  readonly frameAssetIds: EntityId[];
+}
+
 export interface ProjectEntity extends JsonObject {
   id: EntityId;
 }

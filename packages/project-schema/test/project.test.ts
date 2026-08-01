@@ -130,6 +130,61 @@ describe('Aelion Project v1', () => {
     expect(result.ok, JSON.stringify(result.diagnostics, null, 2)).toBe(true);
   });
 
+  it('accepts an image-sequence asset whose frames reference existing image assets', () => {
+    const candidate = canonicalClone(project);
+    const assets = candidate.assets as JsonObject;
+    assets.asset_img = {
+      id: 'asset_img',
+      kind: 'image',
+      locator: { type: 'runtime-binding', bindingId: 'asset_img' },
+    };
+    assets.asset_seq = {
+      id: 'asset_seq',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'asset_seq' },
+      imageSequence: { frameDurationUs: 40_000, frameAssetIds: ['asset_img'] },
+    };
+    const result = validator.validate(candidate);
+    expect(result.ok, JSON.stringify(result.diagnostics, null, 2)).toBe(true);
+  });
+
+  it('rejects an image-sequence asset referencing a missing or non-image frame', () => {
+    const candidate = canonicalClone(project);
+    const assets = candidate.assets as JsonObject;
+    assets.asset_seq_missing = {
+      id: 'asset_seq_missing',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'asset_seq_missing' },
+      imageSequence: { frameDurationUs: 40_000, frameAssetIds: ['no_such_asset'] },
+    };
+    const missing = validator.validate(candidate);
+    expect(missing.ok).toBe(false);
+    expect(missing.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_IMAGE_SEQUENCE_FRAME_MISSING' }),
+      ]),
+    );
+
+    const withVideo = canonicalClone(project);
+    const videoAssets = withVideo.assets as JsonObject;
+    videoAssets.asset_seq_kind = {
+      id: 'asset_seq_kind',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'asset_seq_kind' },
+      imageSequence: {
+        frameDurationUs: 40_000,
+        frameAssetIds: [(videoAssets.asset_a as JsonObject).id as string],
+      },
+    };
+    const kind = validator.validate(withVideo);
+    expect(kind.ok).toBe(false);
+    expect(kind.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'PROJECT_IMAGE_SEQUENCE_FRAME_KIND_INVALID' }),
+      ]),
+    );
+  });
+
   it('validates explicit color semantics and rejects incoherent combinations', () => {
     const candidate = canonicalClone(project);
     const sequence = (candidate.sequences as JsonObject).seq_main as JsonObject;

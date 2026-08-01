@@ -42,6 +42,24 @@ export interface StorageCapability {
   readonly transferableStreams: CapabilityProbe;
 }
 
+/**
+ * Still-image decode capability for the formats the SDK accepts through
+ * {@link ImageDecoder}/`createImageBitmap`. Probes report what the platform can
+ * deterministically signal; a probe with `status: 'unknown'` means the platform
+ * exposes no decoder-capability API (e.g. no `ImageDecoder`), not that the
+ * format is unsupported.
+ */
+export interface ImageFormatCapability {
+  /** AVIF still decode. */
+  readonly avif: CapabilityProbe;
+  /** JPEG still decode. */
+  readonly jpeg: CapabilityProbe;
+  /** PNG still decode. */
+  readonly png: CapabilityProbe;
+  /** WebP still decode. */
+  readonly webp: CapabilityProbe;
+}
+
 export interface ColorCapability {
   readonly displayP3Gamut: CapabilityProbe;
   readonly highDynamicRange: CapabilityProbe;
@@ -81,6 +99,7 @@ export interface CapabilityReport {
   readonly audio: AudioCapability;
   readonly storage: StorageCapability;
   readonly color: ColorCapability;
+  readonly images: ImageFormatCapability;
   readonly wasm: {
     readonly available: CapabilityProbe;
   };

@@ -391,6 +391,105 @@ const definitions = [
       audio: { codecFamily: 'aac', sampleRate: 8000, channels: 1 },
     },
   },
+  {
+    id: 'mov-h264-aac',
+    file: 'mov-h264-aac.mov',
+    args: [
+      ...commonInput,
+      ...sdrBt709,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-x264-params',
+      'keyint=30:min-keyint=30:scenecut=0:bframes=2:threads=1',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      '-f',
+      'mov',
+    ],
+    container: 'mov',
+    features: ['quicktime', 'b-frames', 'cfr', 'audio-video'],
+    expected: {
+      durationUs: 3_000_000,
+      video: {
+        codecFamily: 'avc',
+        width: 320,
+        height: 180,
+        variableFrameRate: false,
+        hasBFrames: true,
+      },
+      audio: { codecFamily: 'aac', sampleRate: 48000, channels: 1 },
+    },
+  },
+  {
+    id: 'mkv-h264-aac',
+    file: 'mkv-h264-aac.mkv',
+    args: [
+      ...commonInput,
+      ...sdrBt709,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-x264-params',
+      'keyint=30:min-keyint=30:scenecut=0:bframes=2:threads=1',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      '-f',
+      'matroska',
+    ],
+    container: 'mkv',
+    features: ['matroska', 'b-frames', 'cfr', 'audio-video'],
+    expected: {
+      durationUs: 3_000_000,
+      video: {
+        codecFamily: 'avc',
+        width: 320,
+        height: 180,
+        variableFrameRate: false,
+        hasBFrames: true,
+      },
+      audio: { codecFamily: 'aac', sampleRate: 48000, channels: 1 },
+    },
+  },
+  {
+    id: 'ts-h264-aac',
+    file: 'ts-h264-aac.ts',
+    args: [
+      ...commonInput,
+      ...sdrBt709,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-x264-params',
+      'keyint=30:min-keyint=30:scenecut=0:bframes=2:threads=1',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      '-f',
+      'mpegts',
+    ],
+    container: 'ts',
+    features: ['mpeg-ts', 'b-frames', 'cfr', 'audio-video'],
+    expected: {
+      durationUs: 3_000_000,
+      video: {
+        codecFamily: 'avc',
+        width: 320,
+        height: 180,
+        variableFrameRate: false,
+        hasBFrames: true,
+      },
+      audio: { codecFamily: 'aac', sampleRate: 48000, channels: 1 },
+    },
+  },
 ];
 
 await mkdir(mediaDirectory, { recursive: true });
@@ -430,6 +529,30 @@ for (const definition of definitions) {
   });
 }
 
+// Still-image fixtures are not container fixtures, so they are not part of the
+// media manifest. Generate one AVIF still for the image-decode certification.
+const avifPath = join(mediaDirectory, 'avif-still.avif');
+await run(ffmpegPath, [
+  '-hide_banner',
+  '-loglevel',
+  'error',
+  '-y',
+  '-f',
+  'lavfi',
+  '-i',
+  'testsrc2=size=64x36:rate=1:duration=1',
+  '-frames:v',
+  '1',
+  '-c:v',
+  'libaom-av1',
+  '-crf',
+  '30',
+  '-f',
+  'avif',
+  avifPath,
+]);
+const avifBytes = await readFile(avifPath);
+
 const manifest = {
   manifestVersion: '1.0.0',
   generator: {
@@ -440,4 +563,6 @@ const manifest = {
 };
 
 await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-console.log('Generated ' + String(fixtures.length) + ' media fixtures and ' + manifestPath);
+console.log(
+  `Generated ${String(fixtures.length)} media fixtures, 1 AVIF still (${avifBytes.byteLength} bytes), and ${manifestPath}`,
+);

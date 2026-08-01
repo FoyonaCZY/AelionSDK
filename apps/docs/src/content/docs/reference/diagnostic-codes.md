@@ -108,7 +108,8 @@ Semantic command codes include `COMMAND_TIME_INVALID`, `COMMAND_ITEM_MISSING`,
 ## Capability and renderer
 
 Capability codes are `CAPABILITY_CODEC_API_UNAVAILABLE`, `CAPABILITY_CODEC_CONFIG_UNSUPPORTED`,
-`CAPABILITY_CODEC_PROBE_FAILED`, `CAPABILITY_WORKER_UNAVAILABLE`,
+`CAPABILITY_CODEC_PROBE_FAILED`, `CAPABILITY_CODEC_FALLBACK_USED`, `CAPABILITY_CODEC_NO_BACKEND`,
+`CAPABILITY_WORKER_UNAVAILABLE`,
 `CAPABILITY_OFFSCREEN_CANVAS_UNAVAILABLE`, `CAPABILITY_WEBGL2_*`, `CAPABILITY_WEBGPU_*`,
 `CAPABILITY_AUDIO_CONTEXT_UNAVAILABLE`, `CAPABILITY_AUDIO_WORKLET_UNAVAILABLE`,
 `CAPABILITY_SHARED_ARRAY_BUFFER_ISOLATION_REQUIRED`, `CAPABILITY_OPFS_UNAVAILABLE`,
@@ -154,6 +155,26 @@ Export codes include `EXPORT_REVISION_MISMATCH`, `EXPORT_CHANNEL_LAYOUT_UNSUPPOR
 Color failures use `COLOR_WORKING_SPACE_UNSUPPORTED`, `COLOR_TRANSFER_FUNCTION_UNSUPPORTED`,
 `COLOR_BIT_DEPTH_UNSUPPORTED`, and `COLOR_HDR_PRESENTATION_UNSUPPORTED`; they must not silently
 change the requested color/HDR contract.
+
+## Localization
+
+`Diagnostic.message` is the canonical English text and is safe to display. Products that need
+localized text use `localizeDiagnostic(diagnostic, catalog, locale)` from `@aelionsdk/core` (plus
+`localizeDiagnostics` for a result array) with a `DiagnosticCatalog` of `code → locale → template`
+strings. Templates interpolate `{key}` placeholders from `diagnostic.details`. `@aelionsdk/core`
+ships `defaultDiagnosticCatalog` (English) covering the most common codes; extend it with more
+locales. Branch on `code` and structured fields, never on the rendered `message`. A missing
+template for a code/locale leaves the original English message unchanged.
+
+```ts
+import { localizeDiagnostic, defaultDiagnosticCatalog } from '@aelionsdk/core';
+
+const zhCatalog = {
+  ...defaultDiagnosticCatalog,
+  PROJECT_REFERENCE_MISSING: { 'zh-CN': '引用 {id} 在 {collection} 中不存在' },
+};
+const localized = localizeDiagnostic(diagnostic, zhCatalog, 'zh-CN');
+```
 
 ## Logging
 

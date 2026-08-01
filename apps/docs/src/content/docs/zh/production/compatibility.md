@@ -16,6 +16,8 @@ description: 了解当前验证范围、HTTPS、COOP/COEP、媒体 CDN、Worker/
 
 Uncertified 不是“肯定不能用”。它表示在正式对客户承诺前，需要你自己完成目标设备测试。
 
+设备矩阵（`compatibility/device-matrix.json`）记录每个 profile 的状态：**Emulated** 是 CI 里运行的浏览器引擎/视口 profile，不等于物理设备；**Pending-capture** 已接线，会在下一次夜间捕获产出证据；**Pending credentials**（物理设备、GPU 驱动矩阵）需要设备农场凭据，在证据清单完成前绝不能标记为 certified。`pnpm report:device-matrix` 捕获 emulated 证据并写 `reports/baseline/device-matrix-evidence.json`，`report:device-matrix:check` 只校验矩阵不重捕获。
+
 机器可读的版本化矩阵位于
 [`compatibility/matrix.v1.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/compatibility/matrix.v1.json)。
 CI 会校验它与 SDK 版本一致、覆盖 codec/container/GPU/AudioWorklet/OPFS/
