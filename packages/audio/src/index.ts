@@ -1,5 +1,6 @@
 export * from './ir-mixer.js';
 export * from './processing.js';
+export * from './analysis.js';
 export * from './pcm-ring.js';
 export * from './worklet-clock.js';
 export * from './video-scheduler.js';

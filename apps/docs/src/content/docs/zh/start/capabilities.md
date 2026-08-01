@@ -47,7 +47,7 @@ File / URL / OPFS
 ## 时间、变速和关键帧
 
 - API 使用整数微秒，帧率使用有理数；
-- TimeMap 支持线性速度、反向、hold/freeze 和分段曲线；
+- TimeMap 支持线性速度、反向、hold/freeze 和分段曲线（可用 `buildRateEnvelope` 把速率包络编译为等价的曲线点）；
 - Preview、seek、音频和 Export 使用同一套素材时间映射；
 - Automation 支持 step、linear 和 cubic-bezier；
 - 标量和 JSON vector/object 可以递归插值；
@@ -63,7 +63,7 @@ TimeMap 无法用单一 stretch ratio 表达，会在 Project validation 阶段�
 - 多条 visual 轨按 Project 顺序合成；
 - WebGL2 和 WebGPU 共享 12 种 blend mode 定义；
 - 支持 alpha/luma mask、invert、feather 和 consumed matte；
-- 支持文字和字幕布局、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、SRT/WebVTT；
+- 支持文字和字幕布局、Unicode grapheme、CJK 换行、RTL shaping 路径、auto-fit、SRT/WebVTT 导入导出和静音感知对齐；
 - 字体加载有数量、字节和生命周期上限；
 - Generator 支持纯色和线性渐变；
 - Adjustment 可以作用于已经合成的下层画面；
@@ -103,7 +103,8 @@ Project/Render IR 可以显式描述 BT.709、Display-P3、BT.2020、PQ、HLG、
 时长误差小于 1 ms。`StreamingPitchPreservingTimeStretch` 保留跨块输入与
 overlap 状态，适合自定义音频宿主按小块连续拉取。
 
-基础播放通过 Session Player 使用；产品层的分析、波形、静音移除和母带通过
+基础播放通过 Session Player 使用；产品层的分析、波形、静音移除、节拍检测（`analyzeBeats`）、
+场景边界检测（`analyzeScenes`，基于音频能量突变）和母带通过
 `session.audio` 使用。只有自定义音频宿主或处理链时才需要直接依赖
 `@aelionsdk/audio`。
 
@@ -114,7 +115,7 @@ overlap 状态，适合自定义音频宿主按小块连续拉取。
 - 支持 MP4 moov 在头/尾、fragmented MP4、B-frame、非零 PTS、MOV、MKV、MPEG-TS 和 WebM VFR 固定语料；
 - 损坏、截断和随机输入会有上限地失败；
 - SampleIndex 有 resident LRU，也可以注入持久 CacheStore；
-- 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；
+- 原片和 proxy 按用途选择，时长不一致时回退 original 并产生诊断；支持通过注入的编码器自动注册低分辨率代理（`registerAutomaticProxy`）；
 - 页面级资源 Governor 控制 decoder、GPU 和 cache 预算；
 - SegmentedIndex 支持长媒体按时间段加载。
 
@@ -142,7 +143,7 @@ configuration 做能力门控。导出支持 preflight、冻结 revision、进�
 
 ## Material
 
-Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式是由标准 Core Node 组成的声明式 Graph；可以校验、编译到 WebGL2/WebGPU、打包、签名、安装和迁移。
+Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式是由标准 Core Node 组成的声明式 Graph；可以校验、编译到 WebGL2/WebGPU、打包、签名、安装和迁移。WebGL2 与 WebGPU 编译器共享完整的单 pass 节点集；多 pass 的 `blur.gaussian` 图在 WebGL2 上编译、在 WebGPU 上失败关闭（WebGPU 尚无多 pass 管线）。
 
 Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者和内容完整，宿主仍要按 publisher、租户和执行预算授权。
 

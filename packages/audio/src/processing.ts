@@ -411,6 +411,7 @@ export async function buildWaveformPeaks(
   };
 }
 
+/** A contiguous range of audio frames. */
 export interface AudioFrameRange {
   readonly startFrame: number;
   readonly frameCount: number;

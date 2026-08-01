@@ -114,6 +114,78 @@ function easingProgress(progress: number, from: Readonly<Record<string, unknown>
   return from.interpolation === 'cubic-bezier' ? cubicBezierProgress(progress, easing) : progress;
 }
 
+function bezierComponent(
+  progress: number,
+  from: number,
+  handleOut: number,
+  handleIn: number,
+  to: number,
+): number {
+  const inverse = 1 - progress;
+  return (
+    inverse * inverse * inverse * from +
+    3 * inverse * inverse * progress * handleOut +
+    3 * inverse * progress * progress * handleIn +
+    progress * progress * progress * to
+  );
+}
+
+/**
+ * Interpolate a value between two keyframes using explicit Bézier handles
+ * (`handleOut` on the from keyframe, `handleIn` on the to keyframe). Handles
+ * are value-space tangents: for a scalar value the tangent is the `y`
+ * component (added to the value), and for a `{x,y}` vector both components
+ * are added as the control point offset. Falls back to plain progress-based
+ * interpolation when no handle is present on the from keyframe.
+ */
+function interpolateWithHandles(
+  fromValue: import('@aelionsdk/core').JsonValue,
+  toValue: import('@aelionsdk/core').JsonValue,
+  progress: number,
+  fromKeyframe: Readonly<Record<string, unknown>>,
+  toKeyframe: Readonly<Record<string, unknown>>,
+): import('@aelionsdk/core').JsonValue {
+  const handleOut = objectProperty(Reflect.get(fromKeyframe, 'handleOut'));
+  if (Object.keys(handleOut).length === 0) return interpolateJson(fromValue, toValue, progress);
+  const handleIn = objectProperty(Reflect.get(toKeyframe, 'handleIn'));
+  if (typeof fromValue === 'number' && typeof toValue === 'number') {
+    const outTangent = numberProperty(handleOut.y, 0);
+    const inTangent = numberProperty(handleIn.y, 0);
+    return bezierComponent(
+      progress,
+      fromValue,
+      fromValue + outTangent,
+      toValue + inTangent,
+      toValue,
+    );
+  }
+  if (
+    fromValue !== null &&
+    toValue !== null &&
+    typeof fromValue === 'object' &&
+    typeof toValue === 'object' &&
+    !Array.isArray(fromValue) &&
+    !Array.isArray(toValue)
+  ) {
+    const outX = numberProperty(handleOut.x, 0);
+    const outY = numberProperty(handleOut.y, 0);
+    const inX = numberProperty(handleIn.x, outX);
+    const inY = numberProperty(handleIn.y, outY);
+    const scalar = (key: string): number | undefined => {
+      const fromScalar = fromValue[key];
+      const toScalar = toValue[key];
+      if (typeof fromScalar !== 'number' || typeof toScalar !== 'number') return undefined;
+      const out = key === 'x' ? outX : outY;
+      const inn = key === 'x' ? inX : inY;
+      return bezierComponent(progress, fromScalar, fromScalar + out, toScalar + inn, toScalar);
+    };
+    const x = scalar('x');
+    const y = scalar('y');
+    if (x !== undefined && y !== undefined) return { x, y };
+  }
+  return interpolateJson(fromValue, toValue, progress);
+}
+
 export function evaluateAnimatedValue(
   value: import('@aelionsdk/core').JsonValue,
   sequenceTimeUs: number,
@@ -160,6 +232,10 @@ export function evaluateAnimatedValue(
     return from.value;
   }
   let progress = (timeUs - from.timeUs) / (to.timeUs - from.timeUs);
+  const hasHandleOut = Reflect.get(from, 'handleOut') !== undefined;
+  if (hasHandleOut) {
+    return interpolateWithHandles(from.value, to.value, progress, from, to);
+  }
   progress = easingProgress(progress, from);
   return interpolateJson(from.value, to.value, progress);
 }

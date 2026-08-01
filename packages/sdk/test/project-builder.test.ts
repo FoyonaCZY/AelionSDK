@@ -295,4 +295,25 @@ describe('ProjectBuilder', () => {
       builder.addImageSequenceClip({ trackId, frameAssetIds: [], frameDurationUs: 40_000 }),
     ).toThrow(/at least one frame/);
   });
+
+  it('persists Bézier keyframe handles and builds a schema-valid project', () => {
+    const builder = createProject({ sequenceId: 'main', width: 320, height: 180 });
+    const trackId = builder.addTrack({ kind: 'visual' });
+    const itemId = builder.addTextClip({ trackId, text: 'Title', atUs: 0, durationUs: 1_000_000 });
+    builder.setKeyframes(itemId, 'opacity', [
+      { timeUs: 0, value: 0, interpolation: 'cubic-bezier', handleOut: { x: 0, y: 0.5 } },
+      { timeUs: 500_000, value: 1, interpolation: 'cubic-bezier', handleIn: { x: 0, y: 0.25 } },
+    ]);
+    const project = builder.build();
+    const item = project.items[itemId] as unknown as {
+      visual: {
+        opacity: {
+          animation: { keyframes: readonly { handleOut?: unknown; handleIn?: unknown }[] };
+        };
+      };
+    };
+    const keyframes = item.visual.opacity.animation.keyframes;
+    expect(keyframes[0]?.handleOut).toEqual({ x: 0, y: 0.5 });
+    expect(keyframes[1]?.handleIn).toEqual({ x: 0, y: 0.25 });
+  });
 });

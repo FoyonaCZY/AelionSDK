@@ -22,16 +22,18 @@ ownership, locks, transitions, or mapping rules cannot be preserved.
 ## Time, animation, and rate
 
 Time is integer microseconds with rational frame rates and half-open ranges. Items support source
-mapping, linear rate and the declared curve/time-map forms, transforms/opacity, keyframes/easing,
-and validated transition intervals. Unsupported edit policies for complex mapping/animation fail
-closed.
+mapping, linear rate, curve time-mapping (authored through the builder or compiled from a rate
+envelope via `buildRateEnvelope`), transforms/opacity, keyframes/easing, and validated transition
+intervals. Unsupported edit policies for complex mapping/animation fail closed.
 
 ## Visual composition
 
 Project/Composition can represent media, images, text, shapes, captions, nested sequences, masks,
 effects, transitions, generators, transforms, blend/composite behavior, and Materials. Image
 sequences (uniform-duration still frames) are modeled as `image-sequence` Assets and sampled
-deterministically through the frame mapping. Preview and export share Render IR semantics.
+deterministically through the frame mapping. Captions are first-class: SRT and WebVTT import and
+export, caption tracks with styled clips, and silence-aware cue alignment. Preview and export share
+Render IR semantics.
 
 Current local color execution is RGBA8 SDR. P3/HDR metadata and capability contracts exist, but
 production HDR output is not yet certified and must not be inferred from API presence.
@@ -46,13 +48,16 @@ scheduling, diagnostics, and cleanup.
 ## Audio
 
 Supported paths include source decode, PCM mix, gain/fades, track mixing, playback timing,
-waveforms/analysis, silence workflows, ducking/master settings, and WAV/RF64 export. Exact encoded
+waveforms/analysis, silence workflows, ducking/master settings, and WAV/RF64 export. Offline
+analysis adds beat detection (energy-envelope onsets) and scene-boundary detection (audio-energy
+discontinuities) through `SessionAudioController.analyzeBeats`/`analyzeScenes`. Exact encoded
 audio support is negotiated inside MP4/WebM profiles.
 
 ## Media input and cache
 
 Production media supports File, URL/Range, OPFS, custom byte sources, MP4/MOV/MKV/TS/WebM indexing,
-VideoFrame/PCM decode, AVIF/JPEG/PNG/WebP stills, proxy representations, cache budgets, admission
+VideoFrame/PCM decode, AVIF/JPEG/PNG/WebP stills, proxy representations (including automatic proxy
+registration through an injected encoder via `registerAutomaticProxy`), cache budgets, admission
 queues, cancellation, and resource statistics. CDN CORS/range correctness remains a deployment
 responsibility.
 
@@ -67,7 +72,9 @@ providers.
 
 The SDK includes typed declarative graphs, Core Nodes, definitions/instances, deterministic
 packages, integrity/signature/trust, catalog/registry, migrations, Material Lab, golden testing,
-WebGL2/WebGPU compilation, budgets, and restricted trusted Shader/WASM policy.
+WebGL2/WebGPU compilation, budgets, and restricted trusted Shader/WASM policy. The WebGL2 and
+WebGPU compilers share the full single-pass node set; multi-pass `blur.gaussian` graphs compile on
+WebGL2 and fail closed on WebGPU (which lacks the multi-pass pipeline).
 
 ## Boundaries that are not universal promises
 
