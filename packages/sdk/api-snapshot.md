@@ -30,11 +30,11 @@ baseline in the same change.
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
     "dist/production-media-provider.d.ts": "f87a2b3118b5ceaee396840d8327edcec69c17887a25fc80f95134a8e3ce5dee",
     "dist/project-builder.d.ts": "93476d7a5c2f21c2437bd466b66777102e619142f5b135b01621fdcc586de30b",
-    "dist/proxy-automation.d.ts": "95a82c3f2ed94a511f5fef67ee3c5c6ce6a5099126a01fc06320145b7fbf17c9",
-    "dist/rate-envelope.d.ts": "e1f552bad35caa5c353e433ff93a77b03ef8ad8bf3a282194a160e8ae24b18b6",
+    "dist/proxy-automation.d.ts": "568aa0b72cd03e1dec5bd4a5f1e14d00ca45c5745d56d29e8282238edbe7835e",
+    "dist/rate-envelope.d.ts": "13ef6e97c5049ffb155b60eab12fe36d5c5e5dd63d970bd017ade04ad7498891",
     "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
     "dist/session.d.ts": "fcf02f0975a9b85ef6dadd8e2afe4542a3a674851fba9d75a3d59a519a5bbe2b",
-    "dist/subtitle-io.d.ts": "1f3aea368baf3541a03545c856e0c776547ac79621b41250217d535da2ae5ce7",
+    "dist/subtitle-io.d.ts": "46f0a1913758a890b2cf466369ebfaf32273930ff6454196c3608c2c8bd07611",
     "dist/types.d.ts": "8e277526b01b7a7fdad18fae8a63609a8aafff5cdd929e4354984c657166f42a"
   },
   "exports": [

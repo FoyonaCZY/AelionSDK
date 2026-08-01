@@ -1,28 +1,31 @@
+import type { RangeReader } from '@aelionsdk/media';
 import { describe, expect, it } from 'vitest';
 
 import { ProductionMediaProvider } from '../src/production-media-provider.js';
 import { registerAutomaticProxy, type ProxyEncoder } from '../src/proxy-automation.js';
 
-function originalReader(bytes: Uint8Array): {
-  readonly size: (signal?: AbortSignal) => Promise<number>;
-  readonly read: (
-    options: { readonly offset: number; readonly length: number },
-    signal?: AbortSignal,
-  ) => Promise<{ readonly bytes: Uint8Array }>;
-} {
+function originalReader(bytes: Uint8Array): RangeReader {
   return {
+    id: 'mock:original',
+    kind: 'memory',
     size: () => Promise.resolve(bytes.byteLength),
-    read: ({ offset, length }) => Promise.resolve({ bytes: bytes.slice(offset, offset + length) }),
+    read: ({ offset, length }) =>
+      Promise.resolve({
+        bytes: bytes.slice(offset, offset + length),
+        range: { offset, length },
+        totalSize: bytes.byteLength,
+        source: 'memory' as const,
+      }),
   };
 }
 
-const downscaled: ProxyEncoder = async input => ({
-  bytes: new Uint8Array([9, 8, 7]),
-  width: 320,
-  height: 180,
-  mimeType: 'image/webp',
-  ...(input.signal === undefined ? {} : {}),
-});
+const downscaled: ProxyEncoder = () =>
+  Promise.resolve({
+    bytes: new Uint8Array([9, 8, 7]),
+    width: 320,
+    height: 180,
+    mimeType: 'image/webp',
+  });
 
 describe('registerAutomaticProxy', () => {
   it('registers a proxy and serves it for preview while keeping the original for export', async () => {
@@ -82,12 +85,8 @@ describe('registerAutomaticProxy', () => {
     provider.registerBlob('asset', new Blob([new Uint8Array([1])]), {
       id: 'asset:original',
     });
-    const emptyEncoder: ProxyEncoder = async () => ({
-      bytes: new Uint8Array(0),
-      width: 1,
-      height: 1,
-      mimeType: 'image/webp',
-    });
+    const emptyEncoder: ProxyEncoder = () =>
+      Promise.resolve({ bytes: new Uint8Array(0), width: 1, height: 1, mimeType: 'image/webp' });
     await expect(
       registerAutomaticProxy(provider, {
         assetId: 'asset',

@@ -1,3 +1,4 @@
+/** A single constant-rate segment of a rate envelope. */
 export interface RateEnvelopeSegment {
   /** Playback rate of this segment, e.g. 0.5 for half speed. */
   readonly rate: number;
@@ -5,12 +6,14 @@ export interface RateEnvelopeSegment {
   readonly durationUs: number;
 }
 
+/** A point in a curve time mapping. */
 export interface CurvePoint {
   readonly itemTimeUs: number;
   readonly sourceTimeUs: number;
   readonly interpolation: 'linear' | 'hold' | 'cubic';
 }
 
+/** Segmented rate envelope input. */
 export interface RateEnvelopeOptions {
   readonly segments: readonly RateEnvelopeSegment[];
 }

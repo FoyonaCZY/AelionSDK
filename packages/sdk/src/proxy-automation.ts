@@ -2,6 +2,7 @@ import type { RangeReader } from '@aelionsdk/media';
 
 import type { ProductionMediaProvider } from './production-media-provider.js';
 
+/** Input to a proxy encoder: the original bytes to downscale. */
 export interface ProxyEncodeInput {
   /** Original bytes of the source representation to proxy. */
   readonly bytes: Uint8Array;
@@ -10,6 +11,7 @@ export interface ProxyEncodeInput {
   readonly signal?: AbortSignal;
 }
 
+/** Encoded proxy output. */
 export interface ProxyEncodeResult {
   readonly bytes: Uint8Array;
   readonly width: number;
@@ -25,6 +27,7 @@ export interface ProxyEncodeResult {
  */
 export type ProxyEncoder = (input: ProxyEncodeInput) => Promise<ProxyEncodeResult>;
 
+/** Options for generating and registering an automatic proxy. */
 export interface RegisterAutomaticProxyOptions {
   /** Original asset id to proxy. */
   readonly assetId: string;
@@ -37,6 +40,7 @@ export interface RegisterAutomaticProxyOptions {
   readonly signal?: AbortSignal;
 }
 
+/** Result of a successful automatic proxy registration. */
 export interface AutomaticProxyResult {
   readonly representationId: string;
   readonly role: 'proxy';

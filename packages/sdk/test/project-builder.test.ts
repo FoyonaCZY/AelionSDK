@@ -306,13 +306,14 @@ describe('ProjectBuilder', () => {
     ]);
     const project = builder.build();
     const item = project.items[itemId] as unknown as {
-      visual?: { opacity?: unknown };
+      visual: {
+        opacity: {
+          animation: { keyframes: readonly { handleOut?: unknown; handleIn?: unknown }[] };
+        };
+      };
     };
-    const animation = item?.visual?.opacity as {
-      animation?: { keyframes?: readonly { handleOut?: unknown; handleIn?: unknown }[] };
-    };
-    const keyframes = animation?.animation?.keyframes;
-    expect(keyframes?.[0]?.handleOut).toEqual({ x: 0, y: 0.5 });
-    expect(keyframes?.[1]?.handleIn).toEqual({ x: 0, y: 0.25 });
+    const keyframes = item.visual.opacity.animation.keyframes;
+    expect(keyframes[0]?.handleOut).toEqual({ x: 0, y: 0.5 });
+    expect(keyframes[1]?.handleIn).toEqual({ x: 0, y: 0.25 });
   });
 });

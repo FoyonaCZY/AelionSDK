@@ -146,11 +146,11 @@ function interpolateWithHandles(
   toKeyframe: Readonly<Record<string, unknown>>,
 ): import('@aelionsdk/core').JsonValue {
   const handleOut = objectProperty(Reflect.get(fromKeyframe, 'handleOut'));
-  if (handleOut === null) return interpolateJson(fromValue, toValue, progress);
+  if (Object.keys(handleOut).length === 0) return interpolateJson(fromValue, toValue, progress);
   const handleIn = objectProperty(Reflect.get(toKeyframe, 'handleIn'));
   if (typeof fromValue === 'number' && typeof toValue === 'number') {
     const outTangent = numberProperty(handleOut.y, 0);
-    const inTangent = numberProperty(handleIn?.y ?? 0, 0);
+    const inTangent = numberProperty(handleIn.y, 0);
     return bezierComponent(
       progress,
       fromValue,
@@ -169,8 +169,8 @@ function interpolateWithHandles(
   ) {
     const outX = numberProperty(handleOut.x, 0);
     const outY = numberProperty(handleOut.y, 0);
-    const inX = numberProperty(handleIn?.x ?? outX, 0);
-    const inY = numberProperty(handleIn?.y ?? outY, 0);
+    const inX = numberProperty(handleIn.x, outX);
+    const inY = numberProperty(handleIn.y, outY);
     const scalar = (key: string): number | undefined => {
       const fromScalar = fromValue[key];
       const toScalar = toValue[key];

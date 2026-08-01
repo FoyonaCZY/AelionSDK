@@ -1,5 +1,6 @@
 import { throwIfAborted } from '@aelionsdk/core';
 
+/** A bounded PCM source for offline analysis, mirroring the waveform readFrames contract. */
 export interface AnalysisSource {
   readonly sampleRate: number;
   readonly channelCount: number;
@@ -13,6 +14,7 @@ export interface AnalysisSource {
   readonly onProgress?: (progress: number) => void;
 }
 
+/** A single detected beat. */
 export interface BeatMarker {
   /** Beat start frame. */
   readonly frame: number;
@@ -22,12 +24,14 @@ export interface BeatMarker {
   readonly strength: number;
 }
 
+/** Result of beat detection over a PCM source. */
 export interface BeatDetectionResult {
   readonly sampleRate: number;
   readonly totalFrames: number;
   readonly beats: readonly BeatMarker[];
 }
 
+/** A single detected scene boundary. */
 export interface SceneBoundary {
   /** Frame where the scene change is detected. */
   readonly frame: number;
@@ -35,6 +39,7 @@ export interface SceneBoundary {
   readonly magnitude: number;
 }
 
+/** Result of scene-boundary detection over a PCM source. */
 export interface SceneDetectionResult {
   readonly sampleRate: number;
   readonly totalFrames: number;

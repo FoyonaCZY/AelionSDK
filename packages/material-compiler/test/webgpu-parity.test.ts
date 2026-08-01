@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   compileMaterialGraphToWebGpu,
   compileMaterialGraphToWebGl2,
+  type CompileMaterialOptions,
   type MaterialGraph,
 } from '../src/index.js';
 
@@ -14,7 +15,7 @@ async function graph(path: string): Promise<MaterialGraph> {
   return JSON.parse(await readFile(new URL(path, root), 'utf8')) as MaterialGraph;
 }
 
-const crossDissolveOptions = {
+const crossDissolveOptions: CompileMaterialOptions = {
   parameters: { curve: 'enum' },
   specializationValues: { curve: 'smooth' },
   inputPorts: { from: 'visual-frame', to: 'visual-frame' },
@@ -39,7 +40,10 @@ describe('WebGPU / WebGL2 Material parity', () => {
 
   it('compiles the warm-film graph on both backends (single-pass color chain)', async () => {
     const graphDoc = await graph('examples/materials/warm-film/graphs/warm-film.graph.json');
-    const options = { parameters: { intensity: 'float' }, inputPorts: { source: 'visual-frame' } };
+    const options: CompileMaterialOptions = {
+      parameters: { intensity: 'float' },
+      inputPorts: { source: 'visual-frame' },
+    };
     const webgl2 = compileMaterialGraphToWebGl2(graphDoc, options);
     const webgpu = compileMaterialGraphToWebGpu(graphDoc, options);
     expect(webgpu.shader.length).toBeGreaterThan(0);

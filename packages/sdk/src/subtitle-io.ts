@@ -3,8 +3,10 @@ import type { AelionProject, ItemEntity } from '@aelionsdk/project-schema';
 
 import type { ProjectBuilder } from './project-builder.js';
 
+/** Subtitle document format for import and export. */
 export type SubtitleFormat = 'srt' | 'vtt';
 
+/** A single subtitle cue with its timeline range and optional cue settings. */
 export interface SubtitleCue {
   readonly id?: string;
   readonly startUs: number;
@@ -13,18 +15,21 @@ export interface SubtitleCue {
   readonly settings?: Readonly<Record<string, string>>;
 }
 
+/** Result of importing a subtitle document into a caption track. */
 export interface ImportSubtitleResult {
   readonly itemIds: readonly string[];
   readonly cueCount: number;
   readonly warnings: readonly string[];
 }
 
+/** Result of exporting a caption track to a subtitle document. */
 export interface ExportSubtitleResult {
   readonly text: string;
   readonly cueCount: number;
   readonly warnings: readonly string[];
 }
 
+/** Options for importing a subtitle document into a caption track. */
 export interface ImportSubtitleOptions {
   readonly trackId: string;
   readonly text: string;
@@ -111,7 +116,7 @@ export function exportSubtitleTrack(
         : {}),
       startUs: item.range.startUs,
       endUs: item.range.startUs + item.range.durationUs,
-      text: String(item.text ?? ''),
+      text: typeof item.text === 'string' ? item.text : '',
       ...(item.cueSettings === undefined
         ? {}
         : { settings: item.cueSettings as Readonly<Record<string, string>> }),
