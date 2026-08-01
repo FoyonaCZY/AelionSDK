@@ -72,7 +72,9 @@ providers.
 
 The SDK includes typed declarative graphs, Core Nodes, definitions/instances, deterministic
 packages, integrity/signature/trust, catalog/registry, migrations, Material Lab, golden testing,
-WebGL2/WebGPU compilation, budgets, and restricted trusted Shader/WASM policy.
+WebGL2/WebGPU compilation, budgets, and restricted trusted Shader/WASM policy. The WebGL2 and
+WebGPU compilers share the full single-pass node set; multi-pass `blur.gaussian` graphs compile on
+WebGL2 and fail closed on WebGPU (which lacks the multi-pass pipeline).
 
 ## Boundaries that are not universal promises
 

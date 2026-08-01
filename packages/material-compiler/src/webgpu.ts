@@ -143,7 +143,9 @@ export function compileMaterialGraphToWebGpu(
     );
   }
   if (graph.nodes.some(node => node.type === 'blur.gaussian')) {
-    throw new TypeError('MATERIAL_BACKEND_UNAVAILABLE: multi-pass blur requires WebGL2 in Phase 0');
+    throw new TypeError(
+      'MATERIAL_BACKEND_UNAVAILABLE: multi-pass blur is not implemented on the WebGPU backend; use WebGL2 for blur.gaussian graphs',
+    );
   }
   const nodes = new Map(graph.nodes.map(node => [node.id, node]));
   const expressions = new Map<string, string>();

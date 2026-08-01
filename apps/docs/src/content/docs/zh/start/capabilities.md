@@ -143,7 +143,7 @@ configuration 做能力门控。导出支持 preflight、冻结 revision、进�
 
 ## Material
 
-Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式是由标准 Core Node 组成的声明式 Graph；可以校验、编译到 WebGL2/WebGPU、打包、签名、安装和迁移。
+Material 可以表达 Filter、Transition、Effect 和 Generator。默认方式是由标准 Core Node 组成的声明式 Graph；可以校验、编译到 WebGL2/WebGPU、打包、签名、安装和迁移。WebGL2 与 WebGPU 编译器共享完整的单 pass 节点集；多 pass 的 `blur.gaussian` 图在 WebGL2 上编译、在 WebGPU 上失败关闭（WebGPU 尚无多 pass 管线）。
 
 Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者和内容完整，宿主仍要按 publisher、租户和执行预算授权。
 
