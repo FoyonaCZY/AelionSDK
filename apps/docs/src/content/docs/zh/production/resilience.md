@@ -203,3 +203,11 @@ const unsubscribers = [
   `exportResumableMuxed()`，不能复用已失败 Job 或旧 Sink。
 
 事件字段见[事件与统计](/AelionSDK/zh/reference/events-stats/)，错误码见 [Diagnostic Codes](/AelionSDK/zh/reference/diagnostic-codes/)。
+
+## 长会话操作指南
+
+浏览器页面不是可靠的长期后台服务。持久化可靠状态（按 revision 排序的 Project 快照、素材 locator、remote job ID、resumable export checkpoint），让页面终止后能从最后一个持久点恢复；绝不持久化运行中的 worker、frame、凭据、object URL 或假定的 decoder 状态。重启恢复证据（`reports/baseline/recovery-chromium.json`）和 transaction 重启 soak 演示了「canonical checkpoint → 丢弃 → 重新准入 → 续传」的路径。
+
+Service worker 能做什么：缓存静态资源、保持注册存活、提供 shell 页面、拦截 fetch。不能做什么：运行 WebGL2/WebGPU 合成器、执行 AudioWorklet 时钟、持有 `VideoDecoder`/`VideoEncoder`——GPU 和媒体编码器状态无法跨页面终止存活。因此后台渲染仍在页面生命周期内进行，并在内存/温控压力下降低交互保真度。
+
+需要跨页面存活的 job 用远程导出 provider 作为持久性上限：durable job ID、按素材授权、进度/取消、结果字节/哈希校验是契约。autosave 和 remote hand-off 不能与交互预览争抢无界资源。
