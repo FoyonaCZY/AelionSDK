@@ -6,6 +6,12 @@ import { err, ok } from '@aelionsdk/core';
 
 import { COLLECTION_NAMES, type AelionProject, type CollectionName } from './types.js';
 import { ProjectInputAdmissionError, snapshotProjectInput } from './admission.js';
+import {
+  CURRENT_PROJECT_SCHEMA_URI,
+  CURRENT_PROJECT_SCHEMA_VERSION,
+  migrateAdmittedProjectToCurrent,
+  type ProjectIdentityMigration,
+} from './migration.js';
 
 const MAX_PROJECT_DIAGNOSTICS = 64;
 
@@ -46,6 +52,8 @@ export interface ProjectValidatorOptions {
 
 export interface ProjectValidationSuccess {
   readonly project: AelionProject;
+  /** Present when a legacy 1.1/1.2 RC document identity was upgraded. */
+  readonly migration?: ProjectIdentityMigration;
 }
 
 function schemaDiagnostic(error: ErrorObject): Diagnostic {
@@ -818,6 +826,7 @@ function validateImageSequenceReferences(
 
 export class ProjectValidator {
   readonly #schemaValidator: ValidateFunction;
+  readonly #migrateLegacyIdentity: boolean;
 
   public constructor(options: ProjectValidatorOptions) {
     const ajv = new Ajv2020({
@@ -829,6 +838,17 @@ export class ProjectValidator {
     addFormats(ajv);
     ajv.addSchema(options.materialInstanceSchema);
     this.#schemaValidator = ajv.compile(options.projectSchema);
+    const properties = options.projectSchema.properties;
+    const schemaVersion =
+      properties !== null && typeof properties === 'object' && !Array.isArray(properties)
+        ? properties.schemaVersion
+        : undefined;
+    this.#migrateLegacyIdentity =
+      options.projectSchema.$id === CURRENT_PROJECT_SCHEMA_URI &&
+      schemaVersion !== null &&
+      typeof schemaVersion === 'object' &&
+      !Array.isArray(schemaVersion) &&
+      schemaVersion.const === CURRENT_PROJECT_SCHEMA_VERSION;
   }
 
   public validate(value: unknown): Result<ProjectValidationSuccess> {
@@ -852,7 +872,11 @@ export class ProjectValidator {
         recoverable: false,
       });
     }
-    if (!this.#schemaValidator(admitted)) {
+    const migration = this.#migrateLegacyIdentity
+      ? migrateAdmittedProjectToCurrent(admitted)
+      : undefined;
+    const candidate = migration?.project ?? admitted;
+    if (!this.#schemaValidator(candidate)) {
       const first = this.#schemaValidator.errors?.[0];
       return err(
         first === undefined
@@ -866,7 +890,7 @@ export class ProjectValidator {
       );
     }
 
-    const project = admitted as AelionProject;
+    const project = candidate as AelionProject;
     const diagnostics = new BoundedDiagnosticCollector();
     COLLECTION_NAMES.forEach(collection => validateEntityMap(project, collection, diagnostics));
     validateReferences(project, diagnostics);
@@ -877,6 +901,8 @@ export class ProjectValidator {
     validateAudioSemantics(project, diagnostics);
     validateColorSemantics(project, diagnostics);
     validateImageSequenceReferences(project, diagnostics);
-    return diagnostics.diagnostics.length === 0 ? ok({ project }) : err(...diagnostics.diagnostics);
+    return diagnostics.diagnostics.length === 0
+      ? ok({ project, ...(migration?.migrated === true ? { migration } : {}) })
+      : err(...diagnostics.diagnostics);
   }
 }

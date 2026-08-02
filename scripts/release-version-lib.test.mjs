@@ -68,6 +68,9 @@ test('curated release documents replace every current-version occurrence', () =>
   );
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/sdk/api-snapshot.md'));
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/material-sdk/README.md'));
+  assert.ok(RELEASE_VERSION_DOCUMENTS.includes('compatibility/device-matrix.json'));
+  assert.ok(RELEASE_VERSION_DOCUMENTS.includes('README.zh-CN.md'));
+  assert.ok(RELEASE_VERSION_DOCUMENTS.includes('apps/docs/src/content/docs/project/status.md'));
   for (const packageName of [
     'audio',
     'capability',

@@ -1,40 +1,35 @@
 ---
-title: 2.0 路线图
-description: AelionSDK 如何通过向后兼容的 1.x 增量版本，从 1.0 发布候选演进到 2.0。
+title: 通往 2.0 的路线图
+description: 审计后的 1.x 交付状态、剩余能力缺口，以及有顺序的 2.0 稳定化路径。
 ---
 
-## 范围
-
-AelionSDK `1.0.0-rc.1` 提供了一个以浏览器为优先的剪辑、预览、播放和导出引擎，并带有经过认证的自动化矩阵。通往 `2.0` 的路径是一系列**向后兼容的 `1.x` 次版本**，逐步补充能力和认证，随后是一个单一的 **`2.0` 稳定化发布**，应用沿途收集的破坏性变更并冻结 API。
-
-## 版本规则
-
-- `1.x` 次版本严格**累加**：新增能力、格式、绑定、后端和认证，不破坏公开 API、Project/Material 协议或资源所有权规则。次版本可以用可选、经过校验的字段扩展 schema。
-- 破坏性变更**推迟并在 `2.0` 统一收集**，包括 schema/IR 整合、API 表面清理，以及任何在 1.x 规则下无法保持语义的决策。
-- 每个版本都保持现有纪律：代码、公开契约、文档、CI/证据和发布产物必须一起落地（见[当前状态](/AelionSDK/zh/project/status/)）。
-- 每个次版本都遵循预发布节奏（`alpha` → `beta` → `rc`，使用 `next` dist-tag）。第一个 `latest` 稳定版是 `2.0.0`。
+路线图标签描述计划范围，不是“能力已经发布”的证据。每个里程碑页都区分**已完成**、
+**部分完成**和**延期**。只有代码、公共契约、文档、测试/证据与发布产物一致，功能才算交付。
 
 ## 发布计划
 
-| 版本                                      | 主题             | 向后兼容 | 主导工作                                            |
-| ----------------------------------------- | ---------------- | -------- | --------------------------------------------------- |
-| [1.1](/AelionSDK/zh/project/roadmap/1-1/) | 认证与回退       | 是       | 真机矩阵、WASM 编解码回退、长会话持久性、新容器     |
-| [1.2](/AelionSDK/zh/project/roadmap/1-2/) | 剪辑：影像与时间 | 是       | 字幕轨、时间重映射、关键帧图、离线分析、WebGPU 等级 |
-| [1.3](/AelionSDK/zh/project/roadmap/1-3/) | 生态：框架与 UI  | 是       | React/Vue/Svelte 绑定、CDN/无头、参考 UI 组件       |
-| [1.4](/AelionSDK/zh/project/roadmap/1-4/) | 剪辑：音频与编排 | 是       | 多机位、逐轨效果链、模板                            |
-| [1.5](/AelionSDK/zh/project/roadmap/1-5/) | 智能             | 是       | ASR 字幕、人像分割、智能剪辑                        |
-| [1.6](/AelionSDK/zh/project/roadmap/1-6/) | 协作与协议       | 是       | 协作编辑、Remote Export Protocol 2.0、插件市场      |
-| [2.0](/AelionSDK/zh/project/roadmap/2-0/) | 稳定化           | 否       | Schema v2 / Render IR 整合、API 冻结、v1→v2 迁移    |
+| 版本                                      | 主题               | 当前状态                                                        |
+| ----------------------------------------- | ------------------ | --------------------------------------------------------------- |
+| [1.1](/AelionSDK/zh/project/roadmap/1-1/) | 认证与回退         | RC 已发布；多项认证/回退工作仍是部分完成或延期                  |
+| [1.2](/AelionSDK/zh/project/roadmap/1-2/) | 图像与时间编辑     | rc.2 补救；核心时间/关键帧已交付，更广字幕/分析/WebGPU 仍未完成 |
+| [1.3](/AelionSDK/zh/project/roadmap/1-3/) | 边界、消费者与生态 | 计划中；先加固包和运行时边界，再扩展多个框架绑定                |
+| [1.4](/AelionSDK/zh/project/roadmap/1-4/) | 音频与编排         | 计划中                                                          |
+| [1.5](/AelionSDK/zh/project/roadmap/1-5/) | 智能能力           | 计划中                                                          |
+| [1.6](/AelionSDK/zh/project/roadmap/1-6/) | 协作与协议         | 计划中                                                          |
+| [2.0](/AelionSDK/zh/project/roadmap/2-0/) | 契约优先的稳定化   | 计划中；按迁移、Schema、IR、边界、集成、冻结、认证的顺序推进    |
 
-## 跨版本决策
+## 版本规则
 
-这些选择跨越多个版本，应在受影响的次版本启动前确定：
+- 每个 Project Schema 修订都使用新的不可变 URI 和 `schemaVersion`。
+- 1.x 增量 API 必须保持行为，或同时提供迁移/弃用路径。
+- 破坏性移除之前必须先有迁移 fixture 和损失报告。
+- 自动化、支持与认证是不同结论；以[兼容性与部署](/AelionSDK/zh/production/compatibility/)的定义为准。
+- 预发布使用 `next`。移动 `latest` 前必须有绑定源清单、完整门禁、registry smoke 和独立 blocker review。
 
-1. **软件编解码策略** — 自研 WASM 解码/编码器，还是引入重型依赖（ffmpeg.wasm 一类），还是只依赖平台编解码并带明确的降级契约。它决定 [1.1](/AelionSDK/zh/project/roadmap/1-1/) 的回退工作和包体积预算。
-2. **智能形态** — 端上优先（隐私、离线）还是云端优先（模型质量）。它定义 [1.5](/AelionSDK/zh/project/roadmap/1-5/) 的 provider 边界，以及远程协议是否承载模型推理。
-3. **协作技术** — CRDT（Yjs 一类）还是服务端 OT。它决定 [1.6](/AelionSDK/zh/project/roadmap/1-6/) 的协作层如何接入现有事务和 revision 体系。
-4. **稳定语义** — `2.0.0` 是第一个 `latest` 发布并冻结 API。在 1.6 预发布窗口关闭前确定弃用窗口和迁移契约。
+## 尚未决定的事项
 
-## 验收
-
-路线图条目只有在代码、公开契约、文档、CI/证据和发布产物全部存在时才算交付。认证声明遵循[兼容性与部署](/AelionSDK/zh/production/compatibility/)中的词汇：automated、supported 和 certified 含义不同，证据必须与声明匹配。
+1. 真正的软件 codec 执行：小型定向 WASM、ffmpeg 级重依赖、远程执行，或明确只支持平台 codec。
+2. 实体设备认证的负责人和持续设备农场预算。
+3. 端侧与远程智能能力的 provider 边界。
+4. CRDT 与服务端协调协作语义的选择。
+5. 稳定版后的弃用窗口和长期支持策略。

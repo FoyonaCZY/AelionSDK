@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { execFile } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
@@ -18,6 +18,7 @@ import {
   PHASE_1_REQUIRED_GATE_COMMANDS,
   PHASE_1_RUN_ARTIFACTS,
   WORKSPACE_IDENTITY_POLICY,
+  approvedBlockerReviewTargetsSource,
   buildBlockerReviewGateRunBinding,
   buildPhase1Postflight,
   collectPhase1RunArtifacts,
@@ -43,6 +44,27 @@ const root = '/workspace';
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = 'a'.repeat(64);
 const execFileAsync = promisify(execFile);
+
+test('an approved blocker review applies only to its exact source manifest', () => {
+  const currentIdentity = identity();
+  const review = {
+    decision: 'approved',
+    sourceIdentity: { manifestSha256: currentIdentity.manifestSha256 },
+  };
+
+  assert.equal(approvedBlockerReviewTargetsSource(review, currentIdentity), true);
+  assert.equal(
+    approvedBlockerReviewTargetsSource(
+      { ...review, sourceIdentity: { manifestSha256: 'b'.repeat(64) } },
+      currentIdentity,
+    ),
+    false,
+  );
+  assert.equal(
+    approvedBlockerReviewTargetsSource({ ...review, decision: 'not-approved' }, currentIdentity),
+    false,
+  );
+});
 
 function identity() {
   return {
@@ -258,7 +280,7 @@ test(
 
 test('the final runner policy is exactly fourteen gates plus seven evidence refreshes', () => {
   assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 14);
-  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 84, firefox: 69 });
+  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 85, firefox: 70 });
   assert.deepEqual(PHASE_1_EVIDENCE_REFRESH_COMMANDS, [
     'corepack pnpm report:browser:chromium',
     'corepack pnpm report:browser:firefox',
@@ -1347,9 +1369,10 @@ test('postflight fails closed on command, freshness, semantic and binding drift'
 
 test('postflight validation is stable across checkout mtimes and fails on byte drift', async () => {
   const artifacts = await collectPhase1RunArtifacts(repositoryRoot);
-  const repositoryVersion = JSON.parse(
-    await readFile(join(repositoryRoot, 'package.json'), 'utf8'),
-  ).version;
+  const evidenceVersion = artifacts.find(
+    artifact => artifact.file === 'reports/baseline/tarball-consumer.json',
+  )?.document?.sdkVersion;
+  assert.equal(typeof evidenceVersion, 'string');
   const commands = [...PHASE_1_REQUIRED_GATE_COMMANDS, ...PHASE_1_EVIDENCE_REFRESH_COMMANDS].map(
     command => ({
       command,
@@ -1364,7 +1387,7 @@ test('postflight validation is stable across checkout mtimes and fails on byte d
     postflight: buildPhase1Postflight(
       commands,
       artifacts,
-      repositoryVersion,
+      evidenceVersion,
       '2100-01-01T00:00:01.000Z',
     ),
   };

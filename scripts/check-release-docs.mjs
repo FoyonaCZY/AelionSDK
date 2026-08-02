@@ -2,6 +2,8 @@ import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { approvedBlockerReviewTargetsSource, sourceIdentity } from './phase-1-evidence-lib.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const version = manifest.version;
@@ -59,7 +61,8 @@ if (!viteReadme.includes(`sdk/${version}/`)) {
 const review = JSON.parse(
   await readFile(resolve(root, 'reports/baseline/phase-1-blocker-review.json'), 'utf8'),
 );
-if (review.decision === 'approved') {
+const identity = await sourceIdentity(root);
+if (approvedBlockerReviewTargetsSource(review, identity)) {
   const publishedStatus = [
     sources.get(resolve(root, 'README.md')),
     sources.get(resolve(root, 'apps/docs/src/content/docs/zh/project/status.md')),

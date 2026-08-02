@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/media@next
 ```
 
-`next` currently resolves to `1.2.0-rc.1`. Applications should prefer
+`next` currently resolves to `1.2.0-rc.2`. Applications should prefer
 `ProductionMediaProvider` from `@aelionsdk/sdk`; direct use is intended for
 custom media providers, cache implementations and decode hosts.
 

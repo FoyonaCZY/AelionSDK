@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
-  "sdkVersion": "1.2.0-rc.1",
-  "generatedAt": "2026-08-01T20:20:14.637Z",
+  "sdkVersion": "1.2.0-rc.2",
+  "generatedAt": "2026-08-02T07:06:06.569Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelionsdk/vite-plugin",
     "package": "@aelionsdk/vite-plugin",
-    "version": "1.2.0-rc.1",
-    "packageSha256": "428cbc152fcabc2fdd210e87bfe1c858a7e75eff6ef08935f39f767d417befbb",
+    "version": "1.2.0-rc.2",
+    "packageSha256": "d1d3655f2d1c0312fef4e5df085745021a3dcac74b070050b17bb26358ee14c9",
     "contractSha256": "0bb25c8cc63954339ba45a2abdb88f3d6e70b97b49766fc31e1a3f70750aaabb",
     "public": true,
     "zeroConfigVite": false,
@@ -17,21 +17,21 @@
   },
   "consumerContract": {
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
-    "dependencyContractSha256": "bb99aafbd0a788365fbb2945557503d6eca6dbdd2d4b2f3050dcbc9419301ade",
+    "dependencyContractSha256": "438808d11551fd95b798a58c022537ee7e382e5bc0daf6f99c7c0c0b700a7684",
     "dependencyContract": {
-      "@aelionsdk/audio": "aelionsdk-audio-1.2.0-rc.1.tgz",
-      "@aelionsdk/capability": "aelionsdk-capability-1.2.0-rc.1.tgz",
-      "@aelionsdk/core": "aelionsdk-core-1.2.0-rc.1.tgz",
-      "@aelionsdk/export": "aelionsdk-export-1.2.0-rc.1.tgz",
-      "@aelionsdk/material-compiler": "aelionsdk-material-compiler-1.2.0-rc.1.tgz",
-      "@aelionsdk/material-sdk": "aelionsdk-material-sdk-1.2.0-rc.1.tgz",
-      "@aelionsdk/media": "aelionsdk-media-1.2.0-rc.1.tgz",
-      "@aelionsdk/project-schema": "aelionsdk-project-schema-1.2.0-rc.1.tgz",
-      "@aelionsdk/render-ir": "aelionsdk-render-ir-1.2.0-rc.1.tgz",
-      "@aelionsdk/renderer-worker": "aelionsdk-renderer-worker-1.2.0-rc.1.tgz",
-      "@aelionsdk/sdk": "aelionsdk-sdk-1.2.0-rc.1.tgz",
-      "@aelionsdk/transaction": "aelionsdk-transaction-1.2.0-rc.1.tgz",
-      "@aelionsdk/vite-plugin": "aelionsdk-vite-plugin-1.2.0-rc.1.tgz",
+      "@aelionsdk/audio": "aelionsdk-audio-1.2.0-rc.2.tgz",
+      "@aelionsdk/capability": "aelionsdk-capability-1.2.0-rc.2.tgz",
+      "@aelionsdk/core": "aelionsdk-core-1.2.0-rc.2.tgz",
+      "@aelionsdk/export": "aelionsdk-export-1.2.0-rc.2.tgz",
+      "@aelionsdk/material-compiler": "aelionsdk-material-compiler-1.2.0-rc.2.tgz",
+      "@aelionsdk/material-sdk": "aelionsdk-material-sdk-1.2.0-rc.2.tgz",
+      "@aelionsdk/media": "aelionsdk-media-1.2.0-rc.2.tgz",
+      "@aelionsdk/project-schema": "aelionsdk-project-schema-1.2.0-rc.2.tgz",
+      "@aelionsdk/render-ir": "aelionsdk-render-ir-1.2.0-rc.2.tgz",
+      "@aelionsdk/renderer-worker": "aelionsdk-renderer-worker-1.2.0-rc.2.tgz",
+      "@aelionsdk/sdk": "aelionsdk-sdk-1.2.0-rc.2.tgz",
+      "@aelionsdk/transaction": "aelionsdk-transaction-1.2.0-rc.2.tgz",
+      "@aelionsdk/vite-plugin": "aelionsdk-vite-plugin-1.2.0-rc.2.tgz",
       "@esbuild/win32-x64": "esbuild-win32-x64-0.28.1.tgz",
       "@rollup/rollup-win32-x64-msvc": "rollup-rollup-win32-x64-msvc-4.62.2.tgz",
       "@types/dom-mediacapture-transform": "types-dom-mediacapture-transform-0.1.12.tgz",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.3.6.tgz"
     },
-    "packageJsonSha256": "53008a71abcf726cd200a6b0b664f329ba817f86c1f270b8ec104e4a972c7b07",
+    "packageJsonSha256": "f7258e5d2543737dd197848bd3909f4035b64c906bf02a2c259910ae75f54539",
     "sourceSha256": "e9e9008eb3a07329afc5e1c1ca679b59203ea88106d8731782c1edb772eb3e76",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -72,75 +72,75 @@
       "source": "webav",
       "status": "passed",
       "dryRun": true,
-      "projectSha256": "234ccff53e8943387f2a723563f3ae5c0f72563e251b5fcf2ab0ab2f6585e522",
-      "reportSha256": "5ce332b53faf111bdddb2ec6963ffb676f4b5e55c667517048ed84c4c376e219"
+      "projectSha256": "bc05eb85c2af2c1275defa46a499f15c1df0692bbcc0f1f8c15ab518d85bc6aa",
+      "reportSha256": "282aa997276bf7e00e0d066942928533329427060ba750ff24aafac4627d5a12"
     }
   },
   "packages": [
     {
       "name": "@aelionsdk/audio",
-      "version": "1.2.0-rc.1",
-      "sha256": "a6cf2eda353a421bb04627348a793227f4ac94ac28482bed8bde4f2ae88575d6"
+      "version": "1.2.0-rc.2",
+      "sha256": "a22c21d57911bc3c4e96abc6895fd31d1b1a6c6a6c4aadb596cfa59c88f1f6b2"
     },
     {
       "name": "@aelionsdk/capability",
-      "version": "1.2.0-rc.1",
-      "sha256": "cacb694bfaee6f1c8d00238e2ec09df2bfcebb40877785319e47d120d4f7a710"
+      "version": "1.2.0-rc.2",
+      "sha256": "20402d802b5e7912a1e7c1bfe66215e18583da329c7a5531b0762de1830b99d2"
     },
     {
       "name": "@aelionsdk/core",
-      "version": "1.2.0-rc.1",
-      "sha256": "381f8e1f0224336db6f092890e33d9dd5dea65aec707ab33c72ac3556577825d"
+      "version": "1.2.0-rc.2",
+      "sha256": "9f408b0791b95fd133dd3cdee0b375d8d4afee0100414b884e2d6b0e1ae76af8"
     },
     {
       "name": "@aelionsdk/export",
-      "version": "1.2.0-rc.1",
-      "sha256": "fe169c386b99032076a1b68051c0ea85c3eb0dc735e4522909c849930748078a"
+      "version": "1.2.0-rc.2",
+      "sha256": "61c97251adf4725d78af9f5ee3a90f4186c6077b8a90a6c71f0071360c0dac82"
     },
     {
       "name": "@aelionsdk/material-compiler",
-      "version": "1.2.0-rc.1",
-      "sha256": "e82dab461b9823b23f3082715721e1f8c663f49dcf1b611fcf62ff42fc3a4473"
+      "version": "1.2.0-rc.2",
+      "sha256": "a3121d5a5ff610bfd8a895ebb314f436126730d1f42a0b6b17fab8a7d3a78591"
     },
     {
       "name": "@aelionsdk/material-sdk",
-      "version": "1.2.0-rc.1",
-      "sha256": "ad2d48815e2efcbcd8fa8c4884d6b59ec7f2a511314df4f8e80f9e0612ea79b8"
+      "version": "1.2.0-rc.2",
+      "sha256": "5fd3ee7c497dac41fd70e9b479e58f8160e5515548b9c153b37f2c3d56bd790e"
     },
     {
       "name": "@aelionsdk/media",
-      "version": "1.2.0-rc.1",
-      "sha256": "4642e7040670febdab024181416644bd55e63cf476affca8452c1c57b703ebb6"
+      "version": "1.2.0-rc.2",
+      "sha256": "f8477fa54362eb2014acf6bff0ae3819f1e5f2918cffab37de56f6a56ba11403"
     },
     {
       "name": "@aelionsdk/project-schema",
-      "version": "1.2.0-rc.1",
-      "sha256": "3590319d470c6ff8012d1f6fa079afba85e52beaef3c449894adcfbe3d85c6a1"
+      "version": "1.2.0-rc.2",
+      "sha256": "f121e653b48f77b17529a0c37d356b664455c86fa7a05ce0bd235ff1a6c80424"
     },
     {
       "name": "@aelionsdk/render-ir",
-      "version": "1.2.0-rc.1",
-      "sha256": "7558e599f967985cd5b6e8fd30b097f96d904cc3af841d8f09c420655f936166"
+      "version": "1.2.0-rc.2",
+      "sha256": "c898571411e378058f250c462c58298853d9c5ce08141fc168c1fe9fa73099db"
     },
     {
       "name": "@aelionsdk/renderer-worker",
-      "version": "1.2.0-rc.1",
-      "sha256": "02ba56893436a44e1b23846d8facf7b3440a7753ddbb1ae204b3724d7ed20eea"
+      "version": "1.2.0-rc.2",
+      "sha256": "829468f680fb93d79921bce3c8a44a152da423bad0cc0f8bc0170bca7bc71998"
     },
     {
       "name": "@aelionsdk/sdk",
-      "version": "1.2.0-rc.1",
-      "sha256": "f4ea2741ebc49be729f422e95e22aec73690588f2e8a3c4830e709ce3d859337"
+      "version": "1.2.0-rc.2",
+      "sha256": "2b918f4c53dd9adbec024402b81775e9e5912a735bd376f08c7f35244ebbca45"
     },
     {
       "name": "@aelionsdk/transaction",
-      "version": "1.2.0-rc.1",
-      "sha256": "948e575648d8995b053f5ec3a12eb78e3e15de8827977bb6865ced53427c9c80"
+      "version": "1.2.0-rc.2",
+      "sha256": "5e74725b059ca4b0a31c1ab3556a213bbef2b752bcb66d3ae087ca8e1df26002"
     },
     {
       "name": "@aelionsdk/vite-plugin",
-      "version": "1.2.0-rc.1",
-      "sha256": "428cbc152fcabc2fdd210e87bfe1c858a7e75eff6ef08935f39f767d417befbb"
+      "version": "1.2.0-rc.2",
+      "sha256": "d1d3655f2d1c0312fef4e5df085745021a3dcac74b070050b17bb26358ee14c9"
     }
   ],
   "runtimeAssets": [
@@ -188,7 +188,7 @@
             225,
             255
           ],
-          "workerTimingUs": 87075
+          "workerTimingUs": 87330
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -196,10 +196,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22080,
-          "playedFrames": 1920,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 40000
+          "timeUs": 21333
         },
         "sessionFacade": {
           "revision": "3",
@@ -218,7 +218,7 @@
               225,
               255
             ],
-            "workerTimingUs": 6215
+            "workerTimingUs": 6225
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -262,7 +262,7 @@
             225,
             255
           ],
-          "workerTimingUs": 11620
+          "workerTimingUs": 11100
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -292,7 +292,7 @@
               225,
               255
             ],
-            "workerTimingUs": 7040
+            "workerTimingUs": 6320
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -300,10 +300,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 23744,
-            "playedFrames": 256,
+            "availableReadFrames": 23616,
+            "playedFrames": 384,
             "underrunFrames": 0,
-            "timeUs": 5333
+            "timeUs": 8000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {

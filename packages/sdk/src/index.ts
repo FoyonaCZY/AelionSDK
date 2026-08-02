@@ -1,6 +1,15 @@
 import { AelionSession } from './session.js';
 import type { AelionApi } from './types.js';
 
+export {
+  CURRENT_PROJECT_SCHEMA_URI,
+  CURRENT_PROJECT_SCHEMA_VERSION,
+  LEGACY_PROJECT_SCHEMA_URI,
+  LEGACY_PROJECT_SCHEMA_VERSION,
+  migrateProjectToCurrent,
+  type ProjectIdentityMigration,
+} from '@aelionsdk/project-schema';
+
 export * from './runtime-material-registry.js';
 export * from './media-provider.js';
 export * from './production-media-provider.js';

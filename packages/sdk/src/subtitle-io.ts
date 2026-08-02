@@ -39,6 +39,7 @@ export interface ImportSubtitleOptions {
     readonly startUs: number;
     readonly durationUs: number;
   }[];
+  /** Timeline offset added to every imported cue. Defaults to zero. */
   readonly atUs?: number;
 }
 
@@ -67,29 +68,57 @@ export function importSubtitleTrack(
 ): ImportSubtitleResult {
   const cues = options.format === 'srt' ? parseSrt(options.text) : parseWebVtt(options.text);
   const warnings: string[] = [];
-  let previousEndUs = options.atUs ?? 0;
-  const itemIds: string[] = [];
-  for (const cue of cues) {
-    let startUs = cue.startUs;
-    if (options.alignToSilence !== undefined) {
-      const aligned = alignCueToSilence(cue, options.alignToSilence);
-      if (aligned.startUs !== cue.startUs) {
-        warnings.push(`Cue at ${cue.startUs} moved to ${aligned.startUs} to avoid silence`);
-      }
-      startUs = aligned.startUs;
+  const offsetUs = options.atUs ?? 0;
+  if (!Number.isSafeInteger(offsetUs) || offsetUs < 0) {
+    throw new RangeError('atUs must be a non-negative safe integer');
+  }
+  const silence = options.alignToSilence ?? [];
+  for (const [index, range] of silence.entries()) {
+    if (
+      !Number.isSafeInteger(range.startUs) ||
+      !Number.isSafeInteger(range.durationUs) ||
+      range.startUs < 0 ||
+      range.durationUs < 0 ||
+      !Number.isSafeInteger(range.startUs + range.durationUs)
+    ) {
+      throw new RangeError(`alignToSilence[${index.toString()}] must be a valid time range`);
     }
-    if (startUs < previousEndUs) {
+  }
+
+  // Transform and validate the entire document before mutating the builder.
+  const transformed = cues.map(cue => {
+    const durationUs = cue.endUs - cue.startUs;
+    if (!Number.isSafeInteger(durationUs) || durationUs <= 0) {
+      throw new RangeError('subtitle cues must have a positive safe-integer duration');
+    }
+    const shiftedStartUs = cue.startUs + offsetUs;
+    const shiftedEndUs = cue.endUs + offsetUs;
+    if (!Number.isSafeInteger(shiftedStartUs) || !Number.isSafeInteger(shiftedEndUs)) {
+      throw new RangeError('subtitle cue timestamp exceeds the safe integer range');
+    }
+    let aligned = { ...cue, startUs: shiftedStartUs, endUs: shiftedEndUs };
+    if (options.alignToSilence !== undefined) {
+      const candidate = alignCueToSilence(aligned, silence);
+      if (candidate.startUs !== aligned.startUs) {
+        warnings.push(`Cue at ${aligned.startUs} moved to ${candidate.startUs} to avoid silence`);
+      }
+      aligned = candidate;
+    }
+    return aligned;
+  });
+  let previousEndUs = 0;
+  for (const cue of transformed) {
+    if (cue.startUs < previousEndUs) {
       throw new TypeError(
-        `CAPTION_IMPORT_OVERLAP: cue at ${startUs} overlaps the previous cue ending at ${previousEndUs}`,
+        `CAPTION_IMPORT_OVERLAP: cue at ${cue.startUs} overlaps the previous cue ending at ${previousEndUs}`,
       );
     }
-    const id = builder.addCaptionClip({
-      trackId: options.trackId,
-      ...cueToOptions({ ...cue, startUs }),
-    });
-    itemIds.push(id);
-    previousEndUs = startUs + (cue.endUs - cue.startUs);
+    previousEndUs = cue.endUs;
   }
+
+  const itemIds = transformed.map(cue =>
+    builder.addCaptionClip({ trackId: options.trackId, ...cueToOptions(cue) }),
+  );
   return { itemIds, cueCount: cues.length, warnings };
 }
 
@@ -121,6 +150,15 @@ export function exportSubtitleTrack(
         ? {}
         : { settings: item.cueSettings as Readonly<Record<string, string>> }),
     }));
+  let previousEndUs = 0;
+  for (const cue of cues) {
+    if (cue.startUs < previousEndUs) {
+      throw new TypeError(
+        `CAPTION_EXPORT_OVERLAP: cue at ${cue.startUs} overlaps the previous cue ending at ${previousEndUs}`,
+      );
+    }
+    previousEndUs = cue.endUs;
+  }
   const serialized = format === 'srt' ? serializeSrt(cues) : serializeWebVtt(cues);
   return {
     text: serialized.text,

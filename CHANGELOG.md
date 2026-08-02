@@ -1,6 +1,24 @@
 # Changelog
 
-本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。首个稳定版本前的预发布版本允许有记录、可迁移的破坏性变更，但不允许静默改变公开 API、Project/Material 协议或资源所有权。
+本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。预发布变更必须有记录、可迁移，不允许静默改变公开 API、协议或资源所有权。
+
+## 1.2.0-rc.2 — 2026-08-02
+
+### Fixed
+
+- 恢复不可变的 Project v1.0 Schema，并新增独立的 `v1.2.json / 1.2.0` 身份；默认校验器会在不修改调用方对象的前提下迁移 1.1/1.2 rc.1 产生的歧义身份文档。
+- 把图像序列帧清单接入 Render IR、Renderer 预览和直接导出快路径，统一精确帧边界语义。
+- 字幕导入改为先完整校验再写入，修复 `atUs` 偏移、静音对齐缩短时长和导出重叠未拒绝的问题。
+- 修复 Bézier 求值：线性插值忽略手柄，支持仅入手柄，缺失切线按零处理。
+- 速率包络支持正向、定格与反向区段，并校验源起点和安全整数范围。
+- 代理生成增加 64 MiB 默认整缓冲上限、输出约束和 RangeReader 编码契约，超限时在读取前失败。
+- 新增诚实命名的 `detectAudioEnergyChanges` / `analyzeAudioEnergyChanges`；旧 scene API 仅作弃用兼容，不再宣称视频场景检测。
+- 明确 codec fallback 注册表只是能力描述符而非可执行 WASM 后端，并新增 `selectCodecAvailability`。
+- 设备矩阵版本进入发布同步和常规 CI 校验。
+
+### Documentation
+
+- 逐项审计 1.1/1.2 为“已完成、部分完成、延期”，并按不可变 Schema、迁移、Project/Render IR 分层、消费者集成、API 冻结和全量认证重排 2.0 计划。
 
 ## 1.2.0-rc.1 — 2026-08-01
 

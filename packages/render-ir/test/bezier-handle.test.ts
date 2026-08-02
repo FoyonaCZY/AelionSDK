@@ -90,4 +90,20 @@ describe('Bézier handle keyframe evaluation', () => {
     const result = evaluateAnimatedValue(value, 0) as number;
     expect([10, 20]).toContain(result);
   });
+
+  it('ignores handles on linear interpolation', () => {
+    const value = animated([
+      { timeUs: 0, value: 0, interpolation: 'linear', handleOut: { x: 0, y: 100 } },
+      { timeUs: 100, value: 100, interpolation: 'linear', handleIn: { x: 0, y: -100 } },
+    ]);
+    expect(evaluateAnimatedValue(value, 25)).toBe(25);
+  });
+
+  it('uses an inbound-only handle without inventing an outbound tangent', () => {
+    const value = animated([
+      { timeUs: 0, value: 0, interpolation: 'cubic-bezier' },
+      { timeUs: 100, value: 100, interpolation: 'cubic-bezier', handleIn: { x: 0, y: -100 } },
+    ]);
+    expect(evaluateAnimatedValue(value, 50)).toBeCloseTo(12.5, 4);
+  });
 });

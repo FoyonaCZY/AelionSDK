@@ -23,6 +23,7 @@ import {
 } from '@aelionsdk/project-schema';
 import {
   evaluateAnimatedValue,
+  resolveMediaSourceFrame,
   evaluateVisualState,
   IncrementalRenderCompiler,
   type CompileStats,
@@ -157,11 +158,7 @@ function directOpaqueVisualSource(
   ) {
     return undefined;
   }
-  return {
-    assetId: clip.source.assetId,
-    streamIndex: clip.source.streamIndex,
-    sourceTimeUs: active.sourceTimeUs,
-  };
+  return resolveMediaSourceFrame(clip.source, active.sourceTimeUs) ?? undefined;
 }
 
 function frameHasAlpha(frame: VideoFrame): boolean {

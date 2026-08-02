@@ -12,7 +12,8 @@ async function canonicalJson(path) {
   return JSON.stringify(JSON.parse(await readFile(resolve(root, path), 'utf8')));
 }
 
-const [projectSchema, materialInstanceSchema] = await Promise.all([
+const [projectSchema, legacyProjectSchema, materialInstanceSchema] = await Promise.all([
+  canonicalJson('schemas/project/v1.2/project.schema.json'),
   canonicalJson('schemas/project/v1/project.schema.json'),
   canonicalJson('schemas/material/v1/instance.schema.json'),
 ]);
@@ -32,16 +33,20 @@ function deepFreeze<T>(value: T): Readonly<T> {
 const projectSchema = JSON.parse(
   String.raw\`${projectSchema}\`,
 ) as JsonObject;
+const legacyProjectSchema = JSON.parse(
+  String.raw\`${legacyProjectSchema}\`,
+) as JsonObject;
 const materialInstanceSchema = JSON.parse(
   String.raw\`${materialInstanceSchema}\`,
 ) as JsonObject;
 
 /**
- * The canonical v1 validators bundled into the JavaScript artifact. Consumers
+ * The canonical Project validators bundled into the JavaScript artifact. Consumers
  * can create a session without loading schema files or configuring asset URLs.
  */
 export const defaultSchemas: AelionProjectSchemas = Object.freeze({
   project: deepFreeze(projectSchema),
+  legacyProject: deepFreeze(legacyProjectSchema),
   materialInstance: deepFreeze(materialInstanceSchema),
 });
 `;
@@ -55,6 +60,6 @@ if (write) {
   );
 } else {
   process.stdout.write(
-    'Bundled SDK schemas match canonical Project and Material Instance v1 JSON\n',
+    'Bundled SDK schemas match canonical current, legacy Project, and Material Instance JSON\n',
   );
 }

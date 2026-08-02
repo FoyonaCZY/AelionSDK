@@ -33,6 +33,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run release:version:check
       - run: pnpm run compatibility:check
+      - run: pnpm run report:device-matrix:check
       - run: pnpm run format:check
       - run: pnpm run schemas:check
       - run: pnpm run lint

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.aelion.dev/project/v1.json",
-  "title": "Aelion Project Document v1",
+  "$id": "https://schemas.aelion.dev/project/v1.2.json",
+  "title": "Aelion Project Document v1.2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -22,10 +22,10 @@
   ],
   "properties": {
     "$schema": {
-      "const": "https://schemas.aelion.dev/project/v1.json"
+      "const": "https://schemas.aelion.dev/project/v1.2.json"
     },
     "schemaVersion": {
-      "const": "1.0.0"
+      "const": "1.2.0"
     },
     "projectId": {
       "$ref": "#/$defs/entityId"
@@ -267,6 +267,32 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "handleIn": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["x", "y"],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "handleOut": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["x", "y"],
+                    "properties": {
+                      "x": {
+                        "type": "number"
+                      },
+                      "y": {
+                        "type": "number"
+                      }
+                    }
                   }
                 }
               }
@@ -408,7 +434,7 @@
           "$ref": "#/$defs/entityId"
         },
         "kind": {
-          "enum": ["video", "audio", "image", "font", "lut", "binary"]
+          "enum": ["video", "audio", "image", "font", "lut", "binary", "image-sequence"]
         },
         "name": {
           "type": "string",
@@ -494,6 +520,24 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "imageSequence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["frameDurationUs", "frameAssetIds"],
+          "properties": {
+            "frameDurationUs": {
+              "$ref": "#/$defs/positiveDurationUs"
+            },
+            "frameAssetIds": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "$ref": "#/$defs/entityId"
+              }
+            }
+          }
         }
       }
     },

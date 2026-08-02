@@ -1,38 +1,28 @@
 ---
 title: 1.1 Certification and fallback
-description: 'Close the uncertified boundaries of 1.0: real-device matrices, WASM codec fallback, long-session durability and new containers.'
+description: Audited delivery status for the 1.1 release candidate and the work that remains open.
 ---
 
-## Goal
+`1.1.0-rc.1` was published, but publishing an RC did not complete every item originally assigned to
+the milestone. This page records delivered code separately from certification and deferred scope.
 
-Turn the explicitly uncertified boundaries of `1.0.0-rc.1` into certified, verified capability, so
-applications can deploy to real devices with a documented fallback story.
+## Audited status
 
-## Scope
+| Item                      | Status        | What is delivered                                                                                         | Open work                                                                                |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Real-device certification | **Partial**   | Reproducible device-matrix schema, Chromium/Firefox runs, Playwright WebKit and mobile viewport contracts | Physical Safari/iOS/Android/WebView captures and recurring device-farm evidence          |
+| Software codec fallback   | **Deferred**  | A capability descriptor registry and fail-closed selection diagnostics                                    | No WASM codec ships and the media/export pipelines do not execute registered descriptors |
+| Long-session durability   | **Partial**   | Resumable WebM/fMP4 checkpoints, restart recovery and an operations guide                                 | No Service Worker/PWA background renderer and no 24-hour physical-device soak            |
+| Containers and images     | **Partial**   | MOV, MKV and MPEG-TS import; AVIF; deterministic image-sequence runtime                                   | JPEG-XL and broader encode/export coverage                                               |
+| Diagnostic localization   | **Delivered** | Stable diagnostic codes with localized message catalogs                                                   | More locale coverage remains additive work                                               |
+| Hardened fuzzing and soak | **Partial**   | Export/transaction fuzzing and accelerated restart/soak scenarios                                         | Continuous 24-hour sessions and wider parser corpus automation                           |
 
-| #     | Item                                 | Priority | Size | Notes                                                                                                                                                                                                                       |
-| ----- | ------------------------------------ | -------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.1-1 | **Real-device certification matrix** | P0       | L    | Physical Safari iOS/macOS, Chrome/Edge Android and system WebViews via a device farm; reproducible device × codec evidence bound to a source manifest. Today the docs state physical Safari/iOS/Android need certification. |
-| 1.1-2 | **Software codec fallback**          | P0       | L    | WASM H.264/HEVC/AAC/VP9 decode and encode where hardware is absent (Safari/iOS, Android WebView). Requires the codec-strategy decision; replaces "unsupported" with a documented lower-tier contract.                       |
-| 1.1-3 | **Long-session durability**          | P0       | M    | Service-worker/PWA background rendering so long jobs survive page lifecycle limits, plus stronger recovery for interrupted export. 24h+ soak and restart evidence.                                                          |
-| 1.1-4 | **New containers and image formats** | P1       | M    | MOV/MKV/TS import; AVIF/JPEG-XL decode; PNG image sequences. Extends the existing MP4/WebM and PNG/JPEG/WebP/GIF surface.                                                                                                   |
-| 1.1-5 | **Diagnostic message localization**  | P1       | S    | Multilingual messages over the existing diagnostic-code system.                                                                                                                                                             |
-| 1.1-6 | **Hardened fuzzing and long soak**   | P1       | M    | Extend fast-check fuzzing to export bytes, media parsers and transaction sequences; continuous 24h+ session soak with automatic recovery verification.                                                                      |
+## Remediation
 
-## Acceptance
+`1.2.0-rc.2` completes the image-sequence runtime path, bounds proxy input memory, and changes the
+codec fallback wording/API toward a capability **descriptor**. `CodecFallbackProvider` and
+`selectCodecExecution` remain deprecated compatibility names; they do not prove that codec work is
+routed through a software backend.
 
-- Every capability is exercised on the target matrix and produces the evidence artifacts that the
-  release gate requires.
-- WASM fallback and hardware paths produce **identical** Project and Render IR semantics; only the
-  declared execution tier differs.
-- New containers/formats pass index, decode, preview, export and migration checks with bounded
-  resource admission.
-- The version passes the standard prerelease gates (`alpha` → `beta` → `rc` on `next`).
-
-## Risks and dependencies
-
-- Blocked on the **software codec strategy** decision; scope of 1.1-2 and the package-size budget
-  both depend on it.
-- Device-farm certification is recurring cost and needs a locked device set per release.
-- Long-session durability may be partially blocked by platform lifecycle rules on iOS Safari;
-  remote export remains the durability ceiling for jobs that exceed it.
+1.1 is not considered fully certified until every Partial/Deferred row has its own reproducible
+evidence. Product capability UI must continue to use exact runtime preflight and fail closed.

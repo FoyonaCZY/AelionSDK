@@ -60,7 +60,7 @@ Prefer Session APIs over recreating the SDK's internal dependency graph in appli
 ## Version and import rules
 
 - Keep all `@aelionsdk/*` packages on the same exact release.
-- The npm `next` tag currently points to `1.2.0-rc.1`; pin it after validation.
+- The npm `next` tag currently points to `1.2.0-rc.2`; pin it after validation.
 - Import only package names and documented subpath exports.
 - Never import `src/*`, generated `dist/*`, test helpers, or another workspace package's internals.
 - Browser support remains runtime capability/preflight, not a package-selection rule.

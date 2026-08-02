@@ -64,6 +64,11 @@ export interface IrMediaSource {
   /** @deprecated Compatibility projection for legacy hand-authored linear IR. */
   readonly reverse?: boolean;
   readonly boundary: 'error' | 'hold' | 'loop' | 'transparent';
+  /** Immutable frame manifest compiled from an image-sequence Asset. */
+  readonly imageSequence?: {
+    readonly frameDurationUs: number;
+    readonly frameAssetIds: readonly string[];
+  };
 }
 
 export interface IrBaseClip {

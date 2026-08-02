@@ -12,6 +12,7 @@ import {
   evaluateVisualState,
   IncrementalRenderCompiler,
   mapClipSourceTime,
+  resolveMediaSourceFrame,
 } from '../src/index.js';
 
 const root = new URL('../../../', import.meta.url);
@@ -36,6 +37,41 @@ beforeAll(async () => {
 });
 
 describe('Project to Render IR', () => {
+  it('compiles image-sequence manifests and resolves exact frame boundaries', () => {
+    const changed = structuredClone(project) as AelionProject;
+    changed.assets.frame_1 = {
+      id: 'frame_1',
+      kind: 'image',
+      locator: { type: 'runtime-binding', bindingId: 'frame_1' },
+    };
+    changed.assets.frame_2 = {
+      id: 'frame_2',
+      kind: 'image',
+      locator: { type: 'runtime-binding', bindingId: 'frame_2' },
+    };
+    changed.assets.sequence_1 = {
+      id: 'sequence_1',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'sequence_1' },
+      imageSequence: { frameDurationUs: 40_000, frameAssetIds: ['frame_1', 'frame_2'] },
+    };
+    const visual = Object.values(changed.items).find(item => item.type === 'video');
+    if (visual === undefined) throw new Error('fixture video clip is missing');
+    visual.type = 'image';
+    (visual.source as { assetId: string }).assetId = 'sequence_1';
+    const ir = new IncrementalRenderCompiler().compile(changed, 'seq_main', 0n).ir;
+    const clip = ir.tracks.flatMap(track => track.clips).find(value => value.id === visual.id);
+    if (clip?.kind !== 'visual-clip') throw new Error('compiled visual clip is missing');
+    expect(clip.source.imageSequence?.frameAssetIds).toEqual(['frame_1', 'frame_2']);
+    expect(resolveMediaSourceFrame(clip.source, 39_999)).toEqual({
+      assetId: 'frame_1',
+      streamIndex: 0,
+      sourceTimeUs: 0,
+    });
+    expect(resolveMediaSourceFrame(clip.source, 40_000)?.assetId).toBe('frame_2');
+    expect(resolveMediaSourceFrame(clip.source, 80_000)).toBeNull();
+  });
+
   it('compiles normalized Project entities into versioned IR', () => {
     const compilation = new IncrementalRenderCompiler().compile(project, 'seq_main', 0n);
     expect(compilation.ir).toMatchObject({

@@ -49,17 +49,19 @@ scheduling, diagnostics, and cleanup.
 
 Supported paths include source decode, PCM mix, gain/fades, track mixing, playback timing,
 waveforms/analysis, silence workflows, ducking/master settings, and WAV/RF64 export. Offline
-analysis adds beat detection (energy-envelope onsets) and scene-boundary detection (audio-energy
-discontinuities) through `SessionAudioController.analyzeBeats`/`analyzeScenes`. Exact encoded
-audio support is negotiated inside MP4/WebM profiles.
+analysis adds beat detection and audio-energy change candidates through
+`SessionAudioController.analyzeBeats()` / `analyzeAudioEnergyChanges()`. The deprecated
+`analyzeScenes()` alias inspects audio only and must not be presented as pixel-based video scene
+detection. Exact encoded audio support is negotiated inside MP4/WebM profiles.
 
 ## Media input and cache
 
 Production media supports File, URL/Range, OPFS, custom byte sources, MP4/MOV/MKV/TS/WebM indexing,
 VideoFrame/PCM decode, AVIF/JPEG/PNG/WebP stills, proxy representations (including automatic proxy
 registration through an injected encoder via `registerAutomaticProxy`), cache budgets, admission
-queues, cancellation, and resource statistics. CDN CORS/range correctness remains a deployment
-responsibility.
+queues, cancellation, and resource statistics. Large proxy sources require the range-reader
+encoder contract; the legacy whole-buffer path fails above its configured memory limit. CDN
+CORS/range correctness remains a deployment responsibility.
 
 ## Export
 

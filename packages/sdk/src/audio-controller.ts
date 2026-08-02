@@ -2,12 +2,12 @@ import {
   StreamingLoudnessAnalyzer,
   buildWaveformPeaks,
   detectBeats,
-  detectScenes,
+  detectAudioEnergyChanges,
   detectSilence,
   renderIrAudio,
   type BeatDetectionResult,
+  type AudioEnergyChangeDetectionResult,
   type LoudnessReport,
-  type SceneDetectionResult,
   type SilenceDetectionResult,
   type WaveformPeakResult,
 } from '@aelionsdk/audio';
@@ -22,6 +22,7 @@ import type {
   AelionAudioMasteringOptions,
   AelionAudioRemoveSilenceOptions,
   AelionAudioRemoveSilenceResult,
+  AelionAudioSceneCompatibilityResult,
   AelionAudioWaveformOptions,
   AelionMediaProvider,
 } from './types.js';
@@ -171,13 +172,25 @@ export class SessionAudioController implements AelionAudioApi {
     });
   }
 
+  /** @deprecated Audio-only input cannot detect video scenes; use analyzeAudioEnergyChanges. */
   public async analyzeScenes(
     options: AelionAudioAnalysisOptions = {},
-  ): Promise<SceneDetectionResult> {
+  ): Promise<AelionAudioSceneCompatibilityResult> {
+    const result = await this.analyzeAudioEnergyChanges(options);
+    return {
+      sampleRate: result.sampleRate,
+      totalFrames: result.totalFrames,
+      scenes: result.changes,
+    };
+  }
+
+  public async analyzeAudioEnergyChanges(
+    options: AelionAudioAnalysisOptions = {},
+  ): Promise<AudioEnergyChangeDetectionResult> {
     const ir = this.host.ir();
     const channels = channelCount(ir.channelLayout);
     const frames = totalFrames(ir);
-    return detectScenes({
+    return detectAudioEnergyChanges({
       sampleRate: ir.sampleRate,
       channelCount: channels,
       totalFrames: frames,

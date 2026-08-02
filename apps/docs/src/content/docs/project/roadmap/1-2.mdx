@@ -1,34 +1,33 @@
 ---
 title: '1.2 Editing: image and time'
-description: Subtitle tracks, time remapping, keyframe graphs, offline analysis, proxy automation and the WebGPU tier.
+description: Audited delivery status for subtitles, time mapping, analysis, proxies and WebGPU.
 ---
 
-## Goal
+`1.2.0-rc.1` shipped useful editing APIs, but several milestone descriptions were broader than the
+implementation. `1.2.0-rc.2` is the compatibility remediation release.
 
-Expand the timeline surface with the image-and-time capabilities that editing products most often
-require, and make WebGPU a first-class backend.
+## Audited status
 
-## Scope
+| Item             | Status        | What is delivered in rc.2                                                                       | Open work                                                                             |
+| ---------------- | ------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Subtitle tracks  | **Partial**   | Atomic SRT/WebVTT import/export, cue settings, offset and silence alignment, Render IR captions | ASS/SSA and a documented advanced styling subset                                      |
+| Time remapping   | **Delivered** | Linear and curve maps plus signed rate envelopes for forward, freeze and reverse spans          | Editor UI is host-owned                                                               |
+| Keyframe curves  | **Delivered** | Validated Bézier handles, inbound/outbound tangent evaluation and regression coverage           | A graph-editor UI is host-owned                                                       |
+| Offline analysis | **Partial**   | Loudness, waveform, silence, beats and bounded audio-energy change candidates                   | Pixel-based video scene detection and automatic Project/Material metadata integration |
+| Proxy automation | **Partial**   | Preview/original switching, bounded in-memory encoding and a range-reader encoder contract      | The host still supplies the actual image/video encoder                                |
+| WebGPU tier      | **Partial**   | Capability probing, compilation and supported render paths                                      | Full WebGL2 parity and physical-device golden/performance certification               |
 
-| #     | Item                               | Priority | Size | Notes                                                                                                                                                                                      |
-| ----- | ---------------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.2-1 | **Subtitle tracks**                | P0       | M    | SRT/VTT/ASS import and export, styled subtitle entities, Render IR integration and auto-alignment helpers.                                                                                 |
-| 1.2-2 | **Time remapping and speed ramps** | P1       | M    | Productize the existing linear-rate and curve time-map forms into a rate envelope with bidirectional speed.                                                                                |
-| 1.2-3 | **Keyframe graph editor model**    | P1       | M    | Bézier handles and curve interpolation as first-class graph entities with validated curve evaluation in Render IR.                                                                         |
-| 1.2-4 | **Offline analysis pipeline**      | P1       | L    | Scene detection, beat detection and loudness envelopes that feed Render IR and material metadata for smart editing and snapping. Builds on the existing loudness/waveform/silence tooling. |
-| 1.2-5 | **Proxy workflow automation**      | P1       | M    | Automatic low-resolution proxy generation, switch-over during editing and proxy-to-original swap at export, on top of the existing proxy representation support.                           |
-| 1.2-6 | **WebGPU first-class tier**        | P0       | M    | Full capability parity with WebGL2, performance baseline and a documented backend fallback strategy, covered by the golden and browser matrix.                                             |
+## Project schema remediation
 
-## Acceptance
+The 1.1 and 1.2 rc.1 packages accidentally added fields while retaining the immutable
+`v1.json` / `1.0.0` identity. rc.2 restores the original v1.0 schema and introduces
+`v1.2.json` / `1.2.0`. The default validator accepts legacy RC documents, snapshots them, upgrades
+only their schema identity, and validates the result against v1.2 without mutating caller data.
 
-- Subtitle, time-remap and keyframe entities are validated Project entities with canonical
-  serialization, migration and transaction support.
-- Preview and export render identical semantics for every new entity (shared Render IR rule).
-- WebGPU parity passes the golden and browser matrices; the fallback contract is documented.
-- New analysis outputs have bounded memory and cancellation like every existing pipeline.
+New projects use v1.2. Applications can call `migrateProjectToCurrent()` explicitly when storing a
+canonical upgraded document.
 
-## Risks and dependencies
+## Release rule
 
-- Subtitle styling breadth (ASS is large) should be scoped to a documented subset first.
-- 1.2-6 requires the WebGPU surface to be stable in the target browser matrix.
-- Offline analysis correctness needs golden-style reference data to avoid regressions.
+The milestone is only fully complete when every Partial row is either delivered with evidence or
+moved to a named later milestone. RC publication alone is not acceptance evidence.

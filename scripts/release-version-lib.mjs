@@ -15,7 +15,10 @@ export const RELEASE_LOCKFILE_INSTALL_ARGS = Object.freeze([
 
 export const RELEASE_VERSION_DOCUMENTS = Object.freeze([
   'README.md',
+  'README.zh-CN.md',
   'apps/docs/src/content/docs/index.mdx',
+  'apps/docs/src/content/docs/project/status.md',
+  'apps/docs/src/content/docs/reference/packages.md',
   'apps/docs/src/content/docs/zh/index.mdx',
   'apps/docs/src/content/docs/zh/project/status.md',
   'apps/docs/src/content/docs/zh/reference/diagnostic-codes.md',
@@ -25,6 +28,7 @@ export const RELEASE_VERSION_DOCUMENTS = Object.freeze([
   'apps/docs/src/content/docs/zh/start/installation.md',
   'apps/docs/src/content/docs/zh/start/packages.md',
   'compatibility/matrix.v1.json',
+  'compatibility/device-matrix.json',
   'packages/audio/README.md',
   'packages/capability/README.md',
   'packages/core/README.md',
