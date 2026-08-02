@@ -45,32 +45,32 @@ freshness window.
   not claim an executable WASM backend; audio energy changes are not described
   as video scene detection; deferred roadmap work remains marked deferred.
 
-## Remediation release plan
+## Remediation release outcome
 
-The independent blocker review for `1.2.0-rc.2` must be bound to this exact
-source manifest, gate record, and artifact set before the release workflow can
-publish. Its machine-readable `decision` is authoritative: only `approved`
-with every required check true, no open blockers, and an exact binding makes
-the candidate eligible for provenance publication. This status does not infer
-approval from an older release review.
+The independent blocker review for `1.2.0-rc.2` was approved against this exact
+source manifest, gate record, and artifact set with every required check true
+and no open blocker. The release workflow then published all 13 packages with
+provenance, completed registry install/bundle smoke tests, and created Git tag
+and GitHub prerelease `v1.2.0-rc.2`.
 
 Versions `1.1.0-rc.1` and `1.2.0-rc.1` are immutable npm artifacts and will not
 be overwritten or unpublished. They are superseded because their delivered
 behavior and documentation did not fully match the advertised contracts.
 
-After `1.2.0-rc.2` is visible for all 13 `@aelionsdk/*` packages, the release
-process will:
+`1.2.0-rc.2` is visible for all 13 `@aelionsdk/*` packages. The completed
+release process:
 
-- keep prereleases on the `next` dist-tag, never `latest`;
-- mark both older RC versions deprecated with a pointer to `1.2.0-rc.2`;
-- create Git tag `v1.2.0-rc.2` and a GitHub prerelease with provenance; and
-- run registry smoke checks against the exact published tarballs.
+- kept prereleases on the `next` dist-tag, never `latest`;
+- created Git tag `v1.2.0-rc.2` and a GitHub prerelease with provenance; and
+- passed registry smoke checks against the exact published tarballs.
 
-Consumers should not newly adopt either superseded RC. Until the replacement is
-visible in the registry, wait rather than resolving `@next` to an older RC.
+Consumers should not newly adopt either superseded RC. Their npm deprecation
+metadata remains an administrative follow-up because npm requires a granular
+write token with 2FA bypass for `npm deprecate`; this does not affect the
+published replacement or its `next` dist-tag.
 
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the
 [documentation status page](https://foyonaczy.github.io/AelionSDK/project/status/).
-After release, the immutable record will be the tag, workflow run, GitHub
-prerelease, npm provenance, and this bound evidence set.
+The immutable release record is the tag, workflow run, GitHub prerelease, npm
+provenance, and this bound evidence set.
