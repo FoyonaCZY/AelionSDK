@@ -18,18 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Require a release commit from main
         run: |
           git fetch origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 10.13.1
           run_install: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           package-manager-cache: false
@@ -45,7 +45,7 @@ jobs:
         env:
           AELION_RELEASE_TAG: ${{ github.ref_name }}
         run: node scripts/prepare-release-packages.mjs "$RUNNER_TEMP/aelion-release"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: npm-release-${{ github.ref_name }}
           path: ${{ runner.temp }}/aelion-release
@@ -60,12 +60,12 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           name: npm-release-${{ github.ref_name }}
           path: release-packages
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
           registry-url: https://registry.npmjs.org
@@ -87,10 +87,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: npm-release-${{ github.ref_name }}
           path: release-packages

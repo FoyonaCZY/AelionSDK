@@ -56,8 +56,8 @@ npm install --save-dev @aelionsdk/vite-plugin@next vite
 
 ### rc.2 补救重点
 
-> `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。在 rc.2 出现在
-> registry 之前，应等待发布完成，不要让 `@next` 解析到旧 RC。
+> `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。`1.2.0-rc.2`
+> 已通过 npm `next` dist-tag 发布到全部 13 个包。
 
 - 新 Project 使用独立的 `v1.2.json / 1.2.0` Schema；旧 RC 文档会先隔离快照再兼容迁移。
 - 图像序列已经进入实际预览和导出路径，不再只是 Project 建模辅助函数。

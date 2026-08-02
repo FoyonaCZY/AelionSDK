@@ -26,12 +26,12 @@ an exact prerelease after validating it on your target devices.
 
 > **Remediation notice:** `1.1.0-rc.1` and `1.2.0-rc.1` are superseded. Do not newly adopt either
 > RC. `1.2.0-rc.2` corrects their schema identity/migration, image-sequence runtime, signed-rate,
-> subtitle, Bézier, streaming-proxy, audio-analysis and codec-fallback contract issues. Until rc.2
-> appears in the registry, wait instead of resolving `@next` to an older RC.
+> subtitle, Bézier, streaming-proxy, audio-analysis and codec-fallback contract issues. It is
+> published for all 13 packages on npm under the `next` dist-tag.
 
 The final remediation gate passed all 21 serial commands with unchanged source manifest
-`9d61b2124b579812ca413a588c7b1384eebc1e477f728304d8bd45fedbe86006`. Release eligibility still
-depends on the independently reviewed, exact-bound evidence record in `reports/baseline`.
+`9d61b2124b579812ca413a588c7b1384eebc1e477f728304d8bd45fedbe86006`. The independently reviewed,
+exact-bound evidence record in `reports/baseline` was approved before publication.
 
 ## What it provides
 

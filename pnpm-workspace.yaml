@@ -2,6 +2,11 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
+frozenLockfile: true
+linkWorkspacePackages: true
+preferWorkspacePackages: true
+strictPeerDependencies: true
+
 catalog:
   '@aelionsdk/core': 'workspace:*'
   '@aelionsdk/project-schema': 'workspace:*'
