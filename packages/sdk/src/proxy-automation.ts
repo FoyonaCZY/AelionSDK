@@ -1,3 +1,4 @@
+import { throwIfAborted } from '@aelionsdk/core';
 import type { RangeReader } from '@aelionsdk/media';
 
 import type { ProductionMediaProvider } from './production-media-provider.js';
@@ -27,6 +28,21 @@ export interface ProxyEncodeResult {
  */
 export type ProxyEncoder = (input: ProxyEncodeInput) => Promise<ProxyEncodeResult>;
 
+/** Streaming/range-reader input for encoders that must not buffer the source in memory. */
+export interface ProxyReaderEncodeInput {
+  readonly reader: RangeReader;
+  readonly byteLength: number;
+  readonly mimeType?: string;
+  readonly maxDimension: number;
+  readonly signal?: AbortSignal;
+}
+
+/** Preferred encoder contract for large source media. */
+export type ProxyReaderEncoder = (input: ProxyReaderEncodeInput) => Promise<ProxyEncodeResult>;
+
+/** Default ceiling for the legacy whole-buffer proxy encoder input. */
+export const DEFAULT_MAX_IN_MEMORY_PROXY_INPUT_BYTES = 64 * 1024 * 1024;
+
 /** Options for generating and registering an automatic proxy. */
 export interface RegisterAutomaticProxyOptions {
   /** Original asset id to proxy. */
@@ -35,8 +51,13 @@ export interface RegisterAutomaticProxyOptions {
   readonly originalReader: RangeReader;
   /** Largest proxy dimension (width or height) in pixels. */
   readonly maxDimension: number;
-  /** Proxy encoder implementation (browser-supplied). */
-  readonly encode: ProxyEncoder;
+  /** Legacy in-memory encoder. Inputs above maxInputBytes fail before reading. */
+  readonly encode?: ProxyEncoder;
+  /** Range-reader encoder for large inputs; preferred when available. */
+  readonly encodeReader?: ProxyReaderEncoder;
+  readonly mimeType?: string;
+  readonly maxInputBytes?: number;
+  readonly maxOutputBytes?: number;
   readonly signal?: AbortSignal;
 }
 
@@ -64,20 +85,73 @@ export async function registerAutomaticProxy(
   if (!Number.isSafeInteger(options.maxDimension) || options.maxDimension <= 0) {
     throw new RangeError('maxDimension must be a positive safe integer');
   }
+  if (options.encode === undefined && options.encodeReader === undefined) {
+    throw new TypeError('A proxy encode or encodeReader implementation is required');
+  }
+  const maxInputBytes = options.maxInputBytes ?? DEFAULT_MAX_IN_MEMORY_PROXY_INPUT_BYTES;
+  const maxOutputBytes = options.maxOutputBytes ?? DEFAULT_MAX_IN_MEMORY_PROXY_INPUT_BYTES;
+  if (!Number.isSafeInteger(maxInputBytes) || maxInputBytes <= 0) {
+    throw new RangeError('maxInputBytes must be a positive safe integer');
+  }
+  if (!Number.isSafeInteger(maxOutputBytes) || maxOutputBytes <= 0) {
+    throw new RangeError('maxOutputBytes must be a positive safe integer');
+  }
+  throwIfAborted(options.signal, 'Automatic proxy generation');
   // Fails closed with ReferenceError when the asset (or its original) is unknown.
   provider.representationFor(options.assetId, { purpose: 'export' });
   const size = await options.originalReader.size(options.signal);
   if (!Number.isSafeInteger(size) || size <= 0) {
     throw new RangeError('Original representation must have a positive byte size');
   }
-  const read = await options.originalReader.read({ offset: 0, length: size }, options.signal);
-  const encoded = await options.encode({
-    bytes: read.bytes,
+  const common = {
     maxDimension: options.maxDimension,
+    ...(options.mimeType === undefined ? {} : { mimeType: options.mimeType }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
-  });
+  };
+  const encode = options.encode;
+  const encoded =
+    options.encodeReader === undefined
+      ? await (async () => {
+          if (encode === undefined) {
+            throw new TypeError('A proxy encode implementation is required without encodeReader');
+          }
+          if (size > maxInputBytes) {
+            throw new RangeError(
+              `Original representation exceeds the ${maxInputBytes.toString()} byte in-memory proxy limit; supply encodeReader`,
+            );
+          }
+          const read = await options.originalReader.read(
+            { offset: 0, length: size },
+            options.signal,
+          );
+          if (read.bytes.byteLength !== size) {
+            throw new RangeError('Original representation returned an incomplete read');
+          }
+          return encode({ bytes: read.bytes, ...common });
+        })()
+      : await options.encodeReader({
+          reader: options.originalReader,
+          byteLength: size,
+          ...common,
+        });
+  throwIfAborted(options.signal, 'Automatic proxy generation');
   if (encoded.bytes.byteLength === 0) {
     throw new TypeError('Proxy encoder produced empty bytes');
+  }
+  if (encoded.bytes.byteLength > maxOutputBytes) {
+    throw new RangeError('Proxy encoder output exceeds maxOutputBytes');
+  }
+  if (
+    !Number.isSafeInteger(encoded.width) ||
+    !Number.isSafeInteger(encoded.height) ||
+    encoded.width <= 0 ||
+    encoded.height <= 0 ||
+    Math.max(encoded.width, encoded.height) > options.maxDimension
+  ) {
+    throw new RangeError('Proxy encoder dimensions must be positive and within maxDimension');
+  }
+  if (typeof encoded.mimeType !== 'string' || encoded.mimeType.trim().length === 0) {
+    throw new TypeError('Proxy encoder must return a non-empty mimeType');
   }
   const blob = new Blob([encoded.bytes], { type: encoded.mimeType });
   const representationId = `${options.assetId}:proxy`;

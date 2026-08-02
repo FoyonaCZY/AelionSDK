@@ -67,7 +67,7 @@ function enumValue<const TValues extends readonly string[]>(
   throw new TypeError(`${context} is unsupported`);
 }
 
-function mediaSource(item: ItemEntity): IrMediaSource {
+function mediaSource(item: ItemEntity, assets: AelionProject['assets']): IrMediaSource {
   const source = object(item.source, `item ${item.id}.source`);
   const stream = object(source.stream, `item ${item.id}.source.stream`);
   const sourceRange = object(source.sourceRange, `item ${item.id}.source.sourceRange`);
@@ -112,8 +112,32 @@ function mediaSource(item: ItemEntity): IrMediaSource {
   } else {
     throw new TypeError(`Unsupported time mapping for ${item.id}`);
   }
+  const assetId = string(source.assetId, 'source.assetId');
+  const asset = assets[assetId];
+  let imageSequence: IrMediaSource['imageSequence'];
+  if (asset?.kind === 'image-sequence') {
+    const manifest = object(asset.imageSequence, `image-sequence Asset ${assetId}.imageSequence`);
+    const frameDurationUs = number(
+      manifest.frameDurationUs,
+      `image-sequence Asset ${assetId}.frameDurationUs`,
+    );
+    const frameAssetIds = manifest.frameAssetIds;
+    if (
+      !Number.isSafeInteger(frameDurationUs) ||
+      frameDurationUs <= 0 ||
+      !Array.isArray(frameAssetIds) ||
+      frameAssetIds.length === 0 ||
+      frameAssetIds.some(value => typeof value !== 'string')
+    ) {
+      throw new TypeError(`image-sequence Asset ${assetId} has an invalid frame manifest`);
+    }
+    imageSequence = {
+      frameDurationUs,
+      frameAssetIds: frameAssetIds as string[],
+    };
+  }
   return {
-    assetId: string(source.assetId, 'source.assetId'),
+    assetId,
     streamType,
     streamIndex: number(stream.index, 'stream.index'),
     sourceRange: {
@@ -125,6 +149,14 @@ function mediaSource(item: ItemEntity): IrMediaSource {
       ? { rate: compiledTimeMapping.rate, reverse: compiledTimeMapping.reverse }
       : {}),
     boundary: boundary as IrMediaSource['boundary'],
+    ...(imageSequence === undefined
+      ? {}
+      : {
+          imageSequence: {
+            frameDurationUs: imageSequence.frameDurationUs,
+            frameAssetIds: [...imageSequence.frameAssetIds],
+          },
+        }),
   };
 }
 
@@ -182,9 +214,16 @@ function nestedSequenceSource(item: ItemEntity): IrNestedSequenceSource {
 function clipFingerprint(
   item: ItemEntity,
   materials: Readonly<Record<string, IrMaterialInstance>>,
+  assets: AelionProject['assets'],
 ): string {
+  const source = object(item.source ?? {}, `item ${item.id}.source`);
+  const sourceAssetId = typeof source.assetId === 'string' ? source.assetId : undefined;
+  const sourceAsset = sourceAssetId === undefined ? undefined : assets[sourceAssetId];
   return [
     canonicalStringify(item),
+    ...(sourceAsset?.kind === 'image-sequence'
+      ? [canonicalStringify(sourceAsset.imageSequence ?? null)]
+      : []),
     ...item.materialInstanceIds.map(id => materialFingerprint(materials[id])),
   ].join('|');
 }
@@ -218,6 +257,7 @@ function materialFingerprint(instance: IrMaterialInstance | undefined): string {
 function compileClip(
   item: ItemEntity,
   materials: Readonly<Record<string, IrMaterialInstance>>,
+  assets: AelionProject['assets'],
 ): IrClip {
   const base = {
     id: item.id,
@@ -226,10 +266,10 @@ function compileClip(
     enabled: item.enabled,
     materialInstanceIds: [...item.materialInstanceIds],
     dependencyEntityIds: [item.id, ...item.materialInstanceIds],
-    fingerprint: clipFingerprint(item, materials),
+    fingerprint: clipFingerprint(item, materials, assets),
   };
   if (item.type === 'video' || item.type === 'image') {
-    const source = mediaSource(item);
+    const source = mediaSource(item, assets);
     const visual = object(item.visual, `item ${item.id}.visual`);
     const mask = object(visual.mask ?? {}, `item ${item.id}.visual.mask`);
     const maskSourceId =
@@ -241,6 +281,7 @@ function compileClip(
       dependencyEntityIds: [
         ...base.dependencyEntityIds,
         source.assetId,
+        ...(source.imageSequence?.frameAssetIds ?? []),
         ...(maskSourceId === undefined ? [] : [maskSourceId]),
       ],
       kind: 'visual-clip',
@@ -249,7 +290,7 @@ function compileClip(
     };
   }
   if (item.type === 'audio') {
-    const source = mediaSource(item);
+    const source = mediaSource(item, assets);
     return {
       ...base,
       dependencyEntityIds: [...base.dependencyEntityIds, source.assetId],
@@ -526,7 +567,7 @@ export class IncrementalRenderCompiler {
             reusedClips += 1;
             return [previous];
           }
-          const candidate = compileClip(item, materials);
+          const candidate = compileClip(item, materials, project.assets);
           if (previous?.fingerprint === candidate.fingerprint) {
             reusedClips += 1;
             return [previous];

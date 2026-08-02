@@ -14,14 +14,14 @@ export interface CodecIdentity {
 }
 
 /**
- * Contract for a software codec fallback backend (e.g. a WASM decoder).
+ * Capability descriptor for a host-owned software codec implementation.
  *
- * The engine negotiates through this interface but ships no backend in 1.1:
- * an application registers one after the codec strategy is chosen. The
- * interface intentionally mirrors the WebCodecs lifecycle so a future WASM
- * adapter can implement it without reshaping the negotiation path.
+ * This descriptor does not execute decode or encode work. Aelion's media and
+ * export pipelines do not invoke registered descriptors in 1.2; hosts must
+ * wire their codec implementation separately. The distinction prevents a
+ * capability declaration from being mistaken for an operational fallback.
  */
-export interface CodecFallbackProvider {
+export interface CodecFallbackDescriptor {
   /** Stable provider id, e.g. `wasm-h264`. */
   readonly id: string;
   /** True when the backend is loaded and ready to accept work. */
@@ -29,6 +29,9 @@ export interface CodecFallbackProvider {
   /** Whether this provider can execute the requested codec path. */
   supports(identity: CodecIdentity): boolean;
 }
+
+/** @deprecated Use CodecFallbackDescriptor; this contract describes capability, not execution. */
+export type CodecFallbackProvider = CodecFallbackDescriptor;
 
 /** Negotiated execution path for a single codec operation. */
 export type CodecExecutionPath =
@@ -59,10 +62,10 @@ function decisionDiagnostic(code: string, message: string, recoverable: boolean)
  * reports it, otherwise the first ready provider that supports the identity,
  * otherwise fail closed with a diagnostic.
  */
-export function selectCodecExecution(
+export function selectCodecAvailability(
   identity: CodecIdentity,
   hardwareSupported: boolean,
-  providers: readonly CodecFallbackProvider[],
+  providers: readonly CodecFallbackDescriptor[],
 ): CodecExecutionDecision {
   if (hardwareSupported) {
     return { path: 'hardware', diagnostics: [] };
@@ -75,7 +78,7 @@ export function selectCodecExecution(
       diagnostics: [
         decisionDiagnostic(
           'CAPABILITY_CODEC_FALLBACK_USED',
-          `${identity.class} ${identity.operation} for ${identity.codec} runs through the ${provider.id} software fallback`,
+          `${identity.class} ${identity.operation} for ${identity.codec} has a declared ${provider.id} software fallback; the host must wire its execution path`,
           true,
         ),
       ],
@@ -93,11 +96,23 @@ export function selectCodecExecution(
   };
 }
 
-/** Bounded registry of software codec fallback providers. */
-export class CodecFallbackRegistry {
-  readonly #providers: CodecFallbackProvider[] = [];
+/**
+ * @deprecated This selects a declared capability only; it does not route codec
+ * work. Use selectCodecAvailability and wire the chosen backend explicitly.
+ */
+export function selectCodecExecution(
+  identity: CodecIdentity,
+  hardwareSupported: boolean,
+  providers: readonly CodecFallbackDescriptor[],
+): CodecExecutionDecision {
+  return selectCodecAvailability(identity, hardwareSupported, providers);
+}
 
-  public register(provider: CodecFallbackProvider): void {
+/** Bounded registry of host-owned software codec capability descriptors. */
+export class CodecFallbackRegistry {
+  readonly #providers: CodecFallbackDescriptor[] = [];
+
+  public register(provider: CodecFallbackDescriptor): void {
     if (this.#providers.some(existing => existing.id === provider.id)) {
       throw new TypeError(`Codec fallback ${provider.id} is already registered`);
     }
@@ -113,7 +128,7 @@ export class CodecFallbackRegistry {
     this.#providers.length = 0;
   }
 
-  public providers(): readonly CodecFallbackProvider[] {
+  public providers(): readonly CodecFallbackDescriptor[] {
     return [...this.#providers];
   }
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "sdkVersion": "1.1.0-rc.1",
-  "generatedAt": "2026-08-01",
+  "sdkVersion": "1.2.0-rc.2",
+  "generatedAt": "2026-08-02",
   "policy": {
     "statusVocabulary": {
       "automated": "Runs in a checked repository workflow; evidence exists for this source revision.",

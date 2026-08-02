@@ -1,59 +1,55 @@
 ---
-title: Project v1 field reference
-description: Reference top-level collections, IDs, Sequence, Track, Item, Asset, and load validation.
+title: Project schema reference
+description: Immutable schema identities, migration, collections, relationships and validation.
 ---
 
-The machine-readable definition is `schemas/project/v1/project.schema.json`. Use `createProject()`
-or `createComposition()` for normal authoring.
+Use `createProject()` or `createComposition()` for normal authoring. The current machine-readable
+schema is [`schemas/project/v1.2/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1.2/project.schema.json).
 
-## Top-level fields
+## Schema identities
 
-Project v1 contains protocol/schema identity, project ID and metadata, settings, normalized maps for
-assets/sequences/tracks/items/material instances/link groups/markers, and ordered root references.
-Every persisted value is canonical JSON.
+| Dialect      | `$schema`                                      | `schemaVersion` | Purpose                                                    |
+| ------------ | ---------------------------------------------- | --------------- | ---------------------------------------------------------- |
+| Legacy v1.0  | `https://schemas.aelion.dev/project/v1.json`   | `1.0.0`         | Immutable schema published with 1.0                        |
+| Current v1.2 | `https://schemas.aelion.dev/project/v1.2.json` | `1.2.0`         | Image sequences, caption cue settings and keyframe handles |
 
-## Entity IDs
+The 1.1/1.2 rc.1 packages accidentally emitted new fields with the legacy identity. The default
+rc.2 validator recognizes that exact legacy identity, captures an ownership-isolated snapshot,
+changes only the two identity fields, and validates the document against v1.2. It never mutates the
+caller object. Use `migrateProjectToCurrent(value)` when the upgraded document should be persisted.
+`defaultSchemas.legacyProject` remains available for strict v1.0 validation.
 
-IDs are stable non-empty identifiers. A normalized map key must equal the entity's own `id`.
-Ordered ID lists cannot contain duplicates, and every reference must resolve to an entity owned by
-the correct host.
+## Top-level model
 
-## Settings
+| Field                                   | Purpose                                                                                       |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `$schema`, `schemaVersion`, `projectId` | Protocol identity and stable Project identity                                                 |
+| `metadata`, `settings`, `extensions`    | JSON-only product metadata, defaults and namespaced extensions                                |
+| `assets`                                | Persistent media identities and representations; never `File`, credentials or decoder objects |
+| `sequences`, `tracks`, `items`          | Normalized timeline graph and ordered ownership references                                    |
+| `materialInstances`, `transitions`      | Effect instances and explicit transition ranges                                               |
+| `markers`, `linkGroups`                 | Timeline annotations and AV/edit grouping                                                     |
 
-Settings hold Project-wide execution and product-compatible defaults such as main sequence,
-working color/audio policy, and extension data allowed by the schema. Runtime objects and secrets
-are forbidden.
+Map keys must equal entity `id` values. Ordered ID lists cannot contain duplicates. Every reference
+must resolve to an entity owned by the correct Sequence or Track.
 
-## Sequence
+## Time, color and media
 
-A Sequence defines canvas width/height, rational frame rate, sample rate, duration, color contract,
-ordered track IDs, and sequence-scoped markers/material data. Nested sequence references cannot
-form a cycle.
+Timeline and source timestamps are integer microseconds. Frame rate is rational. A Sequence owns the
+canvas, sample rate, channel layout and explicit color contract. Media Items map Sequence time to an
+Asset stream with linear or curve time maps and a declared boundary policy.
 
-## Track
+An `image-sequence` Asset contains `imageSequence.frameDurationUs` and ordered
+`frameAssetIds`. Every referenced frame must be an existing `image` Asset. The compiler copies this
+manifest into immutable Render IR, and preview/export resolve the same frame at every boundary.
 
-Tracks belong to exactly one Sequence and have a compatible kind, ordered item IDs, lock/visibility
-state, and audio mixer fields where applicable. An Item cannot be owned by multiple tracks.
+Caption Items are owned by caption Tracks. SRT/WebVTT cue settings remain JSON data; advanced ASS
+styling is not part of the current schema contract.
 
-## Item common fields
+## Validation and loading
 
-Items have ID, host track, kind, timeline `startUs`/`durationUs`, source mapping where relevant,
-enabled state, and kind-specific content. Visual items may carry transforms, crop/mask, opacity,
-animation, effects, and transitions; audio items carry media/source and mix behavior.
-
-## Assets and relationships
-
-Assets describe persistent media identity and representations, never `File` or credentials.
-An `image-sequence` Asset carries an optional `imageSequence` frame manifest
-(`frameDurationUs` + ordered `frameAssetIds`) referencing `image` Assets; each frame reference must
-resolve to an existing `image` Asset or validation fails closed with
-`PROJECT_IMAGE_SEQUENCE_FRAME_MISSING` / `PROJECT_IMAGE_SEQUENCE_FRAME_KIND_INVALID`.
-Transitions bind compatible visual hosts over non-overlapping valid ranges. Link groups bind
-co-edited items. Markers annotate sequence/item time without rendering.
-
-## `loadProject()`
-
-Load performs bounded structural admission, canonical clone/number checks, JSON Schema validation,
-entity/reference/ownership checks, time and mapping validation, transition/mask/material/audio/color
-rules, migration compatibility, and Render IR compilation. Failure leaves the Session unchanged
-and returns structured diagnostics with path/entity/range context.
+`loadProject()` performs bounded admission, schema validation, entity ownership and reference
+checks, nested-sequence cycle checks, time-map semantics, transitions, masks, Material/audio/color
+rules and image-sequence reference checks. Failure leaves the Session unchanged and returns stable,
+path-aware diagnostics. A successful legacy migration is reported in
+`ProjectValidationSuccess.migration`.

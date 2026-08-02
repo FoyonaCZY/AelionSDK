@@ -1,6 +1,6 @@
 {
   "name": "aelion-sdk",
-  "version": "1.2.0-rc.1",
+  "version": "1.2.0-rc.2",
   "private": true,
   "description": "Browser-first real-time editing, rendering and export SDK",
   "license": "MIT",
@@ -76,7 +76,7 @@
     "build:editor": "corepack pnpm --filter @aelionsdk/editor-demo build",
     "build:quickstart": "corepack pnpm --filter @aelionsdk/quickstart build",
     "build:docs": "corepack pnpm --filter @aelionsdk/docs build",
-    "ci": "corepack pnpm run release:version:check && corepack pnpm run compatibility:check && corepack pnpm run format:check && corepack pnpm run docs:check && corepack pnpm run docs:typecheck && corepack pnpm run build:docs && corepack pnpm run docs:check:built && corepack pnpm run schemas:check && corepack pnpm run lint && corepack pnpm run typecheck && corepack pnpm run test && corepack pnpm run test:schema && corepack pnpm run build && corepack pnpm run build:quickstart && corepack pnpm run build:editor && corepack pnpm run api:snapshot",
+    "ci": "corepack pnpm run release:version:check && corepack pnpm run compatibility:check && corepack pnpm run report:device-matrix:check && corepack pnpm run format:check && corepack pnpm run docs:check && corepack pnpm run docs:typecheck && corepack pnpm run build:docs && corepack pnpm run docs:check:built && corepack pnpm run schemas:check && corepack pnpm run lint && corepack pnpm run typecheck && corepack pnpm run test && corepack pnpm run test:schema && corepack pnpm run build && corepack pnpm run build:quickstart && corepack pnpm run build:editor && corepack pnpm run api:snapshot",
     "api:snapshot": "corepack pnpm --filter @aelionsdk/sdk run api:snapshot",
     "test:pack": "corepack pnpm run build && node scripts/test-package-consumer.mjs",
     "release:dry-run": "corepack pnpm run build && node scripts/release-dry-run.mjs",

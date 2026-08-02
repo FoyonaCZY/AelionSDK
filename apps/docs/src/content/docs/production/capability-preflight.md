@@ -35,14 +35,13 @@ Typical product handling:
 Disable controls only when the current capability report is conclusive and no user input can
 change it. Re-run checks after source, settings, permission, or output changes.
 
-## Software codec fallback contract
+## Software codec capability descriptors
 
-When hardware codec support is absent, the SDK negotiates a software fallback through the
-`CodecFallbackProvider` contract in `@aelionsdk/capability` (`CodecFallbackRegistry`,
-`selectCodecExecution`). Register a backend (e.g. a WASM decoder) with
-`codecFallbackRegistry.register(provider)`; the engine never ships a WASM backend in 1.1, so an
-application chooses the codec strategy and supplies one. Negotiation picks hardware first, then the
-first ready provider that `supports()` the codec identity, otherwise fails closed with
-`CAPABILITY_CODEC_NO_BACKEND`. A `CAPABILITY_CODEC_FALLBACK_USED` diagnostic marks the lower
-execution tier; preview and export semantics must stay identical across hardware and fallback
-paths.
+`CodecFallbackDescriptor`, `CodecFallbackRegistry` and `selectCodecAvailability()` describe a
+host-owned software codec capability. They do **not** execute or route media work. The 1.2 media and
+export pipelines ship no WASM codec backend and do not invoke registered descriptors.
+
+Use this registry for product-level availability decisions only. If hardware support is absent,
+either integrate and test a codec backend in the host, select another export profile, or use remote
+export. `CodecFallbackProvider` and `selectCodecExecution()` are deprecated compatibility names;
+their `fallback` result means a provider was declared, not that its runtime was wired.

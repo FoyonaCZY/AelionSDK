@@ -1,8 +1,9 @@
 import type {
+  AudioEnergyBoundary,
+  AudioEnergyChangeDetectionResult,
   BeatDetectionResult,
   LoudnessReport,
   PcmSourceBlock,
-  SceneDetectionResult,
   SilenceDetectionResult,
   WaveformPeakResult,
 } from '@aelionsdk/audio';
@@ -39,7 +40,10 @@ import type {
 } from '@aelionsdk/transaction';
 
 export interface AelionProjectSchemas {
+  /** Canonical schema for newly created and migrated Project documents. */
   readonly project: JsonObject;
+  /** Frozen immutable v1.0 schema for explicitly validating pre-1.1 documents. */
+  readonly legacyProject?: JsonObject;
   readonly materialInstance: JsonObject;
 }
 
@@ -156,12 +160,23 @@ export interface AelionAudioRemoveSilenceResult {
   readonly removedUs: number;
 }
 
+/** Structural result retained by the deprecated audio-only `analyzeScenes` wrapper. */
+export interface AelionAudioSceneCompatibilityResult {
+  readonly sampleRate: number;
+  readonly totalFrames: number;
+  readonly scenes: readonly AudioEnergyBoundary[];
+}
+
 export interface AelionAudioApi {
   analyze(options?: AelionAudioAnalysisOptions): Promise<LoudnessReport>;
   waveform(options?: AelionAudioWaveformOptions): Promise<WaveformPeakResult>;
   detectSilence(options: AelionAudioRemoveSilenceOptions): Promise<SilenceDetectionResult>;
   analyzeBeats(options?: AelionAudioAnalysisOptions): Promise<BeatDetectionResult>;
-  analyzeScenes(options?: AelionAudioAnalysisOptions): Promise<SceneDetectionResult>;
+  analyzeAudioEnergyChanges(
+    options?: AelionAudioAnalysisOptions,
+  ): Promise<AudioEnergyChangeDetectionResult>;
+  /** @deprecated Audio-only input cannot detect video scenes; use analyzeAudioEnergyChanges. */
+  analyzeScenes(options?: AelionAudioAnalysisOptions): Promise<AelionAudioSceneCompatibilityResult>;
   removeSilence(options: AelionAudioRemoveSilenceOptions): Promise<AelionAudioRemoveSilenceResult>;
   configureMastering(options: AelionAudioMasteringOptions): TransactionCommit;
   getMastering(): AelionAudioMasteringOptions | undefined;

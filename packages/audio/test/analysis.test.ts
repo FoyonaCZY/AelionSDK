@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { detectBeats, detectScenes } from '../src/analysis.js';
+import { detectAudioEnergyChanges, detectBeats } from '../src/analysis.js';
+import { detectScenes } from '../src/analysis.js';
+
+async function detectScenesCompatibility(options: Parameters<typeof detectAudioEnergyChanges>[0]) {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- This call is the compatibility behavior under test.
+  return detectScenes(options);
+}
 
 function makeSource(
   sampleRate: number,
@@ -66,14 +72,14 @@ describe('detectScenes', () => {
     const quiet = new Float32Array(sampleRate).fill(0.01);
     const loud = new Float32Array(sampleRate).fill(0.9);
     const pcm = new Float32Array([...quiet, ...loud]);
-    const result = await detectScenes(makeSource(sampleRate, 1, pcm));
+    const result = await detectScenesCompatibility(makeSource(sampleRate, 1, pcm));
     expect(result.scenes.length).toBeGreaterThanOrEqual(1);
     expect(result.scenes[0]?.frame).toBeGreaterThanOrEqual(sampleRate * 0.9);
   });
 
   it('reports no boundaries for a constant signal', async () => {
     const pcm = new Float32Array(8_000 * 2).fill(0.5);
-    const result = await detectScenes(makeSource(8_000, 1, pcm));
+    const result = await detectScenesCompatibility(makeSource(8_000, 1, pcm));
     expect(result.scenes).toEqual([]);
   });
 
@@ -84,7 +90,33 @@ describe('detectScenes', () => {
       pcm[f * 2] = 0.8;
       pcm[f * 2 + 1] = 0.8;
     }
-    const result = await detectScenes(makeSource(sampleRate, 2, pcm));
+    const result = await detectScenesCompatibility(makeSource(sampleRate, 2, pcm));
     expect(result.scenes.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('detectAudioEnergyChanges', () => {
+  it('names audio-only results without claiming video scene detection', async () => {
+    const sampleRate = 8_000;
+    const pcm = new Float32Array([
+      ...new Float32Array(sampleRate).fill(0.01),
+      ...new Float32Array(sampleRate).fill(0.9),
+    ]);
+    const result = await detectAudioEnergyChanges(makeSource(sampleRate, 1, pcm));
+    expect(result.changes.length).toBeGreaterThanOrEqual(1);
+    expect(Reflect.has(result, 'scenes')).toBe(false);
+  });
+
+  it('validates source geometry and reports completion for an empty source', async () => {
+    await expect(
+      detectAudioEnergyChanges({ ...makeSource(0, 1, new Float32Array()), totalFrames: 0 }),
+    ).rejects.toThrow(/sampleRate/);
+    const progress: number[] = [];
+    const result = await detectAudioEnergyChanges({
+      ...makeSource(8_000, 1, new Float32Array()),
+      onProgress: value => progress.push(value),
+    });
+    expect(result.changes).toEqual([]);
+    expect(progress).toEqual([1]);
   });
 });

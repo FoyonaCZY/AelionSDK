@@ -62,6 +62,21 @@ describe('importSubtitleTrack', () => {
     expect(() =>
       importSubtitleTrack(builder, { trackId, text: overlapping, format: 'srt' }),
     ).toThrow(/CAPTION_IMPORT_OVERLAP/);
+    expect(Object.keys(builder.build().items)).toHaveLength(0);
+  });
+
+  it('offsets all cues with atUs and preserves duration after silence alignment', () => {
+    const builder = createProject({ sequenceId: 'main' });
+    const trackId = captionTrack(builder);
+    importSubtitleTrack(builder, {
+      trackId,
+      text: SRT,
+      format: 'srt',
+      atUs: 2_000_000,
+      alignToSilence: [{ startUs: 2_900_000, durationUs: 300_000 }],
+    });
+    const first = Object.values(builder.build().items).find(item => item.type === 'caption');
+    expect(first?.range).toEqual({ startUs: 3_200_000, durationUs: 2_000_000 });
   });
 
   it('aligns cues away from silent ranges', () => {
@@ -112,6 +127,16 @@ describe('exportSubtitleTrack', () => {
     const trackId = builder.addTrack({ kind: 'visual' });
     const project = builder.build();
     expect(() => exportSubtitleTrack(project, trackId, 'srt')).toThrow(/caption Track/);
+  });
+
+  it('fails closed when the caption track contains overlapping clips', () => {
+    const builder = createProject({ sequenceId: 'main' });
+    const trackId = captionTrack(builder);
+    builder.addCaptionClip({ trackId, text: 'one', atUs: 0, durationUs: 2_000_000 });
+    builder.addCaptionClip({ trackId, text: 'two', atUs: 1_000_000, durationUs: 2_000_000 });
+    expect(() => exportSubtitleTrack(builder.build(), trackId, 'vtt')).toThrow(
+      /CAPTION_EXPORT_OVERLAP/,
+    );
   });
 });
 

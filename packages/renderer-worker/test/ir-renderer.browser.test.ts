@@ -248,6 +248,71 @@ const source: IrFrameSource = {
 };
 
 describe('Project → Render IR → Material Graph → Worker renderer', () => {
+  it('decodes concrete image-sequence frame assets at preview boundaries', async () => {
+    const value = project();
+    const red = value.assets.red;
+    const blue = value.assets.blue;
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (red === undefined || blue === undefined || sequence === undefined || visual === undefined) {
+      throw new Error('Fixture is incomplete');
+    }
+    value.assets.red = { ...red, kind: 'image' };
+    value.assets.blue = { ...blue, kind: 'image' };
+    value.assets.sequence = {
+      id: 'sequence',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'sequence' },
+      imageSequence: { frameDurationUs: 40_000, frameAssetIds: ['red', 'blue'] },
+    };
+    sequence.transitionIds = [];
+    visual.itemIds = ['sequence_item'];
+    value.items = {
+      sequence_item: {
+        ...mediaItem('sequence_item', 'sequence', 0),
+        type: 'image',
+        range: { startUs: 0, durationUs: 120_000 },
+        source: {
+          assetId: 'sequence',
+          stream: { type: 'video', index: 0 },
+          sourceRange: { startUs: 0, durationUs: 80_000 },
+          timeMapping: {
+            type: 'linear',
+            rate: { numerator: 1, denominator: 1 },
+            reverse: false,
+            boundary: 'hold',
+          },
+        },
+        materialInstanceIds: [],
+      },
+    };
+    value.materialInstances = {};
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const requested: string[] = [];
+    const trackedSource: IrFrameSource = {
+      frameAt: assetId => {
+        requested.push(assetId);
+        return source.frameAt(assetId, 0, 0);
+      },
+    };
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      for (const timeUs of [39_999, 40_000, 100_000]) {
+        const result = await renderer.render({
+          ir,
+          timeUs,
+          source: trackedSource,
+          mode: 'preview',
+          preferredBackend: 'webgl2',
+        });
+        result.bitmap.close();
+      }
+      expect(requested).toEqual(['red', 'blue', 'blue']);
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
   it('renders schema-declared Shape content instead of silently dropping it', async () => {
     const value = project();
     const sequence = value.sequences.sequence;

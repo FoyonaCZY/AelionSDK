@@ -136,7 +136,7 @@ function bezierComponent(
  * are value-space tangents: for a scalar value the tangent is the `y`
  * component (added to the value), and for a `{x,y}` vector both components
  * are added as the control point offset. Falls back to plain progress-based
- * interpolation when no handle is present on the from keyframe.
+ * interpolation when neither endpoint carries a handle.
  */
 function interpolateWithHandles(
   fromValue: import('@aelionsdk/core').JsonValue,
@@ -146,8 +146,10 @@ function interpolateWithHandles(
   toKeyframe: Readonly<Record<string, unknown>>,
 ): import('@aelionsdk/core').JsonValue {
   const handleOut = objectProperty(Reflect.get(fromKeyframe, 'handleOut'));
-  if (Object.keys(handleOut).length === 0) return interpolateJson(fromValue, toValue, progress);
   const handleIn = objectProperty(Reflect.get(toKeyframe, 'handleIn'));
+  if (Object.keys(handleOut).length === 0 && Object.keys(handleIn).length === 0) {
+    return interpolateJson(fromValue, toValue, progress);
+  }
   if (typeof fromValue === 'number' && typeof toValue === 'number') {
     const outTangent = numberProperty(handleOut.y, 0);
     const inTangent = numberProperty(handleIn.y, 0);
@@ -169,8 +171,8 @@ function interpolateWithHandles(
   ) {
     const outX = numberProperty(handleOut.x, 0);
     const outY = numberProperty(handleOut.y, 0);
-    const inX = numberProperty(handleIn.x, outX);
-    const inY = numberProperty(handleIn.y, outY);
+    const inX = numberProperty(handleIn.x, 0);
+    const inY = numberProperty(handleIn.y, 0);
     const scalar = (key: string): number | undefined => {
       const fromScalar = fromValue[key];
       const toScalar = toValue[key];
@@ -232,8 +234,10 @@ export function evaluateAnimatedValue(
     return from.value;
   }
   let progress = (timeUs - from.timeUs) / (to.timeUs - from.timeUs);
-  const hasHandleOut = Reflect.get(from, 'handleOut') !== undefined;
-  if (hasHandleOut) {
+  const hasBezierHandle =
+    from.interpolation === 'cubic-bezier' &&
+    (Reflect.get(from, 'handleOut') !== undefined || Reflect.get(to, 'handleIn') !== undefined);
+  if (hasBezierHandle) {
     return interpolateWithHandles(from.value, to.value, progress, from, to);
   }
   progress = easingProgress(progress, from);
@@ -291,6 +295,25 @@ function mapBaseClipSourceTime(
 
 export function mapClipSourceTime(clip: IrVisualClip, sequenceTimeUs: number): number | null {
   return mapBaseClipSourceTime(clip, sequenceTimeUs);
+}
+
+/** Resolve a compiled media source to the concrete Asset and timestamp to decode. */
+export function resolveMediaSourceFrame(
+  source: IrVisualClip['source'],
+  sourceTimeUs: number,
+): {
+  readonly assetId: string;
+  readonly streamIndex: number;
+  readonly sourceTimeUs: number;
+} | null {
+  const sequence = source.imageSequence;
+  if (sequence === undefined) {
+    return { assetId: source.assetId, streamIndex: source.streamIndex, sourceTimeUs };
+  }
+  if (!Number.isSafeInteger(sourceTimeUs) || sourceTimeUs < 0) return null;
+  const index = Math.floor(sourceTimeUs / sequence.frameDurationUs);
+  const assetId = sequence.frameAssetIds[index];
+  return assetId === undefined ? null : { assetId, streamIndex: 0, sourceTimeUs: 0 };
 }
 
 function isVisualRenderClip(

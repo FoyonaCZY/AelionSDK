@@ -108,4 +108,71 @@ describe('registerAutomaticProxy', () => {
       }),
     ).rejects.toThrow(/positive safe integer/);
   });
+
+  it('fails before reading when a legacy encoder exceeds the in-memory limit', async () => {
+    const provider = new ProductionMediaProvider();
+    provider.registerBlob('asset', new Blob([new Uint8Array([1])]), { id: 'asset:original' });
+    let reads = 0;
+    const reader = originalReader(new Uint8Array([1, 2, 3]));
+    await expect(
+      registerAutomaticProxy(provider, {
+        assetId: 'asset',
+        originalReader: {
+          ...reader,
+          read: request => {
+            reads += 1;
+            return reader.read(request);
+          },
+        },
+        maxDimension: 1280,
+        maxInputBytes: 2,
+        encode: downscaled,
+      }),
+    ).rejects.toThrow(/in-memory proxy limit/);
+    expect(reads).toBe(0);
+  });
+
+  it('uses the streaming encoder without eagerly reading the original', async () => {
+    const provider = new ProductionMediaProvider();
+    provider.registerBlob('asset', new Blob([new Uint8Array([1])]), { id: 'asset:original' });
+    let reads = 0;
+    const reader = originalReader(new Uint8Array([1, 2, 3]));
+    const result = await registerAutomaticProxy(provider, {
+      assetId: 'asset',
+      originalReader: {
+        ...reader,
+        read: request => {
+          reads += 1;
+          return reader.read(request);
+        },
+      },
+      maxDimension: 1280,
+      encodeReader: input => {
+        expect(input.byteLength).toBe(3);
+        return downscaled({ bytes: new Uint8Array(), maxDimension: input.maxDimension });
+      },
+    });
+    expect(reads).toBe(0);
+    expect(result.byteLength).toBe(3);
+  });
+
+  it('rejects invalid or oversized encoder output before registration', async () => {
+    const provider = new ProductionMediaProvider();
+    provider.registerBlob('asset', new Blob([new Uint8Array([1])]), { id: 'asset:original' });
+    await expect(
+      registerAutomaticProxy(provider, {
+        assetId: 'asset',
+        originalReader: originalReader(new Uint8Array([1])),
+        maxDimension: 320,
+        encode: () =>
+          Promise.resolve({
+            bytes: new Uint8Array([1]),
+            width: 640,
+            height: 360,
+            mimeType: 'image/webp',
+          }),
+      }),
+    ).rejects.toThrow(/within maxDimension/);
+    expect(() => provider.representationFor('asset', { purpose: 'preview' })).not.toThrow();
+  });
 });

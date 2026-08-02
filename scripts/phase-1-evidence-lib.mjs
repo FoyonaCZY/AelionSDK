@@ -60,8 +60,8 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 84,
-  firefox: 69,
+  chromium: 85,
+  firefox: 70,
 });
 
 export const PHASE_1_ARTIFACT_CLOCK_TOLERANCE_MS = 5_000;
@@ -2833,4 +2833,13 @@ export function validateBlockerReview(review, identity, options = {}) {
       openBlockerIds: openBlockers.map(blocker => blocker.id),
     },
   };
+}
+
+/** Returns true only when an approval belongs to the exact current source manifest. */
+export function approvedBlockerReviewTargetsSource(review, identity) {
+  return (
+    review?.decision === 'approved' &&
+    isSha256(identity?.manifestSha256) &&
+    review?.sourceIdentity?.manifestSha256 === identity.manifestSha256
+  );
 }

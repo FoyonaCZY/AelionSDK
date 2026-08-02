@@ -1,6 +1,6 @@
 # `@aelionsdk/sdk` public API snapshot
 
-Version: `1.2.0-rc.1`
+Version: `1.2.0-rc.2`
 
 This checked-in manifest is intentionally structural. `check-api-snapshot.mjs`
 extracts the public declarations reachable from `dist/index.d.ts`, compares the
@@ -12,16 +12,16 @@ baseline in the same change.
 {
   "schemaVersion": "1.0.0",
   "package": "@aelionsdk/sdk",
-  "version": "1.2.0-rc.1",
+  "version": "1.2.0-rc.2",
   "entrypoint": "dist/index.d.ts",
   "files": {
-    "dist/audio-controller.d.ts": "138ac581b598ca00686fb45e4196187f3beed4a8e633db8a89a2fbd61de3abbd",
+    "dist/audio-controller.d.ts": "367403e08db883c651383e3fca1b56fc33a1858d99a9c40d739f1f4fd21765c8",
     "dist/audio-mastering.d.ts": "4be6be012fb10e3b1b805b61fa3e118a4cb1f2a9af3bef0cbae3e26046b54458",
     "dist/composition.d.ts": "1148a276594c5e66cd9e6b020aa371558488b10fc36ccdd6e84fe0e0167cda90",
-    "dist/default-schemas.d.ts": "60956845e621cd1a663df4807d6073666e2062b106d2d967f529a2ac703f2ab8",
+    "dist/default-schemas.d.ts": "0fb3fd82be392aadbc8f0e41bbf82be86485eccb0d47522da8d037fa37035d7a",
     "dist/diagnostic-report.d.ts": "6a93267e6541ad93419cacac16dd43f0be8921e2759e96f4c479428fee0055dd",
     "dist/extension-host.d.ts": "94034076f92e79baca0d5fd162ca334fbca6a57158ffd7221f7b0458d18fc738",
-    "dist/index.d.ts": "a55cfccba820ac6b1dc43b6d89032310545a66c3bd60c0203547b1a4a82742da",
+    "dist/index.d.ts": "2bcfa3ec687b8214d4b97b329252f2bbc8667ca4b97e4e637f3a444224bf6cde",
     "dist/media-provider.d.ts": "aab4fd227dbcf45bfc101970a304bc1661b91ac849d08571e6bf6dacfef7aafa",
     "dist/migration-materials.d.ts": "c8b24ea198868a5c923fe37ae7fb93bbb9d432dfe4bce66f792526a7497d2edd",
     "dist/migration.d.ts": "600a3c29cb8cff2baca8efdaa52d262e6bd676ae9205ff8aa2f69edbf046792b",
@@ -30,12 +30,12 @@ baseline in the same change.
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
     "dist/production-media-provider.d.ts": "f87a2b3118b5ceaee396840d8327edcec69c17887a25fc80f95134a8e3ce5dee",
     "dist/project-builder.d.ts": "93476d7a5c2f21c2437bd466b66777102e619142f5b135b01621fdcc586de30b",
-    "dist/proxy-automation.d.ts": "568aa0b72cd03e1dec5bd4a5f1e14d00ca45c5745d56d29e8282238edbe7835e",
-    "dist/rate-envelope.d.ts": "13ef6e97c5049ffb155b60eab12fe36d5c5e5dd63d970bd017ade04ad7498891",
+    "dist/proxy-automation.d.ts": "990fb956823340118e3ab5267d6a6fc96f37032805e0850eeebbc7a35c49f97d",
+    "dist/rate-envelope.d.ts": "f34a2dd4475a643975e22a91c04ce596f7c005cb79d1e589b5fdc3500ba2a823",
     "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
     "dist/session.d.ts": "fcf02f0975a9b85ef6dadd8e2afe4542a3a674851fba9d75a3d59a519a5bbe2b",
-    "dist/subtitle-io.d.ts": "46f0a1913758a890b2cf466369ebfaf32273930ff6454196c3608c2c8bd07611",
-    "dist/types.d.ts": "8e277526b01b7a7fdad18fae8a63609a8aafff5cdd929e4354984c657166f42a"
+    "dist/subtitle-io.d.ts": "7fe26fe08bbae4ceaa7f4062c89042539054fa7870c01aeb593dfa92b05c0b26",
+    "dist/types.d.ts": "967ae5ac9bcac75dccf9f1cab692559969dd2fe542c2d68a7a77641c6a1b4a30"
   },
   "exports": [
     "AELION_EXTENSION_PROTOCOL",
@@ -59,6 +59,7 @@ baseline in the same change.
     "AelionAudioMasteringOptions",
     "AelionAudioRemoveSilenceOptions",
     "AelionAudioRemoveSilenceResult",
+    "AelionAudioSceneCompatibilityResult",
     "AelionAudioSelection",
     "AelionAudioWaveformOptions",
     "AelionDiagnosticReport",
@@ -116,6 +117,8 @@ baseline in the same change.
     "AutomaticProxyResult",
     "ByteMediaProvider",
     "ByteMediaProviderOptions",
+    "CURRENT_PROJECT_SCHEMA_URI",
+    "CURRENT_PROJECT_SCHEMA_VERSION",
     "Clip",
     "ClipAnimatableProperty",
     "ClipBox",
@@ -124,6 +127,7 @@ baseline in the same change.
     "CreateMasteredAudioRendererOptions",
     "CreateProjectOptions",
     "CurvePoint",
+    "DEFAULT_MAX_IN_MEMORY_PROXY_INPUT_BYTES",
     "DiffusionAssetBinding",
     "DiffusionMigrationOptions",
     "ExportSubtitleResult",
@@ -134,6 +138,8 @@ baseline in the same change.
     "IndexedDbProjectRevisionStore",
     "IndexedDbProjectRevisionStoreOptions",
     "Keyframe",
+    "LEGACY_PROJECT_SCHEMA_URI",
+    "LEGACY_PROJECT_SCHEMA_VERSION",
     "Layer",
     "LayerOptions",
     "MasteredAudioRenderer",
@@ -172,6 +178,8 @@ baseline in the same change.
     "ProxyEncodeInput",
     "ProxyEncodeResult",
     "ProxyEncoder",
+    "ProxyReaderEncodeInput",
+    "ProxyReaderEncoder",
     "RateEnvelopeOptions",
     "RateEnvelopeSegment",
     "RegisterAutomaticProxyOptions",
@@ -201,6 +209,7 @@ baseline in the same change.
     "importSubtitleTrack",
     "installMigrationMaterials",
     "migrateDiffusionCheckpoint",
+    "migrateProjectToCurrent",
     "migrateWebAvProject",
     "migrationMaterialPackage",
     "migrationMaterialProgram",
@@ -208,7 +217,8 @@ baseline in the same change.
     "projectAudioMastering",
     "registerAutomaticProxy",
     "restoreLatestProject",
-    "seconds"
+    "seconds",
+    "type ProjectIdentityMigration"
   ]
 }
 ```

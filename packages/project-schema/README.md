@@ -1,7 +1,7 @@
 # `@aelionsdk/project-schema`
 
-Project v1 types, bounded admission, validation and canonical serialization for
-AelionSDK.
+Project types, immutable v1.0/v1.2 schema identities, bounded admission,
+validation, migration and canonical serialization for AelionSDK.
 
 ## Install
 
@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/project-schema@next
 ```
 
-`next` currently resolves to `1.2.0-rc.1`. Use this package in importers,
+`next` currently resolves to `1.2.0-rc.2`. Use this package in importers,
 services and Project tooling that must validate data without creating a browser
 Session.
 
@@ -18,6 +18,7 @@ Session.
 - Project v1 TypeScript types;
 - bounded plain-JSON admission;
 - `ProjectValidator` and stable diagnostics;
+- `migrateProjectToCurrent` for ownership-isolated legacy RC identity upgrades;
 - canonical clone and serialization helpers.
 
 Treat every file or network Project as untrusted input. Run admission before

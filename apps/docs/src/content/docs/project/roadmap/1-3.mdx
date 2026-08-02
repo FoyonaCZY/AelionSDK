@@ -1,37 +1,18 @@
 ---
-title: '1.3 Ecosystem: frameworks and UI'
-description: Official React, Vue and Svelte bindings, CDN and headless usage, reference UI components and build-integration parity.
+title: '1.3 Boundaries and ecosystem'
+description: Harden package/runtime contracts and consumer fixtures before adding framework bindings and UI packages.
 ---
 
-## Goal
+## Ordered scope
 
-Make the engine product-ready by providing the framework bindings, deployment paths and reference
-UI building blocks that applications need, without building a full product.
+| Order | Item                                   | Acceptance                                                                                                     |
+| ----- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 1     | **Package and runtime boundary audit** | Dependency direction, lifecycle ownership, worker assets, SSR behavior and exports are documented and enforced |
+| 2     | **Real consumer fixtures**             | Vite, Webpack/Rspack, Next.js, headless Node and no-build ESM consumers pass install/build/runtime checks      |
+| 3     | **Package-size budgets**               | Per-package and representative-app gzip budgets fail CI on regression                                          |
+| 4     | **Framework bindings**                 | React/Vue/Svelte bindings remain thin lifecycle/state adapters over the already exercised SDK boundary         |
+| 5     | **Reference UI components**            | Accessible timeline, properties, media, player and subtitle primitives; not a full editor product              |
+| 6     | **Measured hot-path optimization**     | SIMD/WASM work lands only behind unchanged semantics and with benchmark/golden evidence                        |
 
-## Scope
-
-| #     | Item                                | Priority | Size | Notes                                                                                                                                                                                                                      |
-| ----- | ----------------------------------- | -------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.3-1 | **Official framework bindings**     | P0       | L    | `@aelionsdk/react`, `@aelionsdk/vue` and `@aelionsdk/svelte` with Composition/session lifecycle hooks and reactive state bridges. The README promises framework-agnostic usage; this delivers first-class bindings on top. |
-| 1.3-2 | **CDN and headless usage**          | P1       | M    | No-build ESM CDN entry, safe Node/SSR degradation and verified tree-shaking.                                                                                                                                               |
-| 1.3-3 | **Reference UI components**         | P1       | L    | Composable timeline, properties panel, media browser, player controls and subtitle editor — not a full product, but drop-in building blocks evolved from `editor-demo`.                                                    |
-| 1.3-4 | **Build-integration parity**        | P2       | S    | Bring the Webpack/Rspack/Next.js/CDN runtime-asset support to parity with the Vite plugin.                                                                                                                                 |
-| 1.3-5 | **Package-size budget**             | P1       | M    | Per-package gzip budgets, subpath exports, side-effect declaration audit and bundle-size enforcement in CI.                                                                                                                |
-| 1.3-6 | **Hot-path SIMD/WASM optimization** | P1       | M    | Rewrite resampling, matrix and color hot paths with SIMD/WASM behind the existing APIs.                                                                                                                                    |
-
-## Acceptance
-
-- Each binding package publishes with the same release discipline (contract, docs, evidence,
-  artifact) as the engine packages.
-- Reference components are keyboard-accessible and document their ARIA contract.
-- Bundle-size enforcement fails CI on regression, mirroring the existing api:snapshot gate.
-- SIMD/WASM hot paths are behind the current public APIs; behavior is unchanged and benchmarks
-  ship with the release.
-
-## Risks and dependencies
-
-- 1.3-5 needs a baseline audit before budgets are set; retrofitting budgets too early blocks the
-  capability minors.
-- 1.3-6 depends on the 1.1 codec/backend decisions so optimization targets are stable.
-- Framework bindings multiply maintenance; the API snapshot and narrative-coverage gates apply to
-  each new package.
+Framework bindings are intentionally after boundary and consumer validation. Otherwise each binding
+would fossilize unstable lifecycle decisions and multiply migration cost.

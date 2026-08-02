@@ -1,7 +1,7 @@
 {
   "schemaVersion": "3.0.0",
   "generatedBy": "scripts/run-phase-1-final-gates.mjs",
-  "startedAt": "2026-08-01T20:16:55.414Z",
+  "startedAt": "2026-08-02T07:02:33.778Z",
   "sourceIdentityBefore": {
     "kind": "workspace-input-manifest",
     "policyVersion": "3.4.0",
@@ -18,12 +18,12 @@
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 529,
-    "totalBytes": 9582756,
-    "manifestSha256": "e04336d206fab60eed49dcbb2c4bf2fe3863b52b842ef57b17223c7d3f5e2cf5",
+    "fileCount": 531,
+    "totalBytes": 9664809,
+    "manifestSha256": "9d61b2124b579812ca413a588c7b1384eebc1e477f728304d8bd45fedbe86006",
     "vcs": {
-      "commit": "0f9b9a336898734e9c19e6e03bfe7c4c9e1ec430",
-      "tree": "91565e251e5e52d51ff1305b2a88c66ab6abb161"
+      "commit": "af9fdd6bd892cb35c6ba6ae743ab0945fb55f152",
+      "tree": "fad693299e74e1772ad82ca8e48b21bd5262ab08"
     },
     "files": [
       {
@@ -33,8 +33,8 @@
       },
       {
         "path": ".github/workflows/ci.yml",
-        "bytes": 4401,
-        "sha256": "fe2a5d13f6519d40e3eea4d1370cd59568b135ed7752b3a28293876e47b00d90"
+        "bytes": 4450,
+        "sha256": "aa58e971d7e60dd89a894389e1ba6a62268b05fbeb5a58876728a560903a5635"
       },
       {
         "path": ".github/workflows/docs.yml",
@@ -78,8 +78,8 @@
       },
       {
         "path": "CHANGELOG.md",
-        "bytes": 23572,
-        "sha256": "bd8e83b92e3a1328f9a0ad39b6723d541b5e12b4a2dcc98aa5c70849f5cddac2"
+        "bytes": 24873,
+        "sha256": "cb17caec2f087b615377551a151cb67500b8c4d8faeb6f8238e9e322ea2083b4"
       },
       {
         "path": "CODE_OF_CONDUCT.md",
@@ -98,8 +98,8 @@
       },
       {
         "path": "README.zh-CN.md",
-        "bytes": 20740,
-        "sha256": "836ea5cc4955e5c61747d7b28159a89fc3e7ae76dbe03080a9bd04167c518f1e"
+        "bytes": 21432,
+        "sha256": "2d083af41567050601bc68589a97153ee786a465afc4106d90ae5507280bf9a7"
       },
       {
         "path": "SECURITY.md",
@@ -119,7 +119,7 @@
       {
         "path": "apps/capability-lab/package.json",
         "bytes": 241,
-        "sha256": "3a1f731832db8a0fd78e1936cb6a7f61caaff451f587973a502edde860ba0134"
+        "sha256": "c113908a4eb4c64c14ba37c44934269f054dd6e666a12a5105e0a05ddd087c86"
       },
       {
         "path": "apps/capability-lab/src/main.ts",
@@ -159,7 +159,7 @@
       {
         "path": "apps/docs/package.json",
         "bytes": 436,
-        "sha256": "ce95c4c96654220f613a65946b5e979854e5eb905cd1b7b17e50aa72bb2ed246"
+        "sha256": "93ab5c90d8a47cefe82555782ec52d4888db92e14ba8fccdc21d9052d99f972b"
       },
       {
         "path": "apps/docs/public/favicon.svg",
@@ -168,8 +168,8 @@
       },
       {
         "path": "apps/docs/scripts/astro.mjs",
-        "bytes": 471,
-        "sha256": "f686b48ffc8e9c4c7f88ba38a38ba3d80958242681290fb70cdf49d4bf0fc53d"
+        "bytes": 553,
+        "sha256": "7436eaf655b116662b72b6e42dc8a543d5b3ce9a69ccab44e40563e92e811d04"
       },
       {
         "path": "apps/docs/src/content/docs/concepts/architecture.md",
@@ -289,12 +289,12 @@
       {
         "path": "apps/docs/src/content/docs/index.mdx",
         "bytes": 4003,
-        "sha256": "01116cde3a872a86c296b4575e6f12da5e7aba8a49502c4c42504efc48efb659"
+        "sha256": "7f011d60abc2c1387ba520988526761e9e8bbf22bf46ac34321a61f608ba9f85"
       },
       {
         "path": "apps/docs/src/content/docs/production/capability-preflight.md",
-        "bytes": 2603,
-        "sha256": "340800f281964f3b2f520d6c0cbe843f05a4a8af541b461e62fcc545ff527dc0"
+        "bytes": 2546,
+        "sha256": "9445d826ade33e9a39d0a584b45f08f940e7ade461b5c4cd807073bd0084d172"
       },
       {
         "path": "apps/docs/src/content/docs/production/compatibility.md",
@@ -333,18 +333,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-1.mdx",
-        "bytes": 3580,
-        "sha256": "4b19dce79b3d0b104e29c81e44e012f413ae928f5f48bfae17c8aa5851234891"
+        "bytes": 2856,
+        "sha256": "37d5c0a3389c82ca7695babddc95cf97cd44f2e1278f1eabf3ea840480c5bb24"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-2.mdx",
-        "bytes": 3083,
-        "sha256": "a6660e80aeaad680dd383c148cd818e5ed95aafeeac2f0189449113051e9ddb6"
+        "bytes": 2841,
+        "sha256": "573a934e0b8070c6ae943bdc6e19039a6d3274bd135c693cf9902ac9d23c78db"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-3.mdx",
-        "bytes": 3464,
-        "sha256": "7b477cc1dc381467cc6428fdc2b9bf18e683b8c02c5a1b8c8189c16f9fffd512"
+        "bytes": 1670,
+        "sha256": "98a01d14a0b3870ae0f3edc6579784444f1e71b35df37dff95c9f1795b2cbb95"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-4.mdx",
@@ -363,18 +363,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/2-0.mdx",
-        "bytes": 3445,
-        "sha256": "b04fad4e910887b572240279250dc5396377a00692425901f97415d178e75a9e"
+        "bytes": 2769,
+        "sha256": "db502703403e2dff33d5dfa7994f5ca0843fbb1bec230c9aa452a65cf18d9c1b"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/index.mdx",
-        "bytes": 4375,
-        "sha256": "fbfc2ed402b32a5204bfdc617cf41148acd0c37250c05eefa574d1c3ddd2d543"
+        "bytes": 3113,
+        "sha256": "aff6f1df217d2d093c5ac97d21658082087794d24d748e6f4bba88c4ec5b1026"
       },
       {
         "path": "apps/docs/src/content/docs/project/status.md",
-        "bytes": 2320,
-        "sha256": "8aca41f7bb76055c0ecfa7cd2c557fbe05b1ab6662542407d6afdd37fcf919e2"
+        "bytes": 2664,
+        "sha256": "ad479b906a920c7dcfab462a2c4bbdfeba51581a44f7218cdadc491102193ddf"
       },
       {
         "path": "apps/docs/src/content/docs/reference/core-node-math-v1.md",
@@ -414,17 +414,17 @@
       {
         "path": "apps/docs/src/content/docs/reference/packages.md",
         "bytes": 3677,
-        "sha256": "e5923cbc08ef9bc9ba592ba681ac62f51b564867f811895a8a9595ebd07af6f6"
+        "sha256": "3f616e20d95722d90367a202cf6ddc785f3fee05d2d718fc9941b153a95094e6"
       },
       {
         "path": "apps/docs/src/content/docs/reference/project-schema.md",
-        "bytes": 2733,
-        "sha256": "d09b28bc087714fa08efca66ef0462485873838bfe579dda2b5395ba71207587"
+        "bytes": 3922,
+        "sha256": "97c6fafeca2c004b04ca341434334bc4855b4d7b80cb01ace37fb11e280de66b"
       },
       {
         "path": "apps/docs/src/content/docs/start/capabilities.md",
-        "bytes": 4863,
-        "sha256": "60abed0c9dbcc8afe5c16745c6ee939a4d24000fae58fad7c4fc50bcab7263f2"
+        "bytes": 5087,
+        "sha256": "1e2ab98e8f13abca81a81dda86994212b59fa4b948f707301cc1f112bfdadceb"
       },
       {
         "path": "apps/docs/src/content/docs/start/getting-started.md",
@@ -434,12 +434,12 @@
       {
         "path": "apps/docs/src/content/docs/start/installation.md",
         "bytes": 4469,
-        "sha256": "55234dcc85326a26dedd856953832910f21e603f2d5a2f5c08cbff0e21701d70"
+        "sha256": "bdce43381de54041265ab16896ea87f6b9f9b65e425113f33e9c9f1e4c0fc18a"
       },
       {
         "path": "apps/docs/src/content/docs/start/packages.md",
         "bytes": 2986,
-        "sha256": "bf9af4a60a671d4533eed31d6e0a61551773b713a7e0cea285d76e3cca3d9c9a"
+        "sha256": "f89027ea6139567de5fe480a69753ab4dae18728d2b0e57afba6c9a9808b095f"
       },
       {
         "path": "apps/docs/src/content/docs/start/reference-editor.md",
@@ -564,12 +564,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/index.mdx",
         "bytes": 4884,
-        "sha256": "cfeb406257bcc33e31351999e8fecf7f99bb30af0f71d7cd3dd0ffd61af7210f"
+        "sha256": "388ac809b3c0cbb1ed5b6c9fb4a202e150c961b285591e7963f0b2e2af83b4b9"
       },
       {
         "path": "apps/docs/src/content/docs/zh/production/capability-preflight.md",
-        "bytes": 5615,
-        "sha256": "5a2fd2c9818f9fd591ad5afb1e9d49c860852d836fd0462c6354ad26b4c2adcf"
+        "bytes": 5572,
+        "sha256": "a91cf45800333b808ed6b2f20a60829c7f3a08e5acfb7a9963f20123f24f4ee9"
       },
       {
         "path": "apps/docs/src/content/docs/zh/production/compatibility.md",
@@ -608,18 +608,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-1.mdx",
-        "bytes": 3187,
-        "sha256": "62973f7734908fe2a4340b935d1487572a10ae2d1fddf9a696c4439dc56a9888"
+        "bytes": 2507,
+        "sha256": "42fb5a241a85ce033b340e1ece993ecf4cc537990244e7011da5813de8033d87"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-2.mdx",
-        "bytes": 2625,
-        "sha256": "ce04f945f07556e3fc9fbf39e3c0618d529a1b444886d8b34ad6b30526a4a104"
+        "bytes": 2627,
+        "sha256": "0de1aaa2f610dbf15c3d696dcdf6b5ae7f6d24d4c6e4e8393f45bbbe97d9321c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-3.mdx",
-        "bytes": 2992,
-        "sha256": "a27c3615bb0510a2c1e44fa4132cc061f3318d6c518bede2efdc62f3fbffea40"
+        "bytes": 1459,
+        "sha256": "d83b33a52478b5711fc9b726015b7b9f413581949d12113cadfe636a037840a3"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-4.mdx",
@@ -638,18 +638,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/2-0.mdx",
-        "bytes": 2982,
-        "sha256": "46f93f45517ab5df585aa50203e6f4459aaf5b4512a1e4e9961ea23825f6b6b6"
+        "bytes": 2344,
+        "sha256": "e312df5dac88d3b0c4dc1ea079165832a2e818d205a4b24f5fb0db2cb61f169d"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/index.mdx",
-        "bytes": 3762,
-        "sha256": "c46537d28ba91d2e7280a0311fe18de53bdfae2f347448afb78ddfc459a9529b"
+        "bytes": 2651,
+        "sha256": "2975c18111285211103a464260e8a520a752d859f6cc3ebb7c686d86142a3a73"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/status.md",
-        "bytes": 7723,
-        "sha256": "72251f5a03010bf90cdaaa3ae054006bd29f780c87a9fbd208714196ea2c529e"
+        "bytes": 2458,
+        "sha256": "e5b2661799f42d9782605a13e196fb2cbf61474e3b5db5db617878c098d46a0b"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/core-node-math-v1.md",
@@ -659,7 +659,7 @@
       {
         "path": "apps/docs/src/content/docs/zh/reference/diagnostic-codes.md",
         "bytes": 31069,
-        "sha256": "2a412f62310b99e824ca8b3fc3fb512349e7422e0ff174881f64022e9a2c8f8d"
+        "sha256": "1c1926877c970b86a3022d1ce3ccd6203bf724aa1b24844a0f3781dbb1d4de0c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/editing-commands.md",
@@ -689,12 +689,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/reference/packages.md",
         "bytes": 6895,
-        "sha256": "6028a7148135f596ee6f510cf4e7ffce03dbb9ecc8cce769a09f8b900f538a1a"
+        "sha256": "74394fc79bd271a48ebcb519f7281a455c0a4a75b8a93ac6e8ea7a3fef9660d6"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/project-schema.md",
-        "bytes": 6046,
-        "sha256": "1febfad82166deecd2112f99a8597b220dc5dfad247664b06ddfbe399a38d442"
+        "bytes": 3492,
+        "sha256": "026759dac5fe17de1b356a335def2f47d9ef39f61c55003593082e2ee7211a21"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/capabilities.md",
@@ -709,12 +709,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/start/installation.md",
         "bytes": 8772,
-        "sha256": "c0bf2ecf92cea99166c43f8fb71ceda4463d4c61ff99b718adde36bef7519f95"
+        "sha256": "ff2b39519b5e6b9ce9b88cd63aad09efa68264be3293406a924daf6a855d96d1"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/packages.md",
         "bytes": 4281,
-        "sha256": "3d01471bfc29d9e3dc58e960a900a2c179a913d1084be8e6a2b27baa12712a6a"
+        "sha256": "048ea2189db14e572c0e2fa7fb174a7f1d45c5338dba349bbf4105f8d4ff277c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/reference-editor.md",
@@ -749,7 +749,7 @@
       {
         "path": "apps/editor-demo/package.json",
         "bytes": 364,
-        "sha256": "2dff4624c8933f97009d953ba4f849f893f6af800e3e7d5318ea32e874f7bff6"
+        "sha256": "ffce902520c533ab6693fe12d61ea0fa010d11739cc87af9b1db62bd1f88dab6"
       },
       {
         "path": "apps/editor-demo/src/main.ts",
@@ -784,7 +784,7 @@
       {
         "path": "apps/evidence-runner/package.json",
         "bytes": 608,
-        "sha256": "50c23e21bf05e298c6d707309b6c2ce206896f7f2922246732212729facc2a8a"
+        "sha256": "542dcc7d95ff7baca55924b4600c4247b0329dd3e46ac49bc45da8a0942bc125"
       },
       {
         "path": "apps/evidence-runner/performance.html",
@@ -854,7 +854,7 @@
       {
         "path": "apps/quickstart/package.json",
         "bytes": 363,
-        "sha256": "633402d12d34d4ef1eb695fd85e43391e60a9748debd40d86c19713433be5bdd"
+        "sha256": "0ecb3975b64d55d29f9ecb2727d07e4dcf8345a0d4b607484e8c65f68b95764a"
       },
       {
         "path": "apps/quickstart/src/main.ts",
@@ -884,12 +884,12 @@
       {
         "path": "compatibility/device-matrix.json",
         "bytes": 3717,
-        "sha256": "9b71e7b0eed26e6ebcb7221c772061fda7e9e4a5b5360b6717215f003f20e24b"
+        "sha256": "3be647fc8302c3d4070dd10d216880fbe400b9f90cedc410d42ce96520384e02"
       },
       {
         "path": "compatibility/matrix.v1.json",
         "bytes": 4542,
-        "sha256": "fa6c98ca4da73d5129d6b9000dcb33084aaa247929481ca4f5a6e36d4eb7e7b6"
+        "sha256": "32409a07acb355d42c5b653e214d613ec917fb3328621d5a6a183d5a637f3e3a"
       },
       {
         "path": "eslint.config.mjs",
@@ -1068,23 +1068,23 @@
       },
       {
         "path": "package.json",
-        "bytes": 6669,
-        "sha256": "9ae8acb74a7f868c8731639d83ee0d0f10c5ae84a7ed8e70bac65246408bbb72"
+        "bytes": 6717,
+        "sha256": "9c0316b33641d764d56d11b5ca24731a0ecb13cd16dc1965edf7ad5c2da4704a"
       },
       {
         "path": "packages/audio/README.md",
-        "bytes": 936,
-        "sha256": "04780b3d86033273308c10d6e1b4146850ffe1378b5a82962264f79dc5d66b6a"
+        "bytes": 1052,
+        "sha256": "9ab0afba5f5f7a59f07b23282dfe587cfb39ede5d276a6a7f4321a12d425df72"
       },
       {
         "path": "packages/audio/package.json",
         "bytes": 1049,
-        "sha256": "c162dd1dd58313b3a32b6900e921b52a0231bb78f922ce22df8fb0a55176c6f8"
+        "sha256": "88c43538b65a82b35937058d0d3357966414dfd7419dac379789a34087d04aac"
       },
       {
         "path": "packages/audio/src/analysis.ts",
-        "bytes": 5291,
-        "sha256": "e6025746efb085d1f2a8d841918444b907ee17e6fe2a26968a930d46f9f6170f"
+        "bytes": 6935,
+        "sha256": "d73ae0294256b7dd23bf517a4ecaf2be13607df232b55361d47ac917b2fbca5b"
       },
       {
         "path": "packages/audio/src/device-state.ts",
@@ -1158,8 +1158,8 @@
       },
       {
         "path": "packages/audio/test/analysis.test.ts",
-        "bytes": 3128,
-        "sha256": "7a6492aa2650bf903da5bf3bb0f51ddd59dad63bfc0aa6d87a1e665916c132a3"
+        "bytes": 4512,
+        "sha256": "1893d4619a32c3054e85b37315b87dd4650e16d655bc6ab59bd20c1633c499a0"
       },
       {
         "path": "packages/audio/test/device-state.test.ts",
@@ -1218,18 +1218,18 @@
       },
       {
         "path": "packages/capability/README.md",
-        "bytes": 935,
-        "sha256": "ba9cae7229fcc517ec4ea2992df9280748cbe213b32f04becec78415870f8c4a"
+        "bytes": 1146,
+        "sha256": "bdbac863a37f39820b6c9b1391def275b0eadff917b5831e677edfdabd0d7ad7"
       },
       {
         "path": "packages/capability/package.json",
         "bytes": 998,
-        "sha256": "d1866c00ee3d73d928701f0e275b85cccec41194b019392becd3db075019f897"
+        "sha256": "c41de844369e1277f34423be2cec9f617126197f325a424070788ab360972328"
       },
       {
         "path": "packages/capability/src/fallback.ts",
-        "bytes": 4092,
-        "sha256": "e4916356acbc4506616fef7ec08d79143d2cb4cbffe3e6359b5ee66842b6eaa0"
+        "bytes": 4742,
+        "sha256": "1480a63155ee75b2c30d7d275819fe4ddccfef2df6519890524b1118e97dfc23"
       },
       {
         "path": "packages/capability/src/gate.ts",
@@ -1258,8 +1258,8 @@
       },
       {
         "path": "packages/capability/test/fallback.test.ts",
-        "bytes": 3073,
-        "sha256": "c4984e2320c70ee99e666fe3c5c2d41954c9ee0eff00889d565b9a926784979a"
+        "bytes": 3479,
+        "sha256": "6ca4fb6ac2a893044dce09eeb285c2c0922f64ba63fe4b66af3943954bbc5592"
       },
       {
         "path": "packages/capability/test/gate.test.ts",
@@ -1274,12 +1274,12 @@
       {
         "path": "packages/core/README.md",
         "bytes": 878,
-        "sha256": "5ee34a68eeeed76691f3f59f01de823c7be036ed95c935f85cf7e89951dd8503"
+        "sha256": "c01f38bb57a4a2196a45cd3b30b07c96bf7b2aefd2e243376962542937604e99"
       },
       {
         "path": "packages/core/package.json",
         "bytes": 937,
-        "sha256": "e54a5ba3952140bf8ed5832dae5cabc8f87af956e01288f66717e457e04bd4ca"
+        "sha256": "09a8b0a4e97875ad2f56db16537167e8bd7092098e62fa5f12b12ce4346dd9ca"
       },
       {
         "path": "packages/core/src/diagnostic-localization.ts",
@@ -1339,12 +1339,12 @@
       {
         "path": "packages/export/README.md",
         "bytes": 978,
-        "sha256": "fe06d73d20f7a2cf3bc785e77d7ce0563b1a6c7a7bd1a32bbf0ebabcaca829a8"
+        "sha256": "1aa99cb338973c5041a84f064b26cad519b58847df54862917e155b8a05b8b5a"
       },
       {
         "path": "packages/export/package.json",
         "bytes": 1119,
-        "sha256": "f015147068662f0c3c22ac29f2b07a343cf5ccd078229c636fd625206812ec2e"
+        "sha256": "d90efea58098aad880a29623cbcb70ad590bcecb1a1ffdfd15a951d583431ba3"
       },
       {
         "path": "packages/export/src/audio-export.ts",
@@ -1454,12 +1454,12 @@
       {
         "path": "packages/material-compiler/README.md",
         "bytes": 960,
-        "sha256": "904655c5da05bd883d00754ec542056a47da9e0c4c5369e11cbe928b5916c82e"
+        "sha256": "df1e1d278e6fa0e2065e261d317427cfe7d5d1fab0ae6b7073f027f1ff77f7cc"
       },
       {
         "path": "packages/material-compiler/package.json",
         "bytes": 1024,
-        "sha256": "c20039d9018ebe43919efa6426b9d8c023f23813f68ba0b263020bb704129cde"
+        "sha256": "2c6ef6ba23c263fb430733efb624894311a2afa40901866b675719c70d4f7af7"
       },
       {
         "path": "packages/material-compiler/src/codegen-common.ts",
@@ -1514,12 +1514,12 @@
       {
         "path": "packages/material-sdk/README.md",
         "bytes": 1747,
-        "sha256": "e3d3dde64293d8221e1a34069d9d45648aa2351251bee9714c4270df4a4be969"
+        "sha256": "119080cbdf574b55a8767bd1aae535f791f9bd66d4a2724fef11d5b4872e141d"
       },
       {
         "path": "packages/material-sdk/package.json",
         "bytes": 1343,
-        "sha256": "b9ae50bdc9445fbaa2c214b8f0485f05f2787c467a51d438b5699f9e453c89bf"
+        "sha256": "be4d251e5c166d209fa7749aee5046a623fcbe6e3fb6bfa1485a00f974b3b6d9"
       },
       {
         "path": "packages/material-sdk/src/bundled-schemas.ts",
@@ -1649,12 +1649,12 @@
       {
         "path": "packages/media/README.md",
         "bytes": 1027,
-        "sha256": "ce27d3844b57091e7844926adacadef4409bea1d2575e59d001ee8cbee408231"
+        "sha256": "b422a9750863ca110d42cd5732e911d624a658394b8895aebde0fe8b219278e4"
       },
       {
         "path": "packages/media/package.json",
         "bytes": 1031,
-        "sha256": "87e393c67c77e18fc2f1d60f20c2e1d5ea3842d74296611e7f27b1a02da30e6b"
+        "sha256": "25b8869f0a799bb37cf3046644d199b1c010535972eb8f1e36c7015798562562"
       },
       {
         "path": "packages/media/src/cache-store.ts",
@@ -1743,13 +1743,13 @@
       },
       {
         "path": "packages/project-schema/README.md",
-        "bytes": 914,
-        "sha256": "093c45724f68bf54df60ddfc003e967bdbbc33993e67a4578b90b56a4c0a96c8"
+        "bytes": 1041,
+        "sha256": "a083eb5dd4f19156870d8ee62182944d4494fafa7a2bcff42b1f8bf6e0d49c23"
       },
       {
         "path": "packages/project-schema/package.json",
         "bytes": 1077,
-        "sha256": "2a469dcaaece4a4e50dd7cb861528df3f1540265af0dbee551568cbdc028613d"
+        "sha256": "e218dc0c202b32a076a9f58ca7d750df176e0407189f0046bd025953cbc3ac72"
       },
       {
         "path": "packages/project-schema/src/admission.ts",
@@ -1768,8 +1768,13 @@
       },
       {
         "path": "packages/project-schema/src/index.ts",
-        "bytes": 160,
-        "sha256": "0a7e680a3fbe640fa438cdd36195fb8012c652f883e11b7c95d98c7bed4827c3"
+        "bytes": 192,
+        "sha256": "67fe1c046135265a6845812059a033bddc36d60cce3fb1d3e56cc20ebfaf60e0"
+      },
+      {
+        "path": "packages/project-schema/src/migration.ts",
+        "bytes": 3019,
+        "sha256": "a54d569d67e8da698f7dc851aea9263eb3d9d8973956640c374e36ef258e0fad"
       },
       {
         "path": "packages/project-schema/src/types.ts",
@@ -1778,8 +1783,8 @@
       },
       {
         "path": "packages/project-schema/src/validate.ts",
-        "bytes": 28191,
-        "sha256": "927502688f3e063b5696dd72ccd97a9846f475f3e2fdebff2a779db27775a1b7"
+        "bytes": 29272,
+        "sha256": "7cf82a53eadfc9627058d49161a6469ee4fbf66053a557a3cec2c128c0c22630"
       },
       {
         "path": "packages/project-schema/test/admission.fuzz.test.ts",
@@ -1793,8 +1798,8 @@
       },
       {
         "path": "packages/project-schema/test/project.test.ts",
-        "bytes": 25833,
-        "sha256": "46a7976a92fc626a8b3503993be00b435c4a1d02738a5a363628af75d3e0ffaf"
+        "bytes": 27822,
+        "sha256": "89914775b2c457ff008d6bfb1574b3b244e6abdb3d2562a3c46b0f93c4b7645f"
       },
       {
         "path": "packages/project-schema/tsconfig.json",
@@ -1804,12 +1809,12 @@
       {
         "path": "packages/render-ir/README.md",
         "bytes": 964,
-        "sha256": "3f520c23f1bafe756562890c2ff7ae49f01a028b517e33b996192f7be4584600"
+        "sha256": "190e2013a5b048f7d7651e5e7e5416aeb33868aeca076f619c997ce11b1d083a"
       },
       {
         "path": "packages/render-ir/package.json",
         "bytes": 1117,
-        "sha256": "165211813e52a7f4eb1ef363417ab4726e188a1ca9aadc66589d38a3b3f53c9a"
+        "sha256": "0604e8def279d7666db9756c803942cc016aae4cd8d023d183b71bd3399ba090"
       },
       {
         "path": "packages/render-ir/src/captions.ts",
@@ -1823,13 +1828,13 @@
       },
       {
         "path": "packages/render-ir/src/compiler.ts",
-        "bytes": 25880,
-        "sha256": "d85618d54cba07867406437817e507316cfd4e7776cc8c42db22f5783b7dddae"
+        "bytes": 27539,
+        "sha256": "b8217d7fe6edebbcce2ac8add23919818c639f45b9dd13c69cb5efab1bdf5362"
       },
       {
         "path": "packages/render-ir/src/evaluate.ts",
-        "bytes": 16094,
-        "sha256": "57a5f6087cd16d0df39cd84018888586bf46c72a768f670a97ba52af2f426eea"
+        "bytes": 16971,
+        "sha256": "961e57572688680d6ba24bbd8c71d27774b08159c8a43adfbc1254429125da7b"
       },
       {
         "path": "packages/render-ir/src/index.ts",
@@ -1848,13 +1853,13 @@
       },
       {
         "path": "packages/render-ir/src/types.ts",
-        "bytes": 9016,
-        "sha256": "1bd2288525439f0a028a9a4718c8d58db75433c45705ba365e3dbe2a923e5563"
+        "bytes": 9208,
+        "sha256": "fd286b1366e277b068c00d835fd0254224346d6ec40cd2a7879fe76eb5aec276"
       },
       {
         "path": "packages/render-ir/test/bezier-handle.test.ts",
-        "bytes": 3318,
-        "sha256": "dfd86b515d5288659081aab278ecc1ae0fe8681e5212a6dd5b7f9da3dc1bc604"
+        "bytes": 3997,
+        "sha256": "9345b29f661763208de1ee336378c7e12a2ed099963a095517f51997e65026a3"
       },
       {
         "path": "packages/render-ir/test/color.test.ts",
@@ -1863,8 +1868,8 @@
       },
       {
         "path": "packages/render-ir/test/compiler.test.ts",
-        "bytes": 25676,
-        "sha256": "be6dd3eeb98ffb8dc3f47c72bbc57f4070bf36803663dfa7203e2cb28ccb03ad"
+        "bytes": 27317,
+        "sha256": "aad73232aad6bb0082a7e096f827dd72f487dfdbaab7693669b122deae83fdd8"
       },
       {
         "path": "packages/render-ir/test/production-soak.test.ts",
@@ -1889,12 +1894,12 @@
       {
         "path": "packages/renderer-worker/README.md",
         "bytes": 923,
-        "sha256": "1d09e149404ad926d1498d23d7ca6bda2054e69bfe15ac868d76eeda957441d4"
+        "sha256": "368388dccfc36ba6558cbd718b829f8a6889711768c3c0a08ab947dee06cefca"
       },
       {
         "path": "packages/renderer-worker/package.json",
         "bytes": 1107,
-        "sha256": "44b7d019e1f6a9268653dc37ee470549ffb87645ad389ab40d8bf7b9482c261e"
+        "sha256": "3d5854f60194c4c58097d64322bcb000ba9a75b21dab44bbebe553a56ddd4ea7"
       },
       {
         "path": "packages/renderer-worker/src/client.ts",
@@ -1913,8 +1918,8 @@
       },
       {
         "path": "packages/renderer-worker/src/ir-renderer.ts",
-        "bytes": 50968,
-        "sha256": "46c974fda65debd34b3dc56344ec25ba8089152ba5dbb9dea48629a9093ea74e"
+        "bytes": 51113,
+        "sha256": "7cbbf4e6ce5a3aacf53ca164199ad7ae13e5cfeccbe90925b8a16ee167a7fa0a"
       },
       {
         "path": "packages/renderer-worker/src/protocol.ts",
@@ -1948,8 +1953,8 @@
       },
       {
         "path": "packages/renderer-worker/test/ir-renderer.browser.test.ts",
-        "bytes": 32956,
-        "sha256": "7f98d26c2f06c03b9d4349cc6b5a9a88bd5d49a8bedcdc408010520cd33c405d"
+        "bytes": 35143,
+        "sha256": "c124647d7f87c1106191b6bf648eef4973e8152b8fe3187296aba2ba2fb66124"
       },
       {
         "path": "packages/renderer-worker/test/material.golden.test.ts",
@@ -1968,13 +1973,13 @@
       },
       {
         "path": "packages/sdk/README.md",
-        "bytes": 2392,
-        "sha256": "3f8060e720d649a6ead26490c450a9c930955b5f50ff2dfe00b8335b9940b69f"
+        "bytes": 2687,
+        "sha256": "5434bf9ec70ec4fc98e51591910988e416bacb1b65e7ca554547147cd0ebd714"
       },
       {
         "path": "packages/sdk/api-snapshot.md",
-        "bytes": 7550,
-        "sha256": "1cf789e65924cf8ed58d03ed43432f9e000e3b47c5c08c1a09548dd3b056cfb7"
+        "bytes": 7906,
+        "sha256": "01cf9291fdc852de0952071b7f299afe10a8c266e22dcd130c79b9846269fd1f"
       },
       {
         "path": "packages/sdk/check-api-snapshot.mjs",
@@ -1984,12 +1989,12 @@
       {
         "path": "packages/sdk/package.json",
         "bytes": 1977,
-        "sha256": "f41107609bdbf0d0ec2f44344cdd7c7e9413bfdb34a59928b2626efddd0d4e3a"
+        "sha256": "24ef743c38bca893a219ee95d063135759998bd415631981fdf86386c8fdfe46"
       },
       {
         "path": "packages/sdk/src/audio-controller.ts",
-        "bytes": 14211,
-        "sha256": "1cd0ab85f91eceb2b6ede07965441f5bc224c3d5f244a285f2a6e5f3511c880d"
+        "bytes": 14732,
+        "sha256": "3caefb98facc1049968959f89b38a9c897c5af6dc9849c8a267bc9c7b80ab927"
       },
       {
         "path": "packages/sdk/src/audio-mastering.ts",
@@ -2003,8 +2008,8 @@
       },
       {
         "path": "packages/sdk/src/default-schemas.ts",
-        "bytes": 23881,
-        "sha256": "990a06dfaa236e5f18009be124926f4f2b900cc64733f724e331bde2ca0d741e"
+        "bytes": 45099,
+        "sha256": "8ac3d59e9b6169080a2160b5079ec64b10f55c783186b8f4393250b7a3265810"
       },
       {
         "path": "packages/sdk/src/diagnostic-report.ts",
@@ -2023,8 +2028,8 @@
       },
       {
         "path": "packages/sdk/src/index.ts",
-        "bytes": 917,
-        "sha256": "ad9b5f5774ae0d307da95fa59ef5b2d8dcd09fce330e6e8a4d38b867df7ade30"
+        "bytes": 1149,
+        "sha256": "fc7ae6f951983f4ddb6eb1307be4f4ec6a8213974253b6c396e0b74d3f70ee03"
       },
       {
         "path": "packages/sdk/src/media-provider.ts",
@@ -2078,18 +2083,18 @@
       },
       {
         "path": "packages/sdk/src/project-builder.ts",
-        "bytes": 51898,
-        "sha256": "51ebd6d094a8786059ca386469f49156cf86901b05e20999ab925d20d35a6855"
+        "bytes": 52038,
+        "sha256": "8df39667a6654458402d061a336b6a41160e8eb1fd6c1feeb765b061c7261f30"
       },
       {
         "path": "packages/sdk/src/proxy-automation.ts",
-        "bytes": 3672,
-        "sha256": "afc05c77aebae659884ef472cfc4bbe2186dc1d7d18ded382ef5175e8a900057"
+        "bytes": 6888,
+        "sha256": "cc83a214aaac6800bc69f22a656e2f663926da41ad80893583a17b08cf347418"
       },
       {
         "path": "packages/sdk/src/rate-envelope.ts",
-        "bytes": 2549,
-        "sha256": "cb5803190e96c9f6ecc27103389f525265d60d76b6eeaa0df37a1a934c74887b"
+        "bytes": 3482,
+        "sha256": "bb8a7d87929b7672acf73e8ce992e1732d647ffaec99972086dbe7e3fed1132e"
       },
       {
         "path": "packages/sdk/src/runtime-material-registry.ts",
@@ -2098,18 +2103,18 @@
       },
       {
         "path": "packages/sdk/src/session.ts",
-        "bytes": 52277,
-        "sha256": "abb1e1af7150f28c3726b8c40590e0fcb1a0ea3df901fa0513fb093b28234af5"
+        "bytes": 52254,
+        "sha256": "d07eea7ec6cccd295f99daf03a270313c6019e5cffa9069e1fb3f56a004d8fa1"
       },
       {
         "path": "packages/sdk/src/subtitle-io.ts",
-        "bytes": 5944,
-        "sha256": "36c1d21cad308e9eeda70a2c50a387110474cad6eded9f01b28e963041398512"
+        "bytes": 7490,
+        "sha256": "5c7554afe61b045e95bd86e1daeb541a2a46f1aac469ab777c8794f1514f1ae3"
       },
       {
         "path": "packages/sdk/src/types.ts",
-        "bytes": 19355,
-        "sha256": "7529c309c3920582c9bb76057fa33d654550e4c6fb09f2c178ee7821e04abe42"
+        "bytes": 20079,
+        "sha256": "544b2615ad8b1e90d1b86e692dd9bf87a16b1836ae8705bb403aba16d1b25b09"
       },
       {
         "path": "packages/sdk/test/audio-controller.test.ts",
@@ -2173,18 +2178,18 @@
       },
       {
         "path": "packages/sdk/test/project-builder.test.ts",
-        "bytes": 10972,
-        "sha256": "d9c97ae30216ae3a9a3f0fcc5888b0f148bf72260d65dbff0ffda41580dd947a"
+        "bytes": 11067,
+        "sha256": "b0a461000c24f7b154fb083dd904a030a1f8c99206e879db1efb8ad6ca3ce45c"
       },
       {
         "path": "packages/sdk/test/proxy-automation.test.ts",
-        "bytes": 3485,
-        "sha256": "c1d80ca8bcdc4d07b8e84c9b37837abe494225644ee42faf4651b629dcbf9cad"
+        "bytes": 5809,
+        "sha256": "8ee989baef33fb1e02134759c4f218661d086dc53ab51dffeb2679f76544dde5"
       },
       {
         "path": "packages/sdk/test/rate-envelope.test.ts",
-        "bytes": 4683,
-        "sha256": "8cdbe05ec20fb6b9e06ec7f17fbca4bfc858138086c4f4bc7ca2d82dd92f3cf1"
+        "bytes": 5590,
+        "sha256": "1b91ea14ce87527dd5c3b6b76c35b9eb5f832f57dfe1d4aa47ca411264f6db07"
       },
       {
         "path": "packages/sdk/test/session.browser.test.ts",
@@ -2193,13 +2198,13 @@
       },
       {
         "path": "packages/sdk/test/session.test.ts",
-        "bytes": 28788,
-        "sha256": "ee0c7f74a37df9de5d6bf2ac07598756e40d2ff251134c55d561f72e2cb58c35"
+        "bytes": 29026,
+        "sha256": "874c2c6b5ec8f92a10d3f0cc084c8a1c0ed15c5def582c5426c93002093dcca4"
       },
       {
         "path": "packages/sdk/test/subtitle-io.test.ts",
-        "bytes": 5375,
-        "sha256": "b2f863b23b358a0829bbc7103b5edf1657e1ed825b2bd0393c403c8657d260b9"
+        "bytes": 6488,
+        "sha256": "a6fe803eea1b57216818d3f97554f625018c733560affcb97ed184b859fec2f5"
       },
       {
         "path": "packages/sdk/test/target-conformance.browser.test.ts",
@@ -2214,12 +2219,12 @@
       {
         "path": "packages/transaction/README.md",
         "bytes": 970,
-        "sha256": "8a80dd80fda8b68cafd6fc18234f8487b8080b0086eb170ac2a0af75a6bc4ef8"
+        "sha256": "07cfe91147448780d8b234e0a5d6c6300c052078b66705fd08b2962449ec696c"
       },
       {
         "path": "packages/transaction/package.json",
         "bytes": 1070,
-        "sha256": "a2c27cdf932f17af25c8c8a624b3bee81e91fec6f646dd60fa04913daff4ffbc"
+        "sha256": "42786ef4155a293e853beb1d88bdac49ca4d7eff3bfb654bae094bd5bfd7906f"
       },
       {
         "path": "packages/transaction/src/affected-ranges.ts",
@@ -2289,12 +2294,12 @@
       {
         "path": "packages/vite-plugin/README.md",
         "bytes": 2261,
-        "sha256": "642bf0b13f828a0d18803ce711937d66722480f21e4ab953978929089c859aae"
+        "sha256": "d291f86c29b0236845538af7ba7ad7b0a171fc8f8391e442d554879d7ba48d0f"
       },
       {
         "path": "packages/vite-plugin/package.json",
         "bytes": 1388,
-        "sha256": "a4b210030c485a714987a7093e9c026f6210a2881bc3638c9308c44526e5ca97"
+        "sha256": "13fa448f1789eb08072c1af8023bc17d9aeb66b21f65c6861ac65abc6f8914a9"
       },
       {
         "path": "packages/vite-plugin/src/index.ts",
@@ -2329,7 +2334,7 @@
       {
         "path": "pnpm-lock.yaml",
         "bytes": 209159,
-        "sha256": "8c73b9075ecf4ac67023993fa5643104938c241fe310b2461a17ac50bd846043"
+        "sha256": "6782d8314785006132a31a099ba0d1fd13e8ff68cdd98b93634324d859b271c4"
       },
       {
         "path": "pnpm-workspace.yaml",
@@ -2358,8 +2363,13 @@
       },
       {
         "path": "schemas/project/v1/project.schema.json",
-        "bytes": 42334,
-        "sha256": "de622653441e695c8999aca8fd0872a4c4b7d248fe2ae7af7f18b4c1808dd65f"
+        "bytes": 40924,
+        "sha256": "8edad52a01adf752b29bb895a9aa1dbbb8dd35de945c68980c2ff05556e7fbaf"
+      },
+      {
+        "path": "schemas/project/v1.2/project.schema.json",
+        "bytes": 42340,
+        "sha256": "a53c8aaab99eb67b223ed0b4bb9e15febb18e07fb0ec2153958646a652c90eef"
       },
       {
         "path": "scripts/benchmark-competitors.mjs",
@@ -2433,8 +2443,8 @@
       },
       {
         "path": "scripts/check-default-schemas.mjs",
-        "bytes": 2040,
-        "sha256": "5ccebfa424efcd8960eefdb76cfccf9c1f4cca3fed57ed5fd05e5b237a672238"
+        "bytes": 2288,
+        "sha256": "450981fbded55ba682b2a427a98eb7d6febb37389d9df788ddd1a92a4f826f2d"
       },
       {
         "path": "scripts/check-doc-locales.mjs",
@@ -2458,8 +2468,8 @@
       },
       {
         "path": "scripts/check-release-docs.mjs",
-        "bytes": 3389,
-        "sha256": "ecfed30b405e2f188d48c4aa7ff6800730fc8760bef609dc24379b840a1e21c4"
+        "bytes": 3554,
+        "sha256": "9bacc3bbca121edf18e763cce09be32350c4d4e2edebb3eed96c32ab753b7602"
       },
       {
         "path": "scripts/compatibility-matrix-lib.mjs",
@@ -2533,13 +2543,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 110626,
-        "sha256": "577136be51916a867516d297f6fdcc760e059c2c70ea261e1d876d544188e375"
+        "bytes": 110956,
+        "sha256": "bb5bb7b3376e0b2b7bb9988b7fa84dcc4177040c5d17693840e76b247fb72851"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 44658,
-        "sha256": "3ecb8066c5f0e58fbb3a531836cc6e4478402332e80522473c47aa9def896d77"
+        "bytes": 45399,
+        "sha256": "790b75bc9a792122741395c4a2a5ec87c707b61f954f0ae77aed6d4b8029e8c7"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -2578,13 +2588,13 @@
       },
       {
         "path": "scripts/release-version-lib.mjs",
-        "bytes": 2461,
-        "sha256": "c69ce1fc0cf200af5c1d81b56af965055dceaafb82f38daf4a9ae8aac682f6b9"
+        "bytes": 2624,
+        "sha256": "564c0376a93c879312d4de93e3c68f07b3ceba49c95b35c16033aeaecd516408"
       },
       {
         "path": "scripts/release-version-lib.test.mjs",
-        "bytes": 2558,
-        "sha256": "5270d91b33364a8da50911d696cd04340f0f906a3358b92e3392026339303616"
+        "bytes": 2808,
+        "sha256": "971b86e0363a41aecde559c91e635daef04c6a1c7519a2e68dd89ef62f3b6a6d"
       },
       {
         "path": "scripts/run-evidence-tests.mjs",
@@ -2676,241 +2686,241 @@
   "commands": [
     {
       "command": "corepack pnpm run ci",
-      "startedAt": "2026-08-01T20:16:55.571Z",
-      "endedAt": "2026-08-01T20:18:35.194Z",
+      "startedAt": "2026-08-02T07:02:33.952Z",
+      "endedAt": "2026-08-02T07:04:25.902Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "ew-controller.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/media.test.ts \u001b[2m(\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 12\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/material-compiler/test/webgpu-parity.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 8\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/text-caption.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 11\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/sdk/test/proxy-automation.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/cache-proxy.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/export/test/audio-export.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/time-map.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m apps/evidence-runner/src/long-task-window.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/export/test/export-protocols.test.ts \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 8\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/device-state.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/capability/test/fallback.test.ts \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/resource-governor.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/bezier-handle.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/video-scheduler.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/core/test/diagnostic-localization.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/capability/test/gate.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/color.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/image-sequence.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 2\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/transferable-pcm-queue.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m57 passed\u001b[39m\u001b[22m\u001b[90m (57)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m421 passed\u001b[39m\u001b[22m\u001b[90m (421)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:18:19\n\u001b[2m   Duration \u001b[22m 5.51s\u001b[2m (transform 1.71s, setup 0ms, collect 16.26s, tests 22.83s, environment 11ms, prepare 7.42s)\u001b[22m\n\n\n> @aelionsdk/vite-plugin@1.2.0-rc.1 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: Vite, Webpack/Rspack, and explicit CDN assets\n\n> aelion-sdk@1.2.0-rc.1 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\n✔ versioned compatibility matrix requires all product decision axes (0.9626ms)\n✔ matrix cannot claim tested without evidence or use unsafe evidence paths (0.5058ms)\n✔ Darwin parsers return only approved non-identifying fields (1.152ms)\n✔ reference-device probe uses Darwin data and records explicit fallback limitations (1.0327ms)\n✔ browser identity requires Playwright and page versions to agree (0.659ms)\n✔ failed staged JSON validation preserves the published artifact (6.9947ms)\n✔ Alpha pair publication restores both old artifacts when report publish fails (41.1057ms)\n✔ Alpha pair publication serializes canonical path aliases in one process (99.0899ms)\n✔ Alpha pair publication serializes the same canonical pair across processes (244.5335ms)\n✔ Alpha pair publication rolls back when published bytes fail readback binding (21.7689ms)\n✔ workspace identity excludes only the exact post-gate projections plus generated evidence (1.1509ms)\n✔ post-gate projections do not churn source identity but every other document remains bound (75.0449ms)\n✔ source identity is stable across Git-normalized text checkouts and generated Astro state (41.0584ms)\n✔ source identity preserves binary CRLF bytes (39.8363ms)\n✔ source identity rejects every non-excluded symbolic link (2.5958ms)\n✔ source identity equality binds every policy field (0.2727ms)\n﹣ source identity rejects non-regular filesystem entries (0.0672ms) # SKIP\n✔ the final runner policy is exactly fourteen gates plus seven evidence refreshes (0.8045ms)\n✔ seek and performance validators fail closed on resource or SLO drift (3.3667ms)\n✔ strict browser summaries require exact reviewed counts and zero skipped work (0.3015ms)\n✔ Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes (1.2269ms)\n✔ gate record must be serial and bound to one source identity (2.0649ms)\n✔ tarball consumer validator checks exact package, asset and browser contracts (1.141ms)\n✔ Alpha cleanup and blocker review both fail closed (2.5938ms)\n✔ blocker review gate binding requires fresh exact artifacts from the serial run (1.7389ms)\n✔ postflight fails closed on command, freshness, semantic and binding drift (0.7884ms)\n✔ postflight validation is stable across checkout mtimes and fails on byte drift (12.5522ms)\n✔ publisher submits every missing package before waiting for registry consistency (1.7691ms)\n✔ publisher fails closed when a visible version has different bytes (0.4069ms)\n✔ publisher times out when npm never exposes an accepted version (0.8171ms)\n✔ only immutable-version conflicts are treated as an accepted publish (0.2431ms)\n✔ stable versions publish to latest as full GitHub releases (1.647ms)\n✔ prerelease versions publish to next as GitHub prereleases (0.3008ms)\n✔ release versions reject non-canonical or unsafe forms (0.4247ms)\n✔ version updates can intentionally refresh a frozen workspace lockfile (0.8191ms)\n✔ manifest updates exact public package pins and preserves workspace links (0.2197ms)\n✔ manifest update fails closed on an independently drifted package pin (0.2721ms)\n✔ curated release documents replace every current-version occurrence (0.1772ms)\nℹ tests 38\nℹ suites 0\nℹ pass 37\nℹ fail 0\nℹ cancelled 0\nℹ skipped 1\nℹ todo 0\nℹ duration_ms 484.0878\n\n> aelion-sdk@1.2.0-rc.1 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/image-sequence.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 2\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 94\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/project.test.ts \u001b[2m(\u001b[22m\u001b[2m37 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 195\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m44 passed\u001b[39m\u001b[22m\u001b[90m (44)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:18:28\n\u001b[2m   Duration \u001b[22m 650ms\u001b[2m (transform 112ms, setup 0ms, collect 603ms, tests 291ms, environment 0ms, prepare 317ms)\u001b[22m\n\n\n> aelion-sdk@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@1.2.0-rc.1 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\n\u001b[36mvite v7.3.6 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 364 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  1.99 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.97 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CaSGBhjJ.css                                      \u001b[39m\u001b[1m\u001b[2m  1.96 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.99 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-CoPpuTcc.js          \u001b[39m\u001b[1m\u001b[2m  9.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.56 kB\u001b[22m\u001b[2m │ map:    27.79 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-BToojpAk.js                                       \u001b[39m\u001b[1m\u001b[2m474.07 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 133.53 kB\u001b[22m\u001b[2m │ map: 1,585.45 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DaBvwO72.js                             \u001b[39m\u001b[1m\u001b[33m514.31 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 130.11 kB\u001b[22m\u001b[2m │ map: 2,320.38 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.73s\u001b[39m\n\n> aelion-sdk@1.2.0-rc.1 build:editor C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/editor-demo build\n\n\n> @aelionsdk/editor-demo@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\editor-demo\n> vite build\n\n\u001b[36mvite v7.3.6 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 364 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.61 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-C9w8bZ6F.css                                      \u001b[39m\u001b[1m\u001b[2m  6.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   2.12 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-CoPpuTcc.js          \u001b[39m\u001b[1m\u001b[2m  9.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.56 kB\u001b[22m\u001b[2m │ map:    27.79 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-D0N7JwaQ.js                                       \u001b[39m\u001b[1m\u001b[2m482.88 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 136.28 kB\u001b[22m\u001b[2m │ map: 1,614.90 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DaBvwO72.js                             \u001b[39m\u001b[1m\u001b[33m514.31 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 130.11 kB\u001b[22m\u001b[2m │ map: 2,320.38 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.72s\u001b[39m\n\n> aelion-sdk@1.2.0-rc.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@1.2.0-rc.1 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
+        "outputTail": ".test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 10\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m apps/evidence-runner/src/long-task-window.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/export/test/export-protocols.test.ts \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/export/test/audio-export.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/sdk/test/proxy-automation.test.ts \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/bezier-handle.test.ts \u001b[2m(\u001b[22m\u001b[2m7 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/cache-proxy.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/capability/test/fallback.test.ts \u001b[2m(\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/resource-governor.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/device-state.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/time-map.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 6\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/video-scheduler.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/core/test/diagnostic-localization.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/capability/test/gate.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/transferable-pcm-queue.test.ts \u001b[2m(\u001b[22m\u001b[2m3 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/render-ir/test/color.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/image-sequence.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 2\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/transaction/test/soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 5295\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m long-session restart recovery\u001b[2m > \u001b[22mround-trips every edit checkpoint through canonical persistence without drift \u001b[33m 5293\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m57 passed\u001b[39m\u001b[22m\u001b[90m (57)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m436 passed\u001b[39m\u001b[22m\u001b[90m (436)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:04:09\n\u001b[2m   Duration \u001b[22m 5.94s\u001b[2m (transform 2.34s, setup 0ms, collect 14.93s, tests 27.54s, environment 10ms, prepare 6.60s)\u001b[22m\n\n\n> @aelionsdk/vite-plugin@1.2.0-rc.2 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: Vite, Webpack/Rspack, and explicit CDN assets\n\n> aelion-sdk@1.2.0-rc.2 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\n✔ versioned compatibility matrix requires all product decision axes (1.4974ms)\n✔ matrix cannot claim tested without evidence or use unsafe evidence paths (0.2103ms)\n✔ Darwin parsers return only approved non-identifying fields (1.7236ms)\n✔ reference-device probe uses Darwin data and records explicit fallback limitations (0.7309ms)\n✔ browser identity requires Playwright and page versions to agree (0.6684ms)\n✔ failed staged JSON validation preserves the published artifact (9.1491ms)\n✔ Alpha pair publication restores both old artifacts when report publish fails (27.3787ms)\n✔ Alpha pair publication serializes canonical path aliases in one process (107.5587ms)\n✔ Alpha pair publication serializes the same canonical pair across processes (248.3782ms)\n✔ Alpha pair publication rolls back when published bytes fail readback binding (22.3525ms)\n✔ an approved blocker review applies only to its exact source manifest (1.486ms)\n✔ workspace identity excludes only the exact post-gate projections plus generated evidence (1.0699ms)\n✔ post-gate projections do not churn source identity but every other document remains bound (93.8243ms)\n✔ source identity is stable across Git-normalized text checkouts and generated Astro state (55.595ms)\n✔ source identity preserves binary CRLF bytes (61.5254ms)\n✔ source identity rejects every non-excluded symbolic link (2.5402ms)\n✔ source identity equality binds every policy field (0.248ms)\n﹣ source identity rejects non-regular filesystem entries (0.0998ms) # SKIP\n✔ the final runner policy is exactly fourteen gates plus seven evidence refreshes (0.7148ms)\n✔ seek and performance validators fail closed on resource or SLO drift (3.4619ms)\n✔ strict browser summaries require exact reviewed counts and zero skipped work (0.2592ms)\n✔ Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes (1.0413ms)\n✔ gate record must be serial and bound to one source identity (1.9004ms)\n✔ tarball consumer validator checks exact package, asset and browser contracts (1.1422ms)\n✔ Alpha cleanup and blocker review both fail closed (1.9831ms)\n✔ blocker review gate binding requires fresh exact artifacts from the serial run (1.9662ms)\n✔ postflight fails closed on command, freshness, semantic and binding drift (0.9504ms)\n✔ postflight validation is stable across checkout mtimes and fails on byte drift (11.3605ms)\n✔ publisher submits every missing package before waiting for registry consistency (2.7483ms)\n✔ publisher fails closed when a visible version has different bytes (0.4873ms)\n✔ publisher times out when npm never exposes an accepted version (0.7212ms)\n✔ only immutable-version conflicts are treated as an accepted publish (0.2226ms)\n✔ stable versions publish to latest as full GitHub releases (1.5357ms)\n✔ prerelease versions publish to next as GitHub prereleases (0.2575ms)\n✔ release versions reject non-canonical or unsafe forms (0.6424ms)\n✔ version updates can intentionally refresh a frozen workspace lockfile (1.2664ms)\n✔ manifest updates exact public package pins and preserves workspace links (0.3036ms)\n✔ manifest update fails closed on an independently drifted package pin (0.4321ms)\n✔ curated release documents replace every current-version occurrence (0.2451ms)\nℹ tests 39\nℹ suites 0\nℹ pass 38\nℹ fail 0\nℹ cancelled 0\nℹ skipped 1\nℹ todo 0\nℹ duration_ms 489.6239\n\n> aelion-sdk@1.2.0-rc.2 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/image-sequence.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 2\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 100\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/project-schema/test/project.test.ts \u001b[2m(\u001b[22m\u001b[2m39 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 263\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m46 passed\u001b[39m\u001b[22m\u001b[90m (46)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:04:18\n\u001b[2m   Duration \u001b[22m 658ms\u001b[2m (transform 113ms, setup 0ms, collect 490ms, tests 365ms, environment 0ms, prepare 241ms)\u001b[22m\n\n\n> aelion-sdk@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@1.2.0-rc.2 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\n\u001b[36mvite v7.3.6 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 365 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  1.99 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.98 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-CaSGBhjJ.css                                      \u001b[39m\u001b[1m\u001b[2m  1.96 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.99 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-CoPpuTcc.js          \u001b[39m\u001b[1m\u001b[2m  9.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.56 kB\u001b[22m\u001b[2m │ map:    27.79 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DKzZRF1C.js                                       \u001b[39m\u001b[1m\u001b[2m497.98 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 134.95 kB\u001b[22m\u001b[2m │ map: 1,621.74 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DaBvwO72.js                             \u001b[39m\u001b[1m\u001b[33m514.31 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 130.11 kB\u001b[22m\u001b[2m │ map: 2,320.38 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.70s\u001b[39m\n\n> aelion-sdk@1.2.0-rc.2 build:editor C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/editor-demo build\n\n\n> @aelionsdk/editor-demo@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\editor-demo\n> vite build\n\n\u001b[36mvite v7.3.6 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 365 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                                                     \u001b[39m\u001b[1m\u001b[2m  4.18 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.61 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-C9w8bZ6F.css                                      \u001b[39m\u001b[1m\u001b[2m  6.60 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   2.12 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js  \u001b[39m\u001b[1m\u001b[2m  2.02 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   0.90 kB\u001b[22m\u001b[2m │ map:     0.14 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js          \u001b[39m\u001b[1m\u001b[2m  4.00 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   1.42 kB\u001b[22m\u001b[2m │ map:    12.28 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-export-mux-export-worker.js-CoPpuTcc.js          \u001b[39m\u001b[1m\u001b[2m  9.61 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   3.56 kB\u001b[22m\u001b[2m │ map:    27.79 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/aelion-renderer-worker-webgl2-worker.js-DQL-BbF2.js     \u001b[39m\u001b[1m\u001b[2m 22.44 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:   6.99 kB\u001b[22m\u001b[2m │ map:     0.15 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-D9zWdpVV.js                                       \u001b[39m\u001b[1m\u001b[33m506.79 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 137.69 kB\u001b[22m\u001b[2m │ map: 1,651.16 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/sink-completion-DaBvwO72.js                             \u001b[39m\u001b[1m\u001b[33m514.31 kB\u001b[39m\u001b[22m\u001b[2m │ gzip: 130.11 kB\u001b[22m\u001b[2m │ map: 2,320.38 kB\u001b[22m\n\u001b[33m\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001b[39m\n\u001b[32m✓ built in 1.71s\u001b[39m\n\n> aelion-sdk@1.2.0-rc.2 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@1.2.0-rc.2 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
         "outputTailTruncated": true
       }
     },
     {
       "command": "corepack pnpm test:browser",
-      "startedAt": "2026-08-01T20:18:35.195Z",
-      "endedAt": "2026-08-01T20:18:48.917Z",
+      "startedAt": "2026-08-02T07:04:25.905Z",
+      "endedAt": "2026-08-02T07:04:40.819Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/resumable-export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 3587\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mencodes one complete fragmented MP4 unit or fails closed without runtime AAC \u001b[33m 495\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' } \u001b[33m 1629\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' } \u001b[33m 1383\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1897\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 1092\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 666\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 666\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 485\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 465\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 332\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/vertical-slice.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 261\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 143\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 94\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 96\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 93\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/production-media-provider.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 63\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/client.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 21\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/image.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m14 passed\u001b[39m\u001b[22m\u001b[90m (14)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m84 passed\u001b[39m\u001b[22m\u001b[90m (84)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:18:35\n\u001b[2m   Duration \u001b[22m 12.89s\u001b[2m (transform 0ms, setup 0ms, collect 492ms, tests 8.21s, environment 0ms, prepare 154.14s)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/resumable-export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 4289\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mencodes one complete fragmented MP4 unit or fails closed without runtime AAC \u001b[33m 504\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' } \u001b[33m 2076\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m resumable muxed export\u001b[2m > \u001b[22mreuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' } \u001b[33m 1616\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2010\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 1131\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 710\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 710\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 504\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 547\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 388\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/vertical-slice.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 271\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 151\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 106\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 114\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/production-media-provider.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 78\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 101\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/renderer-worker/test/client.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 23\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/media/test/image.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 3\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m14 passed\u001b[39m\u001b[22m\u001b[90m (14)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m85 passed\u001b[39m\u001b[22m\u001b[90m (85)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:04:26\n\u001b[2m   Duration \u001b[22m 14.08s\u001b[2m (transform 0ms, setup 0ms, collect 583ms, tests 9.29s, environment 0ms, prepare 166.46s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:firefox",
-      "startedAt": "2026-08-01T20:18:48.919Z",
-      "endedAt": "2026-08-01T20:19:07.436Z",
+      "startedAt": "2026-08-02T07:04:40.821Z",
+      "endedAt": "2026-08-02T07:05:00.136Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 4136\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 2499\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m14 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2155\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Project → Render IR → Material Graph → Worker renderer\u001b[2m > \u001b[22mapplies alpha masks with invert, feather and consumed matte semantics \u001b[33m 347\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1994\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 1994\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1001\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 755\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 319\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 367\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 216\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m69 passed\u001b[39m\u001b[22m\u001b[90m (69)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:18:49\n\u001b[2m   Duration \u001b[22m 17.43s\u001b[2m (transform 0ms, setup 0ms, collect 782ms, tests 10.94s, environment 0ms, prepare 107.86s)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/compose.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m17 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 4196\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Worker WebGL2 compositor\u001b[2m > \u001b[22mreleases Worker GPU resources across repeated compositor sessions \u001b[33m 2524\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/renderer-worker/test/ir-renderer.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 2597\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Project → Render IR → Material Graph → Worker renderer\u001b[2m > \u001b[22mrenders draft previews internally at scale while keeping export full resolution \u001b[33m 390\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m Project → Render IR → Material Graph → Worker renderer\u001b[2m > \u001b[22mapplies alpha masks with invert, feather and consumed matte semantics \u001b[33m 349\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/session.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1988\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m @aelionsdk/sdk public browser facade\u001b[2m > \u001b[22mloads, edits, previews and exports one frozen Project through public APIs \u001b[33m 1987\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/sdk/test/player-race.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m4 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1051\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m AelionPlayer asynchronous generations\u001b[2m > \u001b[22mcloses an owned frame and enters error state when its subscriber throws \u001b[33m 333\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/export/test/export.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 870\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/media/test/decode.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 334\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/audio/test/worklet.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 330\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m firefox \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 217\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m70 passed\u001b[39m\u001b[22m\u001b[90m (70)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:04:41\n\u001b[2m   Duration \u001b[22m 18.22s\u001b[2m (transform 0ms, setup 0ms, collect 855ms, tests 11.58s, environment 0ms, prepare 112.03s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:webkit",
-      "startedAt": "2026-08-01T20:19:07.438Z",
-      "endedAt": "2026-08-01T20:19:12.616Z",
+      "startedAt": "2026-08-02T07:05:00.139Z",
+      "endedAt": "2026-08-02T07:05:05.294Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 164\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:19:08\n\u001b[2m   Duration \u001b[22m 4.46s\u001b[2m (transform 0ms, setup 0ms, collect 243ms, tests 168ms, environment 0ms, prepare 7.06s)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 146\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[46m webkit \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 5\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:05:00\n\u001b[2m   Duration \u001b[22m 4.47s\u001b[2m (transform 0ms, setup 0ms, collect 261ms, tests 151ms, environment 0ms, prepare 6.74s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:mobile",
-      "startedAt": "2026-08-01T20:19:12.618Z",
-      "endedAt": "2026-08-01T20:19:17.687Z",
+      "startedAt": "2026-08-02T07:05:05.296Z",
+      "endedAt": "2026-08-02T07:05:10.412Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 470\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m browser capability report\u001b[2m > \u001b[22mprobes real browser configurations and returns a serializable report \u001b[33m 427\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 102\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:19:13\n\u001b[2m   Duration \u001b[22m 4.29s\u001b[2m (transform 0ms, setup 0ms, collect 121ms, tests 572ms, environment 0ms, prepare 7.05s)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/capability/test/capability.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 494\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m browser capability report\u001b[2m > \u001b[22mprobes real browser configurations and returns a serializable report \u001b[33m 449\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m \u001b[30m\u001b[43m chromium \u001b[49m\u001b[39m packages/sdk/test/target-conformance.browser.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 107\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:05:05\n\u001b[2m   Duration \u001b[22m 4.33s\u001b[2m (transform 0ms, setup 0ms, collect 125ms, tests 601ms, environment 0ms, prepare 6.40s)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:golden",
-      "startedAt": "2026-08-01T20:19:17.689Z",
-      "endedAt": "2026-08-01T20:19:18.720Z",
+      "startedAt": "2026-08-02T07:05:10.415Z",
+      "endedAt": "2026-08-02T07:05:11.500Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/renderer-worker/test/material.golden.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:19:18\n\u001b[2m   Duration \u001b[22m 341ms\u001b[2m (transform 56ms, setup 0ms, collect 74ms, tests 4ms, environment 0ms, prepare 98ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/renderer-worker/test/material.golden.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 4\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:05:10\n\u001b[2m   Duration \u001b[22m 411ms\u001b[2m (transform 63ms, setup 0ms, collect 79ms, tests 4ms, environment 0ms, prepare 96ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:security",
-      "startedAt": "2026-08-01T20:19:18.722Z",
-      "endedAt": "2026-08-01T20:19:20.194Z",
+      "startedAt": "2026-08-02T07:05:11.502Z",
+      "endedAt": "2026-08-02T07:05:13.030Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 98\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/material-sdk/test/material-sdk.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 106\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/corpus.test.ts \u001b[2m(\u001b[22m\u001b[2m21 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 143\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m57 passed\u001b[39m\u001b[22m\u001b[90m (57)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:19:19\n\u001b[2m   Duration \u001b[22m 770ms\u001b[2m (transform 275ms, setup 0ms, collect 1000ms, tests 348ms, environment 0ms, prepare 304ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/project-schema/test/admission.fuzz.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 127\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/material-sdk/test/material-sdk.test.ts \u001b[2m(\u001b[22m\u001b[2m34 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 112\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/media/test/corpus.test.ts \u001b[2m(\u001b[22m\u001b[2m21 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 166\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m57 passed\u001b[39m\u001b[22m\u001b[90m (57)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:05:12\n\u001b[2m   Duration \u001b[22m 769ms\u001b[2m (transform 291ms, setup 0ms, collect 966ms, tests 404ms, environment 0ms, prepare 246ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:soak",
-      "startedAt": "2026-08-01T20:19:20.196Z",
-      "endedAt": "2026-08-01T20:19:22.995Z",
+      "startedAt": "2026-08-02T07:05:13.032Z",
+      "endedAt": "2026-08-02T07:05:15.782Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 260\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/pcm-ring.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 306\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mwraps interleaved writes into planar reads without allocation growth \u001b[33m 305\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mrecords underrun frames and zero-fills output \u001b[33m 305\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mruns a ten-minute equivalent bounded producer/consumer simulation without underrun \u001b[33m 305\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdoes not accept writes after end or close \u001b[33m 305\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdrops all queued PCM when closed \u001b[33m 305\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/transaction/test/soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1577\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m long-session restart recovery\u001b[2m > \u001b[22mround-trips every edit checkpoint through canonical persistence without drift \u001b[33m 1576\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m   Start at \u001b[22m 04:19:20\n\u001b[2m   Duration \u001b[22m 2.10s\u001b[2m (transform 265ms, setup 0ms, collect 701ms, tests 2.14s, environment 0ms, prepare 326ms)\u001b[22m",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts\n\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n \u001b[32m✓\u001b[39m packages/render-ir/test/production-soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 317\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m large Project accelerated soak\u001b[2m > \u001b[22mcompiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly \u001b[33m 316\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/audio/test/pcm-ring.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 368\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mwraps interleaved writes into planar reads without allocation growth \u001b[33m 367\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mrecords underrun frames and zero-fills output \u001b[33m 366\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mruns a ten-minute equivalent bounded producer/consumer simulation without underrun \u001b[33m 366\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdoes not accept writes after end or close \u001b[33m 366\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m SharedPcmRingBuffer\u001b[2m > \u001b[22mdrops all queued PCM when closed \u001b[33m 366\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m packages/transaction/test/soak.test.ts \u001b[2m(\u001b[22m\u001b[2m1 test\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 1616\u001b[2mms\u001b[22m\u001b[39m\n   \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m long-session restart recovery\u001b[2m > \u001b[22mround-trips every edit checkpoint through canonical persistence without drift \u001b[33m 1615\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m3 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m8 passed\u001b[39m\u001b[22m\u001b[90m (8)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:05:13\n\u001b[2m   Duration \u001b[22m 2.09s\u001b[2m (transform 282ms, setup 0ms, collect 677ms, tests 2.30s, environment 0ms, prepare 267ms)\u001b[22m",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm bench",
-      "startedAt": "2026-08-01T20:19:22.997Z",
-      "endedAt": "2026-08-01T20:19:28.248Z",
+      "startedAt": "2026-08-02T07:05:15.784Z",
+      "endedAt": "2026-08-02T07:05:20.996Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\n\u001b[33mBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\u001b[39m\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\n \u001b[32m✓\u001b[39m benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22mRender IR compilation\u001b[33m 3773\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[1mname                                       \u001b[22m  \u001b[1m       hz\u001b[22m  \u001b[1m    min\u001b[22m  \u001b[1m    max\u001b[22m  \u001b[1m   mean\u001b[22m  \u001b[1m    p75\u001b[22m  \u001b[1m    p99\u001b[22m  \u001b[1m   p995\u001b[22m  \u001b[1m   p999\u001b[22m  \u001b[1m   rme\u001b[22m  \u001b[1msamples\u001b[22m\n   \u001b[32m·\u001b[39m cold compile 1,000 clips                     \u001b[34m  21.0392\u001b[39m  \u001b[36m45.1680\u001b[39m  \u001b[36m51.6376\u001b[39m  \u001b[36m47.5303\u001b[39m  \u001b[36m49.1707\u001b[39m  \u001b[36m51.6376\u001b[39m  \u001b[36m51.6376\u001b[39m  \u001b[36m51.6376\u001b[39m  \u001b[2m±3.11%\u001b[22m  \u001b[2m     11\u001b[22m\n   \u001b[32m·\u001b[39m incremental no-op compile 1,000 clips        \u001b[34m   399.89\u001b[39m  \u001b[36m 2.2288\u001b[39m  \u001b[36m 4.4780\u001b[39m  \u001b[36m 2.5007\u001b[39m  \u001b[36m 2.5766\u001b[39m  \u001b[36m 4.1502\u001b[39m  \u001b[36m 4.3873\u001b[39m  \u001b[36m 4.4780\u001b[39m  \u001b[2m±1.94%\u001b[22m  \u001b[2m    200\u001b[22m\n   \u001b[32m·\u001b[39m session initialization 1,000 clips           \u001b[34m  20.4407\u001b[39m  \u001b[36m47.5383\u001b[39m  \u001b[36m50.5715\u001b[39m  \u001b[36m48.9220\u001b[39m  \u001b[36m49.6380\u001b[39m  \u001b[36m50.5715\u001b[39m  \u001b[36m50.5715\u001b[39m  \u001b[36m50.5715\u001b[39m  \u001b[2m±1.37%\u001b[22m  \u001b[2m     11\u001b[22m\n   \u001b[32m·\u001b[39m single-field transaction commit 1,000 clips  \u001b[34m14,818.52\u001b[39m  \u001b[36m 0.0568\u001b[39m  \u001b[36m 1.4105\u001b[39m  \u001b[36m 0.0675\u001b[39m  \u001b[36m 0.0635\u001b[39m  \u001b[36m 0.1663\u001b[39m  \u001b[36m 0.1971\u001b[39m  \u001b[36m 0.3298\u001b[39m  \u001b[2m±0.91%\u001b[22m  \u001b[2m   7410\u001b[22m\n   \u001b[32m·\u001b[39m schema-validated field commit 1,000 clips    \u001b[34m  25.9778\u001b[39m  \u001b[36m36.7917\u001b[39m  \u001b[36m42.9047\u001b[39m  \u001b[36m38.4944\u001b[39m  \u001b[36m38.7551\u001b[39m  \u001b[36m42.9047\u001b[39m  \u001b[36m42.9047\u001b[39m  \u001b[36m42.9047\u001b[39m  \u001b[2m±2.35%\u001b[22m  \u001b[2m     13\u001b[22m\n\n\u001b[1m\u001b[46m BENCH \u001b[49m\u001b[22m \u001b[36mSummary\n\u001b[39m\n  single-field transaction commit 1,000 clips\u001b[2m - benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22m\u001b[2mRender IR compilation\u001b[22m\n\u001b[32m    37.06x \u001b[39m\u001b[90mfaster than \u001b[39mincremental no-op compile 1,000 clips\n\u001b[32m    570.43x \u001b[39m\u001b[90mfaster than \u001b[39mschema-validated field commit 1,000 clips\n\u001b[32m    704.33x \u001b[39m\u001b[90mfaster than \u001b[39mcold compile 1,000 clips\n\u001b[32m    724.95x \u001b[39m\u001b[90mfaster than \u001b[39msession initialization 1,000 clips",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\n\u001b[33mBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\u001b[39m\n\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.7 \u001b[39m\u001b[90mC:/Users/zhongyu/Documents/AelionSDK\u001b[39m\n\n\n \u001b[32m✓\u001b[39m benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22mRender IR compilation\u001b[33m 3811\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[1mname                                       \u001b[22m  \u001b[1m       hz\u001b[22m  \u001b[1m    min\u001b[22m  \u001b[1m    max\u001b[22m  \u001b[1m   mean\u001b[22m  \u001b[1m    p75\u001b[22m  \u001b[1m    p99\u001b[22m  \u001b[1m   p995\u001b[22m  \u001b[1m   p999\u001b[22m  \u001b[1m   rme\u001b[22m  \u001b[1msamples\u001b[22m\n   \u001b[32m·\u001b[39m cold compile 1,000 clips                     \u001b[34m  23.1308\u001b[39m  \u001b[36m40.0947\u001b[39m  \u001b[36m51.9203\u001b[39m  \u001b[36m43.2325\u001b[39m  \u001b[36m44.1580\u001b[39m  \u001b[36m51.9203\u001b[39m  \u001b[36m51.9203\u001b[39m  \u001b[36m51.9203\u001b[39m  \u001b[2m±4.81%\u001b[22m  \u001b[2m     12\u001b[22m\n   \u001b[32m·\u001b[39m incremental no-op compile 1,000 clips        \u001b[34m   382.32\u001b[39m  \u001b[36m 2.2360\u001b[39m  \u001b[36m 9.2926\u001b[39m  \u001b[36m 2.6156\u001b[39m  \u001b[36m 2.5081\u001b[39m  \u001b[36m 7.1306\u001b[39m  \u001b[36m 9.2926\u001b[39m  \u001b[36m 9.2926\u001b[39m  \u001b[2m±4.51%\u001b[22m  \u001b[2m    192\u001b[22m\n   \u001b[32m·\u001b[39m session initialization 1,000 clips           \u001b[34m  21.6976\u001b[39m  \u001b[36m43.7431\u001b[39m  \u001b[36m49.4548\u001b[39m  \u001b[36m46.0881\u001b[39m  \u001b[36m46.9601\u001b[39m  \u001b[36m49.4548\u001b[39m  \u001b[36m49.4548\u001b[39m  \u001b[36m49.4548\u001b[39m  \u001b[2m±2.22%\u001b[22m  \u001b[2m     11\u001b[22m\n   \u001b[32m·\u001b[39m single-field transaction commit 1,000 clips  \u001b[34m14,391.20\u001b[39m  \u001b[36m 0.0579\u001b[39m  \u001b[36m 2.5291\u001b[39m  \u001b[36m 0.0695\u001b[39m  \u001b[36m 0.0650\u001b[39m  \u001b[36m 0.1364\u001b[39m  \u001b[36m 0.1474\u001b[39m  \u001b[36m 0.2895\u001b[39m  \u001b[2m±1.18%\u001b[22m  \u001b[2m   7196\u001b[22m\n   \u001b[32m·\u001b[39m schema-validated field commit 1,000 clips    \u001b[34m  24.5385\u001b[39m  \u001b[36m38.3313\u001b[39m  \u001b[36m44.9820\u001b[39m  \u001b[36m40.7523\u001b[39m  \u001b[36m42.0745\u001b[39m  \u001b[36m44.9820\u001b[39m  \u001b[36m44.9820\u001b[39m  \u001b[36m44.9820\u001b[39m  \u001b[2m±2.92%\u001b[22m  \u001b[2m     13\u001b[22m\n\n\u001b[1m\u001b[46m BENCH \u001b[49m\u001b[22m \u001b[36mSummary\n\u001b[39m\n  single-field transaction commit 1,000 clips\u001b[2m - benchmarks/render-ir.bench.ts\u001b[2m > \u001b[22m\u001b[2mRender IR compilation\u001b[22m\n\u001b[32m    37.64x \u001b[39m\u001b[90mfaster than \u001b[39mincremental no-op compile 1,000 clips\n\u001b[32m    586.48x \u001b[39m\u001b[90mfaster than \u001b[39mschema-validated field commit 1,000 clips\n\u001b[32m    622.17x \u001b[39m\u001b[90mfaster than \u001b[39mcold compile 1,000 clips\n\u001b[32m    663.26x \u001b[39m\u001b[90mfaster than \u001b[39msession initialization 1,000 clips",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:pack",
-      "startedAt": "2026-08-01T20:19:28.250Z",
-      "endedAt": "2026-08-01T20:19:48.974Z",
+      "startedAt": "2026-08-02T07:05:20.999Z",
+      "endedAt": "2026-08-02T07:05:41.270Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:pack C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs\n\n\n> aelion-sdk@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:pack C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs\n\n\n> aelion-sdk@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:consumer",
-      "startedAt": "2026-08-01T20:19:48.976Z",
-      "endedAt": "2026-08-01T20:20:14.788Z",
+      "startedAt": "2026-08-02T07:05:41.272Z",
+      "endedAt": "2026-08-02T07:06:06.727Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 87075\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22080,\n        \"playedFrames\": 1920,\n        \"underrunFrames\": 0,\n        \"timeUs\": 40000\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6215\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22592,\n          \"playedFrames\": 1408,\n          \"underrunFrames\": 0,\n          \"timeUs\": 29333\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 11620\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 29333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 7040\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 23744,\n          \"playedFrames\": 256,\n          \"underrunFrames\": 0,\n          \"timeUs\": 5333\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 87330\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 21333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6225\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22592,\n          \"playedFrames\": 1408,\n          \"underrunFrames\": 0,\n          \"timeUs\": 29333\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 11100\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 29333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6320\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 23616,\n          \"playedFrames\": 384,\n          \"underrunFrames\": 0,\n          \"timeUs\": 8000\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm release:dry-run",
-      "startedAt": "2026-08-01T20:20:14.790Z",
-      "endedAt": "2026-08-01T20:20:46.416Z",
+      "startedAt": "2026-08-02T07:06:06.730Z",
+      "endedAt": "2026-08-02T07:06:38.111Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 release:dry-run C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/release-dry-run.mjs\n\n\n> aelion-sdk@1.2.0-rc.1 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nRelease dry-run passed: @aelionsdk/audio@1.2.0-rc.1, @aelionsdk/capability@1.2.0-rc.1, @aelionsdk/core@1.2.0-rc.1, @aelionsdk/export@1.2.0-rc.1, @aelionsdk/material-compiler@1.2.0-rc.1, @aelionsdk/material-sdk@1.2.0-rc.1, @aelionsdk/media@1.2.0-rc.1, @aelionsdk/project-schema@1.2.0-rc.1, @aelionsdk/render-ir@1.2.0-rc.1, @aelionsdk/renderer-worker@1.2.0-rc.1, @aelionsdk/sdk@1.2.0-rc.1, @aelionsdk/transaction@1.2.0-rc.1, @aelionsdk/vite-plugin@1.2.0-rc.1",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 release:dry-run C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/release-dry-run.mjs\n\n\n> aelion-sdk@1.2.0-rc.2 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nRelease dry-run passed: @aelionsdk/audio@1.2.0-rc.2, @aelionsdk/capability@1.2.0-rc.2, @aelionsdk/core@1.2.0-rc.2, @aelionsdk/export@1.2.0-rc.2, @aelionsdk/material-compiler@1.2.0-rc.2, @aelionsdk/material-sdk@1.2.0-rc.2, @aelionsdk/media@1.2.0-rc.2, @aelionsdk/project-schema@1.2.0-rc.2, @aelionsdk/render-ir@1.2.0-rc.2, @aelionsdk/renderer-worker@1.2.0-rc.2, @aelionsdk/sdk@1.2.0-rc.2, @aelionsdk/transaction@1.2.0-rc.2, @aelionsdk/vite-plugin@1.2.0-rc.2",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm release:reproducibility",
-      "startedAt": "2026-08-01T20:20:46.418Z",
-      "endedAt": "2026-08-01T20:21:04.468Z",
+      "startedAt": "2026-08-02T07:06:38.113Z",
+      "endedAt": "2026-08-02T07:06:56.841Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 release:reproducibility C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/verify-release-reproducibility.mjs\n\nRelease reproducibility passed for 13 packages at 1.2.0-rc.1",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 release:reproducibility C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/verify-release-reproducibility.mjs\n\nRelease reproducibility passed for 13 packages at 1.2.0-rc.2",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm format:check",
-      "startedAt": "2026-08-01T20:21:04.470Z",
-      "endedAt": "2026-08-01T20:21:08.572Z",
+      "startedAt": "2026-08-02T07:06:56.844Z",
+      "endedAt": "2026-08-02T07:07:01.375Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 format:check C:\\Users\\zhongyu\\Documents\\AelionSDK\n> prettier --check .\n\nChecking formatting...\nAll matched files use Prettier code style!",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 format:check C:\\Users\\zhongyu\\Documents\\AelionSDK\n> prettier --check .\n\nChecking formatting...\nAll matched files use Prettier code style!",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:browser:chromium",
-      "startedAt": "2026-08-01T20:21:08.575Z",
-      "endedAt": "2026-08-01T20:21:22.988Z",
+      "startedAt": "2026-08-02T07:07:01.378Z",
+      "endedAt": "2026-08-02T07:07:17.010Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:browser:chromium C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json\n\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-chromium.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:browser:chromium C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-chromium.json\n\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:browser:firefox",
-      "startedAt": "2026-08-01T20:21:22.990Z",
-      "endedAt": "2026-08-01T20:21:41.915Z",
+      "startedAt": "2026-08-02T07:07:17.012Z",
+      "endedAt": "2026-08-02T07:07:36.619Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-firefox.json\n\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-firefox.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts --reporter=json --outputFile=reports/baseline/browser-smoke-firefox.json\n\nJSON report written to C:/Users/zhongyu/Documents/AelionSDK/reports/baseline/browser-smoke-firefox.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:seek",
-      "startedAt": "2026-08-01T20:21:41.918Z",
-      "endedAt": "2026-08-01T20:21:46.147Z",
+      "startedAt": "2026-08-02T07:07:36.621Z",
+      "endedAt": "2026-08-02T07:07:40.894Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:seek C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-seek-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\media-seek-chromium.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:seek C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-seek-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\media-seek-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:performance",
-      "startedAt": "2026-08-01T20:21:46.149Z",
-      "endedAt": "2026-08-01T20:21:57.206Z",
+      "startedAt": "2026-08-02T07:07:40.897Z",
+      "endedAt": "2026-08-02T07:07:52.689Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:performance C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-performance-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\performance-1080p30-chromium.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:performance C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-performance-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\performance-1080p30-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:recovery",
-      "startedAt": "2026-08-01T20:21:57.209Z",
-      "endedAt": "2026-08-01T20:22:05.566Z",
+      "startedAt": "2026-08-02T07:07:52.692Z",
+      "endedAt": "2026-08-02T07:08:01.332Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:recovery C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-recovery-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\recovery-chromium.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:recovery C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-recovery-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\recovery-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:phase3:check",
-      "startedAt": "2026-08-01T20:22:05.568Z",
-      "endedAt": "2026-08-01T20:22:05.845Z",
+      "startedAt": "2026-08-02T07:08:01.335Z",
+      "endedAt": "2026-08-02T07:08:01.638Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:phase3:check C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/check-phase-3-evidence.mjs\n\nPASS reports/baseline/performance-1080p30-chromium.json\nPASS reports/baseline/recovery-chromium.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:phase3:check C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/check-phase-3-evidence.mjs\n\nPASS reports/baseline/performance-1080p30-chromium.json\nPASS reports/baseline/recovery-chromium.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm report:alpha",
-      "startedAt": "2026-08-01T20:22:05.847Z",
-      "endedAt": "2026-08-01T20:22:33.606Z",
+      "startedAt": "2026-08-02T07:08:01.641Z",
+      "endedAt": "2026-08-02T07:08:30.598Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@1.2.0-rc.1 report:alpha C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-alpha-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\alpha-60s.webm and C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\alpha-60s.json",
+        "outputTail": "> aelion-sdk@1.2.0-rc.2 report:alpha C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/capture-alpha-evidence.mjs\n\nWrote C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\alpha-60s.webm and C:\\Users\\zhongyu\\Documents\\AelionSDK\\reports\\baseline\\alpha-60s.json",
         "outputTailTruncated": false
       }
     }
   ],
-  "updatedAt": "2026-08-01T20:22:33.606Z",
+  "updatedAt": "2026-08-02T07:08:30.598Z",
   "postflight": {
     "schemaVersion": "1.0.0",
-    "generatedAt": "2026-08-01T20:22:33.609Z",
-    "expectedVersion": "1.2.0-rc.1",
+    "generatedAt": "2026-08-02T07:08:30.602Z",
+    "expectedVersion": "1.2.0-rc.2",
     "passed": true,
     "checks": [
       {
@@ -2933,7 +2943,7 @@
         "id": "browser-smoke-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:21.954Z",
+          "value": "2026-08-02T07:07:15.959Z",
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -2941,7 +2951,7 @@
         "id": "browser-smoke-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1785615669148,
+          "value": 1785654421907,
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -2961,7 +2971,7 @@
         "id": "browser-smoke-firefox-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:40.880Z",
+          "value": "2026-08-02T07:07:35.589Z",
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -2969,7 +2979,7 @@
         "id": "browser-smoke-firefox-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1785615683558,
+          "value": 1785654437590,
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -2989,7 +2999,7 @@
         "id": "media-seek-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:45.923Z",
+          "value": "2026-08-02T07:07:40.642Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -2997,7 +3007,7 @@
         "id": "media-seek-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:45.918Z",
+          "value": "2026-08-02T07:07:40.638Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -3030,7 +3040,7 @@
         "id": "performance-1080p30-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:57.005Z",
+          "value": "2026-08-02T07:07:52.444Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -3038,7 +3048,7 @@
         "id": "performance-1080p30-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:21:57.000Z",
+          "value": "2026-08-02T07:07:52.439Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -3046,8 +3056,8 @@
         "id": "performance-1080p30-chromium-json-semantic",
         "passed": true,
         "details": {
-          "webGl2P95Ms": 1.3800000101327896,
-          "exportRealtimeMultiple": 9.134672476407886,
+          "webGl2P95Ms": 1.0049999952316284,
+          "exportRealtimeMultiple": 8.442309478248822,
           "steadyLongTasksOver50Ms": 0,
           "initializationLongTasksOver50Ms": 0,
           "pcm": {
@@ -3072,7 +3082,7 @@
         "id": "recovery-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:22:05.329Z",
+          "value": "2026-08-02T07:08:01.071Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -3080,7 +3090,7 @@
         "id": "recovery-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:22:05.328Z",
+          "value": "2026-08-02T07:08:01.067Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -3114,7 +3124,7 @@
         "id": "tarball-consumer-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:20:14.641Z",
+          "value": "2026-08-02T07:06:06.573Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -3122,7 +3132,7 @@
         "id": "tarball-consumer-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:20:14.637Z",
+          "value": "2026-08-02T07:06:06.569Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -3146,7 +3156,7 @@
             "@aelionsdk/transaction",
             "@aelionsdk/vite-plugin"
           ],
-          "packageContractSha256": "703b86220e961549c2b87a57847245fa27ba743d3800b8297ddae7939a60c8a9",
+          "packageContractSha256": "a409a0bd8342f1ff1995ea8e586d44179c6bd1045f5a63f852862d130d8c4b6b",
           "runtimeAssetCount": 4,
           "runtimeAssetIds": [
             "pcm-player-worklet",
@@ -3159,7 +3169,7 @@
             "chromium",
             "firefox"
           ],
-          "consumerDependencyContractSha256": "bb99aafbd0a788365fbb2945557503d6eca6dbdd2d4b2f3050dcbc9419301ade"
+          "consumerDependencyContractSha256": "438808d11551fd95b798a58c022537ee7e382e5bc0daf6f99c7c0c0b700a7684"
         }
       },
       {
@@ -3174,7 +3184,7 @@
         "id": "alpha-60s-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:22:33.322Z",
+          "value": "2026-08-02T07:08:30.258Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3182,7 +3192,7 @@
         "id": "alpha-60s-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:22:33.320Z",
+          "value": "2026-08-02T07:08:30.254Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3240,8 +3250,8 @@
                 "lastHeight": 180,
                 "lastRenderScale": 1,
                 "lastTiming": {
-                  "totalWorkerUs": 2025,
-                  "gpuCompletionUs": 1910
+                  "totalWorkerUs": 1845,
+                  "gpuCompletionUs": 1745
                 },
                 "lastResources": {
                   "activeRequests": 0,
@@ -3297,8 +3307,8 @@
                 "lastHeight": 180,
                 "lastRenderScale": 1,
                 "lastTiming": {
-                  "totalWorkerUs": 2025,
-                  "gpuCompletionUs": 1910
+                  "totalWorkerUs": 1845,
+                  "gpuCompletionUs": 1745
                 },
                 "lastResources": {
                   "activeRequests": 0,
@@ -3375,7 +3385,7 @@
         "id": "alpha-60s-webm-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-08-01T20:22:33.058Z",
+          "value": "2026-08-02T07:08:29.991Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3390,61 +3400,61 @@
         {
           "file": "reports/baseline/browser-smoke-chromium.json",
           "command": "corepack pnpm report:browser:chromium",
-          "bytes": 31454,
-          "sha256": "320d9882bf7bee252324dd95d9faffb7f7e2a7ebbb70301240db89384dea0f8d",
-          "mtime": "2026-08-01T20:21:21.954Z"
+          "bytes": 31815,
+          "sha256": "3a8023838115d3791273f2fb5cf7444006e30d6251031ca0a9ad1a0e43d417a3",
+          "mtime": "2026-08-02T07:07:15.959Z"
         },
         {
           "file": "reports/baseline/browser-smoke-firefox.json",
           "command": "corepack pnpm report:browser:firefox",
-          "bytes": 24997,
-          "sha256": "66f6709df01eb68fcb7bf4260723fa4e3a227191cba4feab43209f6f449e9442",
-          "mtime": "2026-08-01T20:21:40.880Z"
+          "bytes": 25415,
+          "sha256": "8c5f91ae040f000260f261238162e288bb6ea848e0d4454399dc513d142f8df6",
+          "mtime": "2026-08-02T07:07:35.589Z"
         },
         {
           "file": "reports/baseline/media-seek-chromium.json",
           "command": "corepack pnpm report:seek",
-          "bytes": 21517,
-          "sha256": "b7a17d0db22337e24b87ebcce15eb1341660101d4e8d3b62df7c3834ea8fabc8",
-          "mtime": "2026-08-01T20:21:45.923Z"
+          "bytes": 21598,
+          "sha256": "c2705b42db124bcf794b59d829aeeceb24108f3f0596b616ab72090541991a90",
+          "mtime": "2026-08-02T07:07:40.642Z"
         },
         {
           "file": "reports/baseline/performance-1080p30-chromium.json",
           "command": "corepack pnpm report:performance",
-          "bytes": 65511,
-          "sha256": "63c02e65dac732d8c5225243b0801bc4c0c5199bf2a6f7c692b598142cc95d20",
-          "mtime": "2026-08-01T20:21:57.005Z"
+          "bytes": 66261,
+          "sha256": "59dabe9f0843e8e2fcd2d2d7abffcdcedd93b67566ecfb33a9650929e77f9757",
+          "mtime": "2026-08-02T07:07:52.444Z"
         },
         {
           "file": "reports/baseline/recovery-chromium.json",
           "command": "corepack pnpm report:recovery",
           "bytes": 33162,
-          "sha256": "4b55512255b34f3b5464eac2f3372d2422323e8ad510dc333a0431aedd1ef758",
-          "mtime": "2026-08-01T20:22:05.329Z"
+          "sha256": "00140666fc60d10ec49b2a6d35a24d4d3857ec37c01b77eb52614522ea626571",
+          "mtime": "2026-08-02T07:08:01.071Z"
         },
         {
           "file": "reports/baseline/tarball-consumer.json",
           "command": "corepack pnpm test:consumer",
           "bytes": 11644,
-          "sha256": "bcfdbeecaf653bf74f05a14efcc9036c600430d0284659346cfaf3dfd750c976",
-          "mtime": "2026-08-01T20:20:14.641Z"
+          "sha256": "f4c9f27ebc76126dee8f52c849cee8f1a44d761f9fcf3b676bb03c236efb746a",
+          "mtime": "2026-08-02T07:06:06.573Z"
         },
         {
           "file": "reports/baseline/alpha-60s.json",
           "command": "corepack pnpm report:alpha",
           "bytes": 115968,
-          "sha256": "693c242d830fc6aae57a5980ebf4b2836c6a443adf1f7ad156f059a177e5d51d",
-          "mtime": "2026-08-01T20:22:33.322Z"
+          "sha256": "53e22078f977723c7e68601d0a7c5f9f43c226489f8c8c87d9dd8181fac092d7",
+          "mtime": "2026-08-02T07:08:30.258Z"
         },
         {
           "file": "reports/baseline/alpha-60s.webm",
           "command": "corepack pnpm report:alpha",
           "bytes": 4755727,
           "sha256": "2f4c0aa4409cf3c063367485aa5e47376640daa82ddaebdf403bb7c1d5a7aa4e",
-          "mtime": "2026-08-01T20:22:33.058Z"
+          "mtime": "2026-08-02T07:08:29.991Z"
         }
       ],
-      "setSha256": "9dc58aba03fe2637290541145f9b2fbba88d4499d98e0d6190d960c70a3aa3cb"
+      "setSha256": "cc457c5115151d7a297f389c3b54ad2813c662b71d127b45d6dae86dee64b791"
     }
   },
   "sourceIdentityAfter": {
@@ -3463,12 +3473,12 @@
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 529,
-    "totalBytes": 9582756,
-    "manifestSha256": "e04336d206fab60eed49dcbb2c4bf2fe3863b52b842ef57b17223c7d3f5e2cf5",
+    "fileCount": 531,
+    "totalBytes": 9664809,
+    "manifestSha256": "9d61b2124b579812ca413a588c7b1384eebc1e477f728304d8bd45fedbe86006",
     "vcs": {
-      "commit": "0f9b9a336898734e9c19e6e03bfe7c4c9e1ec430",
-      "tree": "91565e251e5e52d51ff1305b2a88c66ab6abb161"
+      "commit": "af9fdd6bd892cb35c6ba6ae743ab0945fb55f152",
+      "tree": "fad693299e74e1772ad82ca8e48b21bd5262ab08"
     },
     "files": [
       {
@@ -3478,8 +3488,8 @@
       },
       {
         "path": ".github/workflows/ci.yml",
-        "bytes": 4401,
-        "sha256": "fe2a5d13f6519d40e3eea4d1370cd59568b135ed7752b3a28293876e47b00d90"
+        "bytes": 4450,
+        "sha256": "aa58e971d7e60dd89a894389e1ba6a62268b05fbeb5a58876728a560903a5635"
       },
       {
         "path": ".github/workflows/docs.yml",
@@ -3523,8 +3533,8 @@
       },
       {
         "path": "CHANGELOG.md",
-        "bytes": 23572,
-        "sha256": "bd8e83b92e3a1328f9a0ad39b6723d541b5e12b4a2dcc98aa5c70849f5cddac2"
+        "bytes": 24873,
+        "sha256": "cb17caec2f087b615377551a151cb67500b8c4d8faeb6f8238e9e322ea2083b4"
       },
       {
         "path": "CODE_OF_CONDUCT.md",
@@ -3543,8 +3553,8 @@
       },
       {
         "path": "README.zh-CN.md",
-        "bytes": 20740,
-        "sha256": "836ea5cc4955e5c61747d7b28159a89fc3e7ae76dbe03080a9bd04167c518f1e"
+        "bytes": 21432,
+        "sha256": "2d083af41567050601bc68589a97153ee786a465afc4106d90ae5507280bf9a7"
       },
       {
         "path": "SECURITY.md",
@@ -3564,7 +3574,7 @@
       {
         "path": "apps/capability-lab/package.json",
         "bytes": 241,
-        "sha256": "3a1f731832db8a0fd78e1936cb6a7f61caaff451f587973a502edde860ba0134"
+        "sha256": "c113908a4eb4c64c14ba37c44934269f054dd6e666a12a5105e0a05ddd087c86"
       },
       {
         "path": "apps/capability-lab/src/main.ts",
@@ -3604,7 +3614,7 @@
       {
         "path": "apps/docs/package.json",
         "bytes": 436,
-        "sha256": "ce95c4c96654220f613a65946b5e979854e5eb905cd1b7b17e50aa72bb2ed246"
+        "sha256": "93ab5c90d8a47cefe82555782ec52d4888db92e14ba8fccdc21d9052d99f972b"
       },
       {
         "path": "apps/docs/public/favicon.svg",
@@ -3613,8 +3623,8 @@
       },
       {
         "path": "apps/docs/scripts/astro.mjs",
-        "bytes": 471,
-        "sha256": "f686b48ffc8e9c4c7f88ba38a38ba3d80958242681290fb70cdf49d4bf0fc53d"
+        "bytes": 553,
+        "sha256": "7436eaf655b116662b72b6e42dc8a543d5b3ce9a69ccab44e40563e92e811d04"
       },
       {
         "path": "apps/docs/src/content/docs/concepts/architecture.md",
@@ -3734,12 +3744,12 @@
       {
         "path": "apps/docs/src/content/docs/index.mdx",
         "bytes": 4003,
-        "sha256": "01116cde3a872a86c296b4575e6f12da5e7aba8a49502c4c42504efc48efb659"
+        "sha256": "7f011d60abc2c1387ba520988526761e9e8bbf22bf46ac34321a61f608ba9f85"
       },
       {
         "path": "apps/docs/src/content/docs/production/capability-preflight.md",
-        "bytes": 2603,
-        "sha256": "340800f281964f3b2f520d6c0cbe843f05a4a8af541b461e62fcc545ff527dc0"
+        "bytes": 2546,
+        "sha256": "9445d826ade33e9a39d0a584b45f08f940e7ade461b5c4cd807073bd0084d172"
       },
       {
         "path": "apps/docs/src/content/docs/production/compatibility.md",
@@ -3778,18 +3788,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-1.mdx",
-        "bytes": 3580,
-        "sha256": "4b19dce79b3d0b104e29c81e44e012f413ae928f5f48bfae17c8aa5851234891"
+        "bytes": 2856,
+        "sha256": "37d5c0a3389c82ca7695babddc95cf97cd44f2e1278f1eabf3ea840480c5bb24"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-2.mdx",
-        "bytes": 3083,
-        "sha256": "a6660e80aeaad680dd383c148cd818e5ed95aafeeac2f0189449113051e9ddb6"
+        "bytes": 2841,
+        "sha256": "573a934e0b8070c6ae943bdc6e19039a6d3274bd135c693cf9902ac9d23c78db"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-3.mdx",
-        "bytes": 3464,
-        "sha256": "7b477cc1dc381467cc6428fdc2b9bf18e683b8c02c5a1b8c8189c16f9fffd512"
+        "bytes": 1670,
+        "sha256": "98a01d14a0b3870ae0f3edc6579784444f1e71b35df37dff95c9f1795b2cbb95"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/1-4.mdx",
@@ -3808,18 +3818,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/2-0.mdx",
-        "bytes": 3445,
-        "sha256": "b04fad4e910887b572240279250dc5396377a00692425901f97415d178e75a9e"
+        "bytes": 2769,
+        "sha256": "db502703403e2dff33d5dfa7994f5ca0843fbb1bec230c9aa452a65cf18d9c1b"
       },
       {
         "path": "apps/docs/src/content/docs/project/roadmap/index.mdx",
-        "bytes": 4375,
-        "sha256": "fbfc2ed402b32a5204bfdc617cf41148acd0c37250c05eefa574d1c3ddd2d543"
+        "bytes": 3113,
+        "sha256": "aff6f1df217d2d093c5ac97d21658082087794d24d748e6f4bba88c4ec5b1026"
       },
       {
         "path": "apps/docs/src/content/docs/project/status.md",
-        "bytes": 2320,
-        "sha256": "8aca41f7bb76055c0ecfa7cd2c557fbe05b1ab6662542407d6afdd37fcf919e2"
+        "bytes": 2664,
+        "sha256": "ad479b906a920c7dcfab462a2c4bbdfeba51581a44f7218cdadc491102193ddf"
       },
       {
         "path": "apps/docs/src/content/docs/reference/core-node-math-v1.md",
@@ -3859,17 +3869,17 @@
       {
         "path": "apps/docs/src/content/docs/reference/packages.md",
         "bytes": 3677,
-        "sha256": "e5923cbc08ef9bc9ba592ba681ac62f51b564867f811895a8a9595ebd07af6f6"
+        "sha256": "3f616e20d95722d90367a202cf6ddc785f3fee05d2d718fc9941b153a95094e6"
       },
       {
         "path": "apps/docs/src/content/docs/reference/project-schema.md",
-        "bytes": 2733,
-        "sha256": "d09b28bc087714fa08efca66ef0462485873838bfe579dda2b5395ba71207587"
+        "bytes": 3922,
+        "sha256": "97c6fafeca2c004b04ca341434334bc4855b4d7b80cb01ace37fb11e280de66b"
       },
       {
         "path": "apps/docs/src/content/docs/start/capabilities.md",
-        "bytes": 4863,
-        "sha256": "60abed0c9dbcc8afe5c16745c6ee939a4d24000fae58fad7c4fc50bcab7263f2"
+        "bytes": 5087,
+        "sha256": "1e2ab98e8f13abca81a81dda86994212b59fa4b948f707301cc1f112bfdadceb"
       },
       {
         "path": "apps/docs/src/content/docs/start/getting-started.md",
@@ -3879,12 +3889,12 @@
       {
         "path": "apps/docs/src/content/docs/start/installation.md",
         "bytes": 4469,
-        "sha256": "55234dcc85326a26dedd856953832910f21e603f2d5a2f5c08cbff0e21701d70"
+        "sha256": "bdce43381de54041265ab16896ea87f6b9f9b65e425113f33e9c9f1e4c0fc18a"
       },
       {
         "path": "apps/docs/src/content/docs/start/packages.md",
         "bytes": 2986,
-        "sha256": "bf9af4a60a671d4533eed31d6e0a61551773b713a7e0cea285d76e3cca3d9c9a"
+        "sha256": "f89027ea6139567de5fe480a69753ab4dae18728d2b0e57afba6c9a9808b095f"
       },
       {
         "path": "apps/docs/src/content/docs/start/reference-editor.md",
@@ -4009,12 +4019,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/index.mdx",
         "bytes": 4884,
-        "sha256": "cfeb406257bcc33e31351999e8fecf7f99bb30af0f71d7cd3dd0ffd61af7210f"
+        "sha256": "388ac809b3c0cbb1ed5b6c9fb4a202e150c961b285591e7963f0b2e2af83b4b9"
       },
       {
         "path": "apps/docs/src/content/docs/zh/production/capability-preflight.md",
-        "bytes": 5615,
-        "sha256": "5a2fd2c9818f9fd591ad5afb1e9d49c860852d836fd0462c6354ad26b4c2adcf"
+        "bytes": 5572,
+        "sha256": "a91cf45800333b808ed6b2f20a60829c7f3a08e5acfb7a9963f20123f24f4ee9"
       },
       {
         "path": "apps/docs/src/content/docs/zh/production/compatibility.md",
@@ -4053,18 +4063,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-1.mdx",
-        "bytes": 3187,
-        "sha256": "62973f7734908fe2a4340b935d1487572a10ae2d1fddf9a696c4439dc56a9888"
+        "bytes": 2507,
+        "sha256": "42fb5a241a85ce033b340e1ece993ecf4cc537990244e7011da5813de8033d87"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-2.mdx",
-        "bytes": 2625,
-        "sha256": "ce04f945f07556e3fc9fbf39e3c0618d529a1b444886d8b34ad6b30526a4a104"
+        "bytes": 2627,
+        "sha256": "0de1aaa2f610dbf15c3d696dcdf6b5ae7f6d24d4c6e4e8393f45bbbe97d9321c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-3.mdx",
-        "bytes": 2992,
-        "sha256": "a27c3615bb0510a2c1e44fa4132cc061f3318d6c518bede2efdc62f3fbffea40"
+        "bytes": 1459,
+        "sha256": "d83b33a52478b5711fc9b726015b7b9f413581949d12113cadfe636a037840a3"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/1-4.mdx",
@@ -4083,18 +4093,18 @@
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/2-0.mdx",
-        "bytes": 2982,
-        "sha256": "46f93f45517ab5df585aa50203e6f4459aaf5b4512a1e4e9961ea23825f6b6b6"
+        "bytes": 2344,
+        "sha256": "e312df5dac88d3b0c4dc1ea079165832a2e818d205a4b24f5fb0db2cb61f169d"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/roadmap/index.mdx",
-        "bytes": 3762,
-        "sha256": "c46537d28ba91d2e7280a0311fe18de53bdfae2f347448afb78ddfc459a9529b"
+        "bytes": 2651,
+        "sha256": "2975c18111285211103a464260e8a520a752d859f6cc3ebb7c686d86142a3a73"
       },
       {
         "path": "apps/docs/src/content/docs/zh/project/status.md",
-        "bytes": 7723,
-        "sha256": "72251f5a03010bf90cdaaa3ae054006bd29f780c87a9fbd208714196ea2c529e"
+        "bytes": 2458,
+        "sha256": "e5b2661799f42d9782605a13e196fb2cbf61474e3b5db5db617878c098d46a0b"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/core-node-math-v1.md",
@@ -4104,7 +4114,7 @@
       {
         "path": "apps/docs/src/content/docs/zh/reference/diagnostic-codes.md",
         "bytes": 31069,
-        "sha256": "2a412f62310b99e824ca8b3fc3fb512349e7422e0ff174881f64022e9a2c8f8d"
+        "sha256": "1c1926877c970b86a3022d1ce3ccd6203bf724aa1b24844a0f3781dbb1d4de0c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/editing-commands.md",
@@ -4134,12 +4144,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/reference/packages.md",
         "bytes": 6895,
-        "sha256": "6028a7148135f596ee6f510cf4e7ffce03dbb9ecc8cce769a09f8b900f538a1a"
+        "sha256": "74394fc79bd271a48ebcb519f7281a455c0a4a75b8a93ac6e8ea7a3fef9660d6"
       },
       {
         "path": "apps/docs/src/content/docs/zh/reference/project-schema.md",
-        "bytes": 6046,
-        "sha256": "1febfad82166deecd2112f99a8597b220dc5dfad247664b06ddfbe399a38d442"
+        "bytes": 3492,
+        "sha256": "026759dac5fe17de1b356a335def2f47d9ef39f61c55003593082e2ee7211a21"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/capabilities.md",
@@ -4154,12 +4164,12 @@
       {
         "path": "apps/docs/src/content/docs/zh/start/installation.md",
         "bytes": 8772,
-        "sha256": "c0bf2ecf92cea99166c43f8fb71ceda4463d4c61ff99b718adde36bef7519f95"
+        "sha256": "ff2b39519b5e6b9ce9b88cd63aad09efa68264be3293406a924daf6a855d96d1"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/packages.md",
         "bytes": 4281,
-        "sha256": "3d01471bfc29d9e3dc58e960a900a2c179a913d1084be8e6a2b27baa12712a6a"
+        "sha256": "048ea2189db14e572c0e2fa7fb174a7f1d45c5338dba349bbf4105f8d4ff277c"
       },
       {
         "path": "apps/docs/src/content/docs/zh/start/reference-editor.md",
@@ -4194,7 +4204,7 @@
       {
         "path": "apps/editor-demo/package.json",
         "bytes": 364,
-        "sha256": "2dff4624c8933f97009d953ba4f849f893f6af800e3e7d5318ea32e874f7bff6"
+        "sha256": "ffce902520c533ab6693fe12d61ea0fa010d11739cc87af9b1db62bd1f88dab6"
       },
       {
         "path": "apps/editor-demo/src/main.ts",
@@ -4229,7 +4239,7 @@
       {
         "path": "apps/evidence-runner/package.json",
         "bytes": 608,
-        "sha256": "50c23e21bf05e298c6d707309b6c2ce206896f7f2922246732212729facc2a8a"
+        "sha256": "542dcc7d95ff7baca55924b4600c4247b0329dd3e46ac49bc45da8a0942bc125"
       },
       {
         "path": "apps/evidence-runner/performance.html",
@@ -4299,7 +4309,7 @@
       {
         "path": "apps/quickstart/package.json",
         "bytes": 363,
-        "sha256": "633402d12d34d4ef1eb695fd85e43391e60a9748debd40d86c19713433be5bdd"
+        "sha256": "0ecb3975b64d55d29f9ecb2727d07e4dcf8345a0d4b607484e8c65f68b95764a"
       },
       {
         "path": "apps/quickstart/src/main.ts",
@@ -4329,12 +4339,12 @@
       {
         "path": "compatibility/device-matrix.json",
         "bytes": 3717,
-        "sha256": "9b71e7b0eed26e6ebcb7221c772061fda7e9e4a5b5360b6717215f003f20e24b"
+        "sha256": "3be647fc8302c3d4070dd10d216880fbe400b9f90cedc410d42ce96520384e02"
       },
       {
         "path": "compatibility/matrix.v1.json",
         "bytes": 4542,
-        "sha256": "fa6c98ca4da73d5129d6b9000dcb33084aaa247929481ca4f5a6e36d4eb7e7b6"
+        "sha256": "32409a07acb355d42c5b653e214d613ec917fb3328621d5a6a183d5a637f3e3a"
       },
       {
         "path": "eslint.config.mjs",
@@ -4513,23 +4523,23 @@
       },
       {
         "path": "package.json",
-        "bytes": 6669,
-        "sha256": "9ae8acb74a7f868c8731639d83ee0d0f10c5ae84a7ed8e70bac65246408bbb72"
+        "bytes": 6717,
+        "sha256": "9c0316b33641d764d56d11b5ca24731a0ecb13cd16dc1965edf7ad5c2da4704a"
       },
       {
         "path": "packages/audio/README.md",
-        "bytes": 936,
-        "sha256": "04780b3d86033273308c10d6e1b4146850ffe1378b5a82962264f79dc5d66b6a"
+        "bytes": 1052,
+        "sha256": "9ab0afba5f5f7a59f07b23282dfe587cfb39ede5d276a6a7f4321a12d425df72"
       },
       {
         "path": "packages/audio/package.json",
         "bytes": 1049,
-        "sha256": "c162dd1dd58313b3a32b6900e921b52a0231bb78f922ce22df8fb0a55176c6f8"
+        "sha256": "88c43538b65a82b35937058d0d3357966414dfd7419dac379789a34087d04aac"
       },
       {
         "path": "packages/audio/src/analysis.ts",
-        "bytes": 5291,
-        "sha256": "e6025746efb085d1f2a8d841918444b907ee17e6fe2a26968a930d46f9f6170f"
+        "bytes": 6935,
+        "sha256": "d73ae0294256b7dd23bf517a4ecaf2be13607df232b55361d47ac917b2fbca5b"
       },
       {
         "path": "packages/audio/src/device-state.ts",
@@ -4603,8 +4613,8 @@
       },
       {
         "path": "packages/audio/test/analysis.test.ts",
-        "bytes": 3128,
-        "sha256": "7a6492aa2650bf903da5bf3bb0f51ddd59dad63bfc0aa6d87a1e665916c132a3"
+        "bytes": 4512,
+        "sha256": "1893d4619a32c3054e85b37315b87dd4650e16d655bc6ab59bd20c1633c499a0"
       },
       {
         "path": "packages/audio/test/device-state.test.ts",
@@ -4663,18 +4673,18 @@
       },
       {
         "path": "packages/capability/README.md",
-        "bytes": 935,
-        "sha256": "ba9cae7229fcc517ec4ea2992df9280748cbe213b32f04becec78415870f8c4a"
+        "bytes": 1146,
+        "sha256": "bdbac863a37f39820b6c9b1391def275b0eadff917b5831e677edfdabd0d7ad7"
       },
       {
         "path": "packages/capability/package.json",
         "bytes": 998,
-        "sha256": "d1866c00ee3d73d928701f0e275b85cccec41194b019392becd3db075019f897"
+        "sha256": "c41de844369e1277f34423be2cec9f617126197f325a424070788ab360972328"
       },
       {
         "path": "packages/capability/src/fallback.ts",
-        "bytes": 4092,
-        "sha256": "e4916356acbc4506616fef7ec08d79143d2cb4cbffe3e6359b5ee66842b6eaa0"
+        "bytes": 4742,
+        "sha256": "1480a63155ee75b2c30d7d275819fe4ddccfef2df6519890524b1118e97dfc23"
       },
       {
         "path": "packages/capability/src/gate.ts",
@@ -4703,8 +4713,8 @@
       },
       {
         "path": "packages/capability/test/fallback.test.ts",
-        "bytes": 3073,
-        "sha256": "c4984e2320c70ee99e666fe3c5c2d41954c9ee0eff00889d565b9a926784979a"
+        "bytes": 3479,
+        "sha256": "6ca4fb6ac2a893044dce09eeb285c2c0922f64ba63fe4b66af3943954bbc5592"
       },
       {
         "path": "packages/capability/test/gate.test.ts",
@@ -4719,12 +4729,12 @@
       {
         "path": "packages/core/README.md",
         "bytes": 878,
-        "sha256": "5ee34a68eeeed76691f3f59f01de823c7be036ed95c935f85cf7e89951dd8503"
+        "sha256": "c01f38bb57a4a2196a45cd3b30b07c96bf7b2aefd2e243376962542937604e99"
       },
       {
         "path": "packages/core/package.json",
         "bytes": 937,
-        "sha256": "e54a5ba3952140bf8ed5832dae5cabc8f87af956e01288f66717e457e04bd4ca"
+        "sha256": "09a8b0a4e97875ad2f56db16537167e8bd7092098e62fa5f12b12ce4346dd9ca"
       },
       {
         "path": "packages/core/src/diagnostic-localization.ts",
@@ -4784,12 +4794,12 @@
       {
         "path": "packages/export/README.md",
         "bytes": 978,
-        "sha256": "fe06d73d20f7a2cf3bc785e77d7ce0563b1a6c7a7bd1a32bbf0ebabcaca829a8"
+        "sha256": "1aa99cb338973c5041a84f064b26cad519b58847df54862917e155b8a05b8b5a"
       },
       {
         "path": "packages/export/package.json",
         "bytes": 1119,
-        "sha256": "f015147068662f0c3c22ac29f2b07a343cf5ccd078229c636fd625206812ec2e"
+        "sha256": "d90efea58098aad880a29623cbcb70ad590bcecb1a1ffdfd15a951d583431ba3"
       },
       {
         "path": "packages/export/src/audio-export.ts",
@@ -4899,12 +4909,12 @@
       {
         "path": "packages/material-compiler/README.md",
         "bytes": 960,
-        "sha256": "904655c5da05bd883d00754ec542056a47da9e0c4c5369e11cbe928b5916c82e"
+        "sha256": "df1e1d278e6fa0e2065e261d317427cfe7d5d1fab0ae6b7073f027f1ff77f7cc"
       },
       {
         "path": "packages/material-compiler/package.json",
         "bytes": 1024,
-        "sha256": "c20039d9018ebe43919efa6426b9d8c023f23813f68ba0b263020bb704129cde"
+        "sha256": "2c6ef6ba23c263fb430733efb624894311a2afa40901866b675719c70d4f7af7"
       },
       {
         "path": "packages/material-compiler/src/codegen-common.ts",
@@ -4959,12 +4969,12 @@
       {
         "path": "packages/material-sdk/README.md",
         "bytes": 1747,
-        "sha256": "e3d3dde64293d8221e1a34069d9d45648aa2351251bee9714c4270df4a4be969"
+        "sha256": "119080cbdf574b55a8767bd1aae535f791f9bd66d4a2724fef11d5b4872e141d"
       },
       {
         "path": "packages/material-sdk/package.json",
         "bytes": 1343,
-        "sha256": "b9ae50bdc9445fbaa2c214b8f0485f05f2787c467a51d438b5699f9e453c89bf"
+        "sha256": "be4d251e5c166d209fa7749aee5046a623fcbe6e3fb6bfa1485a00f974b3b6d9"
       },
       {
         "path": "packages/material-sdk/src/bundled-schemas.ts",
@@ -5094,12 +5104,12 @@
       {
         "path": "packages/media/README.md",
         "bytes": 1027,
-        "sha256": "ce27d3844b57091e7844926adacadef4409bea1d2575e59d001ee8cbee408231"
+        "sha256": "b422a9750863ca110d42cd5732e911d624a658394b8895aebde0fe8b219278e4"
       },
       {
         "path": "packages/media/package.json",
         "bytes": 1031,
-        "sha256": "87e393c67c77e18fc2f1d60f20c2e1d5ea3842d74296611e7f27b1a02da30e6b"
+        "sha256": "25b8869f0a799bb37cf3046644d199b1c010535972eb8f1e36c7015798562562"
       },
       {
         "path": "packages/media/src/cache-store.ts",
@@ -5188,13 +5198,13 @@
       },
       {
         "path": "packages/project-schema/README.md",
-        "bytes": 914,
-        "sha256": "093c45724f68bf54df60ddfc003e967bdbbc33993e67a4578b90b56a4c0a96c8"
+        "bytes": 1041,
+        "sha256": "a083eb5dd4f19156870d8ee62182944d4494fafa7a2bcff42b1f8bf6e0d49c23"
       },
       {
         "path": "packages/project-schema/package.json",
         "bytes": 1077,
-        "sha256": "2a469dcaaece4a4e50dd7cb861528df3f1540265af0dbee551568cbdc028613d"
+        "sha256": "e218dc0c202b32a076a9f58ca7d750df176e0407189f0046bd025953cbc3ac72"
       },
       {
         "path": "packages/project-schema/src/admission.ts",
@@ -5213,8 +5223,13 @@
       },
       {
         "path": "packages/project-schema/src/index.ts",
-        "bytes": 160,
-        "sha256": "0a7e680a3fbe640fa438cdd36195fb8012c652f883e11b7c95d98c7bed4827c3"
+        "bytes": 192,
+        "sha256": "67fe1c046135265a6845812059a033bddc36d60cce3fb1d3e56cc20ebfaf60e0"
+      },
+      {
+        "path": "packages/project-schema/src/migration.ts",
+        "bytes": 3019,
+        "sha256": "a54d569d67e8da698f7dc851aea9263eb3d9d8973956640c374e36ef258e0fad"
       },
       {
         "path": "packages/project-schema/src/types.ts",
@@ -5223,8 +5238,8 @@
       },
       {
         "path": "packages/project-schema/src/validate.ts",
-        "bytes": 28191,
-        "sha256": "927502688f3e063b5696dd72ccd97a9846f475f3e2fdebff2a779db27775a1b7"
+        "bytes": 29272,
+        "sha256": "7cf82a53eadfc9627058d49161a6469ee4fbf66053a557a3cec2c128c0c22630"
       },
       {
         "path": "packages/project-schema/test/admission.fuzz.test.ts",
@@ -5238,8 +5253,8 @@
       },
       {
         "path": "packages/project-schema/test/project.test.ts",
-        "bytes": 25833,
-        "sha256": "46a7976a92fc626a8b3503993be00b435c4a1d02738a5a363628af75d3e0ffaf"
+        "bytes": 27822,
+        "sha256": "89914775b2c457ff008d6bfb1574b3b244e6abdb3d2562a3c46b0f93c4b7645f"
       },
       {
         "path": "packages/project-schema/tsconfig.json",
@@ -5249,12 +5264,12 @@
       {
         "path": "packages/render-ir/README.md",
         "bytes": 964,
-        "sha256": "3f520c23f1bafe756562890c2ff7ae49f01a028b517e33b996192f7be4584600"
+        "sha256": "190e2013a5b048f7d7651e5e7e5416aeb33868aeca076f619c997ce11b1d083a"
       },
       {
         "path": "packages/render-ir/package.json",
         "bytes": 1117,
-        "sha256": "165211813e52a7f4eb1ef363417ab4726e188a1ca9aadc66589d38a3b3f53c9a"
+        "sha256": "0604e8def279d7666db9756c803942cc016aae4cd8d023d183b71bd3399ba090"
       },
       {
         "path": "packages/render-ir/src/captions.ts",
@@ -5268,13 +5283,13 @@
       },
       {
         "path": "packages/render-ir/src/compiler.ts",
-        "bytes": 25880,
-        "sha256": "d85618d54cba07867406437817e507316cfd4e7776cc8c42db22f5783b7dddae"
+        "bytes": 27539,
+        "sha256": "b8217d7fe6edebbcce2ac8add23919818c639f45b9dd13c69cb5efab1bdf5362"
       },
       {
         "path": "packages/render-ir/src/evaluate.ts",
-        "bytes": 16094,
-        "sha256": "57a5f6087cd16d0df39cd84018888586bf46c72a768f670a97ba52af2f426eea"
+        "bytes": 16971,
+        "sha256": "961e57572688680d6ba24bbd8c71d27774b08159c8a43adfbc1254429125da7b"
       },
       {
         "path": "packages/render-ir/src/index.ts",
@@ -5293,13 +5308,13 @@
       },
       {
         "path": "packages/render-ir/src/types.ts",
-        "bytes": 9016,
-        "sha256": "1bd2288525439f0a028a9a4718c8d58db75433c45705ba365e3dbe2a923e5563"
+        "bytes": 9208,
+        "sha256": "fd286b1366e277b068c00d835fd0254224346d6ec40cd2a7879fe76eb5aec276"
       },
       {
         "path": "packages/render-ir/test/bezier-handle.test.ts",
-        "bytes": 3318,
-        "sha256": "dfd86b515d5288659081aab278ecc1ae0fe8681e5212a6dd5b7f9da3dc1bc604"
+        "bytes": 3997,
+        "sha256": "9345b29f661763208de1ee336378c7e12a2ed099963a095517f51997e65026a3"
       },
       {
         "path": "packages/render-ir/test/color.test.ts",
@@ -5308,8 +5323,8 @@
       },
       {
         "path": "packages/render-ir/test/compiler.test.ts",
-        "bytes": 25676,
-        "sha256": "be6dd3eeb98ffb8dc3f47c72bbc57f4070bf36803663dfa7203e2cb28ccb03ad"
+        "bytes": 27317,
+        "sha256": "aad73232aad6bb0082a7e096f827dd72f487dfdbaab7693669b122deae83fdd8"
       },
       {
         "path": "packages/render-ir/test/production-soak.test.ts",
@@ -5334,12 +5349,12 @@
       {
         "path": "packages/renderer-worker/README.md",
         "bytes": 923,
-        "sha256": "1d09e149404ad926d1498d23d7ca6bda2054e69bfe15ac868d76eeda957441d4"
+        "sha256": "368388dccfc36ba6558cbd718b829f8a6889711768c3c0a08ab947dee06cefca"
       },
       {
         "path": "packages/renderer-worker/package.json",
         "bytes": 1107,
-        "sha256": "44b7d019e1f6a9268653dc37ee470549ffb87645ad389ab40d8bf7b9482c261e"
+        "sha256": "3d5854f60194c4c58097d64322bcb000ba9a75b21dab44bbebe553a56ddd4ea7"
       },
       {
         "path": "packages/renderer-worker/src/client.ts",
@@ -5358,8 +5373,8 @@
       },
       {
         "path": "packages/renderer-worker/src/ir-renderer.ts",
-        "bytes": 50968,
-        "sha256": "46c974fda65debd34b3dc56344ec25ba8089152ba5dbb9dea48629a9093ea74e"
+        "bytes": 51113,
+        "sha256": "7cbbf4e6ce5a3aacf53ca164199ad7ae13e5cfeccbe90925b8a16ee167a7fa0a"
       },
       {
         "path": "packages/renderer-worker/src/protocol.ts",
@@ -5393,8 +5408,8 @@
       },
       {
         "path": "packages/renderer-worker/test/ir-renderer.browser.test.ts",
-        "bytes": 32956,
-        "sha256": "7f98d26c2f06c03b9d4349cc6b5a9a88bd5d49a8bedcdc408010520cd33c405d"
+        "bytes": 35143,
+        "sha256": "c124647d7f87c1106191b6bf648eef4973e8152b8fe3187296aba2ba2fb66124"
       },
       {
         "path": "packages/renderer-worker/test/material.golden.test.ts",
@@ -5413,13 +5428,13 @@
       },
       {
         "path": "packages/sdk/README.md",
-        "bytes": 2392,
-        "sha256": "3f8060e720d649a6ead26490c450a9c930955b5f50ff2dfe00b8335b9940b69f"
+        "bytes": 2687,
+        "sha256": "5434bf9ec70ec4fc98e51591910988e416bacb1b65e7ca554547147cd0ebd714"
       },
       {
         "path": "packages/sdk/api-snapshot.md",
-        "bytes": 7550,
-        "sha256": "1cf789e65924cf8ed58d03ed43432f9e000e3b47c5c08c1a09548dd3b056cfb7"
+        "bytes": 7906,
+        "sha256": "01cf9291fdc852de0952071b7f299afe10a8c266e22dcd130c79b9846269fd1f"
       },
       {
         "path": "packages/sdk/check-api-snapshot.mjs",
@@ -5429,12 +5444,12 @@
       {
         "path": "packages/sdk/package.json",
         "bytes": 1977,
-        "sha256": "f41107609bdbf0d0ec2f44344cdd7c7e9413bfdb34a59928b2626efddd0d4e3a"
+        "sha256": "24ef743c38bca893a219ee95d063135759998bd415631981fdf86386c8fdfe46"
       },
       {
         "path": "packages/sdk/src/audio-controller.ts",
-        "bytes": 14211,
-        "sha256": "1cd0ab85f91eceb2b6ede07965441f5bc224c3d5f244a285f2a6e5f3511c880d"
+        "bytes": 14732,
+        "sha256": "3caefb98facc1049968959f89b38a9c897c5af6dc9849c8a267bc9c7b80ab927"
       },
       {
         "path": "packages/sdk/src/audio-mastering.ts",
@@ -5448,8 +5463,8 @@
       },
       {
         "path": "packages/sdk/src/default-schemas.ts",
-        "bytes": 23881,
-        "sha256": "990a06dfaa236e5f18009be124926f4f2b900cc64733f724e331bde2ca0d741e"
+        "bytes": 45099,
+        "sha256": "8ac3d59e9b6169080a2160b5079ec64b10f55c783186b8f4393250b7a3265810"
       },
       {
         "path": "packages/sdk/src/diagnostic-report.ts",
@@ -5468,8 +5483,8 @@
       },
       {
         "path": "packages/sdk/src/index.ts",
-        "bytes": 917,
-        "sha256": "ad9b5f5774ae0d307da95fa59ef5b2d8dcd09fce330e6e8a4d38b867df7ade30"
+        "bytes": 1149,
+        "sha256": "fc7ae6f951983f4ddb6eb1307be4f4ec6a8213974253b6c396e0b74d3f70ee03"
       },
       {
         "path": "packages/sdk/src/media-provider.ts",
@@ -5523,18 +5538,18 @@
       },
       {
         "path": "packages/sdk/src/project-builder.ts",
-        "bytes": 51898,
-        "sha256": "51ebd6d094a8786059ca386469f49156cf86901b05e20999ab925d20d35a6855"
+        "bytes": 52038,
+        "sha256": "8df39667a6654458402d061a336b6a41160e8eb1fd6c1feeb765b061c7261f30"
       },
       {
         "path": "packages/sdk/src/proxy-automation.ts",
-        "bytes": 3672,
-        "sha256": "afc05c77aebae659884ef472cfc4bbe2186dc1d7d18ded382ef5175e8a900057"
+        "bytes": 6888,
+        "sha256": "cc83a214aaac6800bc69f22a656e2f663926da41ad80893583a17b08cf347418"
       },
       {
         "path": "packages/sdk/src/rate-envelope.ts",
-        "bytes": 2549,
-        "sha256": "cb5803190e96c9f6ecc27103389f525265d60d76b6eeaa0df37a1a934c74887b"
+        "bytes": 3482,
+        "sha256": "bb8a7d87929b7672acf73e8ce992e1732d647ffaec99972086dbe7e3fed1132e"
       },
       {
         "path": "packages/sdk/src/runtime-material-registry.ts",
@@ -5543,18 +5558,18 @@
       },
       {
         "path": "packages/sdk/src/session.ts",
-        "bytes": 52277,
-        "sha256": "abb1e1af7150f28c3726b8c40590e0fcb1a0ea3df901fa0513fb093b28234af5"
+        "bytes": 52254,
+        "sha256": "d07eea7ec6cccd295f99daf03a270313c6019e5cffa9069e1fb3f56a004d8fa1"
       },
       {
         "path": "packages/sdk/src/subtitle-io.ts",
-        "bytes": 5944,
-        "sha256": "36c1d21cad308e9eeda70a2c50a387110474cad6eded9f01b28e963041398512"
+        "bytes": 7490,
+        "sha256": "5c7554afe61b045e95bd86e1daeb541a2a46f1aac469ab777c8794f1514f1ae3"
       },
       {
         "path": "packages/sdk/src/types.ts",
-        "bytes": 19355,
-        "sha256": "7529c309c3920582c9bb76057fa33d654550e4c6fb09f2c178ee7821e04abe42"
+        "bytes": 20079,
+        "sha256": "544b2615ad8b1e90d1b86e692dd9bf87a16b1836ae8705bb403aba16d1b25b09"
       },
       {
         "path": "packages/sdk/test/audio-controller.test.ts",
@@ -5618,18 +5633,18 @@
       },
       {
         "path": "packages/sdk/test/project-builder.test.ts",
-        "bytes": 10972,
-        "sha256": "d9c97ae30216ae3a9a3f0fcc5888b0f148bf72260d65dbff0ffda41580dd947a"
+        "bytes": 11067,
+        "sha256": "b0a461000c24f7b154fb083dd904a030a1f8c99206e879db1efb8ad6ca3ce45c"
       },
       {
         "path": "packages/sdk/test/proxy-automation.test.ts",
-        "bytes": 3485,
-        "sha256": "c1d80ca8bcdc4d07b8e84c9b37837abe494225644ee42faf4651b629dcbf9cad"
+        "bytes": 5809,
+        "sha256": "8ee989baef33fb1e02134759c4f218661d086dc53ab51dffeb2679f76544dde5"
       },
       {
         "path": "packages/sdk/test/rate-envelope.test.ts",
-        "bytes": 4683,
-        "sha256": "8cdbe05ec20fb6b9e06ec7f17fbca4bfc858138086c4f4bc7ca2d82dd92f3cf1"
+        "bytes": 5590,
+        "sha256": "1b91ea14ce87527dd5c3b6b76c35b9eb5f832f57dfe1d4aa47ca411264f6db07"
       },
       {
         "path": "packages/sdk/test/session.browser.test.ts",
@@ -5638,13 +5653,13 @@
       },
       {
         "path": "packages/sdk/test/session.test.ts",
-        "bytes": 28788,
-        "sha256": "ee0c7f74a37df9de5d6bf2ac07598756e40d2ff251134c55d561f72e2cb58c35"
+        "bytes": 29026,
+        "sha256": "874c2c6b5ec8f92a10d3f0cc084c8a1c0ed15c5def582c5426c93002093dcca4"
       },
       {
         "path": "packages/sdk/test/subtitle-io.test.ts",
-        "bytes": 5375,
-        "sha256": "b2f863b23b358a0829bbc7103b5edf1657e1ed825b2bd0393c403c8657d260b9"
+        "bytes": 6488,
+        "sha256": "a6fe803eea1b57216818d3f97554f625018c733560affcb97ed184b859fec2f5"
       },
       {
         "path": "packages/sdk/test/target-conformance.browser.test.ts",
@@ -5659,12 +5674,12 @@
       {
         "path": "packages/transaction/README.md",
         "bytes": 970,
-        "sha256": "8a80dd80fda8b68cafd6fc18234f8487b8080b0086eb170ac2a0af75a6bc4ef8"
+        "sha256": "07cfe91147448780d8b234e0a5d6c6300c052078b66705fd08b2962449ec696c"
       },
       {
         "path": "packages/transaction/package.json",
         "bytes": 1070,
-        "sha256": "a2c27cdf932f17af25c8c8a624b3bee81e91fec6f646dd60fa04913daff4ffbc"
+        "sha256": "42786ef4155a293e853beb1d88bdac49ca4d7eff3bfb654bae094bd5bfd7906f"
       },
       {
         "path": "packages/transaction/src/affected-ranges.ts",
@@ -5734,12 +5749,12 @@
       {
         "path": "packages/vite-plugin/README.md",
         "bytes": 2261,
-        "sha256": "642bf0b13f828a0d18803ce711937d66722480f21e4ab953978929089c859aae"
+        "sha256": "d291f86c29b0236845538af7ba7ad7b0a171fc8f8391e442d554879d7ba48d0f"
       },
       {
         "path": "packages/vite-plugin/package.json",
         "bytes": 1388,
-        "sha256": "a4b210030c485a714987a7093e9c026f6210a2881bc3638c9308c44526e5ca97"
+        "sha256": "13fa448f1789eb08072c1af8023bc17d9aeb66b21f65c6861ac65abc6f8914a9"
       },
       {
         "path": "packages/vite-plugin/src/index.ts",
@@ -5774,7 +5789,7 @@
       {
         "path": "pnpm-lock.yaml",
         "bytes": 209159,
-        "sha256": "8c73b9075ecf4ac67023993fa5643104938c241fe310b2461a17ac50bd846043"
+        "sha256": "6782d8314785006132a31a099ba0d1fd13e8ff68cdd98b93634324d859b271c4"
       },
       {
         "path": "pnpm-workspace.yaml",
@@ -5803,8 +5818,13 @@
       },
       {
         "path": "schemas/project/v1/project.schema.json",
-        "bytes": 42334,
-        "sha256": "de622653441e695c8999aca8fd0872a4c4b7d248fe2ae7af7f18b4c1808dd65f"
+        "bytes": 40924,
+        "sha256": "8edad52a01adf752b29bb895a9aa1dbbb8dd35de945c68980c2ff05556e7fbaf"
+      },
+      {
+        "path": "schemas/project/v1.2/project.schema.json",
+        "bytes": 42340,
+        "sha256": "a53c8aaab99eb67b223ed0b4bb9e15febb18e07fb0ec2153958646a652c90eef"
       },
       {
         "path": "scripts/benchmark-competitors.mjs",
@@ -5878,8 +5898,8 @@
       },
       {
         "path": "scripts/check-default-schemas.mjs",
-        "bytes": 2040,
-        "sha256": "5ccebfa424efcd8960eefdb76cfccf9c1f4cca3fed57ed5fd05e5b237a672238"
+        "bytes": 2288,
+        "sha256": "450981fbded55ba682b2a427a98eb7d6febb37389d9df788ddd1a92a4f826f2d"
       },
       {
         "path": "scripts/check-doc-locales.mjs",
@@ -5903,8 +5923,8 @@
       },
       {
         "path": "scripts/check-release-docs.mjs",
-        "bytes": 3389,
-        "sha256": "ecfed30b405e2f188d48c4aa7ff6800730fc8760bef609dc24379b840a1e21c4"
+        "bytes": 3554,
+        "sha256": "9bacc3bbca121edf18e763cce09be32350c4d4e2edebb3eed96c32ab753b7602"
       },
       {
         "path": "scripts/compatibility-matrix-lib.mjs",
@@ -5978,13 +5998,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 110626,
-        "sha256": "577136be51916a867516d297f6fdcc760e059c2c70ea261e1d876d544188e375"
+        "bytes": 110956,
+        "sha256": "bb5bb7b3376e0b2b7bb9988b7fa84dcc4177040c5d17693840e76b247fb72851"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 44658,
-        "sha256": "3ecb8066c5f0e58fbb3a531836cc6e4478402332e80522473c47aa9def896d77"
+        "bytes": 45399,
+        "sha256": "790b75bc9a792122741395c4a2a5ec87c707b61f954f0ae77aed6d4b8029e8c7"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -6023,13 +6043,13 @@
       },
       {
         "path": "scripts/release-version-lib.mjs",
-        "bytes": 2461,
-        "sha256": "c69ce1fc0cf200af5c1d81b56af965055dceaafb82f38daf4a9ae8aac682f6b9"
+        "bytes": 2624,
+        "sha256": "564c0376a93c879312d4de93e3c68f07b3ceba49c95b35c16033aeaecd516408"
       },
       {
         "path": "scripts/release-version-lib.test.mjs",
-        "bytes": 2558,
-        "sha256": "5270d91b33364a8da50911d696cd04340f0f906a3358b92e3392026339303616"
+        "bytes": 2808,
+        "sha256": "971b86e0363a41aecde559c91e635daef04c6a1c7519a2e68dd89ef62f3b6a6d"
       },
       {
         "path": "scripts/run-evidence-tests.mjs",
@@ -6119,5 +6139,5 @@
     ]
   },
   "sourceIdentityMatches": true,
-  "endedAt": "2026-08-01T20:22:33.751Z"
+  "endedAt": "2026-08-02T07:08:30.791Z"
 }

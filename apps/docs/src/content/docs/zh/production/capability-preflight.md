@@ -112,6 +112,12 @@ Preflight 会考虑当前 revision 的 width、height、frameRate、声道、色
 
 即使按钮此前可用，启动任务前仍要再检查一次，因为 Project revision 和 Sink 状态可能已经变化。
 
-## 软件编解码回退契约
+## 软件编解码能力描述符
 
-当硬件编解码不支持时，SDK 通过 `@aelionsdk/capability` 的 `CodecFallbackProvider` 契约（`CodecFallbackRegistry`、`selectCodecExecution`）协商软件回退。应用用 `codecFallbackRegistry.register(provider)` 注册后端（例如 WASM 解码器）；1.1 引擎自身不内置 WASM 后端，由应用选定编解码策略并提供。协商优先硬件，其次第一个 `supports()` 该 codec identity 且 `ready` 的 provider，否则以 `CAPABILITY_CODEC_NO_BACKEND` 失败关闭。`CAPABILITY_CODEC_FALLBACK_USED` 标记低层级执行；preview 与 export 语义在硬件与回退路径间必须保持一致。
+`CodecFallbackDescriptor`、`CodecFallbackRegistry` 和 `selectCodecAvailability()` 只描述宿主
+拥有的软件 codec 能力，**不会**执行或路由媒体任务。1.2 的媒体与导出管线不内置 WASM codec，
+也不会调用注册的描述符。
+
+因此注册表只能用于产品层能力判断。硬件不支持时，应由宿主真正集成并测试 codec 后端、改选
+导出 profile，或使用远程导出。`CodecFallbackProvider` 与 `selectCodecExecution()` 是弃用兼容名；
+它们返回 `fallback` 只表示有描述符，不表示执行路径已经接通。

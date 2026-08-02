@@ -254,6 +254,7 @@ describe('ProjectBuilder', () => {
       trackId,
       frameAssetIds: ['frame_a', 'frame_b', 'frame_c'],
       frameDurationUs: 40_000,
+      durationUs: 200_000,
     });
     const project = builder.build();
 
@@ -267,7 +268,8 @@ describe('ProjectBuilder', () => {
     });
     expect(project.items[itemId]).toMatchObject({
       type: 'image',
-      range: { startUs: 0, durationUs: 120_000 },
+      range: { startUs: 0, durationUs: 200_000 },
+      source: { sourceRange: { startUs: 0, durationUs: 120_000 } },
     });
   });
 

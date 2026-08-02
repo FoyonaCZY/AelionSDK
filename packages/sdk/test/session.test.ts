@@ -33,16 +33,19 @@ function deferred<T>(): Deferred<T> {
 }
 
 describe('@aelionsdk/sdk session facade', () => {
-  it('bundles the canonical v1 schemas as deeply frozen runtime data', async () => {
-    const [projectSchema, materialInstanceSchema] = await Promise.all([
+  it('bundles current and immutable legacy Project schemas as deeply frozen runtime data', async () => {
+    const [projectSchema, legacyProjectSchema, materialInstanceSchema] = await Promise.all([
+      json('schemas/project/v1.2/project.schema.json'),
       json('schemas/project/v1/project.schema.json'),
       json('schemas/material/v1/instance.schema.json'),
     ]);
     expect(defaultSchemas.project).toEqual(projectSchema);
+    expect(defaultSchemas.legacyProject).toEqual(legacyProjectSchema);
     expect(defaultSchemas.materialInstance).toEqual(materialInstanceSchema);
     expect(Object.isFrozen(defaultSchemas)).toBe(true);
     expect(Object.isFrozen(defaultSchemas.project)).toBe(true);
     expect(Object.isFrozen(defaultSchemas.project.properties)).toBe(true);
+    expect(Object.isFrozen(defaultSchemas.legacyProject)).toBe(true);
     expect(Object.isFrozen(defaultSchemas.materialInstance.properties)).toBe(true);
   });
 

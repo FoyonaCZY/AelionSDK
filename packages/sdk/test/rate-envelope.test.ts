@@ -39,10 +39,34 @@ describe('buildRateEnvelope', () => {
     expect(a).toEqual(b);
   });
 
-  it('rejects empty envelopes and negative rates', () => {
+  it('rejects empty envelopes', () => {
     expect(() => buildRateEnvelope({ segments: [] })).toThrow(/at least one segment/);
+  });
+
+  it('supports reverse and freeze spans from an explicit source start', () => {
+    expect(
+      buildRateEnvelope({
+        sourceStartUs: 2_000_000,
+        segments: [
+          { rate: -1, durationUs: 1_000_000 },
+          { rate: 0, durationUs: 500_000 },
+          { rate: 2, durationUs: 500_000 },
+        ],
+      }),
+    ).toEqual([
+      { itemTimeUs: 0, sourceTimeUs: 2_000_000, interpolation: 'linear' },
+      { itemTimeUs: 1_000_000, sourceTimeUs: 1_000_000, interpolation: 'hold' },
+      { itemTimeUs: 1_500_000, sourceTimeUs: 1_000_000, interpolation: 'linear' },
+      { itemTimeUs: 2_000_000, sourceTimeUs: 2_000_000, interpolation: 'linear' },
+    ]);
+  });
+
+  it('rejects reverse spans that cross source time zero and zero-duration envelopes', () => {
     expect(() => buildRateEnvelope({ segments: [{ rate: -1, durationUs: 1_000 }] })).toThrow(
-      /non-negative/,
+      /outside the supported range/,
+    );
+    expect(() => buildRateEnvelope({ segments: [{ rate: 1, durationUs: 0 }] })).toThrow(
+      /positive total duration/,
     );
   });
 

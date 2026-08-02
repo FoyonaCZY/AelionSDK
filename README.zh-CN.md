@@ -46,13 +46,25 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-当前 1.2 Release Candidate 是 `1.2.0-rc.1`，发布在 npm 的 `next` tag。Vite 应用安装 SDK、
-导出入口和运行时资源插件：
+仓库中的 1.2 Release Candidate 是 `1.2.0-rc.2`。预发布版通过 npm 的 `next` tag 分发，
+当前实际发布版本以 npm badge 和 registry 为准。Vite 应用安装 SDK、导出入口和运行时资源插件：
 
 ```bash
 npm install @aelionsdk/sdk@next @aelionsdk/export@next
 npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
+
+### rc.2 补救重点
+
+> `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。在 rc.2 出现在
+> registry 之前，应等待发布完成，不要让 `@next` 解析到旧 RC。
+
+- 新 Project 使用独立的 `v1.2.json / 1.2.0` Schema；旧 RC 文档会先隔离快照再兼容迁移。
+- 图像序列已经进入实际预览和导出路径，不再只是 Project 建模辅助函数。
+- 字幕导入、Bézier 手柄、双向速率、代理内存边界和音频分析命名都已修正。
+- 内置软件 codec、ASS/SSA、真机矩阵、24 小时后台任务和完整 WebGPU parity 仍未交付；详见
+  [1.1 审计](https://foyonaczy.github.io/AelionSDK/zh/project/roadmap/1-1/)与
+  [1.2 审计](https://foyonaczy.github.io/AelionSDK/zh/project/roadmap/1-2/)。
 
 也可以克隆仓库并启动 Quickstart：
 
@@ -335,19 +347,15 @@ Snapshot；浏览器门禁覆盖 Chromium、Firefox、Playwright WebKit 公共�
 
 ## 最新验证状态
 
-2026-08-01 完成了与源清单
-`9c49a096435e7f733f781408b09b742487598f2b3bb4904cd3d680317da008d8`
-绑定的串行最终门禁：21/21 个命令通过，门禁前后源清单一致，全部产物 postflight
-语义校验通过。Chromium 84 项和 Firefox 69 项浏览器测试均为零失败、零跳过；
-13 个公开 tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包
-字节可复现性、golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出
-外部 FFmpeg readback 均通过。
+每个候选版本都必须通过 21 个串行命令，覆盖 Chromium/Firefox 浏览器门禁、13 个公开
+tarball 的独立 Node/Chromium/Firefox 消费者、release dry-run、双打包字节可复现性、
+golden、benchmark、1080p30/4K 性能、seek、可恢复导出与 60 秒导出的外部 FFmpeg
+readback。发布还要求源清单在门禁前后一致，并由独立审查明确批准资源边界、取消与清理、
+Material 传输完整性、公共 API 与分发和证据完整性五项检查。
 
-完整机器可读结果见 `reports/baseline/phase-1-gate-results.json`，发布状态索引见
-`docs/status.md`。绑定于相同源清单、门禁记录和证据集的独立 blocker review 已签署
-`approved`；`1.1.0-rc.1` 已作为 13 个带 provenance 的 npm 包发布到 `next`，并创建
-[`v1.1.0-rc.1`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.1.0-rc.1) 和
-[GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.1.0-rc.1)。
+当前候选版本的精确源清单、测试计数、审批和发布状态见 `docs/status.md`，机器可读门禁记录见
+`reports/baseline/phase-1-gate-results.json`。未完成与该次源清单、门禁记录和证据集精确绑定的
+审查前，不应宣称候选版本已获批准或已发布。
 精确安装与 registry 验证命令见[安装文档](https://foyonaczy.github.io/AelionSDK/zh/start/installation/#验证发布身份)。
 
 ## License

@@ -12,6 +12,9 @@ import {
   PROJECT_INPUT_MAX_ARRAY_LENGTH,
   PROJECT_INPUT_MAX_DEPTH,
   PROJECT_INPUT_MAX_OBJECT_KEYS,
+  CURRENT_PROJECT_SCHEMA_URI,
+  CURRENT_PROJECT_SCHEMA_VERSION,
+  migrateProjectToCurrent,
   ProjectValidator,
   snapshotProjectInput,
 } from '../src/index.js';
@@ -24,6 +27,8 @@ async function readJson(path: string): Promise<JsonObject> {
 
 let project: JsonObject;
 let projectSchema: JsonObject;
+let legacyProjectSchema: JsonObject;
+let materialSchema: JsonObject;
 let validator: ProjectValidator;
 
 function addTransition(
@@ -69,17 +74,21 @@ function addTransition(
 }
 
 beforeAll(async () => {
-  const [loadedProjectSchema, materialInstanceSchema, fixture] = await Promise.all([
-    readJson('schemas/project/v1/project.schema.json'),
-    readJson('schemas/material/v1/instance.schema.json'),
-    readJson('examples/aelion-project-v1.example.json'),
-  ]);
+  const [loadedProjectSchema, loadedLegacySchema, materialInstanceSchema, fixture] =
+    await Promise.all([
+      readJson('schemas/project/v1.2/project.schema.json'),
+      readJson('schemas/project/v1/project.schema.json'),
+      readJson('schemas/material/v1/instance.schema.json'),
+      readJson('examples/aelion-project-v1.example.json'),
+    ]);
   projectSchema = loadedProjectSchema;
+  legacyProjectSchema = loadedLegacySchema;
+  materialSchema = materialInstanceSchema;
   project = fixture;
   validator = new ProjectValidator({ projectSchema, materialInstanceSchema });
 });
 
-describe('Aelion Project v1', () => {
+describe('Aelion Project v1.2', () => {
   it('keeps every public collection and array schema within the admission budgets', () => {
     const definitions = projectSchema.$defs as JsonObject;
     const idList = definitions.idList as JsonObject;
@@ -128,6 +137,46 @@ describe('Aelion Project v1', () => {
   it('validates the canonical full project example', () => {
     const result = validator.validate(project);
     expect(result.ok, JSON.stringify(result.diagnostics, null, 2)).toBe(true);
+    if (!result.ok) throw new Error('project validation failed');
+    expect(result.value.project).toMatchObject({
+      $schema: CURRENT_PROJECT_SCHEMA_URI,
+      schemaVersion: CURRENT_PROJECT_SCHEMA_VERSION,
+    });
+    expect(result.value.migration?.migrated).toBe(true);
+    expect(project).toMatchObject({
+      $schema: 'https://schemas.aelion.dev/project/v1.json',
+      schemaVersion: '1.0.0',
+    });
+  });
+
+  it('offers an ownership-isolated public identity migration', () => {
+    const migration = migrateProjectToCurrent(project);
+    expect(migration.migrated).toBe(true);
+    expect(migration.project.$schema).toBe(CURRENT_PROJECT_SCHEMA_URI);
+    expect(migration.project.schemaVersion).toBe(CURRENT_PROJECT_SCHEMA_VERSION);
+    expect(project.$schema).toBe('https://schemas.aelion.dev/project/v1.json');
+  });
+
+  it('keeps the published v1.0 dialect immutable while v1.2 accepts additive fields', () => {
+    const candidate = canonicalClone(project);
+    const assets = candidate.assets as JsonObject;
+    assets.asset_img = {
+      id: 'asset_img',
+      kind: 'image',
+      locator: { type: 'runtime-binding', bindingId: 'asset_img' },
+    };
+    assets.asset_seq = {
+      id: 'asset_seq',
+      kind: 'image-sequence',
+      locator: { type: 'runtime-binding', bindingId: 'asset_seq' },
+      imageSequence: { frameDurationUs: 40_000, frameAssetIds: ['asset_img'] },
+    };
+    const legacy = new ProjectValidator({
+      projectSchema: legacyProjectSchema,
+      materialInstanceSchema: materialSchema,
+    });
+    expect(legacy.validate(candidate).ok).toBe(false);
+    expect(validator.validate(candidate).ok).toBe(true);
   });
 
   it('accepts an image-sequence asset whose frames reference existing image assets', () => {

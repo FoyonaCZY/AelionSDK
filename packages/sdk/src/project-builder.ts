@@ -7,6 +7,8 @@ import {
   type Rational,
 } from '@aelionsdk/core';
 import {
+  CURRENT_PROJECT_SCHEMA_URI,
+  CURRENT_PROJECT_SCHEMA_VERSION,
   ProjectValidator,
   canonicalClone,
   imageSequenceDurationUs,
@@ -375,8 +377,8 @@ export class ProjectBuilder {
     if (options.durationUs !== undefined) assertTime(options.durationUs, 'durationUs');
 
     this.#project = {
-      $schema: 'https://schemas.aelion.dev/project/v1.json',
-      schemaVersion: '1.0.0',
+      $schema: CURRENT_PROJECT_SCHEMA_URI,
+      schemaVersion: CURRENT_PROJECT_SCHEMA_VERSION,
       projectId,
       metadata: options.title === undefined ? {} : { title: options.title },
       settings: {
@@ -695,7 +697,8 @@ export class ProjectBuilder {
     const itemId = this.#nextId('item_image_sequence');
     this.#assertUnused(itemId);
     const atUs = options.atUs ?? 0;
-    const durationUs = options.durationUs ?? imageSequenceDurationUs(sequence);
+    const sequenceDurationUs = imageSequenceDurationUs(sequence);
+    const durationUs = options.durationUs ?? sequenceDurationUs;
     assertTime(atUs, 'atUs');
     assertTime(durationUs, 'durationUs', true);
     const item: ItemEntity = {
@@ -708,7 +711,7 @@ export class ProjectBuilder {
       source: {
         assetId,
         stream: { type: 'video', index: 0 },
-        sourceRange: { startUs: 0, durationUs },
+        sourceRange: { startUs: 0, durationUs: sequenceDurationUs },
         timeMapping: {
           type: 'linear',
           rate: { numerator: 1, denominator: 1 },

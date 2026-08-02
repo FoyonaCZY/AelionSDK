@@ -7,6 +7,7 @@ import {
   layoutIrText,
   LOCAL_RGBA8_COLOR_CAPABILITY,
   preflightColorPipeline,
+  resolveMediaSourceFrame,
   type IrMaterialInstance,
   type IrShapeClip,
   type IrTextClip,
@@ -1129,10 +1130,12 @@ export class RenderIrFrameRenderer implements Disposable {
         let frame: VideoFrame | undefined;
         if (active.clip.kind === 'visual-clip') {
           if (active.sourceTimeUs === null) continue;
+          const resolved = resolveMediaSourceFrame(active.clip.source, active.sourceTimeUs);
+          if (resolved === null) continue;
           frame = await options.source.frameAt(
-            active.clip.source.assetId,
-            active.clip.source.streamIndex,
-            active.sourceTimeUs,
+            resolved.assetId,
+            resolved.streamIndex,
+            resolved.sourceTimeUs,
             options.signal,
             { purpose: options.mode, maxDimension: Math.max(width, height) },
           );
