@@ -81,10 +81,22 @@ async function testDevelopmentServer() {
       assert((await response.text()).length > 100);
     }
 
-    const clock = await server.transformRequest(`/@fs/${resolve(audioDist, 'worklet-clock.js')}`);
+    const clockId = `/@fs/${resolve(audioDist, 'worklet-clock.js').replaceAll('\\', '/')}`;
+    const clock = await server.transformRequest(clockId);
     assert(
       clock?.code.includes('/@aelionsdk/vite-plugin/runtime-assets/audio/pcm-player.worklet.js'),
     );
+    assert(clock?.code.includes('@vite-ignore'));
+    assert(!clock?.code.includes('/@fs/@aelionsdk/vite-plugin'));
+
+    const servedClock = await fetch(`${origin}${clockId}`);
+    assert.equal(servedClock.status, 200);
+    const servedCode = await servedClock.text();
+    assert(
+      servedCode.includes('/@aelionsdk/vite-plugin/runtime-assets/audio/pcm-player.worklet.js'),
+    );
+    assert(servedCode.includes('@vite-ignore'));
+    assert(!servedCode.includes('/@fs/@aelionsdk/vite-plugin'));
   } finally {
     await server.close();
   }

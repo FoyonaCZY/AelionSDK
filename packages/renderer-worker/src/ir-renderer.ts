@@ -132,13 +132,15 @@ class AdaptiveBackendSelector {
     webgpu: [],
     webgl2: [],
   };
+  #current: 'webgpu' | 'webgl2' = 'webgl2';
   #selectionCount = 0;
   #webgpuCooldownUntil = 0;
 
   public select(requested: RenderIrFrameOptions['preferredBackend'] = 'auto'): 'webgpu' | 'webgl2' {
     if (requested !== 'auto') return requested;
     this.#selectionCount += 1;
-    return this.#selected();
+    this.#current = this.#selected(this.#current);
+    return this.#current;
   }
 
   public record(
@@ -155,7 +157,7 @@ class AdaptiveBackendSelector {
 
   public snapshot(): AdaptiveBackendSnapshot {
     return {
-      selected: this.#selected(),
+      selected: this.#current,
       webgpuSamples: this.#samples.webgpu.length,
       webgl2Samples: this.#samples.webgl2.length,
       webgpuP95Us: percentile95(this.#samples.webgpu),
@@ -164,13 +166,16 @@ class AdaptiveBackendSelector {
     };
   }
 
-  #selected(): 'webgpu' | 'webgl2' {
+  #selected(current: 'webgpu' | 'webgl2'): 'webgpu' | 'webgl2' {
     if (this.#selectionCount < this.#webgpuCooldownUntil) return 'webgl2';
     if (this.#samples.webgl2.length < 3) return 'webgl2';
     if (this.#samples.webgpu.length < 3) return 'webgpu';
     const webgpuP95 = percentile95(this.#samples.webgpu) ?? Number.POSITIVE_INFINITY;
     const webgl2P95 = percentile95(this.#samples.webgl2) ?? Number.POSITIVE_INFINITY;
-    return webgpuP95 < webgl2P95 ? 'webgpu' : 'webgl2';
+    const currentP95 = current === 'webgpu' ? webgpuP95 : webgl2P95;
+    const challenger: 'webgpu' | 'webgl2' = current === 'webgpu' ? 'webgl2' : 'webgpu';
+    const challengerP95 = challenger === 'webgpu' ? webgpuP95 : webgl2P95;
+    return challengerP95 * 1.15 < currentP95 ? challenger : current;
   }
 }
 
@@ -206,27 +211,37 @@ async function presentationBitmap(
   }
 }
 
+const VISUAL_UNIFORM_IDS = [
+  'positionX',
+  'positionY',
+  'anchorX',
+  'anchorY',
+  'scaleX',
+  'scaleY',
+  'rotationRad',
+  'opacity',
+  'outputWidth',
+  'outputHeight',
+  'cropLeft',
+  'cropTop',
+  'cropRight',
+  'cropBottom',
+] as const;
+
+const TEXT_VISUAL_UNIFORM_IDS = [
+  ...VISUAL_UNIFORM_IDS,
+  'contentX',
+  'contentY',
+  'contentW',
+  'contentH',
+] as const;
+
 const BASE_VISUAL_PROGRAM: WebGl2MaterialProgram = {
   backend: 'webgl2',
   nodeSet: 'aelion.visual.builtin/1.0.0',
-  graphHash: 'builtin-visual-transform-v1',
+  graphHash: 'builtin-visual-transform-v4',
   inputPorts: ['source'],
-  uniforms: [
-    'positionX',
-    'positionY',
-    'anchorX',
-    'anchorY',
-    'scaleX',
-    'scaleY',
-    'rotationRad',
-    'opacity',
-    'outputWidth',
-    'outputHeight',
-    'cropLeft',
-    'cropTop',
-    'cropRight',
-    'cropBottom',
-  ].map(id => ({
+  uniforms: VISUAL_UNIFORM_IDS.map(id => ({
     name: `u_parameter_${id}`,
     type: 'float' as const,
     source: { kind: 'parameter' as const, id },
@@ -262,16 +277,26 @@ uniform float u_parameter_cropBottom;
 in vec2 v_uv;
 out vec4 out_color;
 void main() {
-  vec2 position = vec2(
-    u_parameter_positionX / u_parameter_outputWidth,
-    u_parameter_positionY / u_parameter_outputHeight
-  );
-  vec2 offset = v_uv - position;
-  float c = cos(-u_parameter_rotationRad);
-  float s = sin(-u_parameter_rotationRad);
-  vec2 rotated = mat2(c, -s, s, c) * offset;
-  vec2 sourceUv = rotated / vec2(u_parameter_scaleX, u_parameter_scaleY)
-    + vec2(u_parameter_anchorX, u_parameter_anchorY);
+  // v_uv.y=0 is the bottom of the framebuffer. Convert to Y-down pixels so
+  // rotation is a rigid 2D turn (not a UV-space squash) and +rotation is clockwise.
+  vec2 size = vec2(u_parameter_outputWidth, u_parameter_outputHeight);
+  vec2 fragPx = vec2(v_uv.x * size.x, (1.0 - v_uv.y) * size.y);
+  vec2 posPx = vec2(u_parameter_positionX, size.y - u_parameter_positionY);
+  vec2 offsetPx = fragPx - posPx;
+  float c = cos(u_parameter_rotationRad);
+  float s = sin(u_parameter_rotationRad);
+  vec2 rotatedPx = mat2(c, -s, s, c) * offsetPx;
+  ivec2 tex = textureSize(u_input_source, 0);
+  vec2 texSize = vec2(float(max(tex.x, 1)), float(max(tex.y, 1)));
+  float sourceAspect = texSize.x / texSize.y;
+  float destAspect = size.x / max(size.y, 1.0);
+  vec2 fitScale = sourceAspect > destAspect
+    ? vec2(1.0, destAspect / sourceAspect)
+    : vec2(sourceAspect / destAspect, 1.0);
+  vec2 scalePx = vec2(u_parameter_scaleX, u_parameter_scaleY) * fitScale * size;
+  vec2 sourceYDown = rotatedPx / scalePx
+    + vec2(u_parameter_anchorX, 1.0 - u_parameter_anchorY);
+  vec2 sourceUv = vec2(sourceYDown.x, 1.0 - sourceYDown.y);
   vec2 cropMin = vec2(u_parameter_cropLeft, u_parameter_cropTop);
   vec2 cropMax = vec2(1.0 - u_parameter_cropRight, 1.0 - u_parameter_cropBottom);
   if (any(lessThan(sourceUv, cropMin)) || any(greaterThan(sourceUv, cropMax))) {
@@ -283,24 +308,9 @@ void main() {
   webgpu: {
     backend: 'webgpu',
     nodeSet: 'aelion.visual.builtin/1.0.0',
-    graphHash: 'builtin-visual-transform-v1',
+    graphHash: 'builtin-visual-transform-v4',
     inputPorts: ['source'],
-    uniforms: [
-      'positionX',
-      'positionY',
-      'anchorX',
-      'anchorY',
-      'scaleX',
-      'scaleY',
-      'rotationRad',
-      'opacity',
-      'outputWidth',
-      'outputHeight',
-      'cropLeft',
-      'cropTop',
-      'cropRight',
-      'cropBottom',
-    ].map(id => ({
+    uniforms: VISUAL_UNIFORM_IDS.map(id => ({
       name: `u_parameter_${id}`,
       type: 'float' as const,
       source: { kind: 'parameter' as const, id },
@@ -329,23 +339,164 @@ struct VertexOut { @builtin(position) position: vec4f, @location(0) uv: vec2f };
 }
 
 @fragment fn fs(vertex: VertexOut) -> @location(0) vec4f {
-  let position = vec2f(
-    uniforms.values[0].x / uniforms.values[8].x,
-    uniforms.values[1].x / uniforms.values[9].x
+  let size = vec2f(uniforms.values[8].x, uniforms.values[9].x);
+  let frag_px = vec2f(vertex.uv.x * size.x, vertex.uv.y * size.y);
+  let pos_px = vec2f(uniforms.values[0].x, size.y - uniforms.values[1].x);
+  let offset_px = frag_px - pos_px;
+  let c = cos(uniforms.values[6].x);
+  let s = sin(uniforms.values[6].x);
+  let rotated_px = mat2x2f(c, -s, s, c) * offset_px;
+  let tex_dims = textureDimensions(input_source);
+  let tex_size = vec2f(max(f32(tex_dims.x), 1.0), max(f32(tex_dims.y), 1.0));
+  let source_aspect = tex_size.x / tex_size.y;
+  let dest_aspect = size.x / max(size.y, 1.0);
+  let fit_scale = select(
+    vec2f(source_aspect / dest_aspect, 1.0),
+    vec2f(1.0, dest_aspect / source_aspect),
+    source_aspect > dest_aspect
   );
-  let offset = vertex.uv - position;
-  let c = cos(-uniforms.values[6].x);
-  let s = sin(-uniforms.values[6].x);
-  let rotated = mat2x2f(c, -s, s, c) * offset;
-  let source_uv = rotated / vec2f(uniforms.values[4].x, uniforms.values[5].x)
-    + vec2f(uniforms.values[2].x, uniforms.values[3].x);
+  let scale_px = vec2f(uniforms.values[4].x, uniforms.values[5].x) * fit_scale * size;
+  let source_y_down = rotated_px / scale_px
+    + vec2f(uniforms.values[2].x, 1.0 - uniforms.values[3].x);
+  let source_uv = source_y_down;
+  let crop_uv = vec2f(source_y_down.x, 1.0 - source_y_down.y);
   let crop_min = vec2f(uniforms.values[10].x, uniforms.values[11].x);
   let crop_max = vec2f(1.0 - uniforms.values[12].x, 1.0 - uniforms.values[13].x);
   let sampled = textureSample(input_source, source_sampler, source_uv);
-  if (any(source_uv < crop_min) || any(source_uv > crop_max)) {
+  if (any(crop_uv < crop_min) || any(crop_uv > crop_max)) {
     return vec4f(0.0);
   }
   return sampled * uniforms.values[7].x;
+}`,
+  },
+};
+
+const TEXT_VISUAL_PROGRAM: WebGl2MaterialProgram = {
+  backend: 'webgl2',
+  nodeSet: 'aelion.visual.builtin/1.0.0',
+  graphHash: 'builtin-text-visual-transform-v1',
+  inputPorts: ['source'],
+  uniforms: TEXT_VISUAL_UNIFORM_IDS.map(id => ({
+    name: `u_parameter_${id}`,
+    type: 'float' as const,
+    source: { kind: 'parameter' as const, id },
+  })),
+  executionPlan: {
+    passes: [
+      {
+        id: 'builtin-text-visual-transform',
+        kind: 'draw',
+        nodes: ['builtin-text-visual-transform'],
+        estimatedTextureSamples: 1,
+      },
+    ],
+    intermediateTextureCount: 0,
+  },
+  fragmentShader: `#version 300 es
+precision highp float;
+uniform sampler2D u_input_source;
+uniform float u_parameter_positionX;
+uniform float u_parameter_positionY;
+uniform float u_parameter_anchorX;
+uniform float u_parameter_anchorY;
+uniform float u_parameter_scaleX;
+uniform float u_parameter_scaleY;
+uniform float u_parameter_rotationRad;
+uniform float u_parameter_opacity;
+uniform float u_parameter_outputWidth;
+uniform float u_parameter_outputHeight;
+uniform float u_parameter_cropLeft;
+uniform float u_parameter_cropTop;
+uniform float u_parameter_cropRight;
+uniform float u_parameter_cropBottom;
+uniform float u_parameter_contentX;
+uniform float u_parameter_contentY;
+uniform float u_parameter_contentW;
+uniform float u_parameter_contentH;
+in vec2 v_uv;
+out vec4 out_color;
+void main() {
+  vec2 size = vec2(u_parameter_outputWidth, u_parameter_outputHeight);
+  vec2 fragPx = vec2(v_uv.x * size.x, (1.0 - v_uv.y) * size.y);
+  vec2 posPx = vec2(u_parameter_positionX, size.y - u_parameter_positionY);
+  vec2 offsetPx = fragPx - posPx;
+  float c = cos(u_parameter_rotationRad);
+  float s = sin(u_parameter_rotationRad);
+  vec2 rotatedPx = mat2(c, -s, s, c) * offsetPx;
+  vec2 scalePx = vec2(u_parameter_scaleX, u_parameter_scaleY) * size;
+  vec2 sourceYDown = rotatedPx / scalePx
+    + vec2(u_parameter_anchorX, 1.0 - u_parameter_anchorY);
+  vec2 sourceUv = vec2(sourceYDown.x, 1.0 - sourceYDown.y);
+  vec2 cropMin = vec2(u_parameter_cropLeft, u_parameter_cropTop);
+  vec2 cropMax = vec2(1.0 - u_parameter_cropRight, 1.0 - u_parameter_cropBottom);
+  vec2 contentMin = vec2(u_parameter_contentX, u_parameter_contentY);
+  vec2 contentSize = vec2(max(u_parameter_contentW, 1e-6), max(u_parameter_contentH, 1e-6));
+  vec2 localYD = (sourceYDown - contentMin) / contentSize;
+  if (
+    any(lessThan(sourceUv, cropMin)) ||
+    any(greaterThan(sourceUv, cropMax)) ||
+    any(lessThan(localYD, vec2(0.0))) ||
+    any(greaterThan(localYD, vec2(1.0)))
+  ) {
+    out_color = vec4(0.0);
+  } else {
+    out_color = texture(u_input_source, vec2(localYD.x, 1.0 - localYD.y)) * u_parameter_opacity;
+  }
+}`,
+  webgpu: {
+    backend: 'webgpu',
+    nodeSet: 'aelion.visual.builtin/1.0.0',
+    graphHash: 'builtin-text-visual-transform-v1',
+    inputPorts: ['source'],
+    uniforms: TEXT_VISUAL_UNIFORM_IDS.map(id => ({
+      name: `u_parameter_${id}`,
+      type: 'float' as const,
+      source: { kind: 'parameter' as const, id },
+    })),
+    executionPlan: {
+      passes: [
+        {
+          id: 'builtin-text-visual-transform',
+          kind: 'draw',
+          nodes: ['builtin-text-visual-transform'],
+          estimatedTextureSamples: 1,
+        },
+      ],
+      intermediateTextureCount: 0,
+    },
+    shader: `
+struct Uniforms { values: array<vec4f, 18> };
+@group(0) @binding(0) var source_sampler: sampler;
+@group(0) @binding(1) var input_source: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> uniforms: Uniforms;
+struct VertexOut { @builtin(position) position: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) index: u32) -> VertexOut {
+  var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var uvs = array<vec2f, 3>(vec2f(0.0, 1.0), vec2f(2.0, 1.0), vec2f(0.0, -1.0));
+  return VertexOut(vec4f(positions[index], 0.0, 1.0), uvs[index]);
+}
+
+@fragment fn fs(vertex: VertexOut) -> @location(0) vec4f {
+  let size = vec2f(uniforms.values[8].x, uniforms.values[9].x);
+  let frag_px = vec2f(vertex.uv.x * size.x, vertex.uv.y * size.y);
+  let pos_px = vec2f(uniforms.values[0].x, size.y - uniforms.values[1].x);
+  let offset_px = frag_px - pos_px;
+  let c = cos(uniforms.values[6].x);
+  let s = sin(uniforms.values[6].x);
+  let rotated_px = mat2x2f(c, -s, s, c) * offset_px;
+  let scale_px = vec2f(uniforms.values[4].x, uniforms.values[5].x) * size;
+  let source_y_down = rotated_px / scale_px
+    + vec2f(uniforms.values[2].x, 1.0 - uniforms.values[3].x);
+  let crop_uv = vec2f(source_y_down.x, 1.0 - source_y_down.y);
+  let crop_min = vec2f(uniforms.values[10].x, uniforms.values[11].x);
+  let crop_max = vec2f(1.0 - uniforms.values[12].x, 1.0 - uniforms.values[13].x);
+  let content_min = vec2f(uniforms.values[14].x, uniforms.values[15].x);
+  let content_size = vec2f(max(uniforms.values[16].x, 1e-6), max(uniforms.values[17].x, 1e-6));
+  let local_yd = (source_y_down - content_min) / content_size;
+  if (any(crop_uv < crop_min) || any(crop_uv > crop_max) || any(local_yd < vec2f(0.0)) || any(local_yd > vec2f(1.0))) {
+    return vec4f(0.0);
+  }
+  return textureSample(input_source, source_sampler, local_yd) * uniforms.values[7].x;
 }`,
   },
 };
@@ -673,6 +824,13 @@ function finite(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
+interface VisualSourceContent {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 function visualParameters(
   visual: object,
   projectWidth: number,
@@ -694,6 +852,11 @@ function visualParameters(
   const anchor = record(evaluated(transform.anchor));
   const scale = record(evaluated(transform.scale));
   const crop = record(evaluated(visualRecord.crop));
+  const fit = visualRecord.fit;
+  const userScaleX = finite(scale.x, 1);
+  const userScaleY = finite(scale.y, 1);
+  const leftoverFitBake =
+    fit === 'cover' || fit === 'fill' || Math.abs(userScaleX - userScaleY) > 0.02;
   const positionScaleX = outputWidth / projectWidth;
   const positionScaleY = outputHeight / projectHeight;
   return {
@@ -701,8 +864,8 @@ function visualParameters(
     positionY: finite(position.y, projectHeight / 2) * positionScaleY,
     anchorX: finite(anchor.x, 0.5),
     anchorY: finite(anchor.y, 0.5),
-    scaleX: finite(scale.x, 1),
-    scaleY: finite(scale.y, 1),
+    scaleX: leftoverFitBake ? 1 : userScaleX,
+    scaleY: leftoverFitBake ? 1 : userScaleY,
     rotationRad: (finite(evaluated(transform.rotationDeg), 0) * Math.PI) / 180,
     opacity: Math.max(0, Math.min(1, finite(evaluated(visualRecord.opacity), 1))),
     outputWidth,
@@ -735,6 +898,46 @@ function requiresBaseVisualPass(
   );
 }
 
+function textRasterPlacement(
+  box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number },
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
+): {
+  readonly canvasWidth: number;
+  readonly canvasHeight: number;
+  readonly originX: number;
+  readonly originY: number;
+  readonly scaleX: number;
+  readonly scaleY: number;
+  readonly contentX: number;
+  readonly contentY: number;
+  readonly contentW: number;
+  readonly contentH: number;
+} {
+  const scaleX = outputWidth / projectWidth;
+  const scaleY = outputHeight / projectHeight;
+  const x0 = Math.floor(box.x * scaleX);
+  const y0 = Math.floor(box.y * scaleY);
+  const x1 = Math.ceil((box.x + box.width) * scaleX);
+  const y1 = Math.ceil((box.y + box.height) * scaleY);
+  const canvasWidth = Math.max(1, x1 - x0);
+  const canvasHeight = Math.max(1, y1 - y0);
+  return {
+    canvasWidth,
+    canvasHeight,
+    originX: x0 / scaleX,
+    originY: y0 / scaleY,
+    scaleX,
+    scaleY,
+    contentX: x0 / outputWidth,
+    contentY: y0 / outputHeight,
+    contentW: canvasWidth / outputWidth,
+    contentH: canvasHeight / outputHeight,
+  };
+}
+
 function canvasFont(style: PortableTextStyle): string {
   const families = style.fontFamilies
     .map(value => (/^[\w-]+$/u.test(value) ? value : `"${value.replaceAll('"', '\\"')}"`))
@@ -742,21 +945,65 @@ function canvasFont(style: PortableTextStyle): string {
   return `${style.fontStyle} ${style.fontWeight.toString()} ${style.fontSizePx.toString()}px ${families}`;
 }
 
-function rasterTextFrame(
+const TEXT_RASTER_CACHE_LIMIT = 8;
+const textRasterCache: { key: string; frame: VideoFrame }[] = [];
+
+function textRasterKey(
   clip: IrTextClip,
   projectWidth: number,
   projectHeight: number,
   outputWidth: number,
   outputHeight: number,
-  timestampUs: number,
-): VideoFrame {
-  const canvas = new OffscreenCanvas(outputWidth, outputHeight);
+): string {
+  return JSON.stringify({
+    box: clip.box,
+    overflow: clip.overflow,
+    writingMode: clip.writingMode,
+    paragraphs: clip.paragraphs,
+    projectWidth,
+    projectHeight,
+    outputWidth,
+    outputHeight,
+  });
+}
+
+function cachedTextRaster(key: string): VideoFrame | undefined {
+  const index = textRasterCache.findIndex(entry => entry.key === key);
+  if (index < 0) return undefined;
+  const [entry] = textRasterCache.splice(index, 1);
+  if (entry === undefined) return undefined;
+  textRasterCache.push(entry);
+  return entry.frame;
+}
+
+function rememberTextRaster(key: string, frame: VideoFrame): void {
+  textRasterCache.push({ key, frame });
+  while (textRasterCache.length > TEXT_RASTER_CACHE_LIMIT) {
+    const evicted = textRasterCache.shift();
+    evicted?.frame.close();
+  }
+}
+
+function clearTextRasterCache(): void {
+  for (const entry of textRasterCache) entry.frame.close();
+  textRasterCache.length = 0;
+}
+
+function paintTextClip(
+  canvas: OffscreenCanvas,
+  clip: IrTextClip,
+  originX: number,
+  originY: number,
+  scaleX: number,
+  scaleY: number,
+): void {
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('TEXT_CANVAS_UNAVAILABLE');
   const layout = layoutIrText(clip);
-  context.clearRect(0, 0, outputWidth, outputHeight);
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.clearRect(0, 0, canvas.width, canvas.height);
   context.save();
-  context.scale(outputWidth / projectWidth, outputHeight / projectHeight);
+  context.setTransform(scaleX, 0, 0, scaleY, -originX * scaleX, -originY * scaleY);
   if (clip.overflow !== 'visible') {
     context.beginPath();
     context.rect(clip.box.x, clip.box.y, clip.box.width, clip.box.height);
@@ -785,7 +1032,32 @@ function rasterTextFrame(
     }
   }
   context.restore();
-  return new VideoFrame(canvas, { timestamp: timestampUs });
+}
+
+function rasterTextFrame(
+  clip: IrTextClip,
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
+  timestampUs: number,
+  placement: ReturnType<typeof textRasterPlacement>,
+): VideoFrame {
+  const key = textRasterKey(clip, projectWidth, projectHeight, outputWidth, outputHeight);
+  const cached = cachedTextRaster(key);
+  if (cached !== undefined) return cached.clone();
+  const canvas = new OffscreenCanvas(placement.canvasWidth, placement.canvasHeight);
+  paintTextClip(
+    canvas,
+    clip,
+    placement.originX,
+    placement.originY,
+    placement.scaleX,
+    placement.scaleY,
+  );
+  const frame = new VideoFrame(canvas, { timestamp: timestampUs });
+  rememberTextRaster(key, frame);
+  return frame.clone();
 }
 
 function linearChannelToSrgb(value: number): number {
@@ -1128,6 +1400,7 @@ export class RenderIrFrameRenderer implements Disposable {
       for (const active of state.clips) {
         if (active.clip.kind === 'adjustment-clip') continue;
         let frame: VideoFrame | undefined;
+        let textContent: VisualSourceContent | undefined;
         if (active.clip.kind === 'visual-clip') {
           if (active.sourceTimeUs === null) continue;
           const resolved = resolveMediaSourceFrame(active.clip.source, active.sourceTimeUs);
@@ -1140,6 +1413,19 @@ export class RenderIrFrameRenderer implements Disposable {
             { purpose: options.mode, maxDimension: Math.max(width, height) },
           );
         } else if (active.clip.kind === 'text-clip') {
+          const placement = textRasterPlacement(
+            active.clip.box,
+            options.ir.width,
+            options.ir.height,
+            width,
+            height,
+          );
+          textContent = {
+            x: placement.contentX,
+            y: placement.contentY,
+            width: placement.contentW,
+            height: placement.contentH,
+          };
           frame = rasterTextFrame(
             active.clip,
             options.ir.width,
@@ -1147,6 +1433,7 @@ export class RenderIrFrameRenderer implements Disposable {
             width,
             height,
             options.timeUs,
+            placement,
           );
         } else if (active.clip.kind === 'generator-clip') {
           frame = rasterGeneratorFrame(active.clip.generator, width, height, options.timeUs);
@@ -1188,7 +1475,23 @@ export class RenderIrFrameRenderer implements Disposable {
             options.timeUs,
             active.clip.range.startUs,
           );
-          if (requiresBaseVisualPass(baseParameters, width, height)) {
+          if (active.clip.kind === 'text-clip' && textContent !== undefined) {
+            reference = addNode(
+              `${active.clip.id}:visual`,
+              { source: reference },
+              TEXT_VISUAL_PROGRAM,
+              {
+                ...baseParameters,
+                contentX: textContent.x,
+                contentY: textContent.y,
+                contentW: textContent.width,
+                contentH: textContent.height,
+              },
+            );
+          } else if (
+            active.clip.kind === 'visual-clip' ||
+            requiresBaseVisualPass(baseParameters, width, height)
+          ) {
             reference = addNode(
               `${active.clip.id}:visual`,
               { source: reference },
@@ -1418,6 +1721,7 @@ export class RenderIrFrameRenderer implements Disposable {
       new DOMException('RenderIrFrameRenderer was disposed', 'AbortError'),
     );
     this.#compositor.dispose();
+    clearTextRasterCache();
     const tasks = [...this.#renderTasks.values()];
     this.#disposeTask = Promise.allSettled(tasks).then(() => undefined);
     return this.#disposeTask;

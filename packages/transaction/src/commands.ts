@@ -641,6 +641,7 @@ function commandEditOptions(options: CommandOptions, fallbackLabel: string): Edi
   return {
     label: options.label ?? fallbackLabel,
     ...(options.baseRevision === undefined ? {} : { baseRevision: options.baseRevision }),
+    ...(options.historyGroup === undefined ? {} : { historyGroup: options.historyGroup }),
   };
 }
 
