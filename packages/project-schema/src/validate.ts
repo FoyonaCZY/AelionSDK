@@ -5,7 +5,11 @@ import type { Diagnostic, JsonObject, JsonValue, Result } from '@aelionsdk/core'
 import { err, ok } from '@aelionsdk/core';
 
 import { COLLECTION_NAMES, type AelionProject, type CollectionName } from './types.js';
-import { ProjectInputAdmissionError, snapshotProjectInput } from './admission.js';
+import {
+  assertAdmittedProjectInput,
+  ProjectInputAdmissionError,
+  snapshotProjectInput,
+} from './admission.js';
 import {
   CURRENT_PROJECT_SCHEMA_URI,
   CURRENT_PROJECT_SCHEMA_VERSION,
@@ -292,16 +296,6 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
         diagnostics,
       ),
     );
-    if (item.type === 'adjustment' && item.materialInstanceIds.length === 0) {
-      diagnostics.push(
-        semanticDiagnostic(
-          'PROJECT_ADJUSTMENT_EMPTY',
-          `Adjustment Item ${item.id} must own at least one Material`,
-          ['items', item.id, 'materialInstanceIds'],
-          item.id,
-        ),
-      );
-    }
     if (item.type === 'nested-sequence') {
       const source = item.source as { readonly sequenceId?: unknown } | undefined;
       if (typeof source?.sequenceId === 'string') {
@@ -824,6 +818,24 @@ function validateImageSequenceReferences(
   }
 }
 
+function admissionFailure(error: unknown): Result<ProjectValidationSuccess> {
+  const admission =
+    error instanceof ProjectInputAdmissionError
+      ? error
+      : new ProjectInputAdmissionError(
+          'PROJECT_INPUT_INVALID',
+          'Project input could not be safely inspected',
+          [],
+        );
+  return err({
+    code: admission.code,
+    severity: 'error',
+    message: admission.message,
+    path: admission.path,
+    recoverable: false,
+  });
+}
+
 export class ProjectValidator {
   readonly #schemaValidator: ValidateFunction;
   readonly #migrateLegacyIdentity: boolean;
@@ -856,26 +868,40 @@ export class ProjectValidator {
     try {
       admitted = snapshotProjectInput(value);
     } catch (error) {
-      const admission =
-        error instanceof ProjectInputAdmissionError
-          ? error
-          : new ProjectInputAdmissionError(
-              'PROJECT_INPUT_INVALID',
-              'Project input could not be safely inspected',
-              [],
-            );
-      return err({
-        code: admission.code,
-        severity: 'error',
-        message: admission.message,
-        path: admission.path,
-        recoverable: false,
-      });
+      return admissionFailure(error);
     }
     const migration = this.#migrateLegacyIdentity
       ? migrateAdmittedProjectToCurrent(admitted)
       : undefined;
-    const candidate = migration?.project ?? admitted;
+    return this.#check(migration?.project ?? admitted, migration);
+  }
+
+  /**
+   * Validates a document that is already an owned JSON snapshot, skipping the
+   * cloning admission pass in favour of {@link assertAdmittedProjectInput}.
+   *
+   * Use this only where provenance is known — a transaction commit built from a
+   * previously admitted snapshot, for example. Every externally supplied value
+   * folded into such a document must have passed {@link snapshotProjectInput}
+   * on its own first. Anything crossing a trust boundary (load, import,
+   * restore) must keep using {@link ProjectValidator.validate}.
+   *
+   * Legacy identity migration is not applied: `$schema` and `schemaVersion` are
+   * root fields that no entity-scoped edit can reach.
+   */
+  public validateAdmitted(value: unknown): Result<ProjectValidationSuccess> {
+    try {
+      assertAdmittedProjectInput(value);
+    } catch (error) {
+      return admissionFailure(error);
+    }
+    return this.#check(value as JsonValue, undefined);
+  }
+
+  #check(
+    candidate: JsonValue,
+    migration: ProjectIdentityMigration | undefined,
+  ): Result<ProjectValidationSuccess> {
     if (!this.#schemaValidator(candidate)) {
       const first = this.#schemaValidator.errors?.[0];
       return err(

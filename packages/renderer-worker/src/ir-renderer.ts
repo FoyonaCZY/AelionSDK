@@ -4,10 +4,15 @@ import {
   evaluateMaterialInstance,
   evaluateAnimatedValue,
   evaluateVisualState,
+  cssColorWithAlpha,
+  inflateTextBox,
   layoutIrText,
   LOCAL_RGBA8_COLOR_CAPABILITY,
   preflightColorPipeline,
   resolveMediaSourceFrame,
+  textBackgroundVisible,
+  textClipPaintExtent,
+  type IrLaidOutTextLine,
   type IrMaterialInstance,
   type IrShapeClip,
   type IrTextClip,
@@ -1000,15 +1005,17 @@ function paintTextClip(
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('TEXT_CANVAS_UNAVAILABLE');
   const layout = layoutIrText(clip);
+  const paintBox = inflateTextBox(clip.box, textClipPaintExtent(clip));
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.save();
   context.setTransform(scaleX, 0, 0, scaleY, -originX * scaleX, -originY * scaleY);
   if (clip.overflow !== 'visible') {
     context.beginPath();
-    context.rect(clip.box.x, clip.box.y, clip.box.width, clip.box.height);
+    context.rect(paintBox.x, paintBox.y, paintBox.width, paintBox.height);
     context.clip();
   }
+  paintTextBackgrounds(context, layout.lines);
   context.textBaseline = 'top';
   for (const line of layout.lines) {
     for (const span of line.spans) {
@@ -1032,6 +1039,58 @@ function paintTextClip(
     }
   }
   context.restore();
+}
+
+function paintTextBackgrounds(
+  context: OffscreenCanvasRenderingContext2D,
+  lines: readonly IrLaidOutTextLine[],
+): void {
+  for (const line of lines) {
+    let style: PortableTextStyle | undefined;
+    let pad = 0;
+    for (const span of line.spans) {
+      if (!textBackgroundVisible(span.style)) continue;
+      style = span.style;
+      pad = Math.max(pad, span.style.backgroundPaddingPx);
+    }
+    if (style === undefined || line.width <= 0 || line.height <= 0) continue;
+    context.fillStyle = cssColorWithAlpha(style.backgroundFill, style.backgroundOpacity);
+    fillRoundRect(
+      context,
+      line.x - pad,
+      line.y - pad,
+      line.width + pad * 2,
+      line.height + pad * 2,
+      style.backgroundRadiusPx,
+    );
+  }
+}
+
+function fillRoundRect(
+  context: OffscreenCanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+): void {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.beginPath();
+  if (typeof context.roundRect === 'function') {
+    context.roundRect(x, y, width, height, r);
+  } else {
+    context.moveTo(x + r, y);
+    context.lineTo(x + width - r, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + r);
+    context.lineTo(x + width, y + height - r);
+    context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    context.lineTo(x + r, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - r);
+    context.lineTo(x, y + r);
+    context.quadraticCurveTo(x, y, x + r, y);
+    context.closePath();
+  }
+  context.fill();
 }
 
 function rasterTextFrame(
@@ -1414,7 +1473,7 @@ export class RenderIrFrameRenderer implements Disposable {
           );
         } else if (active.clip.kind === 'text-clip') {
           const placement = textRasterPlacement(
-            active.clip.box,
+            inflateTextBox(active.clip.box, textClipPaintExtent(active.clip)),
             options.ir.width,
             options.ir.height,
             width,

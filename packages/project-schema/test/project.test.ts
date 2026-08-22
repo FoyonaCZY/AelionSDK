@@ -313,6 +313,26 @@ describe('Aelion Project v1.2', () => {
     );
   });
 
+  it('allows an adjustment Item with no Material yet', () => {
+    const changed = canonicalClone(project);
+    const items = changed.items as JsonObject;
+    const tracks = changed.tracks as JsonObject;
+    const video = items.item_video_a as JsonObject;
+    const titleTrack = tracks.track_title as JsonObject;
+    items.item_adjustment = {
+      id: 'item_adjustment',
+      trackId: 'track_title',
+      type: 'adjustment',
+      name: 'Adjustment',
+      enabled: true,
+      range: { startUs: 0, durationUs: 1_000_000 },
+      visual: canonicalClone(video.visual as JsonObject),
+      materialInstanceIds: [],
+    };
+    titleTrack.itemIds = [...(titleTrack.itemIds as string[]), 'item_adjustment'];
+    expect(validator.validate(changed).ok).toBe(true);
+  });
+
   it('rejects one MaterialInstance being owned by multiple hosts', () => {
     const broken = canonicalClone(project);
     const items = broken.items as JsonObject;

@@ -2,6 +2,9 @@ import type { JsonObject, JsonValue } from '@aelionsdk/core';
 import { AelionError } from '@aelionsdk/core';
 import {
   canonicalClone,
+  COLLECTION_NAMES,
+  ProjectInputAdmissionError,
+  snapshotProjectInput,
   type AelionProject,
   type CollectionName,
   type EntityId,
@@ -61,6 +64,171 @@ function createDraft(
   return draft;
 }
 
+const COLLECTION_NAME_SET: ReadonlySet<string> = new Set(COLLECTION_NAMES);
+
+/**
+ * Assigning this key mutates an object's prototype instead of adding a
+ * property, so it can never be an entity id or a field path segment.
+ */
+const UNSAFE_KEY = '__proto__';
+
+function admissionError(
+  error: unknown,
+  collection: string,
+  id: string,
+  scope: string,
+): AelionError {
+  const admission =
+    error instanceof ProjectInputAdmissionError
+      ? error
+      : new ProjectInputAdmissionError(
+          'PROJECT_INPUT_INVALID',
+          `${scope} could not be safely inspected`,
+          [],
+        );
+  return new AelionError([
+    {
+      code: admission.code,
+      severity: 'error',
+      message: `${scope}: ${admission.message}`,
+      path: [collection, id, ...admission.path],
+      entityId: id,
+      recoverable: true,
+    },
+  ]);
+}
+
+function admitKey(value: unknown, collection: string, id: string, scope: string): string {
+  if (typeof value !== 'string' || value.length === 0 || value === UNSAFE_KEY) {
+    throw new AelionError([
+      {
+        code: 'TRANSACTION_KEY_INVALID',
+        severity: 'error',
+        message: `${scope} must be a non-empty string other than ${UNSAFE_KEY}`,
+        path: [collection, id],
+        entityId: id,
+        recoverable: true,
+      },
+    ]);
+  }
+  return value;
+}
+
+function admitPath(path: readonly string[], collection: string, id: string): readonly string[] {
+  if (!Array.isArray(path)) {
+    throw new AelionError([
+      {
+        code: 'TRANSACTION_PATH_INVALID',
+        severity: 'error',
+        message: 'Field path must be an array of strings',
+        path: [collection, id],
+        entityId: id,
+        recoverable: true,
+      },
+    ]);
+  }
+  return path.map(segment => admitKey(segment, collection, id, 'Field path segment'));
+}
+
+function admitValue(value: unknown, collection: string, id: string, scope: string): JsonValue {
+  try {
+    return snapshotProjectInput(value);
+  } catch (error) {
+    throw admissionError(error, collection, id, scope);
+  }
+}
+
+/**
+ * Normalizes one caller-supplied operation into an owned, bounded JSON value.
+ *
+ * The engine no longer re-admits the whole document on every commit, so this is
+ * the boundary where untrusted input is captured: payloads go through
+ * {@link snapshotProjectInput}, and the collection name, entity id and field
+ * path are checked against keys that would mutate a prototype instead of a
+ * property.
+ */
+function admitOperation(operation: AtomicOperation): AtomicOperation {
+  const rawCollection: unknown = operation.collection;
+  if (typeof rawCollection !== 'string' || !COLLECTION_NAME_SET.has(rawCollection)) {
+    throw new AelionError([
+      {
+        code: 'TRANSACTION_COLLECTION_INVALID',
+        severity: 'error',
+        message: `Unknown Project collection: ${String(rawCollection)}`,
+        recoverable: true,
+      },
+    ]);
+  }
+  const collection = rawCollection as CollectionName;
+  const id = admitKey(operation.id, collection, String(operation.id), 'Entity id') as EntityId;
+
+  switch (operation.op) {
+    case 'createEntity': {
+      const value = admitValue(operation.value, collection, id, 'Entity value');
+      if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+        throw new AelionError([
+          {
+            code: 'TRANSACTION_ENTITY_VALUE_INVALID',
+            severity: 'error',
+            message: 'Entity value must be a JSON object',
+            path: [collection, id],
+            entityId: id,
+            recoverable: true,
+          },
+        ]);
+      }
+      return { op: 'createEntity', collection, id, value };
+    }
+    case 'deleteEntity':
+      return { op: 'deleteEntity', collection, id };
+    case 'setField':
+      return {
+        op: 'setField',
+        collection,
+        id,
+        path: admitPath(operation.path, collection, id),
+        value: admitValue(operation.value, collection, id, 'Field value'),
+      };
+    case 'removeField':
+      return {
+        op: 'removeField',
+        collection,
+        id,
+        path: admitPath(operation.path, collection, id),
+      };
+    case 'listInsert':
+      return {
+        op: 'listInsert',
+        collection,
+        id,
+        path: admitPath(operation.path, collection, id),
+        ...(operation.beforeId === undefined
+          ? {}
+          : { beforeId: admitKey(operation.beforeId, collection, id, 'List anchor') }),
+        valueId: admitKey(operation.valueId, collection, id, 'List value id'),
+      };
+    case 'listRemove':
+      return {
+        op: 'listRemove',
+        collection,
+        id,
+        path: admitPath(operation.path, collection, id),
+        valueId: admitKey(operation.valueId, collection, id, 'List value id'),
+      };
+    case 'listMove':
+      return {
+        op: 'listMove',
+        collection,
+        id,
+        path: admitPath(operation.path, collection, id),
+        ...(operation.beforeId === undefined
+          ? {}
+          : { beforeId: admitKey(operation.beforeId, collection, id, 'List anchor') }),
+        valueId: admitKey(operation.valueId, collection, id, 'List value id'),
+      };
+  }
+}
+
 let changeSetSequence = 0;
 
 export const TRANSACTION_MAX_OPERATIONS = 16_384;
@@ -90,7 +258,7 @@ export class TransactionBuilder {
         `A transaction cannot contain more than ${TRANSACTION_MAX_OPERATIONS.toString()} operations`,
       );
     }
-    this.#operations.push(...operations.map(operation => structuredClone(operation)));
+    for (const operation of operations) this.#push(operation);
   }
 
   public createEntity(collection: CollectionName, id: EntityId, value: JsonObject): void {
@@ -164,7 +332,7 @@ export class TransactionBuilder {
         `A transaction cannot contain more than ${TRANSACTION_MAX_OPERATIONS.toString()} operations`,
       );
     }
-    this.#operations.push(operation);
+    this.#operations.push(admitOperation(operation));
   }
 }
 

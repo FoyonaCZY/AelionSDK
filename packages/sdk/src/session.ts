@@ -404,8 +404,12 @@ export class AelionSession implements AelionSessionApi {
     const engineRef: { current?: TransactionEngine } = {};
     const engine = new TransactionEngine(
       project,
+      // `project` was admitted by `loadProject`, and TransactionBuilder admits
+      // every caller-supplied operation payload, so a commit candidate is an
+      // owned JSON snapshot by construction. Re-cloning the whole document here
+      // dominated the cost of interactive edits — a drag commits once per frame.
       candidate => {
-        const result = this.#validator.validate(candidate);
+        const result = this.#validator.validateAdmitted(candidate);
         return { ok: result.ok, diagnostics: result.diagnostics };
       },
       {
