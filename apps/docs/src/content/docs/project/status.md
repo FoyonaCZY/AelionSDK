@@ -3,8 +3,20 @@ title: Current status
 description: Release identity, verified scope, remediations and uncertified boundaries.
 ---
 
-Repository version: `1.2.0-rc.3`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
+Repository version: `1.2.0-rc.4`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
 the npm `next` tag. The npm badge and registry are authoritative for what is currently published.
+
+## rc.4 interactive preview
+
+This candidate keeps the rc.2 remediations and rc.3 preview-runtime fixes, and additionally:
+
+- text/caption background plates, with inflated ink boxes and raster targets;
+- optional `transient` media requests so thumbnails and filmstrips bypass the
+  persistent playback decoder;
+- interactive commits that admit caller-supplied values at the transaction
+  boundary instead of re-cloning the whole Project;
+- playback that follows the clock, skips recoverable queue-full errors, and
+  still rejects a superseded or disposed seek.
 
 ## rc.3 preview runtime
 

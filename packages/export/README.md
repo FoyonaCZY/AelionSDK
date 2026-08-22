@@ -9,7 +9,7 @@ contracts for AelionSDK.
 npm install @aelionsdk/export@next
 ```
 
-`next` currently resolves to `1.2.0-rc.3`. Applications usually start exports
+`next` currently resolves to `1.2.0-rc.4`. Applications usually start exports
 through an `@aelionsdk/sdk` Session and depend on this package for sinks,
 profiles or remote-export types.
 

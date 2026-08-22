@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 29980000,
+    "currentTimeUs": 30012000,
     "emittedFrames": 10,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 29966666
+    "lastTimestampUs": 30001333
   },
   "preview": {
     "width": 320,
@@ -61,9 +61,9 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-5374036d-aaca-4599-8118-2251e6851b93.webm",
+    "fileName": "aelion-alpha-d6e8d2b2-8a05-4cb6-953a-ee5f5a69eb5f.webm",
     "writes": 135,
-    "bytesWritten": 4756115,
+    "bytesWritten": 4746744,
     "maxInFlightWrites": 1,
     "closed": true,
     "aborted": false
@@ -4786,8 +4786,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 1785,
-          "gpuCompletionUs": 1685
+          "totalWorkerUs": 1150,
+          "gpuCompletionUs": 980
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4843,8 +4843,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 1785,
-          "gpuCompletionUs": 1685
+          "totalWorkerUs": 1150,
+          "gpuCompletionUs": 980
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4929,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 17490408,
-      "totalJsHeapBytes": 23113972
+      "usedJsHeapBytes": 15568756,
+      "totalJsHeapBytes": 22128012
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 29409250,
-      "totalJsHeapBytes": 93759882
+      "usedJsHeapBytes": 47856889,
+      "totalJsHeapBytes": 86134477
     }
   },
-  "elapsedMs": 10457.554999992251,
+  "elapsedMs": 10702.954999998212,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-08-22T16:09:09.813Z",
+  "generatedAt": "2026-08-22T22:24:39.009Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
@@ -4966,14 +4966,14 @@
   "browserVersion": "151.0.7922.170",
   "artifact": {
     "file": "reports/baseline/alpha-60s.webm",
-    "bytes": 4755727,
-    "sha256": "2f4c0aa4409cf3c063367485aa5e47376640daa82ddaebdf403bb7c1d5a7aa4e"
+    "bytes": 4746356,
+    "sha256": "c7be75a0360e90868cb71aa9d6f4559aff8545b01af218813349f684adc19b0c"
   },
   "externalReadback": {
     "implementation": "ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers",
     "videoDecode": "passed",
     "audioDecode": "passed",
-    "videoFrameMd5DocumentSha256": "1a352c3e34495abb48df15847928f504d3b431bc87464425766faeb967183bd8",
+    "videoFrameMd5DocumentSha256": "b0cbdc66ceca8138750fdaf791974c9dc3141748ea927bccfb9b2b080c9ed3af",
     "audioPcmMd5": "MD5=bf9147fe03eb526690555fb367345601"
   }
 }

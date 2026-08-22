@@ -8,7 +8,7 @@ Audio scheduling and deterministic PCM processing primitives for AelionSDK.
 npm install @aelionsdk/audio@next
 ```
 
-`next` currently resolves to `1.2.0-rc.3`. Product applications should prefer
+`next` currently resolves to `1.2.0-rc.4`. Product applications should prefer
 `@aelionsdk/sdk`; use this package directly when building a custom audio host,
 analysis pipeline or renderer integration.
 

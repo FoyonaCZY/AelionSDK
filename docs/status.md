@@ -1,15 +1,15 @@
-# AelionSDK 1.2.0-rc.3 release-candidate status
+# AelionSDK 1.2.0-rc.4 release-candidate status
 
-Updated: 2026-08-22 (Asia/Shanghai)
+Updated: 2026-08-23 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `b47a58735933e002f00c58524f97f0e383f0ca11adbb400a06fbf3894cca38dd`
+  `80057004f0ede145d88250ca4d4ff9f4f0b2dbb795310e09a5f2d78cfcbf9dea`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: all semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 88/88 and Firefox 73/73, with zero failed,
+- Browser conformance: Chromium 90/90 and Firefox 75/75, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
@@ -45,19 +45,23 @@ freshness window.
   visual shader; still images on a synthetic SampleIndex; Vite 7 worker URL
   stability; `historyGroup` forwarded into command edit options; Aelion Studio
   moved to its own nested repository.
+- rc.4 interactive preview: text/caption background plates; optional
+  `transient` media requests; interactive commits that admit caller values at
+  the transaction boundary instead of re-cloning the Project; playback that
+  follows the clock and still rejects a superseded or disposed seek.
 - Corrected API boundaries: codec fallback is capability selection only and does
   not claim an executable WASM backend; audio energy changes are not described
   as video scene detection; deferred roadmap work remains marked deferred.
 
 ## Release outcome
 
-The independent blocker review for `1.2.0-rc.3` was approved against this exact
+The independent blocker review for `1.2.0-rc.4` was approved against this exact
 source manifest, gate record, and artifact set with every required check true
-and no open blocker. Tag `v1.2.0-rc.3` publishes all 13 packages with
+and no open blocker. Tag `v1.2.0-rc.4` publishes all 13 packages with
 provenance to the npm `next` dist-tag and creates a GitHub prerelease.
 
-`1.2.0-rc.2` remains an immutable npm artifact. `1.1.0-rc.1` and `1.2.0-rc.1`
-are superseded and should not be newly adopted.
+`1.2.0-rc.3` and `1.2.0-rc.2` remain immutable npm artifacts. `1.1.0-rc.1` and
+`1.2.0-rc.1` are superseded and should not be newly adopted.
 
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the

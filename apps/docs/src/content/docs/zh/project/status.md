@@ -3,8 +3,17 @@ title: 当前状态
 description: 发布身份、已验证范围、补救内容和仍未认证的边界。
 ---
 
-仓库版本：`1.2.0-rc.3`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
+仓库版本：`1.2.0-rc.4`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
 分发；当前实际发布版本以 npm badge 和 registry 为准。
+
+## rc.4 交互预览
+
+本候选版保留 rc.2 契约补救和 rc.3 预览运行时修复，并额外包含：
+
+- 文字/字幕背景板，ink box 与光栅目标会膨胀；
+- 可选 `transient` 媒体请求，缩略图和 filmstrip 绕过持久播放 decoder；
+- 交互提交在事务边界准入调用方写入值，不再对整份 Project 深拷贝；
+- 播放跟随时钟、跳过可恢复的 queue-full，被取代或已释放的 seek 仍会拒绝。
 
 ## rc.3 预览运行时
 

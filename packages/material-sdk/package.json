@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/material-sdk",
-  "version": "1.2.0-rc.3",
+  "version": "1.2.0-rc.4",
   "description": "Type-safe authoring, validation and packaging tools for Aelion materials",
   "license": "MIT",
   "repository": {
@@ -48,8 +48,8 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/core": "1.2.0-rc.3",
-    "@aelionsdk/material-compiler": "1.2.0-rc.3",
+    "@aelionsdk/core": "1.2.0-rc.4",
+    "@aelionsdk/material-compiler": "1.2.0-rc.4",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1"
   }

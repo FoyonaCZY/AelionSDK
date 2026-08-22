@@ -2,6 +2,29 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。预发布变更必须有记录、可迁移，不允许静默改变公开 API、协议或资源所有权。
 
+## 1.2.0-rc.4 — 2026-08-23
+
+### Added
+
+- 文字和字幕支持背景板（填充、不透明度、内边距、圆角）；排版 ink box 与光栅目标会膨胀，描边和底板像素留在栅格化帧内。
+- `AelionMediaRequest` 增加可选 `transient` 标记，缩略图和 filmstrip 解码绕过持久播放 decoder。
+
+### Changed
+
+- 交互式提交不再对整份 Project 做深拷贝准入；调用方写入的 `operation.value` 在 TransactionBuilder 边界准入，commit 只复检聚合预算、规范数字和 JSON 类型。
+- 调整层 Item 不再必须持有 Material。
+- 播放按时钟当前时间渲染；可恢复的 queue-full/abort 不再进入错误态，画质切换也不再中止正在进行的播放帧。
+
+### Fixed
+
+- 被取代或已释放的 `seek()` 仍会拒绝，而不是被可恢复 skip 静默兑现。
+- 排队中的 `frameAt` 在 signal abort 时立即拒绝，中止后可恢复顺序解码。
+- 持久视频解码在缓存前通过 `createImageBitmap` 分离 decoder 持有的帧，避免缓存钉住 decoder 池。
+
+### Performance
+
+- 约 100 clip 工程上，交互拖动提交从约 4.05 ms 降到 0.70 ms（约 5.8×）；admission 不再随节点数线性增长。
+
 ## 1.2.0-rc.3 — 2026-08-22
 
 ### Fixed
