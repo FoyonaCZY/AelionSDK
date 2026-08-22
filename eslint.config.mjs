@@ -10,6 +10,7 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/*.d.ts',
       'apps/*/vite.config.js',
+      'apps/editor-demo/**',
       'benchmarks/reports/**',
       'reports/**',
       'fixtures/**',

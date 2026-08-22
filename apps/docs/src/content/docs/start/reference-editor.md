@@ -3,13 +3,19 @@ title: Run the reference editor
 description: Start the complete example and identify the source files that demonstrate integration.
 ---
 
-The reference editor is a runnable product-shaped example. It is not a supported UI component
-library and does not define how your product must look.
+The reference editor is [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio). Clone it into
+`apps/editor-demo` (this path is gitignored in AelionSDK so both repos can live in one working tree).
+It is not a supported UI component library and does not define how your product must look.
 
 ## Start it
 
+Clone [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio) into `apps/editor-demo` first, then
+from the AelionSDK root:
+
 ```bash
+git clone https://github.com/FoyonaCZY/AelionStudio.git apps/editor-demo
 corepack pnpm install --frozen-lockfile
+corepack pnpm run build
 corepack pnpm dev:editor
 ```
 
@@ -24,11 +30,11 @@ Open the printed URL and use representative MP4/WebM media. Verify:
 
 ## Source map
 
-| File                              | What to learn                                                               |
-| --------------------------------- | --------------------------------------------------------------------------- |
-| `apps/editor-demo/vite.config.ts` | Vite plugin, runtime assets, and isolation headers                          |
-| `apps/editor-demo/src/main.ts`    | Provider, Project, Session, Preview, Player, commands, and Export lifecycle |
-| `apps/editor-demo/src/style.css`  | Demo layout only; not SDK API                                               |
+| File                                                                                   | What to learn                                                               |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [`vite.config.ts`](https://github.com/FoyonaCZY/AelionStudio/blob/main/vite.config.ts) | Vite plugin, runtime assets, and isolation headers                          |
+| [`src/main.ts`](https://github.com/FoyonaCZY/AelionStudio/blob/main/src/main.ts)       | Provider, Project, Session, Preview, Player, commands, and Export lifecycle |
+| [`src/style.css`](https://github.com/FoyonaCZY/AelionStudio/blob/main/src/style.css)   | Demo layout only; not SDK API                                               |
 
 The smaller `apps/quickstart` keeps the whole first workflow in one TypeScript file. Use it when
 learning the API; use the reference editor when studying a product-shaped lifecycle.

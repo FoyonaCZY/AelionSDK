@@ -168,6 +168,9 @@ function normalizedPath(root, path) {
 export function excludedWorkspacePath(root, path) {
   const relativePath = normalizedPath(root, path);
   if (PHASE_1_POST_GATE_DOCUMENTS.includes(relativePath)) return true;
+  if (relativePath === 'apps/editor-demo' || relativePath.startsWith('apps/editor-demo/')) {
+    return true;
+  }
   const segments = relativePath.split('/');
   if (relativePath === 'reports' || relativePath.startsWith('reports/')) return true;
   if (relativePath === 'benchmarks/reports' || relativePath.startsWith('benchmarks/reports/')) {
