@@ -181,7 +181,10 @@ export class AelionPlayer implements AelionPlayerApi {
       }
       this.#publish({ generation, frameIndex: -1, timestampUs: timeUs, droppedFrames: 0 }, result);
     } catch (error) {
-      if (recoverablePreviewSkip(error)) return;
+      // A superseded or disposed seek still rejects: the caller awaited a
+      // specific position and did not reach it. Skipping recoverable errors is
+      // for the playback frame loop, where dropping a frame is the right
+      // outcome; #failRuntime already keeps them out of the error state.
       this.#failRuntime(error);
       throw error;
     }
