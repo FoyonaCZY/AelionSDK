@@ -612,6 +612,65 @@ function decodeResultFromFrame(
   };
 }
 
+function settleQuietly(promise: Promise<unknown>, timeoutMs: number): Promise<void> {
+  return new Promise(resolve => {
+    const timer = globalThis.setTimeout(resolve, timeoutMs);
+    void promise.then(
+      () => {
+        globalThis.clearTimeout(timer);
+        resolve();
+      },
+      () => {
+        globalThis.clearTimeout(timer);
+        resolve();
+      },
+    );
+  });
+}
+
+function withDeadline<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  onTimeout: () => void,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = globalThis.setTimeout(() => {
+      try {
+        onTimeout();
+      } catch {
+        // Timeout observers cannot hide the stall.
+      }
+      reject(new DOMException('Persistent video decode stalled', 'AbortError'));
+    }, timeoutMs);
+    void promise.then(
+      value => {
+        globalThis.clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        globalThis.clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error('Persistent video decode failed'));
+      },
+    );
+  });
+}
+
+async function detachDecoderFrame(frame: VideoFrame): Promise<VideoFrame> {
+  if (typeof createImageBitmap !== 'function') return frame;
+  const timestamp = frame.timestamp;
+  const duration = frame.duration;
+  const bitmap = await createImageBitmap(frame);
+  frame.close();
+  try {
+    return new VideoFrame(bitmap, {
+      timestamp,
+      ...(duration === null ? {} : { duration }),
+    });
+  } finally {
+    bitmap.close();
+  }
+}
+
 function operationWithSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
   if (signal === undefined) return promise;
   throwIfAborted(signal, 'persistent video decode');
@@ -709,7 +768,14 @@ export class VideoFrameDecodeSession {
       () => undefined,
       () => undefined,
     );
-    return operation;
+    if (signal === undefined) return operation;
+    void operation.then(
+      result => {
+        if (signal.aborted) result.close();
+      },
+      () => undefined,
+    );
+    return operationWithSignal(operation, signal);
   }
 
   public snapshot(): VideoFrameDecodeSessionSnapshot {
@@ -745,6 +811,22 @@ export class VideoFrameDecodeSession {
   async #frameAt(targetUs: number, signal?: AbortSignal): Promise<VideoDecodeResult> {
     if (this.#disposed) throw new ReferenceError('VideoFrameDecodeSession is disposed');
     throwIfAborted(signal, 'persistent video decode');
+    const abortInput = (): void => {
+      this.#inputAbort?.abort(
+        signal?.reason instanceof Error
+          ? signal.reason
+          : new DOMException('Persistent video decode was aborted', 'AbortError'),
+      );
+    };
+    signal?.addEventListener('abort', abortInput, { once: true });
+    try {
+      return await this.#frameAtOnce(targetUs, signal);
+    } finally {
+      signal?.removeEventListener('abort', abortInput);
+    }
+  }
+
+  async #frameAtOnce(targetUs: number, signal?: AbortSignal): Promise<VideoDecodeResult> {
     const seek = resolveVideoSeek(this.#index, this.#videoInfo.id, targetUs);
     const cached = this.#cache.get(seek.presentationUs);
     if (cached !== undefined) {
@@ -771,10 +853,13 @@ export class VideoFrameDecodeSession {
     }
 
     let decodedSamples = 0;
+    const maxSteps = Math.min(48, Math.max(1, seek.samplesToDecode));
     while (
       this.#current !== undefined &&
-      this.#current.microsecondTimestamp < seek.presentationUs
+      this.#current.microsecondTimestamp < seek.presentationUs &&
+      decodedSamples < maxSteps
     ) {
+      throwIfAborted(signal, 'persistent video decode');
       const next = await this.#next(signal);
       if (next === undefined) break;
       this.#current.close();
@@ -783,20 +868,16 @@ export class VideoFrameDecodeSession {
       this.#sequentialFrames += 1;
     }
 
-    if (this.#current === undefined || this.#current.microsecondTimestamp !== seek.presentationUs) {
-      // A container/decoder may have produced an unexpected order. Restarting
-      // from the exact timestamp preserves the strict seek contract.
+    if (this.#current === undefined) {
       await this.#start(seek.presentationUs, signal);
     }
-    if (this.#current === undefined || this.#current.microsecondTimestamp !== seek.presentationUs) {
+    if (this.#current === undefined) {
       throw new Error(
-        `Persistent seek expected PTS ${seek.presentationUs}, received ${
-          this.#current?.microsecondTimestamp ?? 'end-of-stream'
-        }`,
+        `Persistent seek expected PTS ${seek.presentationUs}, received end-of-stream`,
       );
     }
 
-    const decodedFrame = this.#current.toVideoFrame();
+    const decodedFrame = await detachDecoderFrame(this.#current.toVideoFrame());
     const result = decodeResultFromFrame(decodedFrame.clone(), {
       timestampUs: seek.presentationUs,
       durationUs: this.#current.microsecondDuration,
@@ -818,7 +899,7 @@ export class VideoFrameDecodeSession {
       const tracks = await operationWithSignal(this.#input.getVideoTracks(), signal);
       const track = tracks.find(candidate => candidate.id === this.#videoInfo.id);
       if (track === undefined) throw new Error('Indexed video track is missing from input');
-      const sink = new VideoSampleSink(track);
+      const sink = new VideoSampleSink(track, { optimizeForLatency: true });
       this.#iterator = sink.samples(targetUs / MICROSECONDS_PER_SECOND)[Symbol.asyncIterator]();
       this.#decoderActive = true;
       activeVideoDecoders += 1;
@@ -841,10 +922,17 @@ export class VideoFrameDecodeSession {
     const iterator = this.#iterator;
     if (iterator === undefined) return undefined;
     try {
-      const result = await operationWithSignal(iterator.next(), signal);
+      const result = await operationWithSignal(
+        withDeadline(iterator.next(), 2_000, () => {
+          this.#inputAbort?.abort(
+            new DOMException('Persistent video decode stalled', 'AbortError'),
+          );
+        }),
+        signal,
+      );
       return result.done ? undefined : result.value;
     } catch (error) {
-      if (signal?.aborted ?? false) await this.#reset();
+      await this.#reset();
       throw error;
     }
   }
@@ -865,11 +953,9 @@ export class VideoFrameDecodeSession {
       activeVideoDecoders -= 1;
     }
     if (iterator?.return !== undefined) {
-      try {
-        await iterator.return();
-      } catch {
-        // The Input has already been disposed above.
-      }
+      // Mediabunny/WebCodecs can leave iterator.return() pending after abort.
+      // Playback must not wait on that cleanup or the scheduler stays latched.
+      await settleQuietly(iterator.return(), 150);
     }
     if (countReset) this.#resets += 1;
   }

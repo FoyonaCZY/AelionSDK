@@ -113,6 +113,7 @@ class CanvasController implements PreviewCanvasController {
   #failedFrames = 0;
   #slowFrames = 0;
   #fastFrames = 0;
+  #lastPlayerPresentAt = 0;
   #resumeWhenVisible = false;
   #disposed = false;
 
@@ -154,7 +155,11 @@ class CanvasController implements PreviewCanvasController {
       this.#resizeObserver = new ResizeObserver(() => {
         if (this.#disposed) return;
         this.resize();
-        if ((options.renderOnResize ?? true) && this.#currentTimeUs !== null) {
+        if (
+          (options.renderOnResize ?? true) &&
+          this.#currentTimeUs !== null &&
+          this.#session.player.state !== 'playing'
+        ) {
           void this.render(this.#currentTimeUs).catch((error: unknown) => this.#reportError(error));
         }
       });
@@ -335,7 +340,17 @@ class CanvasController implements PreviewCanvasController {
     this.#generation = Math.max(this.#generation, frame.generation);
     this.#currentTimeUs = frame.timestampUs;
     this.#draw(frame.result, frame.timestampUs);
-    this.#observePerformance(0, frame.droppedFrames > 0);
+    const now = performance.now();
+    if (this.#lastPlayerPresentAt === 0) {
+      this.#lastPlayerPresentAt = now;
+      return;
+    }
+    const elapsedMs = now - this.#lastPlayerPresentAt;
+    this.#lastPlayerPresentAt = now;
+    // Scheduler drops are expected when decode cannot hold the timeline rate.
+    // Adaptive quality should follow the present interval, not those skips, or
+    // it oscillates scale and hitchs on every resolution change.
+    this.#observePerformance(elapsedMs, false);
   }
 
   #draw(result: RenderIrFrameResult, timeUs: number): void {

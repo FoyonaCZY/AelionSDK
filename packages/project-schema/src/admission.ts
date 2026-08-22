@@ -187,6 +187,36 @@ function inspectedKeys(value: object, path: PathNode | null): readonly PropertyK
   return keys;
 }
 
+/**
+ * Exact UTF-8 byte length without allocating an encoded copy. Lone surrogates
+ * count as the three bytes `TextEncoder` spends on their U+FFFD replacement, so
+ * this agrees with {@link byteLength} for every input.
+ */
+function utf8ByteLength(value: string): number {
+  let bytes = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code < 0x80) {
+      bytes += 1;
+      continue;
+    }
+    if (code < 0x800) {
+      bytes += 2;
+      continue;
+    }
+    if (code >= 0xd800 && code <= 0xdbff && index + 1 < value.length) {
+      const low = value.charCodeAt(index + 1);
+      if (low >= 0xdc00 && low <= 0xdfff) {
+        bytes += 4;
+        index += 1;
+        continue;
+      }
+    }
+    bytes += 3;
+  }
+  return bytes;
+}
+
 function byteLength(value: string, maximum: number, path: PathNode | null, scope: string): number {
   // A UTF-16 code unit contributes at least one UTF-8 byte, so this cheap
   // preflight avoids allocating a multi-megabyte encoded copy for obviously
@@ -354,4 +384,137 @@ export function snapshotProjectInput(value: unknown): JsonValue {
   }
 
   return holder.value as JsonValue;
+}
+
+interface BoundsTask {
+  readonly value: unknown;
+  readonly path: PathNode | null;
+  readonly depth: number;
+}
+
+/**
+ * Re-checks the bounded-shape half of {@link snapshotProjectInput} against a
+ * value that is already an owned JSON snapshot, without cloning it or touching
+ * the reflection machinery.
+ *
+ * This exists for hot paths that mutate an admitted document in place, such as
+ * a transaction commit. It enforces every documented admission limit — node
+ * count, depth, array length, object key count, per-string and total UTF-8
+ * budgets — plus canonical numbers and JSON-only types, so a document can never
+ * grow past its budget through repeated edits.
+ *
+ * It deliberately does **not** repeat the checks that only a hostile *caller*
+ * object can fail: prototype identity, accessor properties, array density and
+ * cycles. Callers must therefore route every externally supplied value through
+ * {@link snapshotProjectInput} before it reaches the document. A cycle that
+ * slipped through anyway still terminates here, on the node budget.
+ */
+export function assertAdmittedProjectInput(value: unknown): void {
+  const tasks: BoundsTask[] = [{ value, path: null, depth: 0 }];
+  let nodes = 0;
+  let totalStringBytes = 0;
+
+  while (tasks.length > 0) {
+    const task = tasks.pop();
+    if (task === undefined) break;
+    nodes += 1;
+    if (nodes > PROJECT_INPUT_MAX_NODES) {
+      limit(task.path, `Project input exceeds ${PROJECT_INPUT_MAX_NODES.toString()} JSON values`);
+    }
+    if (task.depth > PROJECT_INPUT_MAX_DEPTH) {
+      limit(task.path, `Project input exceeds depth ${PROJECT_INPUT_MAX_DEPTH.toString()}`);
+    }
+
+    const current = task.value;
+    if (current === null || typeof current === 'boolean') continue;
+    if (typeof current === 'number') {
+      if (
+        !Number.isFinite(current) ||
+        Object.is(current, -0) ||
+        (Number.isInteger(current) && !Number.isSafeInteger(current))
+      ) {
+        invalid(task.path, 'Project input contains a non-canonical number');
+      }
+      continue;
+    }
+    if (typeof current === 'string') {
+      if (current.length > PROJECT_INPUT_MAX_STRING_BYTES) {
+        limit(
+          task.path,
+          `Project input string exceeds ${PROJECT_INPUT_MAX_STRING_BYTES.toString()} UTF-8 bytes`,
+        );
+      }
+      const bytes = utf8ByteLength(current);
+      if (bytes > PROJECT_INPUT_MAX_STRING_BYTES) {
+        limit(
+          task.path,
+          `Project input string exceeds ${PROJECT_INPUT_MAX_STRING_BYTES.toString()} UTF-8 bytes`,
+        );
+      }
+      totalStringBytes += bytes;
+      if (totalStringBytes > PROJECT_INPUT_MAX_TOTAL_STRING_BYTES) {
+        limit(
+          task.path,
+          `Project input strings exceed ${PROJECT_INPUT_MAX_TOTAL_STRING_BYTES.toString()} total UTF-8 bytes`,
+        );
+      }
+      continue;
+    }
+    if (typeof current !== 'object') {
+      invalid(task.path, 'Project input contains a non-JSON value');
+    }
+
+    if (arrayIsArray(current)) {
+      const length = current.length;
+      if (length > PROJECT_INPUT_MAX_ARRAY_LENGTH) {
+        limit(
+          task.path,
+          `Project input array exceeds ${PROJECT_INPUT_MAX_ARRAY_LENGTH.toString()} values`,
+        );
+      }
+      for (let index = length - 1; index >= 0; index -= 1) {
+        tasks.push({
+          value: current[index],
+          path: { parent: task.path, segment: index },
+          depth: task.depth + 1,
+        });
+      }
+      continue;
+    }
+
+    const keys = Object.keys(current);
+    if (keys.length > PROJECT_INPUT_MAX_OBJECT_KEYS) {
+      limit(
+        task.path,
+        `Project input object exceeds ${PROJECT_INPUT_MAX_OBJECT_KEYS.toString()} properties`,
+      );
+    }
+    const entries = current as Record<string, unknown>;
+    for (let index = keys.length - 1; index >= 0; index -= 1) {
+      const key = keys[index];
+      if (key === undefined) continue;
+      const path = { parent: task.path, segment: key };
+      if (key.length > PROJECT_INPUT_MAX_PROPERTY_KEY_BYTES) {
+        limit(
+          path,
+          `Project input property key exceeds ${PROJECT_INPUT_MAX_PROPERTY_KEY_BYTES.toString()} UTF-8 bytes`,
+        );
+      }
+      const keyBytes = utf8ByteLength(key);
+      if (keyBytes > PROJECT_INPUT_MAX_PROPERTY_KEY_BYTES) {
+        limit(
+          path,
+          `Project input property key exceeds ${PROJECT_INPUT_MAX_PROPERTY_KEY_BYTES.toString()} UTF-8 bytes`,
+        );
+      }
+      totalStringBytes += keyBytes;
+      if (totalStringBytes > PROJECT_INPUT_MAX_TOTAL_STRING_BYTES) {
+        limit(
+          path,
+          `Project input strings exceed ${PROJECT_INPUT_MAX_TOTAL_STRING_BYTES.toString()} total UTF-8 bytes`,
+        );
+      }
+      tasks.push({ value: entries[key], path, depth: task.depth + 1 });
+    }
+  }
 }

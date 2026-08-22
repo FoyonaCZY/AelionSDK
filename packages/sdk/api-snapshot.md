@@ -35,7 +35,7 @@ baseline in the same change.
     "dist/runtime-material-registry.d.ts": "0d7dc3487ef364861c65b1c8f5275ac8f94b3139b8a0b57924ab316d13b26908",
     "dist/session.d.ts": "fcf02f0975a9b85ef6dadd8e2afe4542a3a674851fba9d75a3d59a519a5bbe2b",
     "dist/subtitle-io.d.ts": "7fe26fe08bbae4ceaa7f4062c89042539054fa7870c01aeb593dfa92b05c0b26",
-    "dist/types.d.ts": "967ae5ac9bcac75dccf9f1cab692559969dd2fe542c2d68a7a77641c6a1b4a30"
+    "dist/types.d.ts": "8eebdcb52a7526d45a45f7336c24b972b9d561a2df06179d5196ddc9bec92a33"
   },
   "exports": [
     "AELION_EXTENSION_PROTOCOL",

@@ -120,7 +120,7 @@ describe('PreviewCanvasController', () => {
     await expect(controller.render(0)).rejects.toThrow(/disposed/u);
   });
 
-  it('degrades adaptive Player quality after repeated dropped frames', () => {
+  it('degrades adaptive Player quality when presented frames are slower than the target interval', () => {
     const fake = session(() => Promise.reject(new Error('not used')));
     const target = canvas();
     const controller = attachPreviewCanvas(fake.api, target.element, {
@@ -130,20 +130,59 @@ describe('PreviewCanvasController', () => {
     const listener = fake.playerListener();
     if (listener === undefined) throw new Error('Player listener was not installed');
 
-    for (let frameIndex = 0; frameIndex < 3; frameIndex += 1) {
-      listener({
-        generation: 1,
-        frameIndex,
-        timestampUs: frameIndex * 33_333,
-        droppedFrames: 1,
-        result: result(),
-      });
-    }
+    let now = 1_000;
+    const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => now);
+    try {
+      for (let frameIndex = 0; frameIndex < 4; frameIndex += 1) {
+        listener({
+          generation: 1,
+          frameIndex,
+          timestampUs: frameIndex * 33_333,
+          droppedFrames: 0,
+          result: result(),
+        });
+        now += 50;
+      }
 
-    expect(controller.snapshot().renderScale).toBe(0.75);
-    expect(fake.quality).toHaveBeenLastCalledWith({ quality: 'draft', renderScale: 0.75 });
+      expect(controller.snapshot().renderScale).toBe(0.75);
+      expect(fake.quality).toHaveBeenLastCalledWith({ quality: 'draft', renderScale: 0.75 });
+    } finally {
+      nowSpy.mockRestore();
+    }
     controller.dispose();
     expect(fake.playerListener()).toBeUndefined();
+  });
+
+  it('does not treat scheduler dropped frames as slow when presents stay on time', () => {
+    const fake = session(() => Promise.reject(new Error('not used')));
+    const target = canvas();
+    const controller = attachPreviewCanvas(fake.api, target.element, {
+      pixelRatio: 1,
+      quality: 'adaptive',
+    });
+    const listener = fake.playerListener();
+    if (listener === undefined) throw new Error('Player listener was not installed');
+
+    let now = 1_000;
+    const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => now);
+    try {
+      for (let frameIndex = 0; frameIndex < 4; frameIndex += 1) {
+        listener({
+          generation: 1,
+          frameIndex,
+          timestampUs: frameIndex * 33_333,
+          droppedFrames: 2,
+          result: result(),
+        });
+        now += 33;
+      }
+
+      expect(controller.snapshot().renderScale).toBe(1);
+      expect(fake.quality).toHaveBeenCalledOnce();
+    } finally {
+      nowSpy.mockRestore();
+      controller.dispose();
+    }
   });
 
   it('maps pointer coordinates and exposes captureStream without a second render path', () => {

@@ -38,6 +38,31 @@ function runtimeErrorCode(error: unknown): string {
   return 'PLAYER_RUNTIME_FAILED';
 }
 
+const RECOVERABLE_PREVIEW_CODES = new Set([
+  'RENDERER_QUEUE_FULL',
+  'RENDERER_FRAME_QUEUE_FULL',
+  'MEDIA_RESOURCE_QUEUE_FULL',
+  'MEDIA_PROVIDER_QUEUE_FULL',
+  'OPERATION_ABORTED',
+]);
+
+function recoverablePreviewSkip(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === 'AbortError') return true;
+  if (error instanceof RangeError && error.message.includes('QUEUE_FULL')) return true;
+  if (error === null || typeof error !== 'object') return false;
+  const diagnostics: unknown = Reflect.get(error, 'diagnostics');
+  if (Array.isArray(diagnostics)) {
+    return diagnostics.some(
+      value =>
+        value !== null &&
+        typeof value === 'object' &&
+        RECOVERABLE_PREVIEW_CODES.has(Reflect.get(value, 'code') as string),
+    );
+  }
+  const code: unknown = Reflect.get(error, 'code');
+  return typeof code === 'string' && RECOVERABLE_PREVIEW_CODES.has(code);
+}
+
 export class AelionPlayer implements AelionPlayerApi {
   readonly #session: AelionSession;
   readonly #onRuntimeError: RuntimeErrorListener | undefined;
@@ -156,6 +181,7 @@ export class AelionPlayer implements AelionPlayerApi {
       }
       this.#publish({ generation, frameIndex: -1, timestampUs: timeUs, droppedFrames: 0 }, result);
     } catch (error) {
+      if (recoverablePreviewSkip(error)) return;
       this.#failRuntime(error);
       throw error;
     }
@@ -168,7 +194,9 @@ export class AelionPlayer implements AelionPlayerApi {
   public setPreviewQuality(options: Parameters<AelionPlayerApi['setPreviewQuality']>[0]): void {
     if (this.#state === 'disposed') throw new ReferenceError('AelionPlayer is disposed');
     this.#previewQuality = normalizePreviewQuality(options);
-    this.#advanceGeneration();
+    // Apply on the next composed frame. Aborting the in-flight playback frame
+    // leaves Worker cancel tombstones and can freeze the last presented bitmap
+    // while the audio clock keeps moving.
     this.#session.notifyStatsChanged();
   }
 
@@ -406,16 +434,27 @@ export class AelionPlayer implements AelionPlayerApi {
 
   async #renderScheduled(scheduled: ScheduledVideoFrame): Promise<void> {
     const signal = this.#videoController.signal;
-    const result = await this.#session.preview.renderFrame({
-      timeUs: scheduled.timestampUs,
-      signal,
-      ...this.#previewQuality,
-    });
-    if (signal.aborted || scheduled.generation !== this.#scheduler?.generation) {
-      result.bitmap.close();
-      return;
+    const ir = this.#session.requireIr();
+    // Decode the clock's current time, not the (possibly stale) scheduled PTS.
+    // A per-frame timeout abort restarts sequential decode from a keyframe and
+    // hitches every few hundred milliseconds; the scheduler already skips
+    // behind by dropping intervals while a frame is in flight.
+    const timeUs = Math.min(Math.max(0, this.currentTimeUs), Math.max(0, ir.durationUs - 1));
+    try {
+      const result = await this.#session.preview.renderFrame({
+        timeUs,
+        signal,
+        ...this.#previewQuality,
+      });
+      if (signal.aborted || scheduled.generation !== this.#scheduler?.generation) {
+        result.bitmap.close();
+        return;
+      }
+      this.#publish({ ...scheduled, timestampUs: timeUs }, result);
+    } catch (error) {
+      if (recoverablePreviewSkip(error) || signal.aborted) return;
+      throw error;
     }
-    this.#publish(scheduled, result);
   }
 
   #publish(
@@ -523,21 +562,7 @@ export class AelionPlayer implements AelionPlayerApi {
 
   #failRuntime(error: unknown): void {
     if (this.#state === 'disposed') return;
-    if (error instanceof DOMException && error.name === 'AbortError') return;
-    if (error !== null && typeof error === 'object') {
-      const diagnostics: unknown = Reflect.get(error, 'diagnostics');
-      if (
-        Array.isArray(diagnostics) &&
-        diagnostics.some(
-          value =>
-            value !== null &&
-            typeof value === 'object' &&
-            Reflect.get(value, 'code') === 'OPERATION_ABORTED',
-        )
-      ) {
-        return;
-      }
-    }
+    if (recoverablePreviewSkip(error)) return;
     const failureTimeUs = this.currentTimeUs;
     this.#errors += 1;
     this.#lastErrorCode = runtimeErrorCode(error);

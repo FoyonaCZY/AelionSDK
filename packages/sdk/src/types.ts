@@ -52,6 +52,12 @@ export interface AelionMediaRequest {
   readonly purpose: 'preview' | 'export';
   /** Largest requested output dimension, used to choose a right-sized preview proxy. */
   readonly maxDimension: number;
+  /**
+   * Thumbnail/filmstrip decodes must not share the persistent playback
+   * decoder. Aborting those callers otherwise leaves the serial decode queue
+   * walking toward a late timestamp and freezes preview.
+   */
+  readonly transient?: boolean;
 }
 
 export interface AelionMediaProvider {

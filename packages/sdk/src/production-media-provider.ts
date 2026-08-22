@@ -637,6 +637,25 @@ export class ProductionMediaProvider implements AelionMediaProvider {
         operationSignal,
       );
       try {
+        const decodeOptions = {
+          sampleIndex: index,
+          streamIndex,
+          signal: operationSignal,
+          maxDecodeQueueSize: 8,
+        };
+        if (request?.transient === true) {
+          const result = await decodeVideoFrameAtFromReader(
+            selected.representation.reader,
+            presentationTimeUs,
+            decodeOptions,
+          );
+          try {
+            throwIfAborted(operationSignal, 'production media video decode');
+            return result.frame.clone();
+          } finally {
+            result.close();
+          }
+        }
         const resident = this.#acquireDecodeSession(
           assetId,
           selected.representation,
@@ -649,12 +668,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
               ? await decodeVideoFrameAtFromReader(
                   selected.representation.reader,
                   presentationTimeUs,
-                  {
-                    sampleIndex: index,
-                    streamIndex,
-                    signal: operationSignal,
-                    maxDecodeQueueSize: 8,
-                  },
+                  decodeOptions,
                 )
               : await resident.session.frameAt(presentationTimeUs, operationSignal);
           try {

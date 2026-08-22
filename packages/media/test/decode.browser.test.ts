@@ -133,6 +133,72 @@ describe('WebCodecs exact seek', () => {
     expect(videoDecoderResourceSnapshot()).toEqual(baseline);
   });
 
+  it('rejects a queued frameAt as soon as its signal aborts', async () => {
+    const bytes = await fixture('mp4-moov-head-h264-aac.mp4');
+    const reader = new BlobRangeReader('queued-abort-session', new Blob([bytes]));
+    const index = await createSampleIndex(bytes);
+    const video = index.tracks.find(track => track.kind === 'video');
+    const samples = video === undefined ? undefined : index.samples[video.id];
+    const order = video === undefined ? undefined : index.presentationOrder[video.id];
+    const firstUs =
+      order === undefined ? undefined : samples?.[order[0] ?? -1]?.presentationTimestampUs;
+    const secondUs =
+      order === undefined ? undefined : samples?.[order[1] ?? -1]?.presentationTimestampUs;
+    if (firstUs === undefined || secondUs === undefined) {
+      throw new Error('Fixture has no sequential video samples');
+    }
+    const session = createVideoFrameDecodeSessionFromReader(reader, index);
+    const controller = new AbortController();
+    try {
+      const first = session.frameAt(firstUs);
+      const queued = session.frameAt(secondUs, controller.signal);
+      controller.abort();
+      await expect(queued).rejects.toMatchObject({ name: 'AbortError' });
+      (await first).close();
+    } finally {
+      session.dispose();
+    }
+  });
+
+  it('resumes sequential decode after an in-flight frameAt is aborted', async () => {
+    const bytes = await fixture('mp4-moov-head-h264-aac.mp4');
+    const reader = new BlobRangeReader('inflight-abort-session', new Blob([bytes]));
+    const index = await createSampleIndex(bytes);
+    const video = index.tracks.find(track => track.kind === 'video');
+    const samples = video === undefined ? undefined : index.samples[video.id];
+    const order = video === undefined ? undefined : index.presentationOrder[video.id];
+    const firstUs =
+      order === undefined ? undefined : samples?.[order[0] ?? -1]?.presentationTimestampUs;
+    const laterUs =
+      order === undefined
+        ? undefined
+        : samples?.[order[12] ?? order[1] ?? -1]?.presentationTimestampUs;
+    if (firstUs === undefined || laterUs === undefined) {
+      throw new Error('Fixture has no sequential video samples');
+    }
+    const session = createVideoFrameDecodeSessionFromReader(reader, index);
+    try {
+      const first = await session.frameAt(firstUs);
+      first.close();
+      const controller = new AbortController();
+      const inflight = session.frameAt(laterUs, controller.signal);
+      controller.abort();
+      await expect(inflight).rejects.toMatchObject({ name: 'AbortError' });
+      const resumed = await Promise.race([
+        session.frameAt(firstUs).then(result => {
+          result.close();
+          return 'ok' as const;
+        }),
+        new Promise<'latched'>(resolve => {
+          globalThis.setTimeout(() => resolve('latched'), 1_000);
+        }),
+      ]);
+      expect(resumed).toBe('ok');
+    } finally {
+      session.dispose();
+    }
+  });
+
   it.each(['mp4-moov-head-h264-aac.mp4', 'webm-vp9-opus-vfr.webm'])(
     'normalizes decoded audio from %s to interleaved f32 PCM',
     async file => {

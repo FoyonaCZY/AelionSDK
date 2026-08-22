@@ -1,9 +1,14 @@
 import {
+  cssColorWithAlpha,
+  inflateTextBox,
   layoutIrText,
   parseSrt,
   parseWebVtt,
+  portableTextStyle,
   serializeSrt,
   serializeWebVtt,
+  textBackgroundVisible,
+  textClipPaintExtent,
   type IrTextClip,
 } from '@aelionsdk/render-ir';
 import { describe, expect, it } from 'vitest';
@@ -103,6 +108,43 @@ describe('portable text layout', () => {
     expect(rtl.lines[0]?.x).toBeGreaterThan(10);
     expect(rtl.lines[0]?.spans[0]?.style.direction).toBe('rtl');
     expect(rtl.lines[0]?.spans[0]?.x).toBeGreaterThan(rtl.lines[0]?.spans.at(-1)?.x ?? 0);
+  });
+
+  it('parses text background fields and inflates the paint box only when visible', () => {
+    const plain = portableTextStyle({ fontSizePx: 40, fill: '#ffffff' });
+    expect(plain.backgroundOpacity).toBe(0);
+    expect(textBackgroundVisible(plain)).toBe(false);
+    expect(plain.backgroundPaddingPx).toBeCloseTo(10);
+    const painted = portableTextStyle({
+      fontSizePx: 40,
+      backgroundFill: '#ff0000',
+      backgroundOpacity: 0.8,
+      backgroundPaddingPx: 12,
+    });
+    expect(textBackgroundVisible(painted)).toBe(true);
+    expect(painted.backgroundFill).toBe('#ff0000');
+    expect(cssColorWithAlpha('#ff0000', 0.5)).toBe('rgba(255, 0, 0, 0.5)');
+    expect(inflateTextBox({ x: 10, y: 20, width: 100, height: 40 }, 8)).toEqual({
+      x: 2,
+      y: 12,
+      width: 116,
+      height: 56,
+    });
+    const clip = textClip({
+      paragraphs: [
+        {
+          style: {},
+          runs: [
+            {
+              text: 'Hi',
+              style: { fontSizePx: 20, backgroundFill: '#000000', backgroundOpacity: 1 },
+            },
+          ],
+        },
+      ],
+    });
+    expect(textClipPaintExtent(clip)).toBeCloseTo(5);
+    expect(textClipPaintExtent(textClip())).toBe(0);
   });
 });
 

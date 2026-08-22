@@ -50,6 +50,10 @@ export interface PortableTextStyle {
   readonly strokeWidthPx: number;
   readonly align: 'start' | 'center' | 'end';
   readonly direction: 'ltr' | 'rtl';
+  readonly backgroundFill: string;
+  readonly backgroundOpacity: number;
+  readonly backgroundPaddingPx: number;
+  readonly backgroundRadiusPx: number;
 }
 
 function finite(value: unknown, fallback: number): number {
@@ -85,7 +89,103 @@ export function portableTextStyle(
     strokeWidthPx: Math.max(0, finite(combined.strokeWidthPx, 0) * scale),
     align: align === 'center' || align === 'end' ? align : 'start',
     direction: direction === 'rtl' ? 'rtl' : 'ltr',
+    backgroundFill: text(combined.backgroundFill, '#000000'),
+    backgroundOpacity: Math.max(0, Math.min(1, finite(combined.backgroundOpacity, 0))),
+    backgroundPaddingPx: Math.max(
+      0,
+      combined.backgroundPaddingPx === undefined
+        ? fontSizePx * 0.25
+        : finite(combined.backgroundPaddingPx, fontSizePx * 0.25) * scale,
+    ),
+    backgroundRadiusPx: Math.max(
+      0,
+      combined.backgroundRadiusPx === undefined
+        ? fontSizePx * 0.15
+        : finite(combined.backgroundRadiusPx, fontSizePx * 0.15) * scale,
+    ),
   };
+}
+
+/** Whether a run's background plate contributes any pixels at its opacity. */
+export function textBackgroundVisible(style: PortableTextStyle): boolean {
+  return style.backgroundOpacity > 0.001;
+}
+
+/**
+ * Rewrites a `#rgb`, `#rrggbb` or `rgb()` colour as `rgba()` with the given
+ * alpha. Colours the parser does not recognize are returned unchanged.
+ */
+export function cssColorWithAlpha(color: string, alpha: number): string {
+  const rgb = parseCssRgb(color);
+  const clamped = Math.max(0, Math.min(1, alpha));
+  if (rgb === undefined) return color;
+  return `rgba(${rgb[0].toString()}, ${rgb[1].toString()}, ${rgb[2].toString()}, ${clamped.toString()})`;
+}
+
+/**
+ * Pixels a run paints outside its glyph box, whichever of the stroke or the
+ * background plate's padding reaches further.
+ */
+export function textPaintExtent(style: PortableTextStyle): number {
+  const pad = textBackgroundVisible(style) ? style.backgroundPaddingPx : 0;
+  return Math.max(style.strokeWidthPx, pad);
+}
+
+/** Largest {@link textPaintExtent} across every run in a text clip. */
+export function textClipPaintExtent(clip: IrTextClip): number {
+  let pad = 0;
+  for (const paragraph of clip.paragraphs) {
+    for (const run of paragraph.runs) {
+      pad = Math.max(pad, textPaintExtent(portableTextStyle(run.style, paragraph.style)));
+    }
+  }
+  return pad;
+}
+
+/**
+ * Grows a layout box by `pad` on every side so stroke and background pixels
+ * stay inside the rasterized target. Non-positive padding returns `box` as-is.
+ */
+export function inflateTextBox(
+  box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number },
+  pad: number,
+): { readonly x: number; readonly y: number; readonly width: number; readonly height: number } {
+  if (pad <= 0) return box;
+  return {
+    x: box.x - pad,
+    y: box.y - pad,
+    width: box.width + pad * 2,
+    height: box.height + pad * 2,
+  };
+}
+
+function parseCssRgb(color: string): readonly [number, number, number] | undefined {
+  const value = color.trim();
+  const hex6 = /^#([0-9a-f]{6})$/iu.exec(value);
+  if (hex6?.[1] !== undefined) {
+    const n = Number.parseInt(hex6[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  const hex3 = /^#([0-9a-f]{3})$/iu.exec(value);
+  if (hex3?.[1] !== undefined) {
+    const raw = hex3[1];
+    const r = raw[0];
+    const g = raw[1];
+    const b = raw[2];
+    if (r === undefined || g === undefined || b === undefined) return undefined;
+    return [
+      Number.parseInt(`${r}${r}`, 16),
+      Number.parseInt(`${g}${g}`, 16),
+      Number.parseInt(`${b}${b}`, 16),
+    ];
+  }
+  const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/u.exec(value);
+  if (rgb === null) return undefined;
+  return [
+    Number.parseInt(rgb[1] ?? '0', 10),
+    Number.parseInt(rgb[2] ?? '0', 10),
+    Number.parseInt(rgb[3] ?? '0', 10),
+  ];
 }
 
 export function portableGlyphAdvance(character: string, style: PortableTextStyle): number {

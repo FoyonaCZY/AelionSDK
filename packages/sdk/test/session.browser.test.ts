@@ -150,11 +150,13 @@ describe('@aelionsdk/sdk public browser facade', () => {
       } finally {
         draft.bitmap.close();
       }
+      const qualityGeneration = session.player.getStats().generation;
       session.player.setPreviewQuality({ quality: 'draft', renderScale: 0.75 });
       expect(session.player.getStats().previewQuality).toEqual({
         quality: 'draft',
         renderScale: 0.75,
       });
+      expect(session.player.getStats().generation).toBe(qualityGeneration);
 
       // Keep the consumer export short while proving that the public facade
       // freezes the edited IR and supplies both render callbacks itself.
