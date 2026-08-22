@@ -1,5 +1,6 @@
 packages:
   - 'apps/*'
+  - '!apps/editor-demo'
   - 'packages/*'
 
 frozenLockfile: true

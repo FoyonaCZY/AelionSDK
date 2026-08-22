@@ -5,12 +5,18 @@ description: 启动仓库中的完整示例，并知道应该从哪些源码位�
 
 仓库提供两个可以直接运行的应用：
 
-| 应用               | 适合什么时候看                                                 |
-| ------------------ | -------------------------------------------------------------- |
-| `apps/quickstart`  | 第一次接入。代码少，主线集中在一个文件中                       |
-| `apps/editor-demo` | 已经跑通 SDK，想看时间线、选择、分割、撤销和多格式导出如何组合 |
+| 应用                                                                                  | 适合什么时候看                                                 |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `apps/quickstart`                                                                     | 第一次接入。代码少，主线集中在一个文件中                       |
+| [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio)（放在 `apps/editor-demo`） | 已经跑通 SDK，想看时间线、选择、分割、撤销和多格式导出如何组合 |
 
 如果你还没有成功显示过第一帧，先运行 Quickstart。参考编辑器功能更多，不适合拿来排查最初的工程配置。
+
+把 Studio 克隆到 SDK 工作区（该目录已 gitignore）：
+
+```bash
+git clone https://github.com/FoyonaCZY/AelionStudio.git apps/editor-demo
+```
 
 ## 启动参考编辑器
 
@@ -33,11 +39,11 @@ corepack pnpm dev:editor
 
 参考编辑器没有隐藏 API，核心都在公开包中。建议按调用顺序阅读：
 
-| 文件                                                                                                                  | 可以学到什么                                                 |
-| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [`apps/editor-demo/vite.config.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/vite.config.ts) | Vite 插件、Worker/Worklet 和跨源隔离响应头                   |
-| [`apps/editor-demo/src/main.ts`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/main.ts)       | Provider、Project、Session、Preview 和 Export 的完整生命周期 |
-| [`apps/editor-demo/src/style.css`](https://github.com/FoyonaCZY/AelionSDK/blob/main/apps/editor-demo/src/style.css)   | Demo 的布局；这部分不是 SDK 接口                             |
+| 文件                                                                                   | 可以学到什么                                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [`vite.config.ts`](https://github.com/FoyonaCZY/AelionStudio/blob/main/vite.config.ts) | Vite 插件、Worker/Worklet 和跨源隔离响应头                   |
+| [`src/main.ts`](https://github.com/FoyonaCZY/AelionStudio/blob/main/src/main.ts)       | Provider、Project、Session、Preview 和 Export 的完整生命周期 |
+| [`src/style.css`](https://github.com/FoyonaCZY/AelionStudio/blob/main/src/style.css)   | Demo 的布局；这部分不是 SDK 接口                             |
 
 `main.ts` 中值得重点找的函数：
 
@@ -84,4 +90,4 @@ corepack pnpm dev:editor
 corepack pnpm run build:editor
 ```
 
-产物位于 `apps/editor-demo/dist`。接下来阅读[剪辑 UI 集成](/AelionSDK/zh/guides/editor-ui/)，把 Demo 中的单文件状态拆成自己的产品架构。
+产物位于 `apps/editor-demo/dist`。接下来阅读[剪辑 UI 集成](/AelionSDK/zh/guides/editor-ui/)，把 Demo 中的状态拆成自己的产品架构。

@@ -172,6 +172,7 @@ test('workspace identity excludes only the exact post-gate projections plus gene
     excludedWorkspacePath(root, '/workspace/apps/editor/src/content/docs/api/index.md'),
     false,
   );
+  assert.equal(excludedWorkspacePath(root, '/workspace/apps/editor-demo/src/main.ts'), true);
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/architecture.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/reference/other.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/packages/sdk/src/index.ts'), false);

@@ -75,22 +75,6 @@ importers:
         specifier: 4.9.0
         version: 4.9.0(typedoc@0.28.20(typescript@5.8.3))
 
-  apps/editor-demo:
-    dependencies:
-      '@aelionsdk/export':
-        specifier: workspace:*
-        version: link:../../packages/export
-      '@aelionsdk/sdk':
-        specifier: workspace:*
-        version: link:../../packages/sdk
-    devDependencies:
-      '@aelionsdk/vite-plugin':
-        specifier: workspace:*
-        version: link:../../packages/vite-plugin
-      vite:
-        specifier: 7.3.6
-        version: 7.3.6(@types/node@24.13.3)(yaml@2.9.0)
-
   apps/evidence-runner:
     dependencies:
       '@aelionsdk/audio':

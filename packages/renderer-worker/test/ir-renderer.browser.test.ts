@@ -220,6 +220,39 @@ function pixel(bitmap: ImageBitmap): readonly number[] {
   return [...context.getImageData(4, 4, 1, 1).data];
 }
 
+function occupiedBounds(bitmap: ImageBitmap): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} {
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const context = canvas.getContext('2d');
+  if (context === null) throw new Error('2D context unavailable');
+  context.drawImage(bitmap, 0, 0);
+  const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+  let x0 = bitmap.width;
+  let y0 = bitmap.height;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < bitmap.height; y += 1) {
+    for (let x = 0; x < bitmap.width; x += 1) {
+      const index = (y * bitmap.width + x) * 4;
+      if ((pixels[index] ?? 0) < 200) continue;
+      if (x < x0) x0 = x;
+      if (y < y0) y0 = y;
+      if (x > x1) x1 = x;
+      if (y > y1) y1 = y;
+    }
+  }
+  return {
+    x: x1 >= x0 ? x0 : 0,
+    y: y1 >= y0 ? y0 : 0,
+    width: x1 >= x0 ? x1 - x0 + 1 : 0,
+    height: y1 >= y0 ? y1 - y0 + 1 : 0,
+  };
+}
+
 function pixelOver(bitmap: ImageBitmap, fillStyle: string): readonly number[] {
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const context = canvas.getContext('2d', { alpha: false });
@@ -368,6 +401,196 @@ describe('Project → Render IR → Material Graph → Worker renderer', () => {
         expect(rgba[3]).toBe(255);
       } finally {
         result.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
+  it('rotates visual layers in pixel space so a square stays square', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (sequence === undefined || visual === undefined) throw new Error('Fixture is incomplete');
+    const format = sequence.format as { width: number; height: number };
+    format.width = 32;
+    format.height = 16;
+    sequence.transitionIds = [];
+    visual.itemIds = ['shape'];
+    value.items = {
+      shape: {
+        id: 'shape',
+        trackId: 'visual',
+        type: 'shape',
+        enabled: true,
+        range: { startUs: 0, durationUs: 1_000_000 },
+        shape: {
+          kind: 'rectangle',
+          box: { x: 12, y: 4, width: 8, height: 8 },
+          fill: { space: 'srgb-linear', rgba: [1, 0, 0, 1] },
+          cornerRadiusPx: 0,
+        },
+        visual: {
+          fit: 'fill',
+          transform: {
+            positionPx: { x: 16, y: 8 },
+            anchor: { x: 0.5, y: 0.5 },
+            scale: { x: 1, y: 1 },
+            rotationDeg: 90,
+            skewDeg: { x: 0, y: 0 },
+          },
+          crop: { left: 0, top: 0, right: 0, bottom: 0 },
+          opacity: 1,
+          blendMode: 'normal',
+        },
+        materialInstanceIds: [],
+      } as unknown as ItemEntity,
+    };
+    value.materialInstances = {};
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const result = await renderer.render({
+        ir,
+        timeUs: 0,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+      });
+      try {
+        const bounds = occupiedBounds(result.bitmap);
+        expect(bounds.width).toBeGreaterThan(6);
+        expect(bounds.height).toBeGreaterThan(6);
+        expect(Math.abs(bounds.width - bounds.height)).toBeLessThanOrEqual(2);
+      } finally {
+        result.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
+  it('contains a mismatched source inside the sequence frame', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    const from = value.items.from;
+    if (sequence === undefined || visual === undefined || from === undefined) {
+      throw new Error('Fixture is incomplete');
+    }
+    sequence.transitionIds = [];
+    visual.itemIds = ['from'];
+    from.materialInstanceIds = [];
+    const itemVisual = from.visual as JsonObject;
+    itemVisual.fit = 'contain';
+    const transform = itemVisual.transform as JsonObject;
+    transform.positionPx = { x: 4, y: 4 };
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const result = await renderer.render({
+        ir,
+        timeUs: 1_000_000,
+        source: {
+          frameAt: () => {
+            const canvas = new OffscreenCanvas(16, 8);
+            const context = canvas.getContext('2d');
+            if (context === null) throw new Error('2D context unavailable');
+            context.fillStyle = 'rgb(200 0 0)';
+            context.fillRect(0, 0, 16, 8);
+            return Promise.resolve(new VideoFrame(canvas, { timestamp: 0 }));
+          },
+        },
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+        allowFallback: false,
+      });
+      try {
+        const bounds = occupiedBounds(result.bitmap);
+        expect(bounds.width).toBeGreaterThan(6);
+        expect(bounds.height).toBeGreaterThan(2);
+        expect(bounds.height).toBeLessThan(6);
+        expect(bounds.y).toBeGreaterThanOrEqual(1);
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(7);
+      } finally {
+        result.bitmap.close();
+      }
+    } finally {
+      await renderer.dispose();
+    }
+  });
+
+  it('places off-center layers at the same Y-up position on WebGL2 and WebGPU', async () => {
+    const value = project();
+    const sequence = value.sequences.sequence;
+    const visual = value.tracks.visual;
+    if (sequence === undefined || visual === undefined) throw new Error('Fixture is incomplete');
+    const format = sequence.format as { width: number; height: number };
+    format.width = 32;
+    format.height = 16;
+    sequence.transitionIds = [];
+    visual.itemIds = ['shape'];
+    value.items = {
+      shape: {
+        id: 'shape',
+        trackId: 'visual',
+        type: 'shape',
+        enabled: true,
+        range: { startUs: 0, durationUs: 1_000_000 },
+        shape: {
+          kind: 'rectangle',
+          box: { x: 12, y: 4, width: 8, height: 8 },
+          fill: { space: 'srgb-linear', rgba: [1, 0, 0, 1] },
+          cornerRadiusPx: 0,
+        },
+        visual: {
+          fit: 'fill',
+          transform: {
+            positionPx: { x: 16, y: 12 },
+            anchor: { x: 0.5, y: 0.5 },
+            scale: { x: 1, y: 1 },
+            rotationDeg: 0,
+            skewDeg: { x: 0, y: 0 },
+          },
+          crop: { left: 0, top: 0, right: 0, bottom: 0 },
+          opacity: 1,
+          blendMode: 'normal',
+        },
+        materialInstanceIds: [],
+      } as unknown as ItemEntity,
+    };
+    value.materialInstances = {};
+    const ir = new IncrementalRenderCompiler().compile(value, 'sequence', 0n).ir;
+    const renderer = new RenderIrFrameRenderer();
+    try {
+      const webgl = await renderer.render({
+        ir,
+        timeUs: 0,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgl2',
+        allowFallback: false,
+      });
+      const gpu = await renderer.render({
+        ir,
+        timeUs: 0,
+        source,
+        mode: 'preview',
+        preferredBackend: 'webgpu',
+        allowFallback: true,
+      });
+      try {
+        const glBounds = occupiedBounds(webgl.bitmap);
+        expect(glBounds.y).toBeLessThan(6);
+        expect(glBounds.height).toBeGreaterThan(6);
+        if (gpu.backend === 'webgpu') {
+          const gpuBounds = occupiedBounds(gpu.bitmap);
+          expect(Math.abs(glBounds.x - gpuBounds.x)).toBeLessThanOrEqual(1);
+          expect(Math.abs(glBounds.y - gpuBounds.y)).toBeLessThanOrEqual(1);
+        }
+      } finally {
+        webgl.bitmap.close();
+        gpu.bitmap.close();
       }
     } finally {
       await renderer.dispose();

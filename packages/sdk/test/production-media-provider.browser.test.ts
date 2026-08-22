@@ -18,6 +18,14 @@ describe('ProductionMediaProvider browser image path', () => {
     provider.registerImageBlob('poster', blob);
 
     try {
+      const probe = await provider.probe('poster');
+      expect(probe.index.tracks[0]).toMatchObject({
+        kind: 'video',
+        codedWidth: 4,
+        codedHeight: 3,
+        codecFamily: 'image',
+      });
+
       const first = await provider.frameAt('poster', 0, 0);
       const second = await provider.frameAt('poster', 0, 2_000_000);
       try {
@@ -26,7 +34,7 @@ describe('ProductionMediaProvider browser image path', () => {
         expect(second.displayWidth).toBe(4);
         expect(provider.snapshot()).toMatchObject({
           cachedImages: 1,
-          imageCacheHits: 1,
+          imageCacheHits: 2,
           imageCacheMisses: 1,
           decodeSessions: 0,
         });

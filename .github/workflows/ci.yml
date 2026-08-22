@@ -76,7 +76,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm run build:quickstart
-      - run: pnpm run build:editor
       - run: pnpm run api:snapshot
       - run: pnpm run test:pack
       - run: pnpm run release:dry-run

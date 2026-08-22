@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { execFile } from 'node:child_process';
-import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { readFile, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
@@ -24,11 +24,17 @@ if (!checkOnly && args.length !== 1) {
 }
 
 async function childManifestPaths(directoryName) {
-  const directory = join(root, directoryName);
-  const entries = await readdir(directory, { withFileTypes: true });
-  return entries
-    .filter(entry => entry.isDirectory())
-    .map(entry => join(directory, entry.name, 'package.json'))
+  const { stdout } = await execFileAsync(
+    'git',
+    ['ls-files', '-z', `${directoryName}/*/package.json`],
+    {
+      cwd: root,
+    },
+  );
+  return stdout
+    .split('\0')
+    .filter(Boolean)
+    .map(path => join(root, path.replaceAll('/', sep)))
     .sort();
 }
 

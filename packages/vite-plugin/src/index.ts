@@ -163,7 +163,9 @@ export function aelion(options: AelionVitePluginOptions = {}): Plugin {
         asset.referencePattern.lastIndex = 0;
         let replacement: string;
         if (command === 'serve') {
-          replacement = `new URL(${JSON.stringify(asset.publicUrl)}, import.meta.url)`;
+          // Vite 7 import analysis rewrites `new URL('/@aelion…', import.meta.url)`
+          // into `/@fs/@aelion…`, which 404s. @vite-ignore keeps the public module URL.
+          replacement = `new URL(/* @vite-ignore */ ${JSON.stringify(asset.publicUrl)}, import.meta.url)`;
         } else {
           const referenceId = emittedReferences.get(asset.key);
           if (referenceId === undefined) {

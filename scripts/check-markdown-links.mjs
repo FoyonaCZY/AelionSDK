@@ -12,6 +12,7 @@ const skippedDirectories = new Set([
   '.vitest',
   'coverage',
   'dist',
+  'editor-demo',
   'fixtures',
   'node_modules',
   'playwright-report',

@@ -128,6 +128,62 @@ interface RegisteredAsset {
   readonly representations: Map<string, RegisteredRepresentation>;
 }
 
+function stillImageSampleIndex(options: {
+  readonly width: number;
+  readonly height: number;
+  readonly durationUs: number;
+  readonly codec: string;
+}): SampleIndex {
+  const durationUs = Math.max(1, options.durationUs);
+  return {
+    schemaVersion: '1.0.0',
+    container: 'unknown',
+    durationUs,
+    tracks: [
+      {
+        kind: 'video',
+        id: 0,
+        codec: options.codec,
+        codecFamily: 'image',
+        codedWidth: options.width,
+        codedHeight: options.height,
+        rotation: 0,
+        color: {
+          primaries: null,
+          transfer: null,
+          matrix: 'rgb',
+          fullRange: true,
+          highDynamicRange: false,
+          canBeTransparent: true,
+        },
+      },
+    ],
+    capabilities: {
+      timingAndSize: true,
+      rawDecodeTimestamps: false,
+      byteOffsets: false,
+    },
+    samples: {
+      0: [
+        {
+          trackId: 0,
+          sampleIndex: 0,
+          kind: 'video',
+          decodeOrder: 0,
+          presentationOrder: 0,
+          sourceSequenceNumber: 0,
+          presentationTimestampUs: 0,
+          durationUs,
+          normalizedDecodeTimeUs: 0,
+          isSync: true,
+        },
+      ],
+    },
+    presentationOrder: { 0: [0] },
+    diagnostics: [],
+  };
+}
+
 interface ResidentIndex {
   readonly index: SampleIndex;
   readonly byteLength: number;
@@ -818,9 +874,12 @@ export class ProductionMediaProvider implements AelionMediaProvider {
         }
       }
 
-      const index = await createSampleIndexFromReader(representation.reader, {
-        signal: operationSignal,
-      });
+      const index =
+        representation.kind === 'image'
+          ? await this.#stillImageIndex(assetId, representation, operationSignal)
+          : await createSampleIndexFromReader(representation.reader, {
+              signal: operationSignal,
+            });
       const serialized = serializeSampleIndex(index);
       this.#hydrateRepresentation(representation, index, generation);
       this.#rememberIndex(key, index, serialized.byteLength, generation);
@@ -915,6 +974,34 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       if (!key.startsWith(prefix)) continue;
       resident.session.dispose();
       this.#decodeSessions.delete(key);
+    }
+  }
+
+  async #stillImageIndex(
+    assetId: string,
+    representation: RegisteredRepresentation,
+    signal: AbortSignal,
+  ): Promise<SampleIndex> {
+    const width = representation.width;
+    const height = representation.height;
+    if (typeof width === 'number' && width > 0 && typeof height === 'number' && height > 0) {
+      return stillImageSampleIndex({
+        width,
+        height,
+        durationUs: representation.durationUs ?? 1,
+        codec: representation.mimeType ?? 'image',
+      });
+    }
+    const frame = await this.#imageFrame(assetId, representation, signal);
+    try {
+      return stillImageSampleIndex({
+        width: frame.displayWidth,
+        height: frame.displayHeight,
+        durationUs: representation.durationUs ?? 1,
+        codec: representation.mimeType ?? 'image',
+      });
+    } finally {
+      frame.close();
     }
   }
 

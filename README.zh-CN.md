@@ -77,7 +77,7 @@ corepack pnpm dev:quickstart
 
 打开终端给出的本地地址，选择一个 MP4 或 WebM 文件。页面可以显示第一帧、拖动和播放素材、移动片段并撤销，以及在设备支持时导出 H.264/AAC MP4。
 
-如果想看一个更接近剪辑产品的例子，可以运行参考编辑器：
+如果想看一个更接近剪辑产品的例子，把 [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio) 克隆到 `apps/editor-demo`（SDK 仓库已 gitignore 该目录），然后运行：
 
 ```bash
 corepack pnpm dev:editor
@@ -319,7 +319,7 @@ MP4/H.264/AAC、WebGPU、SharedArrayBuffer 和高分辨率预览是否可用，�
 仓库内值得先看的目录：
 
 - [`apps/quickstart`](apps/quickstart)：不依赖 UI 框架的最短完整示例；
-- [`apps/editor-demo`](apps/editor-demo)：参考剪辑器；
+- [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio)：参考剪辑器，本地放在 `apps/editor-demo`；
 - [`examples/typescript`](examples/typescript)：文档中的可编译代码；
 - [`packages`](packages)：SDK 各模块源码；
 - [`apps/docs`](apps/docs)：文档站源码。

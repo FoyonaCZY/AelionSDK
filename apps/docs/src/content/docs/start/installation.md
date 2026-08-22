@@ -38,7 +38,8 @@ corepack pnpm dev:quickstart
 Open the printed local URL, choose an MP4 or WebM, and verify first-frame preview, scrub, playback,
 move/undo, and MP4 export.
 
-The fuller editor example is available with:
+The fuller editor example lives in [Aelion Studio](https://github.com/FoyonaCZY/AelionStudio). Clone it
+into `apps/editor-demo` (gitignored in this repository) and run:
 
 ```bash
 corepack pnpm dev:editor
