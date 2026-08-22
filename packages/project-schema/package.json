@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/project-schema",
-  "version": "1.2.0-rc.2",
+  "version": "1.2.0-rc.3",
   "description": "Project v1 types, validation and canonical serialization for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,7 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/core": "1.2.0-rc.2",
+    "@aelionsdk/core": "1.2.0-rc.3",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1"
   }

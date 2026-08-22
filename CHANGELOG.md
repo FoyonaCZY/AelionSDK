@@ -2,6 +2,19 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。预发布变更必须有记录、可迁移，不允许静默改变公开 API、协议或资源所有权。
 
+## 1.2.0-rc.3 — 2026-08-22
+
+### Fixed
+
+- 预览视觉变换改为像素空间 Y-up：旋转后的正方形保持为正方形，WebGL2 与 WebGPU 的离中心图层位置一致；文字使用独立的 `builtin-text-visual-transform-v1`，图片仍使用 `builtin-visual-transform-v4`。
+- 静图走合成 SampleIndex，不再把静态图送进容器 indexer。
+- Vite 插件为 Worker/Worklet URL 加上 `/* @vite-ignore */`，避免 Vite 7 把公开模块 URL 改写成 `/@fs/@aelion…` 后 404。
+- 事务 `historyGroup` 会传入 command edit options，连续拖动等高频编辑可以合并为同一历史条目。
+
+### Changed
+
+- Aelion Studio 参考剪辑器拆到独立仓库；SDK 工作区、CI 和发布清单不再包含 `apps/editor-demo`。
+
 ## 1.2.0-rc.2 — 2026-08-02
 
 ### Fixed

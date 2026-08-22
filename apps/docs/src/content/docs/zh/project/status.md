@@ -3,8 +3,18 @@ title: 当前状态
 description: 发布身份、已验证范围、补救内容和仍未认证的边界。
 ---
 
-仓库版本：`1.2.0-rc.2`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
+仓库版本：`1.2.0-rc.3`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
 分发；当前实际发布版本以 npm badge 和 registry 为准。
+
+## rc.3 预览运行时
+
+本候选版保留 rc.2 的契约补救，并额外包含：
+
+- 像素空间 Y-up 预览变换，文字使用独立 visual shader；
+- 静图使用合成 SampleIndex，不再走容器 indexer；
+- Vite 7 不得把 Worker/Worklet URL 改写成 `/@fs/@aelion…`；
+- `historyGroup` 传入 command edit options；
+- Aelion Studio 拆到独立嵌套仓库。
 
 ## rc.2 补救
 

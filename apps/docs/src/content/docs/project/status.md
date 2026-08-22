@@ -3,8 +3,18 @@ title: Current status
 description: Release identity, verified scope, remediations and uncertified boundaries.
 ---
 
-Repository version: `1.2.0-rc.2`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
+Repository version: `1.2.0-rc.3`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
 the npm `next` tag. The npm badge and registry are authoritative for what is currently published.
+
+## rc.3 preview runtime
+
+This candidate keeps the rc.2 contract remediations and additionally:
+
+- pixel-space Y-up preview transforms, with a dedicated text visual shader;
+- still images using a synthetic SampleIndex instead of the container indexer;
+- Vite 7 worker/worklet URLs that must not be rewritten to `/@fs/@aelion…`;
+- `historyGroup` forwarded into command edit options;
+- Aelion Studio moved into its own nested repository.
 
 ## rc.2 remediation
 

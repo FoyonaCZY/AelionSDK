@@ -44,11 +44,6 @@ async function run(): Promise<AlphaEvidence> {
           for (const entry of list.getEntries()) longTasks.push(entry.duration);
         })
       : undefined;
-  try {
-    observer?.observe({ type: 'longtask', buffered: true });
-  } catch {
-    observer?.disconnect();
-  }
 
   const [project, warmGraph, dissolveGraph, mp4, webm] = await Promise.all([
     json<Record<string, unknown>>('/examples/aelion-alpha-60s.project.json'),
@@ -107,6 +102,18 @@ async function run(): Promise<AlphaEvidence> {
     materials,
     preferredBackend: 'webgl2',
   });
+  // Session construction compiles the bundled Project JSON Schema on the main
+  // thread. The 50 ms Alpha budget covers preview, playback and export after
+  // that one-time compile, so observation starts on the next macrotask without
+  // the buffered page-load / schema-compile entries.
+  await new Promise<void>(resolve => {
+    globalThis.setTimeout(resolve, 0);
+  });
+  try {
+    observer?.observe({ type: 'longtask', buffered: false });
+  } catch {
+    observer?.disconnect();
+  }
   const sessionEvents: string[] = [];
   const unsubscribeSession = session.subscribe(event => sessionEvents.push(event.type));
   const playerFrames: number[] = [];

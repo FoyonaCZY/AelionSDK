@@ -2,7 +2,7 @@
   "evidenceVersion": "1.0.0",
   "command": "pnpm report:device-matrix",
   "captured": false,
-  "generatedAt": "2026-08-02T07:02:35.087Z",
+  "generatedAt": "2026-08-22T16:03:13.855Z",
   "summary": {
     "emulated": 4,
     "physical": 5,

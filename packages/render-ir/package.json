@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/render-ir",
-  "version": "1.2.0-rc.2",
+  "version": "1.2.0-rc.3",
   "description": "Incremental render intermediate representation compiler for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,8 +40,8 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/core": "1.2.0-rc.2",
-    "@aelionsdk/material-compiler": "1.2.0-rc.2",
-    "@aelionsdk/project-schema": "1.2.0-rc.2"
+    "@aelionsdk/core": "1.2.0-rc.3",
+    "@aelionsdk/material-compiler": "1.2.0-rc.3",
+    "@aelionsdk/project-schema": "1.2.0-rc.3"
   }
 }

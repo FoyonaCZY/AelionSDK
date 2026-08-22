@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/sdk",
-  "version": "1.2.0-rc.2",
+  "version": "1.2.0-rc.3",
   "description": "Browser-first real-time editing, preview and export SDK facade",
   "type": "module",
   "license": "MIT",
@@ -56,15 +56,15 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/audio": "1.2.0-rc.2",
-    "@aelionsdk/capability": "1.2.0-rc.2",
-    "@aelionsdk/core": "1.2.0-rc.2",
-    "@aelionsdk/export": "1.2.0-rc.2",
-    "@aelionsdk/material-compiler": "1.2.0-rc.2",
-    "@aelionsdk/media": "1.2.0-rc.2",
-    "@aelionsdk/project-schema": "1.2.0-rc.2",
-    "@aelionsdk/render-ir": "1.2.0-rc.2",
-    "@aelionsdk/renderer-worker": "1.2.0-rc.2",
-    "@aelionsdk/transaction": "1.2.0-rc.2"
+    "@aelionsdk/audio": "1.2.0-rc.3",
+    "@aelionsdk/capability": "1.2.0-rc.3",
+    "@aelionsdk/core": "1.2.0-rc.3",
+    "@aelionsdk/export": "1.2.0-rc.3",
+    "@aelionsdk/material-compiler": "1.2.0-rc.3",
+    "@aelionsdk/media": "1.2.0-rc.3",
+    "@aelionsdk/project-schema": "1.2.0-rc.3",
+    "@aelionsdk/render-ir": "1.2.0-rc.3",
+    "@aelionsdk/renderer-worker": "1.2.0-rc.3",
+    "@aelionsdk/transaction": "1.2.0-rc.3"
   }
 }

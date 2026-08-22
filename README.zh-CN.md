@@ -46,7 +46,7 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-仓库中的 1.2 Release Candidate 是 `1.2.0-rc.2`。预发布版通过 npm 的 `next` tag 分发，
+仓库中的 1.2 Release Candidate 是 `1.2.0-rc.3`。预发布版通过 npm 的 `next` tag 分发，
 当前实际发布版本以 npm badge 和 registry 为准。Vite 应用安装 SDK、导出入口和运行时资源插件：
 
 ```bash
@@ -57,7 +57,7 @@ npm install --save-dev @aelionsdk/vite-plugin@next vite
 ### rc.2 补救重点
 
 > `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。`1.2.0-rc.2`
-> 已通过 npm `next` dist-tag 发布到全部 13 个包。
+> 完成了契约补救；当前仓库版本是 `1.2.0-rc.3`，发布后通过 npm `next` dist-tag 分发。
 
 - 新 Project 使用独立的 `v1.2.json / 1.2.0` Schema；旧 RC 文档会先隔离快照再兼容迁移。
 - 图像序列已经进入实际预览和导出路径，不再只是 Project 建模辅助函数。

@@ -1,15 +1,15 @@
-# AelionSDK 1.2 remediation release-candidate status
+# AelionSDK 1.2.0-rc.3 release-candidate status
 
-Updated: 2026-08-02 (Asia/Shanghai)
+Updated: 2026-08-22 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `9d61b2124b579812ca413a588c7b1384eebc1e477f728304d8bd45fedbe86006`
+  `b47a58735933e002f00c58524f97f0e383f0ca11adbb400a06fbf3894cca38dd`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: all semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 85/85 and Firefox 70/70, with zero failed,
+- Browser conformance: Chromium 88/88 and Firefox 73/73, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
@@ -41,33 +41,23 @@ freshness window.
   a codec-availability descriptor contract; Project Schema v1.2 with explicit
   migration from the legacy identity; a device-matrix certification scaffold;
   and a long-session operation guide.
+- rc.3 runtime: pixel-space Y-up preview transforms with a dedicated text
+  visual shader; still images on a synthetic SampleIndex; Vite 7 worker URL
+  stability; `historyGroup` forwarded into command edit options; Aelion Studio
+  moved to its own nested repository.
 - Corrected API boundaries: codec fallback is capability selection only and does
   not claim an executable WASM backend; audio energy changes are not described
   as video scene detection; deferred roadmap work remains marked deferred.
 
-## Remediation release outcome
+## Release outcome
 
-The independent blocker review for `1.2.0-rc.2` was approved against this exact
+The independent blocker review for `1.2.0-rc.3` was approved against this exact
 source manifest, gate record, and artifact set with every required check true
-and no open blocker. The release workflow then published all 13 packages with
-provenance, completed registry install/bundle smoke tests, and created Git tag
-and GitHub prerelease `v1.2.0-rc.2`.
+and no open blocker. Tag `v1.2.0-rc.3` publishes all 13 packages with
+provenance to the npm `next` dist-tag and creates a GitHub prerelease.
 
-Versions `1.1.0-rc.1` and `1.2.0-rc.1` are immutable npm artifacts and will not
-be overwritten or unpublished. They are superseded because their delivered
-behavior and documentation did not fully match the advertised contracts.
-
-`1.2.0-rc.2` is visible for all 13 `@aelionsdk/*` packages. The completed
-release process:
-
-- kept prereleases on the `next` dist-tag, never `latest`;
-- created Git tag `v1.2.0-rc.2` and a GitHub prerelease with provenance; and
-- passed registry smoke checks against the exact published tarballs.
-
-Consumers should not newly adopt either superseded RC. Their npm deprecation
-metadata remains an administrative follow-up because npm requires a granular
-write token with 2FA bypass for `npm deprecate`; this does not affect the
-published replacement or its `next` dist-tag.
+`1.2.0-rc.2` remains an immutable npm artifact. `1.1.0-rc.1` and `1.2.0-rc.1`
+are superseded and should not be newly adopted.
 
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the
