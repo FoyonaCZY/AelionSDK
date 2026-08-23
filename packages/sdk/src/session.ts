@@ -168,6 +168,17 @@ function frameHasAlpha(frame: VideoFrame): boolean {
   return frame.format === 'I420A' || frame.format === 'RGBA' || frame.format === 'BGRA';
 }
 
+function sameDisplayAspect(
+  widthA: number,
+  heightA: number,
+  widthB: number,
+  heightB: number,
+): boolean {
+  return (
+    widthA > 0 && heightA > 0 && widthB > 0 && heightB > 0 && widthA * heightB === heightA * widthB
+  );
+}
+
 const DEFAULT_MAX_DIAGNOSTICS = 256;
 
 interface MutableOperationTiming {
@@ -1019,10 +1030,10 @@ export class AelionSession implements AelionSessionApi {
    * Decodes the frame for a Project that is one untransformed opaque clip, so
    * compositing can be skipped entirely.
    *
-   * Returns the source only when it is opaque *and* already the frame's exact
-   * size. The size check is what makes every `fit` mode safe to bypass, and it
-   * closes a hole in the previous `fit === 'fill'` test, which would hand a
-   * mismatched source straight to the encoder at the wrong resolution.
+   * Returns an opaque frame already at the composition size. A source that
+   * already matches is used as-is. A same-aspect source is scaled to the frame
+   * so `fit` stays a no-op without sending the encoder the wrong resolution —
+   * the hole the previous `fit === 'fill'` test left open.
    *
    * Ownership transfers to the caller; `undefined` means nothing was retained.
    */
@@ -1045,12 +1056,33 @@ export class AelionSession implements AelionSessionApi {
         maxDimension: Math.max(ir.width, ir.height),
       },
     );
-    if (
-      !frameHasAlpha(source) &&
-      source.displayWidth === ir.width &&
-      source.displayHeight === ir.height
-    ) {
+    if (frameHasAlpha(source)) {
+      source.close();
+      return undefined;
+    }
+    if (source.displayWidth === ir.width && source.displayHeight === ir.height) {
       return source;
+    }
+    if (sameDisplayAspect(source.displayWidth, source.displayHeight, ir.width, ir.height)) {
+      const duration = source.duration;
+      const timestamp = source.timestamp;
+      try {
+        const bitmap = await createImageBitmap(source, {
+          resizeWidth: ir.width,
+          resizeHeight: ir.height,
+          resizeQuality: purpose === 'export' ? 'high' : 'medium',
+        });
+        try {
+          return new VideoFrame(bitmap, {
+            timestamp,
+            ...(duration === null ? {} : { duration }),
+          });
+        } finally {
+          bitmap.close();
+        }
+      } finally {
+        source.close();
+      }
     }
     source.close();
     return undefined;

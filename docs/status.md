@@ -1,15 +1,15 @@
-# AelionSDK 1.2.0-rc.4 release-candidate status
+# AelionSDK 1.2.0-rc.5 release-candidate status
 
 Updated: 2026-08-23 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `80057004f0ede145d88250ca4d4ff9f4f0b2dbb795310e09a5f2d78cfcbf9dea`
+  `dda0f3020672aea03b567866422713056144d75b1b030a5e79f6398ede0e6b79`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: all semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 90/90 and Firefox 75/75, with zero failed,
+- Browser conformance: Chromium 91/91 and Firefox 75/75, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
@@ -49,19 +49,25 @@ freshness window.
   `transient` media requests; interactive commits that admit caller values at
   the transaction boundary instead of re-cloning the Project; playback that
   follows the clock and still rejects a superseded or disposed seek.
+- rc.5 compositor path: pooled WebGL2 render targets and one context across
+  render-scale changes; preview reuses the export compositor bypass when the
+  decoded frame already matches the canvas, or shares its aspect ratio and can
+  be scaled; preview `maxDimension` downscale at the provider boundary; shared
+  LRU raster cache for text, generators and shapes; 4K30 real-media evidence
+  excludes one warmup export so the 1.5× floor measures a primed encoder.
 - Corrected API boundaries: codec fallback is capability selection only and does
   not claim an executable WASM backend; audio energy changes are not described
   as video scene detection; deferred roadmap work remains marked deferred.
 
 ## Release outcome
 
-The independent blocker review for `1.2.0-rc.4` was approved against this exact
+The independent blocker review for `1.2.0-rc.5` was approved against this exact
 source manifest, gate record, and artifact set with every required check true
-and no open blocker. Tag `v1.2.0-rc.4` publishes all 13 packages with
+and no open blocker. Tag `v1.2.0-rc.5` publishes all 13 packages with
 provenance to the npm `next` dist-tag and creates a GitHub prerelease.
 
-`1.2.0-rc.3` and `1.2.0-rc.2` remain immutable npm artifacts. `1.1.0-rc.1` and
-`1.2.0-rc.1` are superseded and should not be newly adopted.
+`1.2.0-rc.4`, `1.2.0-rc.3` and `1.2.0-rc.2` remain immutable npm artifacts.
+`1.1.0-rc.1` and `1.2.0-rc.1` are superseded and should not be newly adopted.
 
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the

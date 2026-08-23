@@ -3,8 +3,17 @@ title: 当前状态
 description: 发布身份、已验证范围、补救内容和仍未认证的边界。
 ---
 
-仓库版本：`1.2.0-rc.4`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
+仓库版本：`1.2.0-rc.5`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
 分发；当前实际发布版本以 npm badge 和 registry 为准。
+
+## rc.5 合成路径
+
+本候选版保留 rc.2–rc.4 的工作，并额外包含：
+
+- WebGL2 渲染目标池化，画质缩放共用一个 context；
+- 解码尺寸已等于画幅时预览走 compositor bypass；
+- 预览 `maxDimension` 在 provider 边界缩小（导出仍是全分辨率）；
+- 文字、生成器和形状共用 LRU 栅格缓存。
 
 ## rc.4 交互预览
 

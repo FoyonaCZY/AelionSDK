@@ -3,8 +3,18 @@ title: Current status
 description: Release identity, verified scope, remediations and uncertified boundaries.
 ---
 
-Repository version: `1.2.0-rc.4`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
+Repository version: `1.2.0-rc.5`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
 the npm `next` tag. The npm badge and registry are authoritative for what is currently published.
+
+## rc.5 compositor path
+
+This candidate keeps the rc.2–rc.4 work and additionally:
+
+- pooled WebGL2 render targets and one context across render-scale changes;
+- preview compositor bypass when the decoded source already matches the frame;
+- preview `maxDimension` downscale at the provider boundary (export stays full
+  resolution);
+- shared LRU raster cache for text, generators and shapes.
 
 ## rc.4 interactive preview
 

@@ -2,6 +2,25 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。预发布变更必须有记录、可迁移，不允许静默改变公开 API、协议或资源所有权。
 
+## 1.2.0-rc.5 — 2026-08-23
+
+### Changed
+
+- WebGL2 合成改为按 runtime 复用渲染目标和输入槽，稳态帧不再每帧分配/释放 GPU 显存；画质缩放共用一个 context，不再按分辨率重建并重编译 shader。
+- 预览在全分辨率且解码尺寸等于画幅时走与导出相同的 compositor bypass；始终可 bypass 的工程不会启动合成 Worker。
+- bypass 条件改为「解码后尺寸等于画幅，或宽高比相同并可缩放到画幅」（任意 `fit`），不再把 `fill` 的小尺寸片源直接送给编码器。
+- 预览 `maxDimension` 在 provider 边界按目标表面缩小上传；导出仍保留全部源像素。
+
+### Fixed
+
+- 从 WebGL2/WebGPU 合成路径去掉每帧 `gl.finish()` / 等效硬同步；`gpuCompletionUs` 报告提交时间。
+- 生成器和形状与文字共用 LRU 栅格缓存，不再每帧重绘静态内容。
+
+### Performance
+
+- 1080p 三层叠片段：稳态中位约 6.09 ms → 3.87 ms，最差帧约 10.72 ms → 4.94 ms；画质切换中位约 5.84 ms → 3.81 ms。
+- 4K30 真媒体导出证据排除一次 warmup，按 primed encoder 测量 1.5× 实时下限。
+
 ## 1.2.0-rc.4 — 2026-08-23
 
 ### Added

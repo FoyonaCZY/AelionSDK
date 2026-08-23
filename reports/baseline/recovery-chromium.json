@@ -1,7 +1,7 @@
 {
   "evidenceVersion": "1.0.0",
   "command": "corepack pnpm report:recovery",
-  "generatedAt": "2026-08-22T22:24:09.623Z",
+  "generatedAt": "2026-08-23T02:18:04.282Z",
   "fixture": "Aelion deterministic segmented A/V",
   "durationUs": 2000000,
   "sampleRate": 48000,
@@ -408,7 +408,7 @@
         "firstRenderedFrame": 0,
         "rerenderedCommittedFrames": 60,
         "bytes": 46198,
-        "artifactSha256": "9f21d6729f3055382894b83f90de53b1e91ca50dfc1bb476b56ea0000cf7e1b1",
+        "artifactSha256": "7ca56c61ec80d0637ec35ca66869a7337811280eba14ff1f03997f840f807934",
         "readback": {
           "videoFrames": 60,
           "videoFrameMd5": [
@@ -495,7 +495,7 @@
           "firstRenderedFrame": 18,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "9f21d6729f3055382894b83f90de53b1e91ca50dfc1bb476b56ea0000cf7e1b1",
+          "artifactSha256": "f2c6050d1a51eebfbfbec5da7e218ad505301785e881572db5bc36d1df8792e0",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [
@@ -581,7 +581,7 @@
           "firstRenderedFrame": 30,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "9f21d6729f3055382894b83f90de53b1e91ca50dfc1bb476b56ea0000cf7e1b1",
+          "artifactSha256": "f2c6050d1a51eebfbfbec5da7e218ad505301785e881572db5bc36d1df8792e0",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [
@@ -667,7 +667,7 @@
           "firstRenderedFrame": 54,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "a8e6b7905749452d887208f0032be471d96c3254cf70fb6cfa5b5fe668ce4f21",
+          "artifactSha256": "f2c6050d1a51eebfbfbec5da7e218ad505301785e881572db5bc36d1df8792e0",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [

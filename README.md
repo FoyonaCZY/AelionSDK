@@ -21,7 +21,7 @@ npm install @aelionsdk/sdk@next @aelionsdk/export@next
 npm install --save-dev @aelionsdk/vite-plugin@next vite
 ```
 
-Repository version: `1.2.0-rc.4`. The npm badge shows the currently published `next` version. Pin
+Repository version: `1.2.0-rc.5`. The npm badge shows the currently published `next` version. Pin
 an exact prerelease after validating it on your target devices.
 
 > **Remediation notice:** `1.1.0-rc.1` and `1.2.0-rc.1` are superseded. Do not newly adopt either
@@ -29,11 +29,12 @@ an exact prerelease after validating it on your target devices.
 > subtitle, Bézier, streaming-proxy, audio-analysis and codec-fallback contract issues.
 > `1.2.0-rc.3` kept those remediations and fixed preview transforms, still-image indexing, Vite 7
 > worker URLs, and `historyGroup` forwarding. `1.2.0-rc.4` adds faster interactive commits, text
-> background plates, transient thumbnail decodes, and steadier playback/seek. Prereleases publish
-> to npm under the `next` dist-tag.
+> background plates, transient thumbnail decodes, and steadier playback/seek. `1.2.0-rc.5` pools
+> WebGL2 compositor resources, reuses the export bypass on preview, and honours preview
+> `maxDimension` at the provider boundary. Prereleases publish to npm under the `next` dist-tag.
 
-The 1.2.0-rc.4 gate passed all 21 serial commands with unchanged source manifest
-`80057004f0ede145d88250ca4d4ff9f4f0b2dbb795310e09a5f2d78cfcbf9dea`. The independently reviewed,
+The 1.2.0-rc.5 gate passed all 21 serial commands with unchanged source manifest
+`dda0f3020672aea03b567866422713056144d75b1b030a5e79f6398ede0e6b79`. The independently reviewed,
 exact-bound evidence record in `reports/baseline` was approved before publication.
 
 ## What it provides
