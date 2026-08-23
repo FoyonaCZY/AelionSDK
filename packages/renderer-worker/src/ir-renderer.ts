@@ -64,7 +64,18 @@ export interface RenderIrFrameOptions {
 }
 
 export interface RenderIrFrameResult {
-  readonly bitmap: ImageBitmap;
+  /**
+   * The composed frame, owned by the caller and closed by it.
+   *
+   * Composition produces an `ImageBitmap`. The preview bypass, which skips
+   * composition when the decoded source already matches the frame, hands back
+   * the decoded `VideoFrame` instead: every consumer either closes it, draws it
+   * through `drawImage`, or wraps it in a `VideoFrame`, and all three accept
+   * both. Converting one to the other would reintroduce the per-frame full-frame
+   * copy the bypass exists to avoid. Read `width`/`height` from this result
+   * rather than off the image -- the two types spell those differently.
+   */
+  readonly bitmap: ImageBitmap | VideoFrame;
   readonly backend: 'webgpu' | 'webgl2';
   readonly diagnostics?: readonly RendererWorkerDiagnostic[];
   /** Measured Worker and backend-completion time for this frame. */
@@ -191,7 +202,7 @@ function requiredProgram(material: IrMaterialInstance, mode: RenderMode) {
 }
 
 /** Converts an owned compositor result and releases the source on every path. */
-function takeBitmapFrame(bitmap: ImageBitmap, timestampUs: number): VideoFrame {
+function takeBitmapFrame(bitmap: ImageBitmap | VideoFrame, timestampUs: number): VideoFrame {
   try {
     return new VideoFrame(bitmap, { timestamp: timestampUs });
   } finally {

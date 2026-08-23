@@ -28,7 +28,7 @@ baseline in the same change.
     "dist/persistence.d.ts": "3b0a5b79d3bc55004857a77f1087d6cdd794d24eadfa2932109de1c752b8a500",
     "dist/player.d.ts": "d7627e6d681fd05e5b268b1be9021619af3020f121a540d0c0b9e04fefdb949e",
     "dist/preview-controller.d.ts": "06548a0e2b8e4f01928272675ef3d30ac011ac1cbd7861b998ec2449311c4c83",
-    "dist/production-media-provider.d.ts": "f87a2b3118b5ceaee396840d8327edcec69c17887a25fc80f95134a8e3ce5dee",
+    "dist/production-media-provider.d.ts": "8e67c508f9f9c9f0aef69d84d65b9f2a61a9ced82e3a86a752a144d80137554a",
     "dist/project-builder.d.ts": "93476d7a5c2f21c2437bd466b66777102e619142f5b135b01621fdcc586de30b",
     "dist/proxy-automation.d.ts": "990fb956823340118e3ab5267d6a6fc96f37032805e0850eeebbc7a35c49f97d",
     "dist/rate-envelope.d.ts": "f34a2dd4475a643975e22a91c04ce596f7c005cb79d1e589b5fdc3500ba2a823",

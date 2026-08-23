@@ -143,8 +143,8 @@ async function run(): Promise<AlphaEvidence> {
     await session.player.pause();
     const preview = await session.preview.renderFrame({ timeUs: 30_000_000 });
     const previewSummary = {
-      width: preview.bitmap.width,
-      height: preview.bitmap.height,
+      width: preview.width,
+      height: preview.height,
       backend: preview.backend,
       materialIds: preview.materialIds,
     };

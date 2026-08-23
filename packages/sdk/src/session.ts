@@ -526,11 +526,8 @@ export class AelionSession implements AelionSessionApi {
           options.signal,
         );
         if (direct !== undefined) {
-          try {
-            return await this.#directPreviewResult(direct, options.signal);
-          } finally {
-            direct.close();
-          }
+          // Ownership moves into the result; the consumer closes it.
+          return this.#directPreviewResult(direct, options.signal);
         }
       }
       const result = await this.#requireRenderer().render({
@@ -1096,17 +1093,16 @@ export class AelionSession implements AelionSessionApi {
    * stay absent. The renderer is not instantiated for this path, so a Project
    * that only ever bypasses never starts a compositor Worker.
    */
-  async #directPreviewResult(
+  #directPreviewResult(
     frame: VideoFrame,
     signal?: AbortSignal,
-  ): Promise<import('@aelionsdk/renderer-worker').RenderIrFrameResult> {
-    const bitmap = await createImageBitmap(frame);
+  ): import('@aelionsdk/renderer-worker').RenderIrFrameResult {
     if (signal?.aborted === true) {
-      bitmap.close();
+      frame.close();
       throw new DOMException('Preview frame was aborted', 'AbortError');
     }
     return {
-      bitmap,
+      bitmap: frame,
       backend:
         this.#renderer?.snapshot().adaptiveBackend.selected ??
         (this.#options.preferredBackend === 'webgpu' ? 'webgpu' : 'webgl2'),

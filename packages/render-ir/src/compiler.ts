@@ -1,4 +1,9 @@
-import { canonicalStringify, type AelionProject, type ItemEntity } from '@aelionsdk/project-schema';
+import {
+  canonicalStringify,
+  type AelionProject,
+  type ItemEntity,
+  type TrackEntity,
+} from '@aelionsdk/project-schema';
 import type { JsonObject } from '@aelionsdk/core';
 
 import type {
@@ -18,13 +23,45 @@ import type {
   RenderCompileOptions,
 } from './types.js';
 
+/**
+ * Objects `deepFreezePlain` has already frozen, along with everything beneath
+ * them.
+ *
+ * An incremental compile reuses most of the previous IR verbatim, and those
+ * objects were deep-frozen by the compile that produced them. Re-walking them
+ * dominated incremental compile time -- roughly three quarters of a no-op
+ * compile at a thousand clips. Membership means the whole subtree is already
+ * frozen, so the walk can stop at the first reused node.
+ *
+ * Entries are held weakly, so a released IR is still collectable.
+ */
+const deepFrozen = new WeakSet<object>();
+
+/** Item types the Render IR can compile, as a set so the check is one lookup. */
+const COMPILABLE_ITEM_TYPES: ReadonlySet<string> = new Set([
+  'video',
+  'image',
+  'audio',
+  'text',
+  'caption',
+  'nested-sequence',
+  'generator',
+  'shape',
+  'material-content',
+  'adjustment',
+]);
+
 function deepFreezePlain<T>(value: T, seen = new WeakSet<object>()): Readonly<T> {
   if (value === null || typeof value !== 'object') return value;
+  if (deepFrozen.has(value)) return value;
   if (seen.has(value)) return value;
   const prototype: unknown = Object.getPrototypeOf(value);
   if (!Array.isArray(value) && prototype !== Object.prototype && prototype !== null) return value;
   seen.add(value);
   for (const entry of Object.values(value)) deepFreezePlain(entry, seen);
+  // Recorded only after the whole subtree is frozen, so membership never
+  // promises more than has actually been done.
+  deepFrozen.add(value);
   return Object.freeze(value);
 }
 
@@ -473,6 +510,16 @@ function contentDuration(project: AelionProject, trackIds: readonly string[]): n
 export class IncrementalRenderCompiler {
   #previous: RenderIr | undefined;
   #compiling = false;
+  /**
+   * Track fingerprints keyed by the source track object.
+   *
+   * A track fingerprint is `canonicalStringify(track)`, and a track carries every
+   * item id on it, so recomputing it for a thousand-clip track dominated the cost
+   * of an incremental compile even when nothing on that track changed. Commits
+   * share structure: editing one item leaves every untouched track at the same
+   * object identity, so identity is a sound key and an edited track simply misses.
+   */
+  readonly #trackFingerprints = new WeakMap<object, string>();
 
   /**
    * Creates an isolated compiler that reuses this compiler's immutable baseline.
@@ -483,6 +530,14 @@ export class IncrementalRenderCompiler {
     const fork = new IncrementalRenderCompiler();
     fork.#previous = this.#previous;
     return fork;
+  }
+
+  #trackFingerprint(track: TrackEntity): string {
+    const cached = this.#trackFingerprints.get(track);
+    if (cached !== undefined) return cached;
+    const fingerprint = canonicalStringify(track);
+    this.#trackFingerprints.set(track, fingerprint);
+    return fingerprint;
   }
 
   /** Releases the incremental baseline retained for clip/transition reuse. */
@@ -542,22 +597,16 @@ export class IncrementalRenderCompiler {
       const tracks: IrTrack[] = sequence.trackIds.map(trackId => {
         const track = project.tracks[trackId];
         if (track === undefined) throw new RangeError(`Track ${trackId} does not exist`);
-        const clips = track.itemIds.flatMap(itemId => {
+        // A plain loop rather than `flatMap`: the reuse path runs once per item on
+        // every commit, and wrapping each result in a throwaway single-element array
+        // was the largest remaining cost of an incremental compile.
+        const clips: IrClip[] = [];
+        for (const itemId of track.itemIds) {
           const item = project.items[itemId];
           if (item === undefined) throw new RangeError(`Item ${itemId} does not exist`);
-          if (
-            item.type !== 'video' &&
-            item.type !== 'image' &&
-            item.type !== 'audio' &&
-            item.type !== 'text' &&
-            item.type !== 'caption' &&
-            item.type !== 'nested-sequence' &&
-            item.type !== 'generator' &&
-            item.type !== 'shape' &&
-            item.type !== 'material-content' &&
-            item.type !== 'adjustment'
-          )
+          if (!COMPILABLE_ITEM_TYPES.has(item.type)) {
             throw new TypeError(`Render IR cannot compile item type ${item.type}`);
+          }
           const previous = previousClips.get(itemId);
           if (
             canReuseByEntity &&
@@ -565,16 +614,18 @@ export class IncrementalRenderCompiler {
             !previous.dependencyEntityIds.some(id => affectedEntityIds.has(id))
           ) {
             reusedClips += 1;
-            return [previous];
+            clips.push(previous);
+            continue;
           }
           const candidate = compileClip(item, materials, project.assets);
           if (previous?.fingerprint === candidate.fingerprint) {
             reusedClips += 1;
-            return [previous];
+            clips.push(previous);
+            continue;
           }
           compiledClips += 1;
-          return [candidate];
-        });
+          clips.push(candidate);
+        }
         return {
           id: track.id,
           kind: track.kind,
@@ -588,7 +639,7 @@ export class IncrementalRenderCompiler {
             : {}),
           clips,
           materialInstanceIds: [...track.materialInstanceIds],
-          fingerprint: canonicalStringify(track),
+          fingerprint: this.#trackFingerprint(track),
         };
       });
 

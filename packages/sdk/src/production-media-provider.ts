@@ -793,6 +793,22 @@ export class ProductionMediaProvider implements AelionMediaProvider {
   ): Promise<PcmSourceBlock> {
     this.#assertActive();
     const selected = this.#select(assetId, { purpose: 'export' });
+    // A window hit is a view into PCM this provider already holds. Admission and
+    // the operation queue exist to bound concurrent decoding, and this path
+    // decodes nothing, so charging it a decoder slot only lets a memcpy wait
+    // behind real video decode admission -- fifty times a second during
+    // playback, which is exactly when the audio ring can least afford to wait.
+    const cached = this.#cachedAudioWindow(
+      assetId,
+      selected.representation,
+      streamIndex,
+      startUs,
+      durationUs,
+    );
+    if (cached !== undefined) {
+      throwIfAborted(signal, 'production media audio slice');
+      return cached;
+    }
     return this.#run(signal, async operationSignal => {
       const lease = await this.#governor.acquire(
         {
@@ -1109,6 +1125,27 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       resident.session.dispose();
       this.#decodeSessions.delete(key);
     }
+  }
+
+  /**
+   * Returns a slice of an already-decoded window, or `undefined` when the range
+   * is not covered. Synchronous and side-effect free apart from LRU bookkeeping,
+   * so it is safe to consult before admission.
+   */
+  #cachedAudioWindow(
+    assetId: string,
+    representation: RegisteredRepresentation,
+    streamIndex: number,
+    startUs: number,
+    durationUs: number,
+  ): PcmSourceBlock | undefined {
+    const key = this.#decodeSessionKey(assetId, representation.id, streamIndex);
+    const resident = this.#audioSessions.get(key);
+    const window = resident?.window;
+    if (resident === undefined || window === undefined) return undefined;
+    if (!audioWindowCovers(window, startUs, durationUs)) return undefined;
+    resident.access = ++this.#clock;
+    return sliceAudioPcmBlock(window, startUs, durationUs);
   }
 
   #acquireAudioSession(
