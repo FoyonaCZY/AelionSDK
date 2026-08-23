@@ -23,6 +23,9 @@
 
 ### Fixed
 
+- 暂停只断开 worklet 输出，不再丢弃环里的缓冲。暂停不移动播放位置，那些帧仍是接下来要播的，
+  丢弃会连带清零对外上报的 play/underrun 计数并让每次恢复都重新填满 2 秒。暂停期间的编辑改由
+  `AelionPlayer.invalidate` 作废陈旧帧，且不向已断开的图回填。
 - 补齐 `AudioPcmDecodeSessionOptions` 与 `createAudioPcmDecodeSessionFromReader` 的 TSDoc，生成的
   API 文档不再缺少这两个声明的说明。
 - 重新生成 `@aelionsdk/sdk` 公开 API 快照。`ProductionMediaProviderSnapshot` 新增的
