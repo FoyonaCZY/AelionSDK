@@ -23,6 +23,8 @@
 
 ### Fixed
 
+- 补齐 `AudioPcmDecodeSessionOptions` 与 `createAudioPcmDecodeSessionFromReader` 的 TSDoc，生成的
+  API 文档不再缺少这两个声明的说明。
 - 重新生成 `@aelionsdk/sdk` 公开 API 快照。`ProductionMediaProviderSnapshot` 新增的
   `audioSessions` / `activeAudioSessions` 字段此前未同步到快照基线。
 
