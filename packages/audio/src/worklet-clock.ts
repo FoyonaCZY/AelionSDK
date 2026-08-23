@@ -63,6 +63,7 @@ export class AudioWorkletClock implements Disposable {
   #initializeTask: Promise<void> | undefined;
   #disposeTask: Promise<void> | undefined;
   #ownsContext: boolean;
+  #outputConnected = false;
   #disposed = false;
   #lifecycleGeneration = 0;
   #lastReport?: AudioClockReport;
@@ -158,6 +159,7 @@ export class AudioWorkletClock implements Disposable {
       // module-loading latency appears as permanent A/V drift.
       node.connect(this.context.destination);
       connected = true;
+      this.#outputConnected = true;
       this.#throwIfInitializationStale(generation);
       this.#contextOriginTime = this.context.currentTime;
       this.#node = node;
@@ -170,20 +172,36 @@ export class AudioWorkletClock implements Disposable {
 
   public async start(): Promise<void> {
     await this.initialize();
+    this.#connectOutput();
     await withTimeout(this.context.resume(), 5_000, 'AudioContext resume');
     this.#emit('started');
   }
 
   public async pause(): Promise<void> {
+    this.#disconnectOutput();
     if (this.context.state === 'running') await this.context.suspend();
     this.#emit('paused');
   }
 
   public async resume(): Promise<void> {
+    this.#connectOutput();
     if (this.context.state !== 'running') {
       await withTimeout(this.context.resume(), 5_000, 'AudioContext resume');
     }
     this.#emit('resumed');
+  }
+
+  #connectOutput(): void {
+    if (this.#node === undefined || this.#outputConnected) return;
+    this.#node.connect(this.context.destination);
+    this.#outputConnected = true;
+  }
+
+  #disconnectOutput(): void {
+    if (this.#node === undefined || !this.#outputConnected) return;
+    this.#node.disconnect();
+    this.#outputConnected = false;
+    this.ring.flush();
   }
 
   public subscribe(listener: (event: AudioClockEvent) => void): () => void {
@@ -222,6 +240,7 @@ export class AudioWorkletClock implements Disposable {
     this.context.removeEventListener('statechange', this.#onStateChange);
     this.ring.close();
     this.#node?.disconnect();
+    this.#outputConnected = false;
     this.#node?.port.close();
     this.#node = undefined;
     if (this.#ownsContext && this.context.state !== 'closed') await this.context.close();

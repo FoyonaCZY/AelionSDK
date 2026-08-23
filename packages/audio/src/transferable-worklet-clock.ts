@@ -48,6 +48,7 @@ export class TransferableAudioWorkletClock implements Disposable {
   public readonly queue: TransferablePcmQueue;
   readonly #ownsContext: boolean;
   #node: AudioWorkletNode | undefined;
+  #outputConnected = false;
   #initializeTask: Promise<void> | undefined;
   #disposeTask: Promise<void> | undefined;
   #disposed = false;
@@ -135,6 +136,7 @@ export class TransferableAudioWorkletClock implements Disposable {
       node.port.start();
       node.connect(this.context.destination);
       connected = true;
+      this.#outputConnected = true;
       this.#throwIfInitializationStale(generation);
       this.#contextOriginTime = this.context.currentTime;
       this.#node = node;
@@ -147,6 +149,7 @@ export class TransferableAudioWorkletClock implements Disposable {
 
   public async start(): Promise<void> {
     await this.initialize();
+    this.#connectOutput();
     this.#node?.port.postMessage({ type: 'start', generation: this.#generation });
     await this.context.resume();
   }
@@ -170,11 +173,26 @@ export class TransferableAudioWorkletClock implements Disposable {
   }
 
   public async pause(): Promise<void> {
+    this.#disconnectOutput();
     if (this.context.state === 'running') await this.context.suspend();
   }
 
   public async resume(): Promise<void> {
+    this.#connectOutput();
     if (this.context.state !== 'running') await this.context.resume();
+  }
+
+  #connectOutput(): void {
+    if (this.#node === undefined || this.#outputConnected) return;
+    this.#node.connect(this.context.destination);
+    this.#outputConnected = true;
+  }
+
+  #disconnectOutput(): void {
+    if (this.#node === undefined || !this.#outputConnected) return;
+    this.#node.disconnect();
+    this.#outputConnected = false;
+    this.queue.flush();
   }
 
   public seek(timeUs: number): number {
@@ -212,6 +230,7 @@ export class TransferableAudioWorkletClock implements Disposable {
     this.queue.close();
     this.#node?.port.postMessage({ type: 'close' });
     this.#node?.disconnect();
+    this.#outputConnected = false;
     this.#node?.port.close();
     this.#node = undefined;
     if (this.#ownsContext && this.context.state !== 'closed') await this.context.close();

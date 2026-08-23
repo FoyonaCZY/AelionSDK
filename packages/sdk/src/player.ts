@@ -144,6 +144,10 @@ export class AelionPlayer implements AelionPlayerApi {
   public async pause(): Promise<void> {
     if (this.#state === 'disposed') throw new ReferenceError('AelionPlayer is disposed');
     const generation = this.#generation;
+    if (this.#fillHandle !== undefined) {
+      globalThis.clearInterval(this.#fillHandle);
+      this.#fillHandle = undefined;
+    }
     this.#scheduler?.pause();
     if (this.#clock !== undefined) await this.#clock.pause();
     if (this.#disposeTask !== undefined || generation !== this.#generation) return;
@@ -270,6 +274,7 @@ export class AelionPlayer implements AelionPlayerApi {
 
   public invalidate(changeSet: ChangeSet): void {
     void changeSet;
+    if (this.#state !== 'playing') return;
     const ir = this.#session.requireIr();
     const timeUs = Math.min(Math.max(0, this.currentTimeUs), ir.durationUs - 1);
     this.#advanceGeneration();
