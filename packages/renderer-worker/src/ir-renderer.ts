@@ -950,8 +950,16 @@ function canvasFont(style: PortableTextStyle): string {
   return `${style.fontStyle} ${style.fontWeight.toString()} ${style.fontSizePx.toString()}px ${families}`;
 }
 
-const TEXT_RASTER_CACHE_LIMIT = 8;
-const textRasterCache: { key: string; frame: VideoFrame }[] = [];
+/**
+ * Rasterized 2D surfaces, keyed by the content that produced them.
+ *
+ * Text, generators and shapes are all pure functions of their clip data and the
+ * output size — `timestampUs` only stamps the returned frame and never selects
+ * an animated value — so an unchanged clip repaints to identical pixels on
+ * every frame. The cache owns its entry; callers receive a clone to close.
+ */
+const RASTER_CACHE_LIMIT = 16;
+const rasterCache: { key: string; frame: VideoFrame }[] = [];
 
 function textRasterKey(
   clip: IrTextClip,
@@ -961,6 +969,7 @@ function textRasterKey(
   outputHeight: number,
 ): string {
   return JSON.stringify({
+    kind: 'text',
     box: clip.box,
     overflow: clip.overflow,
     writingMode: clip.writingMode,
@@ -972,26 +981,47 @@ function textRasterKey(
   });
 }
 
-function cachedTextRaster(key: string): VideoFrame | undefined {
-  const index = textRasterCache.findIndex(entry => entry.key === key);
+function generatorRasterKey(generator: object, width: number, height: number): string {
+  return JSON.stringify({ kind: 'generator', generator, width, height });
+}
+
+function shapeRasterKey(
+  clip: IrShapeClip,
+  projectWidth: number,
+  projectHeight: number,
+  outputWidth: number,
+  outputHeight: number,
+): string {
+  return JSON.stringify({
+    kind: 'shape',
+    shape: clip.shape,
+    projectWidth,
+    projectHeight,
+    outputWidth,
+    outputHeight,
+  });
+}
+
+function cachedRaster(key: string): VideoFrame | undefined {
+  const index = rasterCache.findIndex(entry => entry.key === key);
   if (index < 0) return undefined;
-  const [entry] = textRasterCache.splice(index, 1);
+  const [entry] = rasterCache.splice(index, 1);
   if (entry === undefined) return undefined;
-  textRasterCache.push(entry);
+  rasterCache.push(entry);
   return entry.frame;
 }
 
-function rememberTextRaster(key: string, frame: VideoFrame): void {
-  textRasterCache.push({ key, frame });
-  while (textRasterCache.length > TEXT_RASTER_CACHE_LIMIT) {
-    const evicted = textRasterCache.shift();
+function rememberRaster(key: string, frame: VideoFrame): void {
+  rasterCache.push({ key, frame });
+  while (rasterCache.length > RASTER_CACHE_LIMIT) {
+    const evicted = rasterCache.shift();
     evicted?.frame.close();
   }
 }
 
-function clearTextRasterCache(): void {
-  for (const entry of textRasterCache) entry.frame.close();
-  textRasterCache.length = 0;
+function clearRasterCache(): void {
+  for (const entry of rasterCache) entry.frame.close();
+  rasterCache.length = 0;
 }
 
 function paintTextClip(
@@ -1103,7 +1133,7 @@ function rasterTextFrame(
   placement: ReturnType<typeof textRasterPlacement>,
 ): VideoFrame {
   const key = textRasterKey(clip, projectWidth, projectHeight, outputWidth, outputHeight);
-  const cached = cachedTextRaster(key);
+  const cached = cachedRaster(key);
   if (cached !== undefined) return cached.clone();
   const canvas = new OffscreenCanvas(placement.canvasWidth, placement.canvasHeight);
   paintTextClip(
@@ -1115,7 +1145,7 @@ function rasterTextFrame(
     placement.scaleY,
   );
   const frame = new VideoFrame(canvas, { timestamp: timestampUs });
-  rememberTextRaster(key, frame);
+  rememberRaster(key, frame);
   return frame.clone();
 }
 
@@ -1238,6 +1268,9 @@ function rasterGeneratorFrame(
   height: number,
   timestampUs: number,
 ): VideoFrame {
+  const key = generatorRasterKey(generator, width, height);
+  const cached = cachedRaster(key);
+  if (cached !== undefined) return cached.clone();
   const canvas = new OffscreenCanvas(width, height);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('GENERATOR_CANVAS_UNAVAILABLE');
@@ -1264,7 +1297,9 @@ function rasterGeneratorFrame(
     context.fillStyle = canvasColor(colors[0], 'rgba(0, 0, 0, 0)');
   }
   context.fillRect(0, 0, width, height);
-  return new VideoFrame(canvas, { timestamp: timestampUs });
+  const frame = new VideoFrame(canvas, { timestamp: timestampUs });
+  rememberRaster(key, frame);
+  return frame.clone();
 }
 
 function roundedRectanglePath(
@@ -1295,6 +1330,9 @@ function rasterShapeFrame(
   outputHeight: number,
   timestampUs: number,
 ): VideoFrame {
+  const key = shapeRasterKey(clip, projectWidth, projectHeight, outputWidth, outputHeight);
+  const cached = cachedRaster(key);
+  if (cached !== undefined) return cached.clone();
   const canvas = new OffscreenCanvas(outputWidth, outputHeight);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('SHAPE_CANVAS_UNAVAILABLE');
@@ -1340,7 +1378,9 @@ function rasterShapeFrame(
     context.stroke();
   }
   context.restore();
-  return new VideoFrame(canvas, { timestamp: timestampUs });
+  const frame = new VideoFrame(canvas, { timestamp: timestampUs });
+  rememberRaster(key, frame);
+  return frame.clone();
 }
 
 function rasterTransparentFrame(width: number, height: number, timestampUs: number): VideoFrame {
@@ -1780,7 +1820,7 @@ export class RenderIrFrameRenderer implements Disposable {
       new DOMException('RenderIrFrameRenderer was disposed', 'AbortError'),
     );
     this.#compositor.dispose();
-    clearTextRasterCache();
+    clearRasterCache();
     const tasks = [...this.#renderTasks.values()];
     this.#disposeTask = Promise.allSettled(tasks).then(() => undefined);
     return this.#disposeTask;
