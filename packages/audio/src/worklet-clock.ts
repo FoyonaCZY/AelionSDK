@@ -199,9 +199,14 @@ export class AudioWorkletClock implements Disposable {
 
   #disconnectOutput(): void {
     if (this.#node === undefined || !this.#outputConnected) return;
+    // Disconnect only. A pause does not move the playback position, so the
+    // buffered frames are still the ones that come next and resuming should
+    // continue from them. Dropping them here would also reset the ring's play
+    // and underrun counters, which are reported as session telemetry, and cost
+    // a full refill on every resume. An edit while paused is what makes those
+    // frames stale, and `AelionPlayer.invalidate` handles that case.
     this.#node.disconnect();
     this.#outputConnected = false;
-    this.ring.flush();
   }
 
   public subscribe(listener: (event: AudioClockEvent) => void): () => void {

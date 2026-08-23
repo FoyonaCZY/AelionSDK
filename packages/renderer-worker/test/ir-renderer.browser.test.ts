@@ -212,32 +212,41 @@ function program(definition: IrMaterialDefinition): WebGl2MaterialProgram | unde
   return undefined;
 }
 
-function pixel(bitmap: ImageBitmap): readonly number[] {
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+/** Intrinsic size of either image type a frame result can carry. */
+function imageSize(image: ImageBitmap | VideoFrame): { width: number; height: number } {
+  return image instanceof VideoFrame
+    ? { width: image.displayWidth, height: image.displayHeight }
+    : { width: image.width, height: image.height };
+}
+
+function pixel(bitmap: ImageBitmap | VideoFrame): readonly number[] {
+  const { width, height } = imageSize(bitmap);
+  const canvas = new OffscreenCanvas(width, height);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('2D context unavailable');
   context.drawImage(bitmap, 0, 0);
   return [...context.getImageData(4, 4, 1, 1).data];
 }
 
-function occupiedBounds(bitmap: ImageBitmap): {
+function occupiedBounds(bitmap: ImageBitmap | VideoFrame): {
   x: number;
   y: number;
   width: number;
   height: number;
 } {
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const { width: imageWidth, height: imageHeight } = imageSize(bitmap);
+  const canvas = new OffscreenCanvas(imageWidth, imageHeight);
   const context = canvas.getContext('2d');
   if (context === null) throw new Error('2D context unavailable');
   context.drawImage(bitmap, 0, 0);
-  const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
-  let x0 = bitmap.width;
-  let y0 = bitmap.height;
+  const pixels = context.getImageData(0, 0, imageWidth, imageHeight).data;
+  let x0 = imageWidth;
+  let y0 = imageHeight;
   let x1 = -1;
   let y1 = -1;
-  for (let y = 0; y < bitmap.height; y += 1) {
-    for (let x = 0; x < bitmap.width; x += 1) {
-      const index = (y * bitmap.width + x) * 4;
+  for (let y = 0; y < imageHeight; y += 1) {
+    for (let x = 0; x < imageWidth; x += 1) {
+      const index = (y * imageWidth + x) * 4;
       if ((pixels[index] ?? 0) < 200) continue;
       if (x < x0) x0 = x;
       if (y < y0) y0 = y;
@@ -253,12 +262,13 @@ function occupiedBounds(bitmap: ImageBitmap): {
   };
 }
 
-function pixelOver(bitmap: ImageBitmap, fillStyle: string): readonly number[] {
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+function pixelOver(bitmap: ImageBitmap | VideoFrame, fillStyle: string): readonly number[] {
+  const { width, height } = imageSize(bitmap);
+  const canvas = new OffscreenCanvas(width, height);
   const context = canvas.getContext('2d', { alpha: false });
   if (context === null) throw new Error('2D context unavailable');
   context.fillStyle = fillStyle;
-  context.fillRect(0, 0, bitmap.width, bitmap.height);
+  context.fillRect(0, 0, width, height);
   context.drawImage(bitmap, 0, 0);
   return [...context.getImageData(4, 4, 1, 1).data];
 }

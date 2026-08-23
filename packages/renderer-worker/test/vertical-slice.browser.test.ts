@@ -134,8 +134,8 @@ describe('fixed 30-second Project vertical slice', () => {
         expect(transitionFrame.backend, JSON.stringify(transitionFrame.diagnostics)).toBe(
           preferredBackend,
         );
-        expect(openingFrame.bitmap.width).toBe(320);
-        expect(closingFrame.bitmap.height).toBe(180);
+        expect(openingFrame.width).toBe(320);
+        expect(closingFrame.height).toBe(180);
         expect(audio).toHaveLength(9_600);
         expect(audio.some(value => Math.abs(value) > 0.001)).toBe(true);
       } finally {

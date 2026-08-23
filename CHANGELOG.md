@@ -2,6 +2,35 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/) 和 [Aelion 版本与迁移规则](apps/docs/src/content/docs/zh/project/development.md#版本与迁移)。预发布变更必须有记录、可迁移，不允许静默改变公开 API、协议或资源所有权。
 
+## Unreleased
+
+### Changed
+
+- **公开 API（破坏性类型变更）**：`RenderIrFrameResult.bitmap` 由 `ImageBitmap` 放宽为
+  `ImageBitmap | VideoFrame`。合成路径仍返回 `ImageBitmap`；跳过合成的预览 bypass 现在直接
+  返回解码得到的 `VideoFrame`。三种既有用法（`close()`、`drawImage()`、`new VideoFrame()`）
+  两种类型都支持，**但尺寸字段拼写不同**：请从结果自身的 `width` / `height` 读取，不要读
+  `bitmap.width` / `bitmap.height`。
+
+### Performance
+
+- 增量编译不再重复深冻结从上一次编译原样复用的 IR 子树。1000 clip 工程上，增量空操作编译
+  由约 2.50 ms 降到约 0.30 ms（约 8 倍）。每次提交都会重编译，因此这直接影响交互编辑手感。
+- track 指纹按源对象引用缓存，未改动的轨道不再重复 `canonicalStringify`（约占前述改进的 9%）。
+- 预览 bypass 不再每帧把解码帧拷贝成 `ImageBitmap`。该拷贝原本抵消了 bypass 自身的收益。
+- `ProductionMediaProvider.pcmRange` 的窗口缓存命中不再申请解码器额度和操作队列名额。播放期间
+  约五十分之四十九的调用是纯切片，此前它们会排在真实视频解码的准入队列之后。
+
+### Fixed
+
+- 暂停只断开 worklet 输出，不再丢弃环里的缓冲。暂停不移动播放位置，那些帧仍是接下来要播的，
+  丢弃会连带清零对外上报的 play/underrun 计数并让每次恢复都重新填满 2 秒。暂停期间的编辑改由
+  `AelionPlayer.invalidate` 作废陈旧帧，且不向已断开的图回填。
+- 补齐 `AudioPcmDecodeSessionOptions` 与 `createAudioPcmDecodeSessionFromReader` 的 TSDoc，生成的
+  API 文档不再缺少这两个声明的说明。
+- 重新生成 `@aelionsdk/sdk` 公开 API 快照。`ProductionMediaProviderSnapshot` 新增的
+  `audioSessions` / `activeAudioSessions` 字段此前未同步到快照基线。
+
 ## 1.2.0-rc.5 — 2026-08-23
 
 ### Changed

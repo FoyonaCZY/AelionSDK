@@ -296,7 +296,7 @@ export class AelionPlayer implements AelionPlayerApi {
 
   public invalidate(changeSet: ChangeSet): void {
     void changeSet;
-    if (this.#state !== 'playing') return;
+    if (this.#state !== 'playing' && this.#state !== 'paused') return;
     const ir = this.#session.requireIr();
     const timeUs = Math.min(Math.max(0, this.currentTimeUs), ir.durationUs - 1);
     this.#advanceGeneration();
@@ -305,7 +305,10 @@ export class AelionPlayer implements AelionPlayerApi {
     else clock?.seek(timeUs);
     this.#nextAudioFrame = sampleIndexAtTime(timeUs, ir.sampleRate);
     this.#lastTimeUs = timeUs;
-    void this.#requestAudioFill(false);
+    // A paused graph is never fed. The edit already dropped the stale frames
+    // above, and play() fills before it reconnects the output, so refilling here
+    // would only push audio at a graph nobody is listening to.
+    if (this.#state === 'playing') void this.#requestAudioFill(false);
   }
 
   public async reset(): Promise<void> {

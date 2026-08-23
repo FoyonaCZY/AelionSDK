@@ -455,7 +455,12 @@ export interface AudioDecodeOptions {
   readonly streamIndex?: number;
 }
 
+/** Options for {@link AudioPcmDecodeSession}. */
 export interface AudioPcmDecodeSessionOptions {
+  /**
+   * Which audio stream of the container to decode, counted across audio tracks
+   * only. Defaults to the first.
+   */
   readonly streamIndex?: number;
 }
 
@@ -657,6 +662,14 @@ export class AudioPcmDecodeSession {
   }
 }
 
+/**
+ * Opens an {@link AudioPcmDecodeSession} over a range reader, so consecutive PCM
+ * windows share one demuxer and decoder instead of reopening the container per
+ * request.
+ *
+ * The session owns decoder resources until disposed; callers that need a single
+ * isolated range should use {@link decodeAudioPcmRangeFromReader} instead.
+ */
 export function createAudioPcmDecodeSessionFromReader(
   reader: RangeReader,
   options: AudioPcmDecodeSessionOptions = {},

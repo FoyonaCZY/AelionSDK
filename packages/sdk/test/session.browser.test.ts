@@ -135,7 +135,7 @@ describe('@aelionsdk/sdk public browser facade', () => {
       expect(playerFrames).toBeGreaterThan(0);
       const preview = await session.preview.renderFrame({ timeUs: 15_000_000 });
       try {
-        expect(preview.bitmap.width).toBe(320);
+        expect(preview.width).toBe(320);
         expect(preview.materialIds).toEqual(['mat_warm', 'mat_dissolve']);
       } finally {
         preview.bitmap.close();

@@ -1,7 +1,7 @@
 import type { JsonObject } from '@aelionsdk/core';
 import type { AelionProject } from '@aelionsdk/project-schema';
 import { ProjectValidator } from '@aelionsdk/project-schema';
-import { IncrementalRenderCompiler } from '@aelionsdk/render-ir';
+import { evaluateVisualState, IncrementalRenderCompiler } from '@aelionsdk/render-ir';
 import { TransactionEngine } from '@aelionsdk/transaction';
 import { bench, describe } from 'vitest';
 
@@ -150,5 +150,17 @@ describe('Render IR compilation', () => {
     validatedTransactionEngine.edit({ baseRevision: validatedTransactionEngine.revision }, edit => {
       edit.setField('items', 'item_500', ['metadata'], { value });
     });
+  });
+});
+
+describe('Render IR evaluation', () => {
+  const fixture = project(1_000);
+  const { ir } = new IncrementalRenderCompiler().compile(fixture, 'sequence', 0n);
+  // Mid-timeline: exactly one clip is active, so the cost measured here is the
+  // scan over the other 999 rather than the work done for the active clip.
+  const timeUs = 500_000_000;
+
+  bench('evaluateVisualState 1,000 clips', () => {
+    evaluateVisualState(ir, timeUs);
   });
 });
