@@ -108,6 +108,7 @@ export class AelionPlayer implements AelionPlayerApi {
   #lastErrorCode: string | undefined;
   #previewQuality: NormalizedPreviewQuality = normalizePreviewQuality();
   #lastDisposedRuntime: AelionPlayerResourceStats['lastDisposedRuntime'] = null;
+  #presentedBlank = false;
 
   public constructor(
     session: AelionSession,
@@ -203,6 +204,7 @@ export class AelionPlayer implements AelionPlayerApi {
         result.bitmap.close();
         return;
       }
+      this.#presentedBlank = !hasVisualPreview(ir, timeUs);
       this.#publish({ generation, frameIndex: -1, timestampUs: timeUs, droppedFrames: 0 }, result);
     } catch (error) {
       // A superseded or disposed seek still rejects: the caller awaited a
@@ -468,7 +470,8 @@ export class AelionPlayer implements AelionPlayerApi {
     // hitches every few hundred milliseconds; the scheduler already skips
     // behind by dropping intervals while a frame is in flight.
     const timeUs = Math.min(Math.max(0, this.currentTimeUs), Math.max(0, ir.durationUs - 1));
-    if (!hasVisualPreview(ir, timeUs)) return;
+    const visual = hasVisualPreview(ir, timeUs);
+    if (!visual && this.#presentedBlank) return;
     try {
       const result = await this.#session.preview.renderFrame({
         timeUs,
@@ -479,6 +482,7 @@ export class AelionPlayer implements AelionPlayerApi {
         result.bitmap.close();
         return;
       }
+      this.#presentedBlank = !visual;
       this.#publish({ ...scheduled, timestampUs: timeUs }, result);
     } catch (error) {
       if (recoverablePreviewSkip(error) || signal.aborted) return;
@@ -569,6 +573,7 @@ export class AelionPlayer implements AelionPlayerApi {
 
   #advanceGeneration(): void {
     this.#generation += 1;
+    this.#presentedBlank = false;
     this.#scheduler?.seek();
     this.#fillController.abort(new DOMException('Player generation changed', 'AbortError'));
     this.#videoController.abort(new DOMException('Player generation changed', 'AbortError'));
