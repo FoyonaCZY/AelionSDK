@@ -613,6 +613,90 @@ function sameIds(
   return JSON.stringify(left ?? []) === JSON.stringify(right ?? []);
 }
 
+interface ItemMarkerSplit {
+  readonly leftMarkerIds: EntityId[];
+  readonly leftDurationClamps: readonly { readonly id: EntityId; readonly durationUs: number }[];
+  readonly rightMarkerIds: EntityId[];
+  readonly rightMoves: readonly { readonly id: EntityId; readonly timeUs: number }[];
+}
+
+function collectOwnedMarkerIds(project: Readonly<AelionProject>, item: ItemEntity): EntityId[] {
+  const seen = new Set<EntityId>();
+  const ids: EntityId[] = [];
+  const add = (id: EntityId): void => {
+    if (seen.has(id)) return;
+    seen.add(id);
+    ids.push(id);
+  };
+  for (const id of item.markerIds ?? []) add(id);
+  for (const marker of Object.values(project.markers)) {
+    const owner = asObject(marker.owner);
+    if (owner?.type === 'item' && owner.id === item.id) add(marker.id);
+  }
+  return ids;
+}
+
+function planItemMarkerSplit(
+  project: Readonly<AelionProject>,
+  item: ItemEntity,
+  leftDurationUs: number,
+): ItemMarkerSplit {
+  const leftMarkerIds: EntityId[] = [];
+  const leftDurationClamps: { id: EntityId; durationUs: number }[] = [];
+  const rightMarkerIds: EntityId[] = [];
+  const rightMoves: { id: EntityId; timeUs: number }[] = [];
+  for (const id of collectOwnedMarkerIds(project, item)) {
+    const marker = project.markers[id];
+    if (marker === undefined) continue;
+    if (marker.timeUs < leftDurationUs) {
+      leftMarkerIds.push(id);
+      const maxDurationUs = leftDurationUs - marker.timeUs;
+      if (marker.durationUs > maxDurationUs) {
+        leftDurationClamps.push({ id, durationUs: maxDurationUs });
+      }
+    } else {
+      rightMarkerIds.push(id);
+      rightMoves.push({ id, timeUs: marker.timeUs - leftDurationUs });
+    }
+  }
+  return { leftMarkerIds, leftDurationClamps, rightMarkerIds, rightMoves };
+}
+
+function assignRightItemMarkers(right: ItemEntity, plan: ItemMarkerSplit): void {
+  if (plan.rightMarkerIds.length > 0) {
+    right.markerIds = [...plan.rightMarkerIds];
+  } else {
+    Reflect.deleteProperty(right, 'markerIds');
+  }
+}
+
+function applyItemMarkerSplit(
+  transaction: import('./transaction.js').TransactionBuilder,
+  item: ItemEntity,
+  rightItemId: EntityId,
+  plan: ItemMarkerSplit,
+): void {
+  if (
+    plan.leftMarkerIds.length === 0 &&
+    plan.rightMarkerIds.length === 0 &&
+    plan.leftDurationClamps.length === 0
+  ) {
+    return;
+  }
+  if (plan.leftMarkerIds.length > 0) {
+    transaction.setField('items', item.id, ['markerIds'], [...plan.leftMarkerIds]);
+  } else if (item.markerIds !== undefined) {
+    transaction.removeField('items', item.id, ['markerIds']);
+  }
+  for (const clamp of plan.leftDurationClamps) {
+    transaction.setField('markers', clamp.id, ['durationUs'], clamp.durationUs);
+  }
+  for (const move of plan.rightMoves) {
+    transaction.setField('markers', move.id, ['owner', 'id'], rightItemId);
+    transaction.setField('markers', move.id, ['timeUs'], move.timeUs);
+  }
+}
+
 function containsAnimation(value: JsonValue): boolean {
   if (Array.isArray(value)) return value.some(entry => containsAnimation(entry));
   if (value === null || typeof value !== 'object') return false;
@@ -920,10 +1004,10 @@ export class EditingCommands {
         options.rightItemId,
       );
     }
-    if (item.materialInstanceIds.length > 0 || (item.markerIds?.length ?? 0) > 0) {
+    if (item.materialInstanceIds.length > 0) {
       throw commandError(
         'COMMAND_SPLIT_OWNED_ENTITY_UNSUPPORTED',
-        `Item ${item.id} owns Material or Marker entities; explicit split policies are required`,
+        `Item ${item.id} owns Material entities; an explicit split policy is required`,
         item.id,
       );
     }
@@ -960,8 +1044,10 @@ export class EditingCommands {
         );
       }
     }
+    const markerPlan = planItemMarkerSplit(project, item, leftDurationUs);
     const right = structuredClone(item);
     right.id = options.rightItemId;
+    assignRightItemMarkers(right, markerPlan);
     Reflect.set(right.range, 'startUs', options.atUs);
     Reflect.set(right.range, 'durationUs', rightDurationUs);
     if (rightSourceRange !== undefined) {
@@ -991,6 +1077,7 @@ export class EditingCommands {
         );
       }
       transaction.createEntity('items', right.id, right);
+      applyItemMarkerSplit(transaction, item, right.id, markerPlan);
       transaction.listInsert('tracks', track.id, ['itemIds'], right.id, beforeId);
       for (const transition of Object.values(project.transitions)) {
         if (transition.range.startUs < options.atUs) continue;
@@ -1402,11 +1489,7 @@ export class EditingCommands {
           item.id,
         );
       }
-      if (
-        item.materialInstanceIds.length > 0 ||
-        (item.markerIds?.length ?? 0) > 0 ||
-        containsAnimation(item)
-      ) {
+      if (item.materialInstanceIds.length > 0 || containsAnimation(item)) {
         throw commandError(
           'COMMAND_SPLIT_OWNED_ENTITY_UNSUPPORTED',
           `Linked Item ${item.id} requires an explicit owned-entity split policy`,
@@ -1415,8 +1498,10 @@ export class EditingCommands {
       }
       const leftDurationUs = options.atUs - item.range.startUs;
       const sourceRanges = splitSourceRanges(item, leftDurationUs);
+      const markerPlan = planItemMarkerSplit(project, item, leftDurationUs);
       const right = structuredClone(item);
       right.id = rightIdAt(index);
+      assignRightItemMarkers(right, markerPlan);
       right.linkGroupId = options.rightGroupId;
       right.range = { startUs: options.atUs, durationUs: endUs - options.atUs };
       const rightSource = sourceRanges?.right;
@@ -1427,7 +1512,7 @@ export class EditingCommands {
           range.durationUs = rightSource.durationUs;
         }
       }
-      return { item, track, leftDurationUs, sourceRanges, right };
+      return { item, track, leftDurationUs, sourceRanges, right, markerPlan };
     });
     for (const transition of Object.values(project.transitions)) {
       const transitionEnd = transition.range.startUs + transition.range.durationUs;
@@ -1468,6 +1553,7 @@ export class EditingCommands {
           );
           setSourceRange(transaction, entry.item, entry.sourceRanges?.left);
           transaction.createEntity('items', entry.right.id, entry.right);
+          applyItemMarkerSplit(transaction, entry.item, entry.right.id, entry.markerPlan);
           const itemIndex = entry.track.itemIds.indexOf(entry.item.id);
           transaction.listInsert(
             'tracks',

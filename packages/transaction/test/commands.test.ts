@@ -201,6 +201,81 @@ describe('EditingCommands', () => {
     ]);
   });
 
+  it('splits item-owned markers onto the left and right Items', () => {
+    const { engine, commands } = create();
+    engine.edit({ baseRevision: 0n }, transaction => {
+      transaction.setField('items', 'item_video_a', ['materialInstanceIds'], []);
+      transaction.deleteEntity('materialInstances', 'mat_warm_film');
+      transaction.removeField('items', 'item_video_a', ['linkGroupId']);
+      transaction.removeField('items', 'item_audio_a', ['linkGroupId']);
+      transaction.deleteEntity('linkGroups', 'link_av_a');
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_left',
+        owner: { type: 'item', id: 'item_video_a' },
+        timeUs: 100_000,
+        durationUs: 50_000,
+        label: 'Left',
+      },
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_span',
+        owner: { type: 'item', id: 'item_video_a' },
+        timeUs: 1_900_000,
+        durationUs: 200_000,
+        label: 'Span',
+      },
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_cut',
+        owner: { type: 'item', id: 'item_video_a' },
+        timeUs: 2_000_000,
+        durationUs: 0,
+        label: 'Cut',
+      },
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_right',
+        owner: { type: 'item', id: 'item_video_a' },
+        timeUs: 3_000_000,
+        durationUs: 10_000,
+        label: 'Right',
+      },
+    });
+    const result = commands.splitItem({
+      itemId: 'item_video_a',
+      rightItemId: 'item_video_a_right',
+      atUs: 2_000_000,
+    });
+    const snapshot = result.commit.snapshot;
+    expect(snapshot.items.item_video_a?.markerIds).toEqual(['marker_left', 'marker_span']);
+    expect(snapshot.items.item_video_a_right?.markerIds).toEqual(['marker_cut', 'marker_right']);
+    expect(snapshot.markers.marker_left).toMatchObject({
+      owner: { type: 'item', id: 'item_video_a' },
+      timeUs: 100_000,
+      durationUs: 50_000,
+    });
+    expect(snapshot.markers.marker_span).toMatchObject({
+      owner: { type: 'item', id: 'item_video_a' },
+      timeUs: 1_900_000,
+      durationUs: 100_000,
+    });
+    expect(snapshot.markers.marker_cut).toMatchObject({
+      owner: { type: 'item', id: 'item_video_a_right' },
+      timeUs: 0,
+    });
+    expect(snapshot.markers.marker_right).toMatchObject({
+      owner: { type: 'item', id: 'item_video_a_right' },
+      timeUs: 1_000_000,
+      durationUs: 10_000,
+    });
+    expect(validate(snapshot).ok).toBe(true);
+  });
+
   it('leaves revision and snapshot unchanged when a semantic command is rejected', async () => {
     const { engine, commands } = create();
     const beforeHash = await canonicalHash(engine.getSnapshot());
@@ -338,6 +413,68 @@ describe('EditingCommands', () => {
     expect(removed.snapshot.linkGroups.group_edit_right).toBeUndefined();
     expect(removed.snapshot.items.edit_left_right).toBeUndefined();
     expect(removed.snapshot.items.edit_parallel_right).toBeUndefined();
+  });
+
+  it('splits a linked group and keeps item markers with the correct half', () => {
+    const { engine, commands } = create();
+    installProfessionalEditTrack(engine);
+    const parallel = videoItem('edit_parallel', 'track_edit_parallel');
+    parallel.range = { startUs: 0, durationUs: 2_000_000 };
+    (parallel.source as JsonObject).sourceRange = { startUs: 0, durationUs: 2_000_000 };
+    engine.edit({ baseRevision: engine.revision }, transaction => {
+      transaction.createEntity('tracks', 'track_edit_parallel', {
+        id: 'track_edit_parallel',
+        sequenceId: 'seq_main',
+        kind: 'visual',
+        enabled: true,
+        locked: false,
+        itemIds: [parallel.id],
+        materialInstanceIds: [],
+      });
+      transaction.listInsert('sequences', 'seq_main', ['trackIds'], 'track_edit_parallel');
+      transaction.createEntity('items', parallel.id, parallel);
+    });
+    commands.linkItems({
+      groupId: 'group_marked',
+      kind: 'edit-group',
+      itemIds: ['edit_left', 'edit_parallel'],
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_linked_left',
+        owner: { type: 'item', id: 'edit_left' },
+        timeUs: 250_000,
+        durationUs: 0,
+      },
+    });
+    commands.addMarker({
+      marker: {
+        id: 'marker_linked_right',
+        owner: { type: 'item', id: 'edit_parallel' },
+        timeUs: 1_250_000,
+        durationUs: 0,
+      },
+    });
+    const split = commands.splitLinkedGroup({
+      groupId: 'group_marked',
+      rightGroupId: 'group_marked_right',
+      atUs: 1_000_000,
+      rightItemIds: {
+        edit_left: 'edit_left_right',
+        edit_parallel: 'edit_parallel_right',
+      },
+    });
+    expect(split.commit.snapshot.items.edit_left?.markerIds).toEqual(['marker_linked_left']);
+    expect(split.commit.snapshot.items.edit_left_right?.markerIds).toBeUndefined();
+    expect(split.commit.snapshot.items.edit_parallel?.markerIds).toBeUndefined();
+    expect(split.commit.snapshot.items.edit_parallel_right?.markerIds).toEqual([
+      'marker_linked_right',
+    ]);
+    expect(split.commit.snapshot.markers.marker_linked_right).toMatchObject({
+      owner: { type: 'item', id: 'edit_parallel_right' },
+      timeUs: 250_000,
+    });
+    expect(validate(split.commit.snapshot).ok).toBe(true);
   });
 
   it('removes owned Transition, Material, Marker and degenerate LinkGroup without dangling refs', () => {
