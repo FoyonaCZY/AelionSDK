@@ -3,8 +3,21 @@ title: 当前状态
 description: 发布身份、已验证范围、补救内容和仍未认证的边界。
 ---
 
-仓库版本：`1.2.0-rc.5`。预发布版由 13 个 `@aelionsdk/*` 包组成，通过 npm `next` tag
-分发；当前实际发布版本以 npm badge 和 registry 为准。
+仓库版本：`1.2.0`。这是首个稳定 1.2 版本。13 个 `@aelionsdk/*` 包通过 npm `latest`
+tag 分发；当前实际发布版本以 npm badge 和 registry 为准。
+
+## 1.2.0 编译冻结与播放
+
+本版本保留 rc.2–rc.5 的工作，并额外包含：
+
+- 增量编译复用已冻结的 IR 子树，并按对象引用缓存 track 指纹；
+- 预览 bypass 直接交出解码得到的 `VideoFrame`（`RenderIrFrameResult.bitmap` 为
+  `ImageBitmap | VideoFrame`；宽高从结果读取）；
+- PCM 窗口缓存命中不再申请解码器额度与操作队列；
+- 连续 PCM 填充复用同一个音频 decode session；
+- 暂停只断开 worklet，不冲掉环缓冲；
+- 最后一个可视 clip 结束后清空预览；
+- 持有 Marker 的 Item 可以切分。
 
 ## rc.5 合成路径
 
@@ -67,7 +80,7 @@ rc.2 修复了 1.1/1.2 发布后审计发现的问题：
 - 代理流程仍需要宿主提供编码器。
 - WebGPU 尚未具备完整 WebGL2 多 pass parity 和实体设备认证。
 - 脱离页面的长任务和 24 小时实体设备 soak 证据尚未交付。
-- 首个稳定版本前，RC API 仍可能按文档化迁移/弃用规则变化。
+- 1.2.0 之后，公开 API 变更遵循 SemVer、CHANGELOG 和文档化弃用窗口。
 
 ## 本地复核
 

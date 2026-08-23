@@ -69,6 +69,11 @@ const gates = [
   ],
   ['corepack pnpm format:check', corepackExecutable, corepackArguments(['pnpm', 'format:check'])],
   [
+    'corepack pnpm report:performance',
+    corepackExecutable,
+    corepackArguments(['pnpm', 'report:performance']),
+  ],
+  [
     'corepack pnpm report:browser:chromium',
     corepackExecutable,
     corepackArguments(['pnpm', 'report:browser:chromium']),
@@ -79,11 +84,6 @@ const gates = [
     corepackArguments(['pnpm', 'report:browser:firefox']),
   ],
   ['corepack pnpm report:seek', corepackExecutable, corepackArguments(['pnpm', 'report:seek'])],
-  [
-    'corepack pnpm report:performance',
-    corepackExecutable,
-    corepackArguments(['pnpm', 'report:performance']),
-  ],
   [
     'corepack pnpm report:recovery',
     corepackExecutable,

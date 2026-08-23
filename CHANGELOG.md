@@ -4,6 +4,11 @@
 
 ## Unreleased
 
+## 1.2.0 — 2026-08-24
+
+首个稳定 1.2 版本。包含 rc.2–rc.5 的契约补救、预览/合成路径，以及下列自 rc.5 以来的变更。
+正式版发布到 npm `latest`。
+
 ### Changed
 
 - **公开 API（破坏性类型变更）**：`RenderIrFrameResult.bitmap` 由 `ImageBitmap` 放宽为
@@ -26,6 +31,9 @@
 - 暂停只断开 worklet 输出，不再丢弃环里的缓冲。暂停不移动播放位置，那些帧仍是接下来要播的，
   丢弃会连带清零对外上报的 play/underrun 计数并让每次恢复都重新填满 2 秒。暂停期间的编辑改由
   `AelionPlayer.invalidate` 作废陈旧帧，且不向已断开的图回填。
+- 预览音频复用 PCM decode session 与窗口缓存，避免播放数十秒后因重复开解码器而卡顿。
+- 最后一个可视 clip 结束后清空预览，不再停留在最后一帧。
+- 持有 Marker 的 Item 可以切分；切点处的 Marker 归右侧，不再整段拒绝编辑。
 - 补齐 `AudioPcmDecodeSessionOptions` 与 `createAudioPcmDecodeSessionFromReader` 的 TSDoc，生成的
   API 文档不再缺少这两个声明的说明。
 - 重新生成 `@aelionsdk/sdk` 公开 API 快照。`ProductionMediaProviderSnapshot` 新增的

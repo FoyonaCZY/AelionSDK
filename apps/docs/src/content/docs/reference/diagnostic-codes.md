@@ -3,7 +3,7 @@ title: Diagnostic codes
 description: Look up stable error codes, recoverability, location fields, and recommended handling.
 ---
 
-This catalog describes `1.1.0-rc.1`. Product branches must use `code` and structured fields, not
+This catalog describes `1.2.0`. Product branches must use `code` and structured fields, not
 the English `message`. `recoverable: true` means retry can make sense after the caller changes a
 condition; it does not mean the SDK already retried.
 

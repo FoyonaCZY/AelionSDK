@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/vite-plugin",
-  "version": "1.2.0-rc.5",
+  "version": "1.2.0",
   "description": "Build integrations for AelionSDK Worker and AudioWorklet assets",
   "license": "MIT",
   "repository": {
@@ -46,9 +46,9 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/audio": "1.2.0-rc.5",
-    "@aelionsdk/export": "1.2.0-rc.5",
-    "@aelionsdk/renderer-worker": "1.2.0-rc.5"
+    "@aelionsdk/audio": "1.2.0",
+    "@aelionsdk/export": "1.2.0",
+    "@aelionsdk/renderer-worker": "1.2.0"
   },
   "peerDependencies": {
     "vite": "^7.3.6"

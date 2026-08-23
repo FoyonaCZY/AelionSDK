@@ -6,8 +6,8 @@ Worker and AudioWorklet entry files.
 ## Install
 
 ```bash
-pnpm add @aelionsdk/sdk@next
-pnpm add -D @aelionsdk/vite-plugin@next vite
+pnpm add @aelionsdk/sdk
+pnpm add -D @aelionsdk/vite-plugin vite
 ```
 
 ```ts
@@ -53,9 +53,10 @@ Webpack 5-compatible hooks exposed by Rspack. Pass `runtimeAssets` to `Aelion.cr
 
 For a custom build or CDN copy step, use `loadAelionRuntimeAssets(outputDirectory)`. For an
 already-deployed versioned CDN directory, use
-`aelionRuntimeAssetUrls('https://cdn.example/sdk/1.2.0-rc.5/')`; keep application modules and all four
+`aelionRuntimeAssetUrls('https://cdn.example/sdk/1.2.0/')`; keep application modules and all four
 runtime entries on the same SDK version.
 
 Production pages should use HTTPS. For the SharedArrayBuffer audio path, also return `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. CSP must allow same-origin `worker-src` and `script-src`.
 
-This package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK). The `1.2.0-rc.5` API may change before the first stable release.
+This package is part of [AelionSDK](https://github.com/FoyonaCZY/AelionSDK). Public API changes
+follow SemVer.

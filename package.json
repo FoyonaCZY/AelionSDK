@@ -1,6 +1,6 @@
 {
   "name": "aelion-sdk",
-  "version": "1.2.0-rc.5",
+  "version": "1.2.0",
   "private": true,
   "description": "Browser-first real-time editing, rendering and export SDK",
   "license": "MIT",

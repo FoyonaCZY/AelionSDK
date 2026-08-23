@@ -6,10 +6,10 @@ contracts for AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/export@next
+npm install @aelionsdk/export
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Applications usually start exports
+`latest` currently resolves to `1.2.0`. Applications usually start exports
 through an `@aelionsdk/sdk` Session and depend on this package for sinks,
 profiles or remote-export types.
 

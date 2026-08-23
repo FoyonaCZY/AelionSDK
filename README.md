@@ -6,7 +6,7 @@ Browser-first TypeScript SDK for timeline editing, deterministic preview/playbac
 remote media export.
 
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
-[![npm next](https://img.shields.io/npm/v/@aelionsdk/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelionsdk/sdk)
+[![npm](https://img.shields.io/npm/v/@aelionsdk/sdk/latest?label=npm)](https://www.npmjs.com/package/@aelionsdk/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 
 [English documentation](https://foyonaczy.github.io/AelionSDK/) ·
@@ -14,27 +14,29 @@ remote media export.
 [Roadmap](https://foyonaczy.github.io/AelionSDK/project/roadmap/) ·
 [Current status](https://foyonaczy.github.io/AelionSDK/project/status/)
 
-## Install the 1.2 release candidate
+## Install 1.2
 
 ```bash
-npm install @aelionsdk/sdk@next @aelionsdk/export@next
-npm install --save-dev @aelionsdk/vite-plugin@next vite
+npm install @aelionsdk/sdk @aelionsdk/export
+npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-Repository version: `1.2.0-rc.5`. The npm badge shows the currently published `next` version. Pin
-an exact prerelease after validating it on your target devices.
+Repository version: `1.2.0`. The npm badge shows the currently published `latest` version. Pin
+the exact release after validating it on your target devices.
 
 > **Remediation notice:** `1.1.0-rc.1` and `1.2.0-rc.1` are superseded. Do not newly adopt either
 > RC. `1.2.0-rc.2` corrected their schema identity/migration, image-sequence runtime, signed-rate,
 > subtitle, Bézier, streaming-proxy, audio-analysis and codec-fallback contract issues.
 > `1.2.0-rc.3` kept those remediations and fixed preview transforms, still-image indexing, Vite 7
 > worker URLs, and `historyGroup` forwarding. `1.2.0-rc.4` adds faster interactive commits, text
-> background plates, transient thumbnail decodes, and steadier playback/seek. `1.2.0-rc.5` pools
+> background plates, transient thumbnail decodes, and steadier playback/seek. rc.5 pools
 > WebGL2 compositor resources, reuses the export bypass on preview, and honours preview
-> `maxDimension` at the provider boundary. Prereleases publish to npm under the `next` dist-tag.
+> `maxDimension` at the provider boundary. `1.2.0` is the first stable 1.2: it freezes reused
+> Render IR, hands preview frames over uncopied, and reuses audio PCM sessions. Stable releases
+> publish to npm under the `latest` dist-tag.
 
-The 1.2.0-rc.5 gate passed all 21 serial commands with unchanged source manifest
-`dda0f3020672aea03b567866422713056144d75b1b030a5e79f6398ede0e6b79`. The independently reviewed,
+The 1.2.0 gate passed all 21 serial commands with unchanged source manifest
+`faf025df7c06350bba8eb5e8ea9df1e265dc9dd0d3dbb9fff8a566a179e17781`. The independently reviewed,
 exact-bound evidence record in `reports/baseline` was approved before publication.
 
 ## What it provides

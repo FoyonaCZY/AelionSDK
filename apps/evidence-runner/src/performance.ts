@@ -840,15 +840,9 @@ async function realMediaPipelineBenchmark(): Promise<Record<string, unknown>> {
         continue;
       }
       if (definition.width === 3_840) {
-        const warmupSession = await Aelion.createSession({
-          media,
-          preferredBackend: 'webgl2',
-          allowBackendFallback: false,
-        });
         const warmupSink = new SeekableMemorySink();
         try {
-          await warmupSession.loadProject(builder.build());
-          await warmupSession.export.startProfile({
+          await session.export.startProfile({
             profile: 'mp4-h264-aac',
             execution: 'worker',
             sink: warmupSink.writable,
@@ -857,7 +851,6 @@ async function realMediaPipelineBenchmark(): Promise<Record<string, unknown>> {
           });
         } finally {
           warmupSink.cleanup();
-          await warmupSession.dispose();
         }
       }
       const measured = await measureLongTasksDuring(() =>
@@ -1103,6 +1096,7 @@ async function run(): Promise<Record<string, unknown>> {
         'JavaScript heap excludes most decoder surfaces, GPU textures and browser-process memory',
         'real-mp4-4k30 excludes one warmup export so the 1.5× floor measures a primed encoder',
         'cases execute serially in the recorded order, so thermal and cache effects remain possible',
+        'Phase 1 captures this report before the browser-smoke refresh so the 1.5× floor is not taken after extra GPU test passes',
       ],
     },
     runtime,

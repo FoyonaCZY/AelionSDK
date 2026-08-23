@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/evidence-runner",
-  "version": "1.2.0-rc.5",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "dependencies": {

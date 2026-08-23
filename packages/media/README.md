@@ -6,10 +6,10 @@ AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/media@next
+npm install @aelionsdk/media
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Applications should prefer
+`latest` currently resolves to `1.2.0`. Applications should prefer
 `ProductionMediaProvider` from `@aelionsdk/sdk`; direct use is intended for
 custom media providers, cache implementations and decode hosts.
 

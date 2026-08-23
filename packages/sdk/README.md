@@ -2,15 +2,15 @@
 
 Browser-first video editing, preview, playback and export APIs for AelionSDK.
 
-## Install the 1.2 Release Candidate
+## Install 1.2
 
 ```bash
-npm install @aelionsdk/sdk@next
-npm install --save-dev @aelionsdk/vite-plugin@next vite
+npm install @aelionsdk/sdk
+npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Pin the exact version after
-validation instead of following a moving prerelease tag.
+`latest` currently resolves to `1.2.0`. Pin the exact version after
+validation instead of following a moving dist-tag.
 
 ## Vite setup
 
@@ -72,12 +72,12 @@ pnpm exec aelion-migrate --from diffusion --input checkpoint.json \
 Use the `@aelionsdk/sdk/migrate-cli` subpath to call the same file migration
 API from Node.js.
 
-## Release Candidate contract
+## Compatibility contract
 
-The RC is tested on the automated Chromium and Firefox matrix. Playwright
+The release is tested on the automated Chromium and Firefox matrix. Playwright
 WebKit and a mobile viewport cover public capability and fallback contracts;
 physical Safari, iOS and Android devices are not yet certified. Local color
-execution is RGBA8 SDR. Public APIs may still change before the first stable
-release and will be recorded in the repository changelog and migration guide.
+execution is RGBA8 SDR. Public API changes follow SemVer and are recorded in the
+repository changelog and migration guide.
 
 AelionSDK is licensed under the MIT License.

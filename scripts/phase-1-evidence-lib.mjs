@@ -25,10 +25,10 @@ export const PHASE_1_REQUIRED_GATE_COMMANDS = Object.freeze([
 ]);
 
 export const PHASE_1_EVIDENCE_REFRESH_COMMANDS = Object.freeze([
+  'corepack pnpm report:performance',
   'corepack pnpm report:browser:chromium',
   'corepack pnpm report:browser:firefox',
   'corepack pnpm report:seek',
-  'corepack pnpm report:performance',
   'corepack pnpm report:recovery',
   'corepack pnpm report:phase3:check',
   'corepack pnpm report:alpha',
@@ -60,8 +60,8 @@ export const PHASE_1_EXPECTED_RUNTIME_ASSETS = Object.freeze([
 // This is an explicit release contract, not a minimum. Adding or removing a
 // browser conformance test requires reviewing this count together with Phase 1.
 export const PHASE_1_EXPECTED_BROWSER_TESTS = Object.freeze({
-  chromium: 91,
-  firefox: 75,
+  chromium: 93,
+  firefox: 76,
 });
 
 export const PHASE_1_ARTIFACT_CLOCK_TOLERANCE_MS = 5_000;

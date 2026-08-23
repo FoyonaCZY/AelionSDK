@@ -5,10 +5,10 @@ Typed Aelion Material Protocol graph compiler for WebGL2 and WebGPU.
 ## Install
 
 ```bash
-npm install @aelionsdk/material-compiler@next
+npm install @aelionsdk/material-compiler
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Material authors should normally use
+`latest` currently resolves to `1.2.0`. Material authors should normally use
 `@aelionsdk/material-sdk`; import this package directly to build a custom
 compiler, renderer or validation host.
 

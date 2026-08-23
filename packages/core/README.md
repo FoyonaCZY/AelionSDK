@@ -6,10 +6,10 @@ AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/core@next
+npm install @aelionsdk/core
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Most applications receive these
+`latest` currently resolves to `1.2.0`. Most applications receive these
 types through `@aelionsdk/sdk`; direct use is intended for extensions and
 custom engine hosts.
 

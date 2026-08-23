@@ -6,10 +6,10 @@ validation, migration and canonical serialization for AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/project-schema@next
+npm install @aelionsdk/project-schema
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Use this package in importers,
+`latest` currently resolves to `1.2.0`. Use this package in importers,
 services and Project tooling that must validate data without creating a browser
 Session.
 

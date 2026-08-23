@@ -3,8 +3,23 @@ title: Current status
 description: Release identity, verified scope, remediations and uncertified boundaries.
 ---
 
-Repository version: `1.2.0-rc.5`. Prereleases are distributed as 13 `@aelionsdk/*` packages under
-the npm `next` tag. The npm badge and registry are authoritative for what is currently published.
+Repository version: `1.2.0`. This is the first stable 1.2 release. The 13 `@aelionsdk/*`
+packages publish under the npm `latest` tag. The npm badge and registry are authoritative for what
+is currently published.
+
+## 1.2.0 compile freeze and playback
+
+This release keeps the rc.2–rc.5 work and additionally:
+
+- incremental compile reuses already-frozen IR subtrees and caches track fingerprints by object
+  identity;
+- preview bypass hands the decoded `VideoFrame` over uncopied (`RenderIrFrameResult.bitmap` is
+  `ImageBitmap | VideoFrame`; read `width`/`height` from the result);
+- PCM window-cache hits skip decoder and operation admission;
+- audio PCM decode sessions are reused across sequential fills;
+- pause disconnects the worklet without flushing the ring;
+- the preview clears after the last visual clip ends;
+- items that own markers can be split.
 
 ## rc.5 compositor path
 
@@ -72,7 +87,7 @@ result. Release evidence is valid only for the source manifest to which it is bo
 - The proxy workflow still requires a host encoder.
 - WebGPU lacks complete WebGL2 multi-pass parity and physical-device certification.
 - Long page-independent rendering and 24-hour physical-device soak evidence are not delivered.
-- RC APIs may change through documented migration/deprecation before the first stable release.
+- After 1.2.0, public API changes follow SemVer, CHANGELOG, and the documented deprecation window.
 
 ## Local verification
 

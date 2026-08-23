@@ -1,17 +1,17 @@
 ---
 title: 安装与工程配置
-description: 从 npm 安装 AelionSDK 1.1 Release Candidate，启动 Quickstart，并配置自己的 Vite 应用。
+description: 从 npm 安装 AelionSDK 1.2 正式版，启动 Quickstart，并配置自己的 Vite 应用。
 ---
 
-AelionSDK 的 1.1 Release Candidate 通过 npm `next` tag 分发。普通应用至少安装 SDK；需要直接
+AelionSDK 的 1.2 正式版通过 npm `latest` tag 分发。普通应用至少安装 SDK；需要直接
 使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
 
 ```bash
-npm install @aelionsdk/sdk@next @aelionsdk/export@next
-npm install --save-dev @aelionsdk/vite-plugin@next vite
+npm install @aelionsdk/sdk @aelionsdk/export
+npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-使用 pnpm 或 yarn 时保持相同的包名与 `next` tag。不要导入源码目录或复制仓库内
+使用 pnpm 或 yarn 时保持相同的包名。不要导入源码目录或复制仓库内
 构建产物。
 
 ## 环境要求
@@ -169,7 +169,7 @@ import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
 
 const session = await Aelion.createSession({
   media,
-  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/1.2.0-rc.5/'),
+  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/1.2.0/'),
 });
 ```
 
@@ -235,15 +235,15 @@ corepack pnpm --filter @example/my-editor build
 
 ## 锁定精确版本
 
-生产集成不应长期跟随可移动的 `next` tag。验证完成后，把依赖锁定到当前 RC：
+生产集成不应长期跟随可移动的 `latest` tag。验证完成后，把依赖锁定到当前正式版：
 
 ```bash
-pnpm add @aelionsdk/sdk@1.2.0-rc.5 @aelionsdk/export@1.2.0-rc.5
-pnpm add -D @aelionsdk/vite-plugin@1.2.0-rc.5
+pnpm add @aelionsdk/sdk@1.2.0 @aelionsdk/export@1.2.0
+pnpm add -D @aelionsdk/vite-plugin@1.2.0
 ```
 
-`npm install @aelionsdk/sdk` 默认读取 `latest`，在首个稳定版本发布前不会自动选中当前
-RC。接下来打开[快速开始](/AelionSDK/zh/start/getting-started/)，从素材导入开始接代码。
+`npm install @aelionsdk/sdk` 默认读取 `latest`，当前指向本正式版。接下来打开
+[快速开始](/AelionSDK/zh/start/getting-started/)，从素材导入开始接代码。
 
 ## 验证发布身份
 
@@ -252,18 +252,18 @@ RC。接下来打开[快速开始](/AelionSDK/zh/start/getting-started/)，从�
 锁文件：
 
 ```bash
-npm install @aelionsdk/sdk@1.2.0-rc.5
-npm view @aelionsdk/sdk@1.2.0-rc.5 version dist.integrity dist.attestations --json
+npm install @aelionsdk/sdk@1.2.0
+npm view @aelionsdk/sdk@1.2.0 version dist.integrity dist.attestations --json
 npm view @aelionsdk/sdk dist-tags --json
 ```
 
-预期精确版本为 `1.2.0-rc.5`，`next` 指向该版本，`dist.attestations` 包含来自
+预期精确版本为 `1.2.0`，`latest` 指向该版本，`dist.attestations` 包含来自
 GitHub Actions 的 provenance。完整发布还应交叉核对：
 
-- [Git Tag `v1.2.0-rc.5`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0-rc.5)；
+- [Git Tag `v1.2.0`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0)；
 - [发布工作流](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270)；
-- [GitHub prerelease](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0-rc.5)。
+- [GitHub Release](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0)。
 
-使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.2.0-rc.5 version
-dist.integrity dist.attestations --json`。不要混用不同 RC，也不要把可移动的 `next`
-tag 写入生产锁定策略。
+使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.2.0 version
+dist.integrity dist.attestations --json`。不要混用不同版本，也不要把可移动的
+`latest` tag 写入生产锁定策略。

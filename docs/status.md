@@ -1,15 +1,15 @@
-# AelionSDK 1.2.0-rc.5 release-candidate status
+# AelionSDK 1.2.0 release status
 
-Updated: 2026-08-23 (Asia/Shanghai)
+Updated: 2026-08-24 (Asia/Shanghai)
 
 ## Bound final gate run
 
 - Source manifest:
-  `dda0f3020672aea03b567866422713056144d75b1b030a5e79f6398ede0e6b79`
+  `faf025df7c06350bba8eb5e8ea9df1e265dc9dd0d3dbb9fff8a566a179e17781`
 - Result: 21 of 21 serial commands passed.
 - Source identity: identical before and after the run.
 - Artifact postflight: all semantic, freshness, and binding checks passed.
-- Browser conformance: Chromium 91/91 and Firefox 75/75, with zero failed,
+- Browser conformance: Chromium 93/93 and Firefox 76/76, with zero failed,
   pending, skipped, or todo tests.
 - Distribution: all 13 public packages passed tarball installation, Node
   consumer, Chromium consumer, Firefox consumer, release dry-run, and
@@ -27,7 +27,7 @@ The authoritative machine-readable record is
 `reports/baseline` is bound by byte count, SHA-256, producer command, and
 freshness window.
 
-## Implemented candidate scope
+## Implemented release scope
 
 - 1.0 engine scope: persistent sequential/GOP WebCodecs decoding, whole-frame
   WebGL2/WebGPU frame graphs, public Composition/Layer/Clip APIs, strict
@@ -53,24 +53,30 @@ freshness window.
   render-scale changes; preview reuses the export compositor bypass when the
   decoded frame already matches the canvas, or shares its aspect ratio and can
   be scaled; preview `maxDimension` downscale at the provider boundary; shared
-  LRU raster cache for text, generators and shapes; 4K30 real-media evidence
-  excludes one warmup export so the 1.5× floor measures a primed encoder.
+  LRU raster cache for text, generators and shapes.
+- 1.2.0 compile freeze and playback: incremental compile reuses already-frozen
+  IR subtrees; preview bypass hands decoded `VideoFrame`s over uncopied;
+  `RenderIrFrameResult.bitmap` is `ImageBitmap | VideoFrame`; PCM window-cache
+  hits skip admission; audio PCM sessions are reused; pause disconnects the
+  worklet without flushing the ring; the preview clears after the last visual
+  clip; items that own markers can be split. 4K30 real-media evidence excludes
+  one same-session warmup export so the 1.5× floor measures a primed encoder.
 - Corrected API boundaries: codec fallback is capability selection only and does
   not claim an executable WASM backend; audio energy changes are not described
   as video scene detection; deferred roadmap work remains marked deferred.
 
 ## Release outcome
 
-The independent blocker review for `1.2.0-rc.5` was approved against this exact
+The independent blocker review for `1.2.0` was approved against this exact
 source manifest, gate record, and artifact set with every required check true
-and no open blocker. Tag `v1.2.0-rc.5` publishes all 13 packages with
-provenance to the npm `next` dist-tag and creates a GitHub prerelease.
+and no open blocker. Tag `v1.2.0` publishes all 13 packages with provenance to
+the npm `latest` dist-tag and creates a GitHub Release.
 
-`1.2.0-rc.4`, `1.2.0-rc.3` and `1.2.0-rc.2` remain immutable npm artifacts.
+`1.2.0-rc.5` through `1.2.0-rc.2` remain immutable npm artifacts.
 `1.1.0-rc.1` and `1.2.0-rc.1` are superseded and should not be newly adopted.
 
 This file is a concise evidence index; the canonical user-facing status,
 current limitations, and verification commands live in the
 [documentation status page](https://foyonaczy.github.io/AelionSDK/project/status/).
-The immutable release record is the tag, workflow run, GitHub prerelease, npm
+The immutable release record is the tag, workflow run, GitHub Release, npm
 provenance, and this bound evidence set.

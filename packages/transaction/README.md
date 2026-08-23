@@ -6,10 +6,10 @@ AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/transaction@next
+npm install @aelionsdk/transaction
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Product applications should edit
+`latest` currently resolves to `1.2.0`. Product applications should edit
 through an `@aelionsdk/sdk` Session; direct use is intended for custom hosts and
 engine integrations.
 

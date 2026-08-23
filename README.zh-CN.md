@@ -7,7 +7,7 @@
 **语言：** [English](README.md) · **简体中文**
 
 [![CI](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml/badge.svg)](https://github.com/FoyonaCZY/AelionSDK/actions/workflows/ci.yml)
-[![npm next](https://img.shields.io/npm/v/@aelionsdk/sdk/next?label=npm%20next)](https://www.npmjs.com/package/@aelionsdk/sdk)
+[![npm](https://img.shields.io/npm/v/@aelionsdk/sdk/latest?label=npm)](https://www.npmjs.com/package/@aelionsdk/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Node.js 24](https://img.shields.io/badge/node-24-43853d.svg)](package.json)
 
@@ -46,20 +46,21 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-仓库中的 1.2 Release Candidate 是 `1.2.0-rc.5`。预发布版通过 npm 的 `next` tag 分发，
+仓库中的 1.2 正式版是 `1.2.0`。稳定版通过 npm 的 `latest` tag 分发，
 当前实际发布版本以 npm badge 和 registry 为准。Vite 应用安装 SDK、导出入口和运行时资源插件：
 
 ```bash
-npm install @aelionsdk/sdk@next @aelionsdk/export@next
-npm install --save-dev @aelionsdk/vite-plugin@next vite
+npm install @aelionsdk/sdk @aelionsdk/export
+npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
 ### rc.2 补救重点
 
 > `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。`1.2.0-rc.2`
-> 完成了契约补救；当前仓库版本是 `1.2.0-rc.5`，发布后通过 npm `next` dist-tag 分发。
+> 完成了契约补救；当前仓库版本是 `1.2.0`，发布后通过 npm `latest` dist-tag 分发。
 > rc.4 加快交互提交，并补上文字背景板、transient 解码和更稳的播放/seek。
 > rc.5 池化 WebGL2 资源、复用合成 bypass，并让预览 `maxDimension` 真正缩小上传。
+> 1.2.0 冻结已复用的 Render IR、预览帧零拷贝交接，并复用音频 PCM session。
 
 - 新 Project 使用独立的 `v1.2.json / 1.2.0` Schema；旧 RC 文档会先隔离快照再兼容迁移。
 - 图像序列已经进入实际预览和导出路径，不再只是 Project 建模辅助函数。
@@ -290,10 +291,9 @@ Safari 真机、实体移动端、HDR 或 10-bit 认证。
 
 ## 当前边界
 
-AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证，但版本仍处于
-1.2 RC 阶段。使用前需要了解这些边界：
+AelionSDK 现在适合做产品原型、内部工具和目标设备上的集成验证。使用前需要了解这些边界：
 
-- 13 个公开包通过 npm `next` tag 发布；RC API 在首个稳定版本前仍可能按迁移规则调整；
+- 13 个公开包通过 npm `latest` tag 发布；公开 API 变更遵循 SemVer、CHANGELOG 和弃用窗口；
 - 自动化覆盖 Chromium、Firefox、Playwright WebKit 和 390×844 触控目标；Safari
   真机、iOS 与 Android 实体设备仍未认证；
 - 本地画面管线目前是 RGBA8 SDR，不支持 HDR、PQ/HLG 或 10-bit 输出；

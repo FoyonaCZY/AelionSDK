@@ -6,10 +6,10 @@ evaluation for AelionSDK.
 ## Install
 
 ```bash
-npm install @aelionsdk/render-ir@next
+npm install @aelionsdk/render-ir
 ```
 
-`next` currently resolves to `1.2.0-rc.5`. Product applications should use
+`latest` currently resolves to `1.2.0`. Product applications should use
 `@aelionsdk/sdk`; direct use is for custom renderers, exporters and engine
 instrumentation.
 

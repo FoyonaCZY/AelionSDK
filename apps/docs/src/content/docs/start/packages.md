@@ -8,7 +8,7 @@ description: Choose AelionSDK packages for product integration, Material authori
 Start with:
 
 ```bash
-npm install @aelionsdk/sdk@next
+npm install @aelionsdk/sdk
 ```
 
 The SDK facade includes Project and Composition builders, media registration, Session, commands,
@@ -18,14 +18,14 @@ Materials.
 For Vite, also install:
 
 ```bash
-npm install --save-dev @aelionsdk/vite-plugin@next vite
+npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
 Install `@aelionsdk/export` directly when application code needs OPFS/memory sinks, remote provider
 types, profile metadata, or checkpointed lower-level export.
 
 ```bash
-npm install @aelionsdk/export@next
+npm install @aelionsdk/export
 ```
 
 Non-Vite hosts still install runtime dependencies and deploy the documented Worker/Worklet assets;
@@ -34,7 +34,7 @@ they do not import internal package files.
 ## Material development
 
 ```bash
-npm install --save-dev @aelionsdk/material-sdk@next
+npm install --save-dev @aelionsdk/material-sdk
 ```
 
 It supplies typed graph/definition builders, deterministic packing, validation, Material Lab,
@@ -60,7 +60,7 @@ Prefer Session APIs over recreating the SDK's internal dependency graph in appli
 ## Version and import rules
 
 - Keep all `@aelionsdk/*` packages on the same exact release.
-- The npm `next` tag currently points to `1.2.0-rc.5`; pin it after validation.
+- The npm `latest` tag currently points to `1.2.0`; pin the exact version after validation.
 - Import only package names and documented subpath exports.
 - Never import `src/*`, generated `dist/*`, test helpers, or another workspace package's internals.
 - Browser support remains runtime capability/preflight, not a package-selection rule.

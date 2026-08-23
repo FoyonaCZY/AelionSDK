@@ -3,7 +3,7 @@ title: Packages and public entry points
 description: Understand the responsibilities and intended consumers of the 13 @aelionsdk packages.
 ---
 
-All public packages are currently `1.2.0-rc.5` under npm `next`. Only paths declared by a
+All public packages are currently `1.2.0` under npm `latest`. Only paths declared by a
 package's `exports` field are public API; `src/*`, `dist/*`, tests, and internal helpers are not.
 
 ## Stability tiers
@@ -15,7 +15,7 @@ package's `exports` field are public API; `src/*`, `dist/*`, tests, and internal
 | Advanced engine | `core`, `capability`, `media`, `material-compiler`, `render-ir`, `renderer-worker`, `audio`, `transaction` | Custom hosts and engine contributors    |
 
 All packages share a release version, but direct use of an advanced package opts into a narrower
-compatibility boundary during the prerelease period.
+compatibility boundary; follow SemVer, CHANGELOG and the API snapshot.
 
 ## Product entry packages
 
