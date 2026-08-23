@@ -612,6 +612,9 @@ void main() {
   v_uv = a_uv;
 }`;
 
+/** Retained render targets beyond this are deleted instead of pooled. */
+const MAX_POOLED_FRAME_GRAPH_TARGETS = 32;
+
 class WebGl2Runtime {
   readonly canvas: OffscreenCanvas;
   readonly gl: WebGL2RenderingContext;
@@ -619,12 +622,17 @@ class WebGl2Runtime {
   readonly #textures: WebGLTexture[] = [];
   readonly #positionBuffer: WebGLBuffer;
   readonly #uvBuffer: WebGLBuffer;
+  /** Free render targets at the current size, reused across frames. */
+  readonly #targetPool: FrameGraphTexture[] = [];
+  /** Targets handed out for the frame in flight. */
+  readonly #targetsInUse: FrameGraphTexture[] = [];
+  public width: number;
+  public height: number;
   lastAccess = 0;
 
-  public constructor(
-    public readonly width: number,
-    public readonly height: number,
-  ) {
+  public constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
     this.canvas = new OffscreenCanvas(width, height);
     const gl = this.canvas.getContext('webgl2', {
       alpha: true,
@@ -681,12 +689,50 @@ class WebGl2Runtime {
     return texture;
   }
 
+  /**
+   * Resizes the drawing buffer in place. Compiled programs, vertex buffers and
+   * input textures are resolution independent and survive; only the render
+   * target pool is sized and has to be dropped.
+   */
+  public resize(width: number, height: number): void {
+    if (this.width === width && this.height === height) return;
+    this.width = width;
+    this.height = height;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.#releaseTargetPool();
+  }
+
+  /** Borrows a render target for the frame in flight. */
+  public acquireTarget(): FrameGraphTexture {
+    const pooled = this.#targetPool.pop();
+    const target = pooled ?? createFrameGraphTexture(this.gl, this.width, this.height);
+    this.#targetsInUse.push(target);
+    return target;
+  }
+
+  /** Returns every borrowed target to the pool. Call once per frame. */
+  public releaseTargets(): void {
+    for (const target of this.#targetsInUse) {
+      if (this.#targetPool.length < MAX_POOLED_FRAME_GRAPH_TARGETS) {
+        this.#targetPool.push(target);
+        continue;
+      }
+      this.#deleteTarget(target);
+    }
+    this.#targetsInUse.length = 0;
+  }
+
   public snapshot(): {
     readonly programs: number;
     readonly textures: number;
     readonly buffers: number;
   } {
-    return { programs: this.#programs.size, textures: this.#textures.length, buffers: 2 };
+    return {
+      programs: this.#programs.size,
+      textures: this.#textures.length + this.#targetPool.length + this.#targetsInUse.length,
+      buffers: 2,
+    };
   }
 
   public dispose(): void {
@@ -695,9 +741,22 @@ class WebGl2Runtime {
     this.#programs.clear();
     this.#textures.forEach(texture => gl.deleteTexture(texture));
     this.#textures.length = 0;
+    this.#releaseTargetPool();
     gl.deleteBuffer(this.#positionBuffer);
     gl.deleteBuffer(this.#uvBuffer);
     gl.getExtension('WEBGL_lose_context')?.loseContext();
+  }
+
+  #releaseTargetPool(): void {
+    for (const target of this.#targetPool) this.#deleteTarget(target);
+    for (const target of this.#targetsInUse) this.#deleteTarget(target);
+    this.#targetPool.length = 0;
+    this.#targetsInUse.length = 0;
+  }
+
+  #deleteTarget(target: FrameGraphTexture): void {
+    if (target.framebuffer !== undefined) this.gl.deleteFramebuffer(target.framebuffer);
+    this.gl.deleteTexture(target.texture);
   }
 
   #createBuffer(values: readonly number[]): WebGLBuffer {
@@ -716,37 +775,43 @@ class WebGl2Runtime {
   }
 }
 
-const MAX_WEBGL2_RUNTIMES = 2;
-const webGl2Runtimes = new Map<string, WebGl2Runtime>();
+/**
+ * One context, resized on demand.
+ *
+ * Keying runtimes by output size meant every renderScale change built a fresh
+ * WebGL2 context and recompiled every shader, because the program cache lives
+ * on the runtime. Adaptive preview quality walks several scales, so that ran on
+ * ordinary playback. Programs, buffers and input textures do not depend on the
+ * drawing buffer size, so resizing keeps all of them.
+ */
+let webGl2RuntimeInstance: WebGl2Runtime | undefined;
 let webGl2RuntimeClock = 0;
 
 function webGl2Runtime(width: number, height: number): WebGl2Runtime {
-  const key = `${width.toString()}x${height.toString()}`;
-  let runtime = webGl2Runtimes.get(key);
+  let runtime = webGl2RuntimeInstance;
   if (runtime?.gl.isContextLost() === true) {
     runtime.dispose();
-    webGl2Runtimes.delete(key);
     runtime = undefined;
+    webGl2RuntimeInstance = undefined;
   }
   if (runtime === undefined) {
     runtime = new WebGl2Runtime(width, height);
-    webGl2Runtimes.set(key, runtime);
+    webGl2RuntimeInstance = runtime;
+  } else {
+    runtime.resize(width, height);
   }
   runtime.lastAccess = ++webGl2RuntimeClock;
-  while (webGl2Runtimes.size > MAX_WEBGL2_RUNTIMES) {
-    const oldest = [...webGl2Runtimes.entries()].sort(
-      (left, right) => left[1].lastAccess - right[1].lastAccess,
-    )[0];
-    if (oldest === undefined) break;
-    oldest[1].dispose();
-    webGl2Runtimes.delete(oldest[0]);
-  }
   return runtime;
 }
 
+/** Drops the context after a loss so the next frame rebuilds it. */
+function dropWebGl2Runtime(): void {
+  webGl2RuntimeInstance?.dispose();
+  webGl2RuntimeInstance = undefined;
+}
+
 function disposeWebGl2Runtimes(): void {
-  webGl2Runtimes.forEach(runtime => runtime.dispose());
-  webGl2Runtimes.clear();
+  dropWebGl2Runtime();
 }
 
 function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
@@ -827,11 +892,12 @@ function renderWebGl2Pass(
   gl.viewport(0, 0, request.width, request.height);
   const gpuStartedAt = performance.now();
   gl.drawArrays(gl.TRIANGLES, 0, 6);
-  gl.finish();
+  // No gl.finish(): transferToImageBitmap already orders against the pending
+  // draw, so the explicit stall only served to make the timing below a
+  // completion measure. It now reports submission, matching the WebGPU path.
   timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
   if (gl.isContextLost()) {
-    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
-    runtime.dispose();
+    dropWebGl2Runtime();
     throw new RendererBackendError(
       'RENDERER_WEBGL_CONTEXT_LOST',
       'WebGL2 context was lost during composition',
@@ -843,8 +909,7 @@ function renderWebGl2Pass(
   // the resulting transparent/stale bitmap as a successful composition.
   if (gl.isContextLost()) {
     bitmap.close();
-    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
-    runtime.dispose();
+    dropWebGl2Runtime();
     throw new RendererBackendError(
       'RENDERER_WEBGL_CONTEXT_LOST',
       'WebGL2 context was lost while transferring the composed frame',
@@ -924,8 +989,7 @@ function composeWebGl2(
   if (request.debugSimulateLoss === 'webgl2-context') {
     const runtime = webGl2Runtime(request.width, request.height);
     runtime.gl.getExtension('WEBGL_lose_context')?.loseContext();
-    webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
-    runtime.dispose();
+    dropWebGl2Runtime();
     throw new RendererBackendError(
       'RENDERER_WEBGL_CONTEXT_LOST',
       'WebGL2 context was lost during composition',
@@ -985,11 +1049,14 @@ void main() {
   out_color = texture(u_input_source, v_uv);
 }`;
 
+/**
+ * Allocates a colour-attachment render target. External inputs no longer come
+ * through here: they upload into the runtime's reusable input slots.
+ */
 function createFrameGraphTexture(
   gl: WebGL2RenderingContext,
   width: number,
   height: number,
-  source?: VideoFrame,
 ): FrameGraphTexture {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -997,32 +1064,19 @@ function createFrameGraphTexture(
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  if (source === undefined) {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
-      gl.deleteFramebuffer(framebuffer);
-      gl.deleteTexture(texture);
-      throw new RendererBackendError(
-        'RENDERER_WEBGL_FRAMEBUFFER_INCOMPLETE',
-        'Unable to allocate a complete WebGL2 frame graph target',
-      );
-    }
-    return { texture, framebuffer };
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  const framebuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+  if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+    gl.deleteFramebuffer(framebuffer);
+    gl.deleteTexture(texture);
+    throw new RendererBackendError(
+      'RENDERER_WEBGL_FRAMEBUFFER_INCOMPLETE',
+      'Unable to allocate a complete WebGL2 frame graph target',
+    );
   }
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    source as unknown as TexImageSource,
-  );
-  return { texture };
+  return { texture, framebuffer };
 }
 
 function bindFrameGraphInputs(
@@ -1099,15 +1153,13 @@ function executeFrameGraphNode(
   node: FrameGraphNode,
   externalTextures: ReadonlyMap<string, FrameGraphTexture>,
   nodeTextures: Map<string, FrameGraphTexture>,
-  allocated: FrameGraphTexture[],
 ): void {
   if (nodeTextures.has(node.id)) {
     throw new RangeError(`Frame graph node id ${node.id} is duplicated`);
   }
   const passes = node.program.passes;
   if (passes === undefined) {
-    const target = createFrameGraphTexture(runtime.gl, request.width, request.height);
-    allocated.push(target);
+    const target = runtime.acquireTarget();
     const inputs = node.program.inputPorts.map(port => ({
       sampler: port.replaceAll(/[^a-zA-Z0-9_]/gu, '_'),
       texture: frameGraphInputTexture(request, node, port, externalTextures, nodeTextures),
@@ -1132,8 +1184,7 @@ function executeFrameGraphNode(
     if (passTextures.has(pass.id)) {
       throw new RangeError(`Material pass id ${pass.id} is duplicated in node ${node.id}`);
     }
-    const target = createFrameGraphTexture(runtime.gl, request.width, request.height);
-    allocated.push(target);
+    const target = runtime.acquireTarget();
     const inputs = pass.inputs.map(input => {
       const texture =
         input.source.kind === 'external'
@@ -1178,23 +1229,26 @@ function composeWebGl2FrameGraph(
   if (request.nodes.length === 0) throw new RangeError('Frame graph has no nodes');
   const runtime = webGl2Runtime(request.width, request.height);
   const gl = runtime.gl;
-  const allocated: FrameGraphTexture[] = [];
   const externalTextures = new Map<string, FrameGraphTexture>();
   const nodeTextures = new Map<string, FrameGraphTexture>();
   (resources as { webgl2Contexts: number }).webgl2Contexts = 1;
   (resources as { webgl2Buffers: number }).webgl2Buffers = 2;
   try {
+    // Input textures are reused by slot and render targets come from the pool,
+    // so a steady-state frame allocates no GPU memory. Previously every input
+    // and every node built a texture (plus an FBO) that was deleted again at
+    // the end of the frame — at 1080p that is 8 MB of churn per surface.
+    let inputSlot = 0;
     for (const [id, frame] of Object.entries(request.inputs)) {
-      const texture = createFrameGraphTexture(gl, request.width, request.height, frame);
-      allocated.push(texture);
-      externalTextures.set(id, texture);
+      externalTextures.set(id, { texture: runtime.uploadTexture(inputSlot, frame) });
+      inputSlot += 1;
     }
     const gpuStartedAt = performance.now();
     for (const node of request.nodes) {
       if (cancelledRequestIds.has(request.id)) {
         throw new DOMException('Renderer request cancelled', 'AbortError');
       }
-      executeFrameGraphNode(request, runtime, node, externalTextures, nodeTextures, allocated);
+      executeFrameGraphNode(request, runtime, node, externalTextures, nodeTextures);
     }
     const output = nodeTextures.get(request.outputNodeId);
     if (output === undefined) {
@@ -1209,23 +1263,22 @@ function composeWebGl2FrameGraph(
       {},
       null,
     );
-    gl.finish();
+    // See renderWebGl2Pass: transferToImageBitmap orders against the pending
+    // draws, so this timing is submission rather than completion.
     timing.gpuCompletionUs += Math.round((performance.now() - gpuStartedAt) * 1_000);
     if (gl.isContextLost()) {
-      webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
-      runtime.dispose();
+      dropWebGl2Runtime();
       throw new RendererBackendError(
         'RENDERER_WEBGL_CONTEXT_LOST',
         'WebGL2 context was lost during frame graph composition',
       );
     }
     (resources as { webgl2Programs: number }).webgl2Programs = runtime.snapshot().programs;
-    (resources as { webgl2Textures: number }).webgl2Textures = allocated.length;
+    (resources as { webgl2Textures: number }).webgl2Textures = runtime.snapshot().textures;
     const bitmap = runtime.canvas.transferToImageBitmap();
     if (gl.isContextLost()) {
       bitmap.close();
-      webGl2Runtimes.delete(`${request.width.toString()}x${request.height.toString()}`);
-      runtime.dispose();
+      dropWebGl2Runtime();
       throw new RendererBackendError(
         'RENDERER_WEBGL_CONTEXT_LOST',
         'WebGL2 context was lost while transferring the frame graph result',
@@ -1234,10 +1287,7 @@ function composeWebGl2FrameGraph(
     return bitmap;
   } finally {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    allocated.forEach(({ framebuffer, texture }) => {
-      if (framebuffer !== undefined) gl.deleteFramebuffer(framebuffer);
-      gl.deleteTexture(texture);
-    });
+    runtime.releaseTargets();
     (resources as { webgl2Contexts: number }).webgl2Contexts = 0;
     (resources as { webgl2Programs: number }).webgl2Programs = 0;
     (resources as { webgl2Buffers: number }).webgl2Buffers = 0;

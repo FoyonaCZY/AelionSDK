@@ -128,6 +128,54 @@ interface RegisteredAsset {
   readonly representations: Map<string, RegisteredRepresentation>;
 }
 
+/**
+ * Shrinks a preview frame that is larger than the surface it will be composited
+ * into.
+ *
+ * `maxDimension` previously only chose between registered representations, so
+ * with no proxy attached it did nothing and a 4K source was uploaded to the GPU
+ * at 4K to be sampled down into a 1080p frame. Scaling here is the same
+ * reduction the compositor would do, moved to where it also shrinks the upload.
+ *
+ * Preview only: export must keep every source pixel. Takes ownership of `frame`
+ * and returns an owned frame.
+ */
+async function downscaleForPreview(
+  frame: VideoFrame,
+  request: AelionMediaRequest | undefined,
+): Promise<VideoFrame> {
+  const maxDimension = request?.maxDimension;
+  if (
+    request?.purpose !== 'preview' ||
+    maxDimension === undefined ||
+    !Number.isFinite(maxDimension) ||
+    maxDimension <= 0
+  ) {
+    return frame;
+  }
+  const largest = Math.max(frame.displayWidth, frame.displayHeight);
+  if (largest <= maxDimension) return frame;
+  const scale = maxDimension / largest;
+  const width = Math.max(1, Math.round(frame.displayWidth * scale));
+  const height = Math.max(1, Math.round(frame.displayHeight * scale));
+  const duration = frame.duration;
+  const timestamp = frame.timestamp;
+  const bitmap = await createImageBitmap(frame, {
+    resizeWidth: width,
+    resizeHeight: height,
+    resizeQuality: 'medium',
+  });
+  try {
+    return new VideoFrame(bitmap, {
+      timestamp,
+      ...(duration === null ? {} : { duration }),
+    });
+  } finally {
+    bitmap.close();
+    frame.close();
+  }
+}
+
 function stillImageSampleIndex(options: {
   readonly width: number;
   readonly height: number;
@@ -651,7 +699,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
           );
           try {
             throwIfAborted(operationSignal, 'production media video decode');
-            return result.frame.clone();
+            return await downscaleForPreview(result.frame.clone(), request);
           } finally {
             result.close();
           }
@@ -673,7 +721,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
               : await resident.session.frameAt(presentationTimeUs, operationSignal);
           try {
             throwIfAborted(operationSignal, 'production media video decode');
-            return result.frame.clone();
+            return await downscaleForPreview(result.frame.clone(), request);
           } finally {
             result.close();
           }

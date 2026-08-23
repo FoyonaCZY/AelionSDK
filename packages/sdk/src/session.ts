@@ -122,8 +122,11 @@ function directOpaqueVisualSource(
   }
   const clip = active.clip;
   const visual = clip.visual;
+  // `fit` is deliberately not constrained here. Every fit mode is a no-op once
+  // the decoded source matches the frame exactly, and that is the condition the
+  // caller checks after decoding. Requiring `fill` up front excluded the common
+  // `contain` case even when the source already filled the frame.
   if (
-    visual.fit !== 'fill' ||
     visual.blendMode !== 'normal' ||
     visual.mask !== undefined ||
     clip.materialInstanceIds.length !== 0
@@ -499,6 +502,26 @@ export class AelionSession implements AelionSessionApi {
       const media = this.#options.media;
       if (media === undefined) throw new Error('AelionSession requires a media provider to render');
       const previewQuality = normalizePreviewQuality(options);
+      // Export already skips the compositor for a single untransformed opaque
+      // clip; preview is the path that runs it sixty times a second. Only taken
+      // at full scale, where the composited output would be the same size, so
+      // the result the caller sees is unchanged apart from the frame's origin.
+      if (previewQuality.renderScale >= 1) {
+        const direct = await this.#takeDirectFrame(
+          ir,
+          media,
+          options.timeUs,
+          'preview',
+          options.signal,
+        );
+        if (direct !== undefined) {
+          try {
+            return await this.#directPreviewResult(direct, options.signal);
+          } finally {
+            direct.close();
+          }
+        }
+      }
       const result = await this.#requireRenderer().render({
         ir,
         timeUs: options.timeUs,
@@ -992,30 +1015,91 @@ export class AelionSession implements AelionSessionApi {
     });
   }
 
+  /**
+   * Decodes the frame for a Project that is one untransformed opaque clip, so
+   * compositing can be skipped entirely.
+   *
+   * Returns the source only when it is opaque *and* already the frame's exact
+   * size. The size check is what makes every `fit` mode safe to bypass, and it
+   * closes a hole in the previous `fit === 'fill'` test, which would hand a
+   * mismatched source straight to the encoder at the wrong resolution.
+   *
+   * Ownership transfers to the caller; `undefined` means nothing was retained.
+   */
+  async #takeDirectFrame(
+    ir: RenderIr,
+    media: AelionMediaProvider,
+    timeUs: number,
+    purpose: 'preview' | 'export',
+    signal?: AbortSignal,
+  ): Promise<VideoFrame | undefined> {
+    const direct = directOpaqueVisualSource(ir, timeUs);
+    if (direct === undefined) return undefined;
+    const source = await media.frameAt(
+      direct.assetId,
+      direct.streamIndex,
+      direct.sourceTimeUs,
+      signal,
+      {
+        purpose,
+        maxDimension: Math.max(ir.width, ir.height),
+      },
+    );
+    if (
+      !frameHasAlpha(source) &&
+      source.displayWidth === ir.width &&
+      source.displayHeight === ir.height
+    ) {
+      return source;
+    }
+    source.close();
+    return undefined;
+  }
+
+  /**
+   * Wraps a bypassed source frame as a preview result.
+   *
+   * `backend` reports the backend the compositor would have selected: no pass
+   * ran, and there is no worker timing to report, so `timing` and `resources`
+   * stay absent. The renderer is not instantiated for this path, so a Project
+   * that only ever bypasses never starts a compositor Worker.
+   */
+  async #directPreviewResult(
+    frame: VideoFrame,
+    signal?: AbortSignal,
+  ): Promise<import('@aelionsdk/renderer-worker').RenderIrFrameResult> {
+    const bitmap = await createImageBitmap(frame);
+    if (signal?.aborted === true) {
+      bitmap.close();
+      throw new DOMException('Preview frame was aborted', 'AbortError');
+    }
+    return {
+      bitmap,
+      backend:
+        this.#renderer?.snapshot().adaptiveBackend.selected ??
+        (this.#options.preferredBackend === 'webgpu' ? 'webgpu' : 'webgl2'),
+      materialIds: [],
+      width: frame.displayWidth,
+      height: frame.displayHeight,
+      renderScale: 1,
+    };
+  }
+
   async #renderExportFrame(
     ir: RenderIr,
     media: AelionMediaProvider,
     request: { readonly timestampUs: number; readonly durationUs: number },
     signal?: AbortSignal,
   ): Promise<VideoFrame> {
-    const direct = directOpaqueVisualSource(ir, request.timestampUs);
+    const direct = await this.#takeDirectFrame(ir, media, request.timestampUs, 'export', signal);
     if (direct !== undefined) {
-      const source = await media.frameAt(
-        direct.assetId,
-        direct.streamIndex,
-        direct.sourceTimeUs,
-        signal,
-        { purpose: 'export', maxDimension: Math.max(ir.width, ir.height) },
-      );
       try {
-        if (!frameHasAlpha(source)) {
-          return new VideoFrame(source, {
-            timestamp: request.timestampUs,
-            duration: request.durationUs,
-          });
-        }
+        return new VideoFrame(direct, {
+          timestamp: request.timestampUs,
+          duration: request.durationUs,
+        });
       } finally {
-        source.close();
+        direct.close();
       }
     }
     const rendered = await this.#requireRenderer().render({
