@@ -93,9 +93,32 @@ describe('ProductionMediaProvider browser image path', () => {
         cachedIndexes: 0,
         cachedVideoFrames: 0,
         decodeSessions: 0,
+        audioSessions: 0,
       });
     } finally {
       provider.dispose();
     }
   }, 60_000);
+
+  it('reuses one audio session and a PCM window across sequential fills', async () => {
+    const response = await fetch('/fixtures/media/mp4-moov-head-h264-aac.mp4');
+    expect(response.ok).toBe(true);
+    const provider = new ProductionMediaProvider();
+    provider.registerBlob('voice', await response.blob());
+    try {
+      const first = await provider.pcmRange('voice', 0, 0, 85_334);
+      const second = await provider.pcmRange('voice', 0, 85_334, 85_334);
+      expect(first.frameCount).toBeGreaterThan(0);
+      expect(second.frameCount).toBeGreaterThan(0);
+      expect(provider.snapshot()).toMatchObject({
+        audioSessions: 1,
+        activeAudioSessions: 0,
+        activeOperations: 0,
+      });
+      provider.clear();
+      expect(provider.snapshot().audioSessions).toBe(0);
+    } finally {
+      provider.dispose();
+    }
+  });
 });

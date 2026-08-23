@@ -455,6 +455,10 @@ export interface AudioDecodeOptions {
   readonly streamIndex?: number;
 }
 
+export interface AudioPcmDecodeSessionOptions {
+  readonly streamIndex?: number;
+}
+
 export async function decodeAudioPcmRange(
   bytes: Uint8Array,
   startUs: number,
@@ -484,13 +488,7 @@ export async function decodeAudioPcmRangeFromReader(
   );
 }
 
-async function decodeAudioPcmRangeFromInput(
-  input: Input,
-  startUs: number,
-  durationUs: number,
-  options: AudioDecodeOptions,
-): Promise<AudioPcmBlock> {
-  throwIfAborted(options.signal, 'audio PCM decode');
+function assertAudioDecodeRange(startUs: number, durationUs: number): void {
   if (
     !Number.isSafeInteger(startUs) ||
     !Number.isSafeInteger(durationUs) ||
@@ -499,55 +497,171 @@ async function decodeAudioPcmRangeFromInput(
   ) {
     throw new RangeError('Audio decode range must use non-negative safe integer microseconds');
   }
+}
+
+async function readPcmFromSink(
+  sink: AudioSampleSink,
+  sampleRate: number,
+  channelCount: number,
+  startUs: number,
+  durationUs: number,
+  signal?: AbortSignal,
+): Promise<AudioPcmBlock> {
+  throwIfAborted(signal, 'audio PCM decode');
+  const frameCount = Math.ceil((durationUs * sampleRate) / MICROSECONDS_PER_SECOND);
+  const output = new Float32Array(frameCount * channelCount);
+  const endUs = startUs + durationUs;
+  for await (const sample of sink.samples(
+    startUs / MICROSECONDS_PER_SECOND,
+    endUs / MICROSECONDS_PER_SECOND,
+  )) {
+    throwIfAborted(signal, 'audio PCM decode');
+    try {
+      const sampleStartFrame = Math.round(
+        ((sample.microsecondTimestamp - startUs) * sampleRate) / MICROSECONDS_PER_SECOND,
+      );
+      const sourceOffset = Math.max(0, -sampleStartFrame);
+      const destinationOffset = Math.max(0, sampleStartFrame);
+      const frames = Math.min(sample.numberOfFrames - sourceOffset, frameCount - destinationOffset);
+      if (frames <= 0) continue;
+      const copied = new Float32Array(frames * channelCount);
+      sample.copyTo(copied, {
+        planeIndex: 0,
+        format: 'f32',
+        frameOffset: sourceOffset,
+        frameCount: frames,
+      });
+      output.set(copied, destinationOffset * channelCount);
+    } finally {
+      sample.close();
+    }
+  }
+  return {
+    sampleRate,
+    channelCount,
+    startUs,
+    durationUs,
+    frameCount,
+    interleaved: output,
+  };
+}
+
+async function decodeAudioPcmRangeFromInput(
+  input: Input,
+  startUs: number,
+  durationUs: number,
+  options: AudioDecodeOptions,
+): Promise<AudioPcmBlock> {
+  throwIfAborted(options.signal, 'audio PCM decode');
+  assertAudioDecodeRange(startUs, durationUs);
   try {
     const tracks = await input.getAudioTracks();
     const track = tracks[options.streamIndex ?? 0];
     if (track === undefined) throw new RangeError('Requested audio stream does not exist');
     const sampleRate = await track.getSampleRate();
     const channelCount = await track.getNumberOfChannels();
-    const frameCount = Math.ceil((durationUs * sampleRate) / MICROSECONDS_PER_SECOND);
-    const output = new Float32Array(frameCount * channelCount);
-    const sink = new AudioSampleSink(track);
-    const endUs = startUs + durationUs;
-    for await (const sample of sink.samples(
-      startUs / MICROSECONDS_PER_SECOND,
-      endUs / MICROSECONDS_PER_SECOND,
-    )) {
-      throwIfAborted(options.signal, 'audio PCM decode');
-      try {
-        const sampleStartFrame = Math.round(
-          ((sample.microsecondTimestamp - startUs) * sampleRate) / MICROSECONDS_PER_SECOND,
-        );
-        const sourceOffset = Math.max(0, -sampleStartFrame);
-        const destinationOffset = Math.max(0, sampleStartFrame);
-        const frames = Math.min(
-          sample.numberOfFrames - sourceOffset,
-          frameCount - destinationOffset,
-        );
-        if (frames <= 0) continue;
-        const copied = new Float32Array(frames * channelCount);
-        sample.copyTo(copied, {
-          planeIndex: 0,
-          format: 'f32',
-          frameOffset: sourceOffset,
-          frameCount: frames,
-        });
-        output.set(copied, destinationOffset * channelCount);
-      } finally {
-        sample.close();
-      }
-    }
-    return {
+    return await readPcmFromSink(
+      new AudioSampleSink(track),
       sampleRate,
       channelCount,
       startUs,
       durationUs,
-      frameCount,
-      interleaved: output,
-    };
+      options.signal,
+    );
   } finally {
     input.dispose();
   }
+}
+
+/**
+ * Reuses one Input and AudioSampleSink across sequential PCM fills.
+ *
+ * Playback used to construct a new 8 MiB CustomSource and container parser on
+ * every ~85 ms mix. After a few dozen seconds the leftover caches and decoder
+ * wrappers made preview hitch. Callers still get a fresh decoder per range
+ * (mediabunny's samples() API), so pair this with a short PCM window cache.
+ */
+export class AudioPcmDecodeSession {
+  readonly #reader: RangeReader;
+  readonly #streamIndex: number;
+  #input: Input | undefined;
+  #sink: AudioSampleSink | undefined;
+  #sampleRate = 0;
+  #channelCount = 0;
+  #tail: Promise<void> = Promise.resolve();
+  #disposed = false;
+
+  public constructor(reader: RangeReader, options: AudioPcmDecodeSessionOptions = {}) {
+    this.#reader = reader;
+    this.#streamIndex = options.streamIndex ?? 0;
+    if (!Number.isSafeInteger(this.#streamIndex) || this.#streamIndex < 0) {
+      throw new RangeError('streamIndex must be a non-negative safe integer');
+    }
+  }
+
+  public get disposed(): boolean {
+    return this.#disposed;
+  }
+
+  public pcmRange(
+    startUs: number,
+    durationUs: number,
+    signal?: AbortSignal,
+  ): Promise<AudioPcmBlock> {
+    if (this.#disposed) throw new ReferenceError('AudioPcmDecodeSession is disposed');
+    assertAudioDecodeRange(startUs, durationUs);
+    const task = this.#tail.then(() => this.#pcmRangeOnce(startUs, durationUs, signal));
+    this.#tail = task.then(
+      () => undefined,
+      () => undefined,
+    );
+    return task;
+  }
+
+  public dispose(): void {
+    if (this.#disposed) return;
+    this.#disposed = true;
+    this.#sink = undefined;
+    this.#input?.dispose();
+    this.#input = undefined;
+  }
+
+  async #pcmRangeOnce(
+    startUs: number,
+    durationUs: number,
+    signal?: AbortSignal,
+  ): Promise<AudioPcmBlock> {
+    if (this.#disposed) throw new ReferenceError('AudioPcmDecodeSession is disposed');
+    await this.#ensure(signal);
+    const sink = this.#sink;
+    if (sink === undefined) throw new ReferenceError('AudioPcmDecodeSession is not initialized');
+    return readPcmFromSink(sink, this.#sampleRate, this.#channelCount, startUs, durationUs, signal);
+  }
+
+  async #ensure(signal?: AbortSignal): Promise<void> {
+    if (this.#sink !== undefined) return;
+    const input = inputFromReader(this.#reader, signal);
+    try {
+      throwIfAborted(signal, 'audio PCM decode');
+      const tracks = await input.getAudioTracks();
+      const track = tracks[this.#streamIndex];
+      if (track === undefined) throw new RangeError('Requested audio stream does not exist');
+      this.#sampleRate = await track.getSampleRate();
+      this.#channelCount = await track.getNumberOfChannels();
+      this.#sink = new AudioSampleSink(track);
+      this.#input = input;
+    } catch (error) {
+      input.dispose();
+      throw error;
+    }
+  }
+}
+
+export function createAudioPcmDecodeSessionFromReader(
+  reader: RangeReader,
+  options: AudioPcmDecodeSessionOptions = {},
+): AudioPcmDecodeSession {
+  return new AudioPcmDecodeSession(reader, options);
 }
 
 async function waitForDecodeCapacity(

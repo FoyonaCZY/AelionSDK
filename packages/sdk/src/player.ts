@@ -6,6 +6,7 @@ import {
   type ScheduledVideoFrame,
 } from '@aelionsdk/audio';
 import { sampleIndexAtTime } from '@aelionsdk/core';
+import type { IrClip, RenderIr } from '@aelionsdk/render-ir';
 import type { ChangeSet } from '@aelionsdk/transaction';
 
 import type { AelionSession } from './session.js';
@@ -45,6 +46,25 @@ const RECOVERABLE_PREVIEW_CODES = new Set([
   'MEDIA_PROVIDER_QUEUE_FULL',
   'OPERATION_ABORTED',
 ]);
+
+function clipCoversTime(clip: IrClip, timeUs: number): boolean {
+  return (
+    clip.enabled &&
+    timeUs >= clip.range.startUs &&
+    timeUs < clip.range.startUs + clip.range.durationUs
+  );
+}
+
+function hasVisualPreview(ir: RenderIr, timeUs: number): boolean {
+  for (const track of ir.tracks) {
+    if (!track.enabled || track.kind === 'audio') continue;
+    for (const clip of track.clips) {
+      if (clip.kind === 'audio-clip') continue;
+      if (clipCoversTime(clip, timeUs)) return true;
+    }
+  }
+  return false;
+}
 
 function recoverablePreviewSkip(error: unknown): boolean {
   if (error instanceof DOMException && error.name === 'AbortError') return true;
@@ -448,6 +468,7 @@ export class AelionPlayer implements AelionPlayerApi {
     // hitches every few hundred milliseconds; the scheduler already skips
     // behind by dropping intervals while a frame is in flight.
     const timeUs = Math.min(Math.max(0, this.currentTimeUs), Math.max(0, ir.durationUs - 1));
+    if (!hasVisualPreview(ir, timeUs)) return;
     try {
       const result = await this.#session.preview.renderFrame({
         timeUs,

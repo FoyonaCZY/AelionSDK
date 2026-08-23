@@ -5,6 +5,7 @@ import {
   FetchRangeReader,
   MemoryCacheStore,
   PageMediaResourceGovernor,
+  createAudioPcmDecodeSessionFromReader,
   createSampleIndexFromReader,
   createVideoFrameDecodeSessionFromReader,
   decodeAudioPcmRangeFromReader,
@@ -12,6 +13,8 @@ import {
   decodeVideoFrameAtFromReader,
   proxyPresentationTimeUs,
   selectAssetRepresentation,
+  type AudioPcmBlock,
+  type AudioPcmDecodeSession,
   type CacheAddress,
   type CacheStore,
   type FetchRangeReaderOptions,
@@ -24,6 +27,7 @@ import {
 import type { AelionMediaProvider, AelionMediaRequest } from './types.js';
 
 const SAMPLE_INDEX_CACHE_VERSION = 'aelion-sample-index-v1';
+const AUDIO_PCM_WINDOW_US = 1_000_000;
 
 export type ProductionMediaRole = 'original' | 'proxy' | 'thumbnail' | 'waveform';
 
@@ -85,6 +89,8 @@ export interface ProductionMediaProviderSnapshot {
   readonly maxCachedIndexBytes: number;
   readonly decodeSessions: number;
   readonly activeDecodeSessions: number;
+  readonly audioSessions: number;
+  readonly activeAudioSessions: number;
   readonly maxDecodeSessions: number;
   readonly cachedVideoFrames: number;
   readonly cachedVideoBytes: number;
@@ -244,6 +250,43 @@ interface ResidentDecodeSession {
   active: number;
 }
 
+interface ResidentAudioSession {
+  readonly session: AudioPcmDecodeSession;
+  window: AudioPcmBlock | undefined;
+  access: number;
+  active: number;
+}
+
+function audioWindowCovers(block: AudioPcmBlock, startUs: number, durationUs: number): boolean {
+  return startUs >= block.startUs && startUs + durationUs <= block.startUs + block.durationUs;
+}
+
+function sliceAudioPcmBlock(
+  block: AudioPcmBlock,
+  startUs: number,
+  durationUs: number,
+): AudioPcmBlock {
+  const startFrame = Math.max(
+    0,
+    Math.round(((startUs - block.startUs) * block.sampleRate) / 1_000_000),
+  );
+  const frameCount = Math.min(
+    Math.max(0, Math.ceil((durationUs * block.sampleRate) / 1_000_000)),
+    Math.max(0, block.frameCount - startFrame),
+  );
+  return {
+    sampleRate: block.sampleRate,
+    channelCount: block.channelCount,
+    startUs,
+    durationUs,
+    frameCount,
+    interleaved: block.interleaved.subarray(
+      startFrame * block.channelCount,
+      (startFrame + frameCount) * block.channelCount,
+    ),
+  };
+}
+
 interface ResidentImage {
   readonly frame: VideoFrame;
   readonly byteLength: number;
@@ -375,6 +418,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
   readonly #assets = new Map<string, RegisteredAsset>();
   readonly #residentIndexes = new Map<string, ResidentIndex>();
   readonly #decodeSessions = new Map<string, ResidentDecodeSession>();
+  readonly #audioSessions = new Map<string, ResidentAudioSession>();
   readonly #residentImages = new Map<string, ResidentImage>();
   readonly #indexOperations = new Map<string, Promise<SampleIndex>>();
   readonly #cache: CacheStore;
@@ -489,6 +533,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
           asset.representations.delete(existingId);
           this.#dropResidentIndex(this.#indexKey(assetId, existingId));
           this.#dropDecodeSessions(assetId, existingId);
+          this.#dropAudioSessions(assetId, existingId);
           this.#dropResidentImage(this.#indexKey(assetId, existingId));
         }
       }
@@ -508,6 +553,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#generation += 1;
     this.#dropResidentIndex(this.#indexKey(assetId, id));
     this.#dropDecodeSessions(assetId, id);
+    this.#dropAudioSessions(assetId, id);
     this.#dropResidentImage(this.#indexKey(assetId, id));
   }
 
@@ -610,6 +656,7 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       if (key.startsWith(`${assetId}\u0000`)) this.#dropResidentIndex(key);
     }
     this.#dropDecodeSessions(assetId);
+    this.#dropAudioSessions(assetId);
     for (const key of [...this.#residentImages.keys()]) {
       if (key.startsWith(`${assetId}\u0000`)) this.#dropResidentImage(key);
     }
@@ -758,12 +805,30 @@ export class ProductionMediaProvider implements AelionMediaProvider {
         operationSignal,
       );
       try {
-        return await decodeAudioPcmRangeFromReader(
-          selected.representation.reader,
-          startUs,
-          durationUs,
-          { streamIndex, signal: operationSignal },
-        );
+        const resident = this.#acquireAudioSession(assetId, selected.representation, streamIndex);
+        if (resident === undefined) {
+          return await decodeAudioPcmRangeFromReader(
+            selected.representation.reader,
+            startUs,
+            durationUs,
+            { streamIndex, signal: operationSignal },
+          );
+        }
+        try {
+          const cached = resident.window;
+          if (cached !== undefined && audioWindowCovers(cached, startUs, durationUs)) {
+            return sliceAudioPcmBlock(cached, startUs, durationUs);
+          }
+          const decodeDurationUs = Math.max(durationUs, AUDIO_PCM_WINDOW_US);
+          const block = await resident.session.pcmRange(startUs, decodeDurationUs, operationSignal);
+          resident.window = block;
+          return decodeDurationUs === durationUs
+            ? block
+            : sliceAudioPcmBlock(block, startUs, durationUs);
+        } finally {
+          resident.active -= 1;
+          resident.access = ++this.#clock;
+        }
       } finally {
         await lease.dispose();
       }
@@ -777,6 +842,8 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#cachedIndexBytes = 0;
     for (const resident of this.#decodeSessions.values()) resident.session.dispose();
     this.#decodeSessions.clear();
+    for (const resident of this.#audioSessions.values()) resident.session.dispose();
+    this.#audioSessions.clear();
     for (const resident of this.#residentImages.values()) resident.frame.close();
     this.#residentImages.clear();
     this.#cachedImageBytes = 0;
@@ -806,6 +873,9 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       maxCachedIndexBytes: this.#maxCachedIndexBytes,
       decodeSessions: this.#decodeSessions.size,
       activeDecodeSessions: [...this.#decodeSessions.values()].filter(value => value.active > 0)
+        .length,
+      audioSessions: this.#audioSessions.size,
+      activeAudioSessions: [...this.#audioSessions.values()].filter(value => value.active > 0)
         .length,
       maxDecodeSessions: this.#maxDecodeSessions,
       cachedVideoFrames: decodeSnapshots.reduce((total, value) => total + value.cachedFrames, 0),
@@ -854,6 +924,8 @@ export class ProductionMediaProvider implements AelionMediaProvider {
     this.#cachedIndexBytes = 0;
     for (const resident of this.#decodeSessions.values()) resident.session.dispose();
     this.#decodeSessions.clear();
+    for (const resident of this.#audioSessions.values()) resident.session.dispose();
+    this.#audioSessions.clear();
     for (const resident of this.#residentImages.values()) resident.frame.close();
     this.#residentImages.clear();
     this.#cachedImageBytes = 0;
@@ -1036,6 +1108,48 @@ export class ProductionMediaProvider implements AelionMediaProvider {
       if (!key.startsWith(prefix)) continue;
       resident.session.dispose();
       this.#decodeSessions.delete(key);
+    }
+  }
+
+  #acquireAudioSession(
+    assetId: string,
+    representation: RegisteredRepresentation,
+    streamIndex: number,
+  ): ResidentAudioSession | undefined {
+    const key = this.#decodeSessionKey(assetId, representation.id, streamIndex);
+    const existing = this.#audioSessions.get(key);
+    if (existing !== undefined) {
+      existing.active += 1;
+      existing.access = ++this.#clock;
+      return existing;
+    }
+    while (this.#audioSessions.size >= this.#maxDecodeSessions) {
+      const oldest = [...this.#audioSessions.entries()]
+        .filter(([, value]) => value.active === 0)
+        .sort((left, right) => left[1].access - right[1].access)[0];
+      if (oldest === undefined) return undefined;
+      oldest[1].session.dispose();
+      this.#audioSessions.delete(oldest[0]);
+    }
+    const resident: ResidentAudioSession = {
+      session: createAudioPcmDecodeSessionFromReader(representation.reader, { streamIndex }),
+      window: undefined,
+      active: 1,
+      access: ++this.#clock,
+    };
+    this.#audioSessions.set(key, resident);
+    return resident;
+  }
+
+  #dropAudioSessions(assetId: string, representationId?: string): void {
+    const prefix =
+      representationId === undefined
+        ? `${assetId}\u0000`
+        : `${assetId}\u0000${representationId}\u0000`;
+    for (const [key, resident] of [...this.#audioSessions]) {
+      if (!key.startsWith(prefix)) continue;
+      resident.session.dispose();
+      this.#audioSessions.delete(key);
     }
   }
 

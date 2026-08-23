@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   BlobRangeReader,
+  createAudioPcmDecodeSessionFromReader,
   createVideoFrameDecodeSessionFromReader,
   createSampleIndex,
   decodeAudioPcmRange,
@@ -224,4 +225,20 @@ describe('WebCodecs exact seek', () => {
       expect(rangeBlock.interleaved).toEqual(block.interleaved);
     },
   );
+
+  it('reuses one audio Input across sequential PCM ranges', async () => {
+    const bytes = await fixture('mp4-moov-head-h264-aac.mp4');
+    const reader = new BlobRangeReader('session-audio', new Blob([bytes]));
+    const session = createAudioPcmDecodeSessionFromReader(reader);
+    try {
+      const first = await session.pcmRange(500_000, 100_000);
+      const second = await session.pcmRange(1_500_000, 100_000);
+      const oneShot = await decodeAudioPcmRangeFromReader(reader, 1_500_000, 100_000);
+      expect(first.sampleRate).toBe(48_000);
+      expect(second.frameCount).toBe(oneShot.frameCount);
+      expect(second.interleaved).toEqual(oneShot.interleaved);
+    } finally {
+      session.dispose();
+    }
+  });
 });
