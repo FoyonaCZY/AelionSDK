@@ -3,9 +3,20 @@ title: Current status
 description: Release identity, verified scope, remediations and uncertified boundaries.
 ---
 
-Repository version: `1.2.0`. This is the first stable 1.2 release. The 13 `@aelionsdk/*`
+<!-- aelion-current-version:start -->
+
+Repository version: `2.0.0`. The 13 `@aelionsdk/*`
 packages publish under the npm `latest` tag. The npm badge and registry are authoritative for what
 is currently published.
+
+<!-- aelion-current-version:end -->
+
+## 2.0 timeline and editor primitives
+
+This release introduces immutable Project schema v2.0, storyline/overlay Track roles,
+exclusive/free occupancy, gap Items, reusable layout planning, safe Item factories, speculative
+drag compilation, player time subscriptions and Session thumbnail/filmstrip APIs. Supported v1.0
+and v1.2 Projects migrate from ownership-isolated snapshots without mutating caller data.
 
 ## 1.2.0 compile freeze and playback
 
@@ -87,7 +98,7 @@ result. Release evidence is valid only for the source manifest to which it is bo
 - The proxy workflow still requires a host encoder.
 - WebGPU lacks complete WebGL2 multi-pass parity and physical-device certification.
 - Long page-independent rendering and 24-hour physical-device soak evidence are not delivered.
-- After 1.2.0, public API changes follow SemVer, CHANGELOG, and the documented deprecation window.
+- After 2.0.0, public API changes follow SemVer, CHANGELOG, and the documented deprecation window.
 
 ## Local verification
 

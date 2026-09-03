@@ -10,11 +10,11 @@ description: 根据产品接入、Material 开发和引擎扩展选择 AelionSDK
 ```json
 {
   "dependencies": {
-    "@aelionsdk/sdk": "1.2.0",
-    "@aelionsdk/export": "1.2.0"
+    "@aelionsdk/sdk": "2.0.0",
+    "@aelionsdk/export": "2.0.0"
   },
   "devDependencies": {
-    "@aelionsdk/vite-plugin": "1.2.0"
+    "@aelionsdk/vite-plugin": "2.0.0"
   }
 }
 ```
@@ -43,7 +43,7 @@ import {
 ```
 
 模板和程序化成片优先使用 `createComposition()`；需要探测并导入真实媒体或操作
-Schema 级实体时使用 `createProject()`。两者生成相同的 Project v1 文档，可以加载到
+Schema 级实体时使用 `createProject()`。两者生成相同的 Project v2 文档，可以加载到
 同一个 Session。
 
 只有创建导出落盘目标时，才会直接使用 `@aelionsdk/export`：
@@ -59,7 +59,7 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 ```json
 {
   "dependencies": {
-    "@aelionsdk/material-sdk": "1.2.0"
+    "@aelionsdk/material-sdk": "2.0.0"
   }
 }
 ```
@@ -78,7 +78,7 @@ import { OpfsSeekableSink, SeekableMemorySink } from '@aelionsdk/export';
 | 包                             | 提供的底层接口                                   |
 | ------------------------------ | ------------------------------------------------ |
 | `@aelionsdk/core`              | 时间换算、Diagnostic、JSON 类型和通用错误        |
-| `@aelionsdk/project-schema`    | Project v1 类型、Schema 校验和 canonical JSON    |
+| `@aelionsdk/project-schema`    | Project v2 类型、Schema 校验和 canonical JSON    |
 | `@aelionsdk/transaction`       | 编辑命令、事务、revision、undo/redo              |
 | `@aelionsdk/render-ir`         | 把 Project 编译成渲染执行图                      |
 | `@aelionsdk/media`             | RangeReader、MP4/WebM 索引、解码、缓存和代理选择 |

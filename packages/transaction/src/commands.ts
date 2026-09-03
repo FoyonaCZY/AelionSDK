@@ -8,7 +8,9 @@ import type {
   TrackEntity,
 } from '@aelionsdk/project-schema';
 
+import { violatesOccupancy, type TimelinePlacement } from './layout.js';
 import type { TransactionHost } from './history.js';
+import type { TransactionBuilder } from './transaction.js';
 import type { EditOptions, TransactionCommit } from './types.js';
 
 export type CommandOptions = EditOptions;
@@ -57,6 +59,24 @@ export interface ReplaceItemOptions extends CommandOptions {
    * unchanged; structural relocation uses moveItem instead.
    */
   readonly replacement: ItemEntity;
+}
+
+/** Commit options for applying a resolved timeline layout. */
+export interface ApplyPlacementsOptions extends CommandOptions {
+  /** Final position of every Item the interaction moves, keyed by Item id. */
+  readonly placements: ReadonlyMap<EntityId, TimelinePlacement>;
+  /**
+   * Drop a Transition whose pair no longer sits on one Track, instead of
+   * failing the whole edit. Defaults to true, which is what a drag wants: a
+   * clip pulled onto another lane has plainly ended that Transition.
+   */
+  readonly dropSeparatedTransitions?: boolean;
+}
+
+/** Write-only policy used by {@link writeTimelinePlacements}. */
+export interface WriteTimelinePlacementsOptions {
+  /** See {@link ApplyPlacementsOptions.dropSeparatedTransitions}. Defaults to true. */
+  readonly dropSeparatedTransitions?: boolean;
 }
 
 export interface ReorderTrackOptions extends CommandOptions {
@@ -220,6 +240,9 @@ function assertUnlocked(track: TrackEntity): void {
 }
 
 function assertItemTrackCompatible(item: ItemEntity, track: TrackEntity): void {
+  // A Gap is blank time and belongs on whichever Track needs the pause held
+  // open, so it is the one Item type without a required Track kind.
+  if (item.type === 'gap') return;
   const requiredKind =
     item.type === 'audio' ? 'audio' : item.type === 'caption' ? 'caption' : 'visual';
   if (track.kind !== requiredKind) {
@@ -727,6 +750,112 @@ function commandEditOptions(options: CommandOptions, fallbackLabel: string): Edi
     ...(options.baseRevision === undefined ? {} : { baseRevision: options.baseRevision }),
     ...(options.historyGroup === undefined ? {} : { historyGroup: options.historyGroup }),
   };
+}
+
+/** Where a Transition sits for a given adjacent pair: centred on their cut. */
+function transitionRangeForPair(
+  earlier: ItemEntity,
+  later: ItemEntity,
+  durationUs: number,
+): { readonly startUs: number; readonly durationUs: number } {
+  const earlierEnd = earlier.range.startUs + earlier.range.durationUs;
+  const overlapStart = Math.max(earlier.range.startUs, later.range.startUs);
+  const overlapEnd = Math.min(earlierEnd, later.range.startUs + later.range.durationUs);
+  const cutUs =
+    overlapEnd > overlapStart ? Math.round((overlapStart + overlapEnd) / 2) : earlierEnd;
+  return { startUs: Math.max(0, cutUs - Math.floor(durationUs / 2)), durationUs };
+}
+
+function relocated(item: ItemEntity, placed: ReadonlyMap<EntityId, TimelinePlacement>): ItemEntity {
+  const next = placed.get(item.id);
+  if (next === undefined) return item;
+  return { ...item, trackId: next.trackId, range: { ...item.range, startUs: next.startUs } };
+}
+
+/**
+ * Keeps Transitions attached to the pair they describe after a batch move.
+ *
+ * A Transition names two Items and a place between them. Moving either one
+ * without this leaves it pointing at a cut that no longer exists -- and a
+ * reorder can even swap which of the pair now comes first, so the direction has
+ * to be re-derived rather than preserved.
+ */
+function appendTransitionRebind(
+  project: Readonly<AelionProject>,
+  transaction: TransactionBuilder,
+  placed: ReadonlyMap<EntityId, TimelinePlacement>,
+  dropSeparated: boolean,
+): void {
+  for (const transition of Object.values(project.transitions)) {
+    const fromItem = project.items[transition.fromItemId];
+    const toItem = project.items[transition.toItemId];
+    if (fromItem === undefined || toItem === undefined) continue;
+    if (!placed.has(fromItem.id) && !placed.has(toItem.id)) continue;
+    const from = relocated(fromItem, placed);
+    const to = relocated(toItem, placed);
+    if (from.trackId !== to.trackId) {
+      if (!dropSeparated) {
+        throw commandError(
+          'COMMAND_TRANSITION_PAIR_SEPARATED',
+          `Placements would move Transition ${transition.id} pair onto different Tracks`,
+          transition.id,
+        );
+      }
+      transaction.listRemove('sequences', transition.sequenceId, ['transitionIds'], transition.id);
+      transaction.deleteEntity('transitions', transition.id);
+      transaction.deleteEntity('materialInstances', transition.materialInstanceId);
+      continue;
+    }
+    const earlier = from.range.startUs <= to.range.startUs ? from : to;
+    const later = earlier === from ? to : from;
+    const range = transitionRangeForPair(earlier, later, transition.range.durationUs);
+    if (transition.fromItemId !== earlier.id) {
+      transaction.setField('transitions', transition.id, ['fromItemId'], earlier.id);
+    }
+    if (transition.toItemId !== later.id) {
+      transaction.setField('transitions', transition.id, ['toItemId'], later.id);
+    }
+    if (transition.trackId !== from.trackId) {
+      transaction.setField('transitions', transition.id, ['trackId'], from.trackId);
+    }
+    if (transition.range.startUs !== range.startUs) {
+      transaction.setField('transitions', transition.id, ['range', 'startUs'], range.startUs);
+    }
+  }
+}
+
+/**
+ * Writes a resolved timeline layout into a transaction builder.
+ *
+ * This is the shared bridge between speculative preview and commit. Pass the
+ * same placements to an `AelionPreviewOptions.overlay` callback while dragging,
+ * then to `EditingCommands.applyPlacements` on pointer-up. The helper updates
+ * Track membership and rebinds affected Transitions; it does not commit or
+ * validate the resulting Project by itself.
+ */
+export function writeTimelinePlacements(
+  transaction: TransactionBuilder,
+  project: Readonly<AelionProject>,
+  placements: ReadonlyMap<EntityId, TimelinePlacement>,
+  options: WriteTimelinePlacementsOptions = {},
+): void {
+  for (const [id, placement] of placements) {
+    const item = itemIn(project, id);
+    if (item.trackId !== placement.trackId) {
+      transaction.listRemove('tracks', item.trackId, ['itemIds'], item.id);
+      transaction.setField('items', item.id, ['trackId'], placement.trackId);
+      transaction.listInsert('tracks', placement.trackId, ['itemIds'], item.id);
+    }
+    if (item.range.startUs !== placement.startUs) {
+      transaction.setField('items', item.id, ['range', 'startUs'], placement.startUs);
+    }
+  }
+  appendTransitionRebind(
+    project,
+    transaction,
+    placements,
+    options.dropSeparatedTransitions ?? true,
+  );
 }
 
 /** Domain-level editing commands built exclusively from atomic transactions. */
@@ -1937,6 +2066,58 @@ export class EditingCommands {
           itemIds,
           ...(options.range === undefined ? {} : { range: options.range }),
         },
+      });
+    });
+  }
+
+  /**
+   * Writes a whole resolved interaction -- every Item it moves -- as one edit.
+   *
+   * A real timeline gesture is never one Item: reordering a storyline displaces
+   * its neighbours, linked audio travels with its video, and a clip leaving a
+   * lane closes the hole behind it. Expressing that as a sequence of single-Item
+   * moves means publishing states the user never asked for, each one its own
+   * revision and its own undo entry, several of them momentarily invalid.
+   *
+   * So this takes the finished layout -- normally straight from
+   * {@link planTimelineMove} -- and commits it atomically, re-attaching
+   * Transitions to whatever pair ends up adjacent. It is the counterpart of the
+   * pure planner: the planner decides, this writes.
+   */
+  public applyPlacements(options: ApplyPlacementsOptions): TransactionCommit {
+    const project = this.#host.getSnapshot();
+    const placements = [...options.placements].flatMap(([id, placement]) => {
+      const item = project.items[id];
+      if (item === undefined) {
+        throw commandError('COMMAND_ITEM_MISSING', `Item ${id} does not exist`, id);
+      }
+      return [{ item, placement }];
+    });
+    if (placements.length === 0) {
+      throw commandError('COMMAND_PLACEMENTS_EMPTY', 'applyPlacements requires a placement');
+    }
+
+    for (const { item, placement } of placements) {
+      assertTime(placement.startUs, 'startUs');
+      const target = trackIn(project, placement.trackId);
+      assertUnlocked(trackIn(project, item.trackId));
+      assertUnlocked(target);
+      assertItemTrackCompatible(item, target);
+    }
+
+    const placed = new Map(placements.map(({ item, placement }) => [item.id, placement]));
+    if (violatesOccupancy(project, placed)) {
+      throw commandError(
+        'COMMAND_TRACK_OCCUPANCY_OVERLAP',
+        'Placements would stack Items on a Track declared exclusive',
+      );
+    }
+
+    return this.#host.edit(commandEditOptions(options, 'Move items'), transaction => {
+      writeTimelinePlacements(transaction, project, placed, {
+        ...(options.dropSeparatedTransitions === undefined
+          ? {}
+          : { dropSeparatedTransitions: options.dropSeparatedTransitions }),
       });
     });
   }

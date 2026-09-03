@@ -3,7 +3,7 @@ title: Packages and public entry points
 description: Understand the responsibilities and intended consumers of the 13 @aelionsdk packages.
 ---
 
-All public packages are currently `1.2.0` under npm `latest`. Only paths declared by a
+All public packages are currently `2.0.0` under npm `latest`. Only paths declared by a
 package's `exports` field are public API; `src/*`, `dist/*`, tests, and internal helpers are not.
 
 ## Stability tiers
@@ -48,7 +48,7 @@ signature and trust store, migrations, golden helpers, and the `aelion-material`
 | Package             | Responsibility                                                   |
 | ------------------- | ---------------------------------------------------------------- |
 | `core`              | errors, diagnostics, JSON types, time/frame/sample math          |
-| `project-schema`    | Project v1 types, validation, canonical input admission          |
+| `project-schema`    | Project v2 types, validation, canonical input admission          |
 | `transaction`       | semantic editing, transaction engine, history, change sets       |
 | `render-ir`         | Project compilation and audio/visual evaluation contract         |
 | `media`             | range I/O, MP4/WebM indexing, seek/decode, cache, proxy, budgets |

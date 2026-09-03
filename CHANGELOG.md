@@ -4,6 +4,101 @@
 
 ## Unreleased
 
+## 2.0.0 — 2026-09-04
+
+### Breaking changes
+
+- Project documents created by 2.0 use the immutable `v2.0.json / 2.0.0` identity. Supported v1.0
+  and stable v1.2 documents migrate automatically from ownership-isolated snapshots.
+- `TextParagraph.style` and `TextRun.style` are required, matching the persisted schema. Text and
+  caption overflow unions now match the renderer's implemented values.
+- `planTimelineMove().placements` contains only Items that actually move; the dragged Item's
+  proposed position is represented by `ghost`.
+
+### Added
+
+- v2 Project schema adds explicit Track `role` / `occupancy` semantics and a first-class `gap`
+  Item. `planTimelineMove`, `writeTimelinePlacements`, `applyPlacements`, and the layout query
+  helpers provide a shared plan-preview-commit pipeline for packed storylines, free lanes, linked
+  A/V, and Transition rebinding.
+- Standalone Track and Item factories create complete, schema-valid entities for insertion into an
+  existing Project.
+- `session.media.thumbnail()` and `session.media.filmstrip()` provide cancellable, bounded decoding
+  for asset browsers and visible timeline bands. Returned bitmap ownership is explicit.
+- `player.subscribeTime()` supports any number of playhead-only observers without sharing frame
+  ownership. `player.reset()` releases the warm playback runtime when an editor stops watching it.
+- `preview.renderFrame({ overlay })` renders a transaction without publishing a revision, history
+  entry, or event.
+- `speculateProjectChange` 返回推测后的 Project **以及**被触及的实体 id，供
+  `IncrementalRenderCompiler.compile` 的 `affectedEntityIds` 使用。`speculateProject` 保持不变。
+- `TransactionEngineOptions.adoptValidatedProject`：直接采纳已校验的快照，跳过构造函数里的
+  防御性克隆与重复校验。宿主必须独占该文档且已经校验过它。
+- `cloneJson`：不排序键、不复检数字的结构化 JSON 拷贝，用于已校验文档内部取值。跨信任边界
+  仍须使用 `canonicalClone` 或 `snapshotProjectInput`。
+- `@aelionsdk/sdk` 补充导出 `ItemExcept`（`isRangeFreeOnTrack` 等函数的参数类型）。
+- `benchmarks/scenarios.bench.ts` 与 `benchmarks/fixture.ts`：按「打开工程 / 提交编辑 / 拖拽 /
+  播放求值」四类真实场景度量，`corepack pnpm run bench` 运行，`bench:report` 对比两次报告。
+  fixture 使用与 Session 一致的「已校验 + 深冻结」快照。
+
+### Fixed
+
+- **`createTextItem` 会产出通不过校验的 Item。** schema 要求每个段落和每个 run 都带 `style`，
+  而 `TextParagraph.style` / `TextRun.style` 在类型上是可选的，于是不传 style 的调用能通过类型
+  检查、却在提交时被校验器拒绝——正是这批工厂声称要避免的失败。两个类型改为必填（存储文档里
+  它们本就必然存在），工厂改用各自的输入类型，缺省补 `{}`。
+- **`TextItemEntity.overflow` 与 schema、Render IR、渲染器三方不一致。** 类型声明的
+  `auto-grow` 在这三处都不存在，而已实现的 `ellipsis` / `visible` 无法通过类型表达。改为
+  `clip | ellipsis | visible | auto-fit`。`CaptionItemEntity.overflow` 同理收窄为 `clip | auto-fit`，
+  与编译器 `item.overflow === 'clip' ? 'clip' : 'auto-fit'` 的实际映射一致。
+- **Item 工厂会把调用方对象直接存进实体。** 在同一个 Item 内复用一个对象——渐变两端用同一个
+  颜色、多边形复用同一个点——会让事务准入以 "cycle or shared object" 拒绝该 Item，报错位置与
+  真实原因无关；调用方之后修改自己的对象也会反向改到已完成的 Item。所有工厂改为取完整拥有的
+  拷贝，顺带把 `NaN`、无穷、`-0`、不安全整数的拒绝提前到引入它们的那次调用。
+- exclusive 轨道的重叠检查改为维护完整活动区间，不再因相邻片段恰好由 Transition 连接而漏掉
+  与更早、持续时间更长的片段之间的重叠；同一 Sequence 也明确限制为最多一条 storyline 轨道。
+- Session 替换 Project 或 dispose 时会取消并等待仍在排队的缩略图/filmstrip 任务；取消与
+  `createImageBitmap()` 竞态时会立即关闭新建 bitmap。缩略图尺寸与 filmstrip 帧数、单帧高度及
+  总输出像素均有公开边界，避免编辑器输入造成无界解码或分配。
+- 冻结子树的校验缓存命中会恢复该子树实际深度，防止父对象通过缓存路径绕过输入深度预算。
+- Track/Item 工厂现在在创建边界拒绝 `-0`、非有限数、不安全整数、非法 stream index、rate、
+  fade、gain/pan 与超大 generator 调色板，不再把这些错误延迟到事务提交。
+- `validateTimeMappingSemantics` 在 Item 缺 `source` 时抛 TypeError 而非产出诊断。发行 schema
+  不会让它到达那里，但 schema 是 `ProjectValidator` 的构造参数，宿主传入更宽松的 schema 即可触及。
+- Browser tests bind their Vitest control server to IPv4 explicitly, avoiding intermittent
+  `ERR_CONNECTION_REFUSED` failures caused by Windows localhost resolution.
+- Release dry-runs are idempotent: an already-published version passes only when a locally packed
+  tarball has the same registry integrity, while drift still fails closed.
+
+### Changed
+
+- **`planTimelineMove` 的 `placements` 只包含真正移动的 Item。** 此前磁性排列会为轨道上每个
+  clip 都算出位置并全部返回，其中绝大多数与当前位置相同；宿主据此在每次指针移动时写入 O(N)
+  个操作。被拖拽 clip 的解算位置改由 `ghost` 表达，`placements` 为空即表示这次落点不改变任何
+  东西。`applyPlacements` 与 `violatesOccupancy` 的行为不变。
+
+### Performance
+
+以 1000 clip / 2250 Item / 104,334 个 JSON 节点的工程度量（`benchmarks/render-ir.bench.ts`
+为未改动的同一 fixture 前后对比）：
+
+- **打开工程**：`session initialization` 43.8 ms → 4.5 ms（9.7 倍）。`canonicalClone` 不再经由
+  规范字符串往返，键比较器改为零分配的逐码点比较（原实现每次比较分配两个数组，占克隆时间的
+  62%）；`TransactionEngine` 可采纳已校验快照，不再重复克隆与校验。
+- **冷编译 Render IR**：42.9 ms → 6.2 ms（7.0 倍）。clip/track/transition 指纹改用
+  `JSON.stringify`——指纹只与同一实体上一次编译的指纹比较，规范键序买不到额外的正确性；
+  `deepFreezePlain` 不再为每个节点分配 `Object.values` 数组。
+- **带校验的提交**：34.8 ms → 3.6 ms（9.7 倍）。分三步：Project schema 拆为「文档外壳 + 逐实体
+  校验」，Item 按 `type` 直接分派，绕开 11 分支 `oneOf` 的十一倍冗余；准入边界与逐实体检查按
+  **对象身份**记忆结果——提交在两个快照之间按引用共享未改动实体，未改动的部分不必重新走一遍；
+  引用与唯一性检查不再为每个引用预先构造 path 数组（一万次分配全部丢弃）。
+  记忆只对**冻结**对象生效：冻结对象不可能再变，可变对象每次都重新判定。
+- **拖拽预览**：1000 clip 上一次指针移动（解算 + 推测 + 编译）约 42 ms → 6.9 ms。推测编译此前
+  未声明 `affectedEntityIds`，等同每帧全量冷编译；`createDraft` 改用 `cloneJson`，不再为已经规范
+  的实体重排键序、重检数字（长距离拖拽会位移数百个 clip，每个都要克隆）。
+- **未声明 affectedEntityIds 的增量重编译**：19.1 ms → 5.8 ms（3.3 倍）。
+- `snapshotProjectInput` 77.8 ms → 14.8 ms（5.3 倍）：改用非分配的 UTF-8 长度计算，属性写入仅在
+  键会落到原型链上时才走 `defineProperty`。
+
 ## 1.2.0 — 2026-08-24
 
 首个稳定 1.2 版本。包含 rc.2–rc.5 的契约补救、预览/合成路径，以及下列自 rc.5 以来的变更。

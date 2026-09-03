@@ -8,7 +8,7 @@ Audio scheduling and deterministic PCM processing primitives for AelionSDK.
 npm install @aelionsdk/audio
 ```
 
-`latest` currently resolves to `1.2.0`. Product applications should prefer
+`latest` currently resolves to `2.0.0`. Product applications should prefer
 `@aelionsdk/sdk`; use this package directly when building a custom audio host,
 analysis pipeline or renderer integration.
 

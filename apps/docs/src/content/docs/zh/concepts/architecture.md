@@ -12,7 +12,7 @@ description: 从 Session 的公开接口深入到 Transaction、Render IR、Work
 ```mermaid
 flowchart LR
   Host["宿主应用"] --> SDK["@aelionsdk/sdk Session"]
-  SDK --> Project["Project v1"]
+  SDK --> Project["Project v2"]
   SDK --> Tx["Transaction / History"]
   Tx --> Project
   Project --> Compiler["Render IR Compiler"]
@@ -31,7 +31,7 @@ flowchart LR
 
 Project 是规范化的 JSON snapshot。实体以稳定 ID 存储，关系通过 ID 引用，顺序通过明确的 ID 数组表达。它适合保存、同步、diff 和迁移，不保存实时命令、文件对象和运行时缓存。
 
-Project 的机器可读定义位于 [`schemas/project/v1`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1/project.schema.json)。加载时先复制成 SDK 自己持有的纯 JSON，再检查 Schema、引用、时间和执行条件。不可信输入在进入 Ajv 前还会限制深度、节点数、数组长度、对象属性数和字符串字节，避免一个异常大对象先耗尽页面资源。
+Project 的当前机器可读定义位于 [`schemas/project/v2.0`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v2.0/project.schema.json)。加载时先复制成 SDK 自己持有的纯 JSON，再检查 Schema、引用、时间和执行条件。不可信输入在进入 Ajv 前还会限制深度、节点数、数组长度、对象属性数和字符串字节，避免一个异常大对象先耗尽页面资源。
 
 ### Transaction：修改工程的唯一入口
 

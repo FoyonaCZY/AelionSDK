@@ -1,6 +1,6 @@
 ﻿---
 title: Project 和时间线数据
-description: 看懂 Aelion Project v1 中的 Sequence、Track、Item、Asset、Link Group 和 Marker。
+description: 看懂 Aelion Project v2 中的 Sequence、Track、Item、Asset、Link Group 和 Marker。
 ---
 
 调用 `session.loadProject()` 时传入的是一份 Project JSON。它记录“这条片应该怎么剪”，但不包含视频文件、解码器、播放状态和撤销栈。
@@ -89,6 +89,10 @@ Track 有三种：
 ```
 
 它表示片段从时间线 2 秒开始，占 3 秒，覆盖半开区间 `[2s, 5s)`。Item 的 `type` 必须与 Track 的 `kind` 兼容。
+
+Track 还可以声明 `role` 和 `occupancy`。普通叠加轨使用 `overlay` / `free`；每个 Sequence 最多有一条
+`storyline`，它默认使用 `exclusive`，由时间线规划器做磁性排列。exclusive 轨除显式 Transition
+连接的片段对外不允许重叠。`gap` Item 不渲染内容，只在 storyline 上保留刻意留出的空档。
 
 ## 同一个媒体片段有两套时间
 

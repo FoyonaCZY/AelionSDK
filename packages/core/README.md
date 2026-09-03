@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/core
 ```
 
-`latest` currently resolves to `1.2.0`. Most applications receive these
+`latest` currently resolves to `2.0.0`. Most applications receive these
 types through `@aelionsdk/sdk`; direct use is intended for extensions and
 custom engine hosts.
 

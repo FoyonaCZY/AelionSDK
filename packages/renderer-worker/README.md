@@ -8,7 +8,7 @@ Off-main-thread WebGL2/WebGPU composition and Worker protocol for AelionSDK.
 npm install @aelionsdk/renderer-worker
 ```
 
-`latest` currently resolves to `1.2.0`. Applications should create preview
+`latest` currently resolves to `2.0.0`. Applications should create preview
 surfaces through `@aelionsdk/sdk`; use this package directly for a custom render
 host or Worker transport.
 

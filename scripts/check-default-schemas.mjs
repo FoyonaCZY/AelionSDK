@@ -12,11 +12,13 @@ async function canonicalJson(path) {
   return JSON.stringify(JSON.parse(await readFile(resolve(root, path), 'utf8')));
 }
 
-const [projectSchema, legacyProjectSchema, materialInstanceSchema] = await Promise.all([
-  canonicalJson('schemas/project/v1.2/project.schema.json'),
-  canonicalJson('schemas/project/v1/project.schema.json'),
-  canonicalJson('schemas/material/v1/instance.schema.json'),
-]);
+const [projectSchema, previousProjectSchema, legacyProjectSchema, materialInstanceSchema] =
+  await Promise.all([
+    canonicalJson('schemas/project/v2.0/project.schema.json'),
+    canonicalJson('schemas/project/v1.2/project.schema.json'),
+    canonicalJson('schemas/project/v1/project.schema.json'),
+    canonicalJson('schemas/material/v1/instance.schema.json'),
+  ]);
 
 const expected = `import type { JsonObject } from '@aelionsdk/core';
 
@@ -33,6 +35,9 @@ function deepFreeze<T>(value: T): Readonly<T> {
 const projectSchema = JSON.parse(
   String.raw\`${projectSchema}\`,
 ) as JsonObject;
+const previousProjectSchema = JSON.parse(
+  String.raw\`${previousProjectSchema}\`,
+) as JsonObject;
 const legacyProjectSchema = JSON.parse(
   String.raw\`${legacyProjectSchema}\`,
 ) as JsonObject;
@@ -46,6 +51,7 @@ const materialInstanceSchema = JSON.parse(
  */
 export const defaultSchemas: AelionProjectSchemas = Object.freeze({
   project: deepFreeze(projectSchema),
+  previousProject: deepFreeze(previousProjectSchema),
   legacyProject: deepFreeze(legacyProjectSchema),
   materialInstance: deepFreeze(materialInstanceSchema),
 });
@@ -60,6 +66,6 @@ if (write) {
   );
 } else {
   process.stdout.write(
-    'Bundled SDK schemas match canonical current, legacy Project, and Material Instance JSON\n',
+    'Bundled SDK schemas match canonical current, immutable v1.2/v1 Project, and Material Instance JSON\n',
   );
 }

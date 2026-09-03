@@ -9,7 +9,7 @@ contracts for AelionSDK.
 npm install @aelionsdk/export
 ```
 
-`latest` currently resolves to `1.2.0`. Applications usually start exports
+`latest` currently resolves to `2.0.0`. Applications usually start exports
 through an `@aelionsdk/sdk` Session and depend on this package for sinks,
 profiles or remote-export types.
 

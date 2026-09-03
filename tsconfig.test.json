@@ -20,5 +20,6 @@
     "vitest.golden.config.ts",
     "vitest.mobile.config.ts",
     "vitest.webkit.config.ts"
-  ]
+  ],
+  "exclude": ["apps/editor-demo/**"]
 }

@@ -1,4 +1,6 @@
 .DS_Store
+.claude/
+aelionsdk-architecture*
 node_modules/
 dist/
 
@@ -8,6 +10,7 @@ apps/*/vite.config.js
 apps/*/vite.config.d.ts
 apps/*/vite.config.d.ts.map
 coverage/
+.perf/
 .vitest/
 .vite/
 .astro/

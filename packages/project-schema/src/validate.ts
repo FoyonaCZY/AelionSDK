@@ -4,7 +4,16 @@ import addFormats from 'ajv-formats';
 import type { Diagnostic, JsonObject, JsonValue, Result } from '@aelionsdk/core';
 import { err, ok } from '@aelionsdk/core';
 
-import { COLLECTION_NAMES, type AelionProject, type CollectionName } from './types.js';
+import {
+  COLLECTION_NAMES,
+  itemPairKey,
+  trackOccupancy,
+  trackRole,
+  transitionJoinedPairs,
+  type AelionProject,
+  type CollectionName,
+  type ItemEntity,
+} from './types.js';
 import {
   assertAdmittedProjectInput,
   ProjectInputAdmissionError,
@@ -16,16 +25,27 @@ import {
   migrateAdmittedProjectToCurrent,
   type ProjectIdentityMigration,
 } from './migration.js';
+import {
+  decomposeProjectSchema,
+  entityValidator,
+  type DecomposedProjectSchema,
+} from './schema-decomposition.js';
 
 const MAX_PROJECT_DIAGNOSTICS = 64;
 
 interface DiagnosticSink {
   push(...diagnostics: Diagnostic[]): number;
+  /** How many diagnostics have been collected, so a caller can tell if it added any. */
+  readonly count: number;
 }
 
 class BoundedDiagnosticCollector implements DiagnosticSink {
   readonly #diagnostics: Diagnostic[] = [];
   #truncated = false;
+
+  public get count(): number {
+    return this.#diagnostics.length;
+  }
 
   public get diagnostics(): readonly Diagnostic[] {
     return this.#diagnostics;
@@ -60,11 +80,14 @@ export interface ProjectValidationSuccess {
   readonly migration?: ProjectIdentityMigration;
 }
 
-function schemaDiagnostic(error: ErrorObject): Diagnostic {
-  const path = error.instancePath
-    .split('/')
-    .slice(1)
-    .map(segment => segment.replaceAll('~1', '/').replaceAll('~0', '~'));
+function schemaDiagnostic(error: ErrorObject, prefix: readonly string[] = []): Diagnostic {
+  const path = [
+    ...prefix,
+    ...error.instancePath
+      .split('/')
+      .slice(1)
+      .map(segment => segment.replaceAll('~1', '/').replaceAll('~0', '~')),
+  ];
   return {
     code: 'PROJECT_SCHEMA_INVALID',
     severity: 'error',
@@ -76,6 +99,15 @@ function schemaDiagnostic(error: ErrorObject): Diagnostic {
       schemaPath: error.schemaPath,
       params: error.params as JsonValue,
     },
+  };
+}
+
+function unspecifiedSchemaDiagnostic(): Diagnostic {
+  return {
+    code: 'PROJECT_SCHEMA_INVALID',
+    severity: 'error',
+    message: 'Project does not conform to its JSON Schema',
+    recoverable: false,
   };
 }
 
@@ -101,8 +133,12 @@ function validateEntityMap(
   diagnostics: DiagnosticSink,
 ): void {
   const entities = project[collection];
-  for (const [key, entity] of Object.entries(entities)) {
-    if (key !== entity.id) {
+  // Keys rather than entries: this runs over every entity on every commit, and
+  // `Object.entries` builds a two-element array per entity to carry a pair the
+  // loop immediately takes apart again.
+  for (const key of Object.keys(entities)) {
+    const entity = entities[key];
+    if (entity !== undefined && key !== entity.id) {
       diagnostics.push(
         semanticDiagnostic(
           'PROJECT_ENTITY_KEY_MISMATCH',
@@ -115,6 +151,26 @@ function validateEntityMap(
   }
 }
 
+/**
+ * Reports a reference that does not resolve.
+ *
+ * Call sites test `Object.hasOwn` themselves and only come here when it fails,
+ * so the path array -- which is what naming a reference costs -- is built for
+ * the references that are broken rather than for all ten thousand that are not.
+ */
+function missingReference(
+  id: string,
+  expectedCollection: CollectionName,
+  path: readonly (string | number)[],
+): Diagnostic {
+  return semanticDiagnostic(
+    'PROJECT_REFERENCE_MISSING',
+    `Reference ${id} does not exist in ${expectedCollection}`,
+    path,
+    id,
+  );
+}
+
 function requireReference(
   values: Readonly<Record<string, unknown>>,
   id: string,
@@ -123,24 +179,48 @@ function requireReference(
   diagnostics: DiagnosticSink,
 ): boolean {
   if (Object.hasOwn(values, id)) return true;
-  diagnostics.push(
-    semanticDiagnostic(
-      'PROJECT_REFERENCE_MISSING',
-      `Reference ${id} does not exist in ${expectedCollection}`,
-      path,
-      id,
-    ),
-  );
+  diagnostics.push(missingReference(id, expectedCollection, path));
   return false;
 }
 
+/**
+ * Reports any id that appears twice in a reference list.
+ *
+ * Short lists are compared in place. A `Set` is the right structure once a list
+ * is long, and the wrong one for the two-member link groups and three-member
+ * Track lists that make up almost every list in a Project -- there it allocates
+ * a hash table to answer a question one comparison settles.
+ */
 function validateUniqueList(
   values: readonly string[],
   path: readonly (string | number)[],
   diagnostics: DiagnosticSink,
 ): void {
+  const length = values.length;
+  if (length < 2) return;
+  if (length <= 8) {
+    for (let index = 1; index < length; index += 1) {
+      const value = values[index];
+      if (value === undefined) continue;
+      for (let earlier = 0; earlier < index; earlier += 1) {
+        if (values[earlier] !== value) continue;
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_DUPLICATE_REFERENCE',
+            `Duplicate reference ${value}`,
+            [...path, index],
+            value,
+          ),
+        );
+        break;
+      }
+    }
+    return;
+  }
   const seen = new Set<string>();
-  values.forEach((value, index) => {
+  for (let index = 0; index < length; index += 1) {
+    const value = values[index];
+    if (value === undefined) continue;
     if (seen.has(value)) {
       diagnostics.push(
         semanticDiagnostic(
@@ -152,7 +232,7 @@ function validateUniqueList(
       );
     }
     seen.add(value);
-  });
+  }
 }
 
 function validateReferences(project: AelionProject, diagnostics: DiagnosticSink): void {
@@ -242,17 +322,17 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
       ['tracks', track.id, 'materialInstanceIds'],
       diagnostics,
     );
-    track.itemIds.forEach((id, index) => {
-      if (
-        requireReference(
-          project.items,
-          id,
-          'items',
-          ['tracks', track.id, 'itemIds', index],
-          diagnostics,
-        ) &&
-        project.items[id]?.trackId !== track.id
-      ) {
+    // The hottest reference loop in the Project: every Item on every Track, on
+    // every commit. The lookup is what it costs; naming the position is only
+    // needed when something is wrong with it.
+    const itemIds = track.itemIds;
+    for (let index = 0; index < itemIds.length; index += 1) {
+      const id = itemIds[index];
+      if (id === undefined) continue;
+      const item = project.items[id];
+      if (item === undefined) {
+        diagnostics.push(missingReference(id, 'items', ['tracks', track.id, 'itemIds', index]));
+      } else if (item.trackId !== track.id) {
         diagnostics.push(
           semanticDiagnostic(
             'PROJECT_HOST_MISMATCH',
@@ -262,40 +342,48 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
           ),
         );
       }
-    });
-    track.materialInstanceIds.forEach((id, index) =>
-      requireReference(
-        project.materialInstances,
-        id,
-        'materialInstances',
-        ['tracks', track.id, 'materialInstanceIds', index],
-        diagnostics,
-      ),
-    );
+    }
+    const trackMaterialIds = track.materialInstanceIds;
+    for (let index = 0; index < trackMaterialIds.length; index += 1) {
+      const id = trackMaterialIds[index];
+      if (id === undefined) continue;
+      if (!Object.hasOwn(project.materialInstances, id)) {
+        diagnostics.push(
+          missingReference(id, 'materialInstances', [
+            'tracks',
+            track.id,
+            'materialInstanceIds',
+            index,
+          ]),
+        );
+      }
+    }
   }
 
   for (const item of Object.values(project.items)) {
-    requireReference(
-      project.tracks,
-      item.trackId,
-      'tracks',
-      ['items', item.id, 'trackId'],
-      diagnostics,
-    );
+    if (!Object.hasOwn(project.tracks, item.trackId)) {
+      diagnostics.push(missingReference(item.trackId, 'tracks', ['items', item.id, 'trackId']));
+    }
     validateUniqueList(
       item.materialInstanceIds,
       ['items', item.id, 'materialInstanceIds'],
       diagnostics,
     );
-    item.materialInstanceIds.forEach((id, index) =>
-      requireReference(
-        project.materialInstances,
-        id,
-        'materialInstances',
-        ['items', item.id, 'materialInstanceIds', index],
-        diagnostics,
-      ),
-    );
+    const itemMaterialIds = item.materialInstanceIds;
+    for (let index = 0; index < itemMaterialIds.length; index += 1) {
+      const id = itemMaterialIds[index];
+      if (id === undefined) continue;
+      if (!Object.hasOwn(project.materialInstances, id)) {
+        diagnostics.push(
+          missingReference(id, 'materialInstances', [
+            'items',
+            item.id,
+            'materialInstanceIds',
+            index,
+          ]),
+        );
+      }
+    }
     if (item.type === 'nested-sequence') {
       const source = item.source as { readonly sequenceId?: unknown } | undefined;
       if (typeof source?.sequenceId === 'string') {
@@ -387,20 +475,16 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
       );
     }
     let sequenceId: string | undefined;
-    group.itemIds.forEach((id, index) => {
-      if (
-        !requireReference(
-          project.items,
-          id,
-          'items',
-          ['linkGroups', group.id, 'itemIds', index],
-          diagnostics,
-        )
-      ) {
-        return;
-      }
+    const groupItemIds = group.itemIds;
+    for (let index = 0; index < groupItemIds.length; index += 1) {
+      const id = groupItemIds[index];
+      if (id === undefined) continue;
       const item = project.items[id];
-      if (item?.linkGroupId !== group.id) {
+      if (item === undefined) {
+        diagnostics.push(missingReference(id, 'items', ['linkGroups', group.id, 'itemIds', index]));
+        continue;
+      }
+      if (item.linkGroupId !== group.id) {
         diagnostics.push(
           semanticDiagnostic(
             'PROJECT_LINK_GROUP_BACKREF_MISSING',
@@ -410,8 +494,7 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
           ),
         );
       }
-      const itemSequenceId =
-        item === undefined ? undefined : project.tracks[item.trackId]?.sequenceId;
+      const itemSequenceId = project.tracks[item.trackId]?.sequenceId;
       if (sequenceId === undefined) sequenceId = itemSequenceId;
       else if (itemSequenceId !== undefined && itemSequenceId !== sequenceId) {
         diagnostics.push(
@@ -423,7 +506,7 @@ function validateReferences(project: AelionProject, diagnostics: DiagnosticSink)
           ),
         );
       }
-    });
+    }
     for (const id of Object.keys(group.syncOffsetsUs ?? {})) {
       if (!group.itemIds.includes(id)) {
         diagnostics.push(
@@ -519,46 +602,52 @@ function validateNestedSequenceCycles(project: AelionProject, diagnostics: Diagn
 }
 
 function validateMaterialOwnership(project: AelionProject, diagnostics: DiagnosticSink): void {
-  const owners = new Map<string, string>();
-  const claim = (instanceId: string, owner: string, path: readonly (string | number)[]): void => {
+  // The owner is recorded as the collection and id it came from, not as a
+  // formatted string: naming an owner is only read when two of them collide,
+  // and this runs over every Item in the Project on every commit.
+  const owners = new Map<string, { readonly kind: string; readonly id: string }>();
+  const claim = (
+    instanceId: string,
+    kind: string,
+    ownerId: string,
+    path: readonly (string | number)[],
+  ): void => {
     if (!Object.hasOwn(project.materialInstances, instanceId)) return;
     const existing = owners.get(instanceId);
     if (existing !== undefined) {
       diagnostics.push(
         semanticDiagnostic(
           'PROJECT_MATERIAL_MULTIPLE_OWNERS',
-          `Material instance ${instanceId} is owned by both ${existing} and ${owner}`,
+          `Material instance ${instanceId} is owned by both ${existing.kind}:${existing.id} and ${kind}:${ownerId}`,
           path,
           instanceId,
         ),
       );
       return;
     }
-    owners.set(instanceId, owner);
+    owners.set(instanceId, { kind, id: ownerId });
+  };
+
+  /** Claims one owner's whole list, skipping the empty ones without a callback. */
+  const claimList = (ids: readonly string[], kind: string, ownerId: string): void => {
+    for (let index = 0; index < ids.length; index += 1) {
+      const id = ids[index];
+      if (id === undefined) continue;
+      claim(id, kind, ownerId, [`${kind}s`, ownerId, 'materialInstanceIds', index]);
+    }
   };
 
   for (const sequence of Object.values(project.sequences)) {
-    sequence.materialInstanceIds.forEach((id, index) =>
-      claim(id, `sequence:${sequence.id}`, [
-        'sequences',
-        sequence.id,
-        'materialInstanceIds',
-        index,
-      ]),
-    );
+    claimList(sequence.materialInstanceIds, 'sequence', sequence.id);
   }
   for (const track of Object.values(project.tracks)) {
-    track.materialInstanceIds.forEach((id, index) =>
-      claim(id, `track:${track.id}`, ['tracks', track.id, 'materialInstanceIds', index]),
-    );
+    claimList(track.materialInstanceIds, 'track', track.id);
   }
   for (const item of Object.values(project.items)) {
-    item.materialInstanceIds.forEach((id, index) =>
-      claim(id, `item:${item.id}`, ['items', item.id, 'materialInstanceIds', index]),
-    );
+    claimList(item.materialInstanceIds, 'item', item.id);
   }
   for (const transition of Object.values(project.transitions)) {
-    claim(transition.materialInstanceId, `transition:${transition.id}`, [
+    claim(transition.materialInstanceId, 'transition', transition.id, [
       'transitions',
       transition.id,
       'materialInstanceId',
@@ -636,19 +725,88 @@ function validateVisualTransitionOverlap(
   }
 }
 
-function validateTimeMappingSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
-  for (const item of Object.values(project.items)) {
-    if (item.type !== 'video' && item.type !== 'audio' && item.type !== 'nested-sequence') continue;
-    const source = item.source as {
-      readonly timeMapping?: {
-        readonly type?: unknown;
-        readonly points?: readonly {
-          readonly itemTimeUs?: unknown;
-        }[];
-      };
-    };
-    const mapping = source.timeMapping;
-    if (mapping?.type !== 'curve' || !Array.isArray(mapping.points)) continue;
+/**
+ * Rejects stacked Items on a Track that declared exclusive occupancy.
+ *
+ * Overlap stays legal everywhere else: layered titles and stacked audio need
+ * it. Declaring `exclusive` is how a Track opts into being a single readable
+ * lane of cuts, and this is what makes that declaration mean something --
+ * otherwise every host has to police it, and each one polices it differently.
+ */
+function validateTrackOccupancy(project: AelionProject, diagnostics: DiagnosticSink): void {
+  const joined = transitionJoinedPairs(project);
+  for (const track of Object.values(project.tracks)) {
+    if (trackOccupancy(track) !== 'exclusive') continue;
+    const spans = track.itemIds
+      .flatMap(id => {
+        const item = project.items[id];
+        if (item === undefined) return [];
+        const startUs = BigInt(item.range.startUs);
+        return [{ id, startUs, endUs: startUs + BigInt(item.range.durationUs) }];
+      })
+      .sort((left, right) => {
+        if (left.startUs !== right.startUs) return left.startUs < right.startUs ? -1 : 1;
+        return left.id < right.id ? -1 : left.id > right.id ? 1 : 0;
+      });
+    const active: typeof spans = [];
+    for (const current of spans) {
+      for (let index = active.length - 1; index >= 0; index -= 1) {
+        if ((active[index]?.endUs ?? 0n) <= current.startUs) active.splice(index, 1);
+      }
+      const conflicting = active.find(
+        previous => !joined.has(itemPairKey(previous.id, current.id)),
+      );
+      if (conflicting !== undefined) {
+        diagnostics.push(
+          semanticDiagnostic(
+            'PROJECT_TRACK_OCCUPANCY_OVERLAP',
+            `Item ${current.id} overlaps ${conflicting.id} on exclusive Track ${track.id}`,
+            ['items', current.id, 'range'],
+            current.id,
+          ),
+        );
+      }
+      active.push(current);
+    }
+  }
+}
+
+function validateTrackRoles(project: AelionProject, diagnostics: DiagnosticSink): void {
+  for (const sequence of Object.values(project.sequences)) {
+    const storylines = sequence.trackIds.filter(id => {
+      const track = project.tracks[id];
+      return track !== undefined && trackRole(track) === 'storyline';
+    });
+    if (storylines.length <= 1) continue;
+    diagnostics.push(
+      semanticDiagnostic(
+        'PROJECT_MULTIPLE_STORYLINE_TRACKS',
+        `Sequence ${sequence.id} declares multiple storyline Tracks: ${storylines.join(', ')}`,
+        ['sequences', sequence.id, 'trackIds'],
+        sequence.id,
+      ),
+    );
+  }
+}
+
+function validateItemTimeMapping(item: ItemEntity, diagnostics: DiagnosticSink): void {
+  {
+    if (item.type !== 'video' && item.type !== 'audio' && item.type !== 'nested-sequence') return;
+    // Optional, because the schema is a constructor option: a host that supplies
+    // a looser one can reach here with an Item the shipped schema would have
+    // rejected, and a semantic pass must report that rather than throw.
+    const source = item.source as
+      | {
+          readonly timeMapping?: {
+            readonly type?: unknown;
+            readonly points?: readonly {
+              readonly itemTimeUs?: unknown;
+            }[];
+          };
+        }
+      | undefined;
+    const mapping = source?.timeMapping;
+    if (mapping?.type !== 'curve' || !Array.isArray(mapping.points)) return;
     const points = mapping.points as readonly unknown[];
     const pointTime = (value: unknown): unknown =>
       value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -684,9 +842,9 @@ function validateTimeMappingSemantics(project: AelionProject, diagnostics: Diagn
   }
 }
 
-function validateAudioSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
-  for (const item of Object.values(project.items)) {
-    if (item.type !== 'audio') continue;
+function validateItemAudio(item: ItemEntity, diagnostics: DiagnosticSink): void {
+  {
+    if (item.type !== 'audio') return;
     const typedItem = item as {
       readonly audio?: {
         readonly fadeInUs?: unknown;
@@ -838,7 +996,23 @@ function admissionFailure(error: unknown): Result<ProjectValidationSuccess> {
 
 export class ProjectValidator {
   readonly #schemaValidator: ValidateFunction;
+  readonly #decomposed: DecomposedProjectSchema | undefined;
   readonly #migrateLegacyIdentity: boolean;
+  /**
+   * Frozen entities this validator has already accepted.
+   *
+   * A commit shares every untouched entity with the previous snapshot by object
+   * identity, so on a long timeline nearly every entity handed to the schema on
+   * one commit is the same object the last commit already accepted. Only frozen
+   * entities are recorded: a frozen object cannot change, so a past verdict
+   * stays true, while a mutable one could be edited between two calls.
+   *
+   * Keyed per validator because the verdict is only meaningful for the schema
+   * that produced it, and held weakly so a released snapshot is collectable.
+   */
+  readonly #acceptedEntities = new WeakSet<object>();
+  /** Items that passed the rules decided by the Item alone. See {@link ProjectValidator.validate}. */
+  readonly #acceptedItemSemantics = new WeakSet<object>();
 
   public constructor(options: ProjectValidatorOptions) {
     const ajv = new Ajv2020({
@@ -850,6 +1024,7 @@ export class ProjectValidator {
     addFormats(ajv);
     ajv.addSchema(options.materialInstanceSchema);
     this.#schemaValidator = ajv.compile(options.projectSchema);
+    this.#decomposed = decomposeProjectSchema(ajv, options.projectSchema);
     const properties = options.projectSchema.properties;
     const schemaVersion =
       properties !== null && typeof properties === 'object' && !Array.isArray(properties)
@@ -861,6 +1036,51 @@ export class ProjectValidator {
       typeof schemaVersion === 'object' &&
       !Array.isArray(schemaVersion) &&
       schemaVersion.const === CURRENT_PROJECT_SCHEMA_VERSION;
+  }
+
+  /**
+   * Reports the first schema violation in `candidate`, or `undefined`.
+   *
+   * Where the schema decomposes, this checks the document shell and then each
+   * entity on its own, which is the same set of constraints applied to the same
+   * values -- a map schema that only says "entity ids mapped to entities" adds
+   * nothing to its values that checking them separately would lose. Where it
+   * does not, the whole document goes through Ajv in one call.
+   */
+  #firstSchemaError(candidate: JsonValue): Diagnostic | undefined {
+    const decomposed = this.#decomposed;
+    if (decomposed === undefined) {
+      if (this.#schemaValidator(candidate)) return undefined;
+      const first = this.#schemaValidator.errors?.[0];
+      return first === undefined ? unspecifiedSchemaDiagnostic() : schemaDiagnostic(first);
+    }
+
+    if (!decomposed.shell(candidate)) {
+      const first = decomposed.shell.errors?.[0];
+      return first === undefined ? unspecifiedSchemaDiagnostic() : schemaDiagnostic(first);
+    }
+    const project = candidate as Record<string, Record<string, unknown>>;
+    for (const [collection, check] of decomposed.byCollection) {
+      const entities = project[collection];
+      if (entities === undefined) continue;
+      for (const id of Object.keys(entities)) {
+        const entity = entities[id];
+        if (typeof entity === 'object' && entity !== null && this.#acceptedEntities.has(entity)) {
+          continue;
+        }
+        const validate = entityValidator(check, entity);
+        if (!validate(entity)) {
+          const first = validate.errors?.[0];
+          return first === undefined
+            ? unspecifiedSchemaDiagnostic()
+            : schemaDiagnostic(first, [collection, id]);
+        }
+        if (typeof entity === 'object' && entity !== null && Object.isFrozen(entity)) {
+          this.#acceptedEntities.add(entity);
+        }
+      }
+    }
+    return undefined;
   }
 
   public validate(value: unknown): Result<ProjectValidationSuccess> {
@@ -902,33 +1122,44 @@ export class ProjectValidator {
     candidate: JsonValue,
     migration: ProjectIdentityMigration | undefined,
   ): Result<ProjectValidationSuccess> {
-    if (!this.#schemaValidator(candidate)) {
-      const first = this.#schemaValidator.errors?.[0];
-      return err(
-        first === undefined
-          ? {
-              code: 'PROJECT_SCHEMA_INVALID',
-              severity: 'error',
-              message: 'Project does not conform to its JSON Schema',
-              recoverable: false,
-            }
-          : schemaDiagnostic(first),
-      );
-    }
+    const schemaError = this.#firstSchemaError(candidate);
+    if (schemaError !== undefined) return err(schemaError);
 
     const project = candidate as AelionProject;
     const diagnostics = new BoundedDiagnosticCollector();
-    COLLECTION_NAMES.forEach(collection => validateEntityMap(project, collection, diagnostics));
+    for (const collection of COLLECTION_NAMES) validateEntityMap(project, collection, diagnostics);
     validateReferences(project, diagnostics);
     validateMaterialOwnership(project, diagnostics);
     validateNestedSequenceCycles(project, diagnostics);
     validateVisualTransitionOverlap(project, diagnostics);
-    validateTimeMappingSemantics(project, diagnostics);
-    validateAudioSemantics(project, diagnostics);
+    validateTrackRoles(project, diagnostics);
+    validateTrackOccupancy(project, diagnostics);
+    this.#validatePerItemSemantics(project, diagnostics);
     validateColorSemantics(project, diagnostics);
     validateImageSequenceReferences(project, diagnostics);
     return diagnostics.diagnostics.length === 0
       ? ok({ project, ...(migration?.migrated === true ? { migration } : {}) })
       : err(...diagnostics.diagnostics);
+  }
+
+  /**
+   * Runs the semantic rules that read one Item and nothing else.
+   *
+   * Curve endpoints and audio fades are decided by the Item alone, so a frozen
+   * Item that passed once passes forever -- the same reasoning that lets the
+   * schema check skip an unchanged entity, and the same reason it is limited to
+   * frozen objects. The genuinely cross-entity rules above stay whole-document,
+   * because what they decide can change without any Item changing.
+   */
+  #validatePerItemSemantics(project: AelionProject, diagnostics: DiagnosticSink): void {
+    for (const item of Object.values(project.items)) {
+      if (this.#acceptedItemSemantics.has(item)) continue;
+      const before = diagnostics.count;
+      validateItemTimeMapping(item, diagnostics);
+      validateItemAudio(item, diagnostics);
+      if (diagnostics.count === before && Object.isFrozen(item)) {
+        this.#acceptedItemSemantics.add(item);
+      }
+    }
   }
 }

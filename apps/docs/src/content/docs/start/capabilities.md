@@ -3,12 +3,12 @@ title: What is supported today?
 description: Review editing, preview, media, audio, export, and Material capabilities and boundaries.
 ---
 
-This page answers what can be built with `1.2.0` and what is still a negotiated or uncertified
+This page answers what can be built with `2.0.0` and what is still a negotiated or uncertified
 boundary. Exact symbols are in the generated API Reference and SDK API snapshot.
 
 ## Basic editor
 
-The public SDK can register local/remote/OPFS media, create/load Project v1, render to Canvas, play
+The public SDK can register local/remote/OPFS media, create/load Project v2, render to Canvas, play
 and seek with audio, edit with transactions/history, persist canonical snapshots, and export
 locally or through an application remote provider.
 

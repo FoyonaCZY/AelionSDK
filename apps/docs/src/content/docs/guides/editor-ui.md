@@ -44,9 +44,52 @@ undo entry.
 
 ## Preview, thumbnails, and jobs
 
-Use one main preview controller. Give thumbnail generation a lower budget and cancel results that
-are no longer visible. Represent probe, proxy, waveform, autosave, and export as explicit jobs with
-identity, progress, cancellation, diagnostics, and terminal state.
+Use one main preview controller. `session.media.thumbnail()` and `session.media.filmstrip()` share a
+bounded, serial decode budget with playback, so timeline decoration cannot create one competing
+decoder per clip. Cancel requests as soon as their cells leave the visible band and close every
+returned bitmap:
+
+```ts
+const controller = new AbortController();
+const thumbnail = await session.media.thumbnail({
+  assetId,
+  sourceTimeUs: 2_000_000,
+  maxDimension: 320,
+  signal: controller.signal,
+});
+try {
+  paintThumbnail(thumbnail);
+} finally {
+  thumbnail.close();
+}
+
+const strip = await session.media.filmstrip({ itemId, count: 8, frameHeight: 64 });
+try {
+  paintFilmstrip(strip.bitmap, strip.frameWidth, strip.timesUs);
+} finally {
+  strip.bitmap.close();
+}
+```
+
+Represent probe, proxy, waveform, autosave, and export as explicit jobs with identity, progress,
+cancellation, diagnostics, and terminal state.
+
+Frame subscriptions are exclusive owners: the sole `player.subscribe()` listener must close each
+frame bitmap. UI elements that only need the playhead should use the lightweight, multi-listener
+`subscribeTime()` channel instead:
+
+```ts
+const unsubscribeTime = session.player.subscribeTime(({ timeUs, state }) => {
+  playheadStore.update(timeUs, state);
+});
+
+// When the timeline is no longer watched:
+unsubscribeTime();
+await session.player.reset();
+```
+
+`pause()` keeps decoders and audio transport warm; `reset()` releases them and returns the Player
+to `idle`.
 
 ## Open and close
 

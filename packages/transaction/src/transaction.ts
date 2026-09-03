@@ -2,6 +2,7 @@ import type { JsonObject, JsonValue } from '@aelionsdk/core';
 import { AelionError } from '@aelionsdk/core';
 import {
   canonicalClone,
+  cloneJson,
   COLLECTION_NAMES,
   ProjectInputAdmissionError,
   snapshotProjectInput,
@@ -22,11 +23,24 @@ import type {
   TransactionEngineOptions,
 } from './types.js';
 
+/**
+ * Freezes a Project snapshot and everything beneath it.
+ *
+ * `Object.isFrozen` doubles as the memo: a commit shares every untouched
+ * subtree with the previous snapshot, and those were frozen when that snapshot
+ * was published, so the walk stops at the first shared node. The children are
+ * read without `Object.values`, which would allocate an array for every object
+ * in the document -- tens of thousands of them on a long timeline, for a walk
+ * whose whole job is to touch each node once.
+ */
 function deepFreeze<T>(value: T): Readonly<T> {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    Object.freeze(value);
-    Object.values(value).forEach(entry => deepFreeze(entry));
+  if (value === null || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  Object.freeze(value);
+  if (Array.isArray(value)) {
+    for (const entry of value) deepFreeze(entry);
+    return value;
   }
+  for (const key in value) deepFreeze((value as Record<string, unknown>)[key]);
   return value;
 }
 
@@ -57,7 +71,12 @@ function createDraft(
     );
     for (const id of entityIds) {
       const entity = source[id];
-      if (entity !== undefined) cloned[id] = canonicalClone(entity);
+      // A plain copy: the entity comes from the previous validated snapshot, so
+      // its keys are already canonically ordered and its numbers already
+      // checked, and every caller-supplied value folded in later goes through
+      // `admitOperation`. Re-sorting and re-checking here is the largest cost
+      // of a commit that touches many Items, which is every long drag.
+      if (entity !== undefined) cloned[id] = cloneJson(entity);
     }
     Reflect.set(draft, collection, cloned);
   }
@@ -336,6 +355,55 @@ export class TransactionBuilder {
   }
 }
 
+/**
+ * A Project as it would be, and the entities the change reached.
+ *
+ * The ids are what makes speculating affordable to render. Handed to
+ * `IncrementalRenderCompiler.compile` as `affectedEntityIds`, they let it reuse
+ * every clip the change did not touch; without them the compiler has to
+ * re-derive a fingerprint for every clip in the Sequence to discover the same
+ * thing, which on a long timeline costs more than the whole rest of the frame.
+ */
+export interface SpeculativeProjectChange {
+  readonly project: Readonly<AelionProject>;
+  readonly affectedEntityIds: readonly EntityId[];
+}
+
+/**
+ * Applies a transaction to a Project snapshot without committing it.
+ *
+ * The result is a detached Project that never reaches the engine: no revision,
+ * no history entry, no change notification. It exists so an interaction can be
+ * shown before it is decided -- a drag can render the layout it is proposing
+ * while the committed Project stays exactly as the user left it, and abandoning
+ * the gesture costs nothing because there is nothing to undo.
+ *
+ * The draft shares every untouched subtree with `project`, so speculating once
+ * per pointer move is cheap enough to do at frame rate.
+ */
+export function speculateProjectChange(
+  project: Readonly<AelionProject>,
+  callback: (transaction: TransactionBuilder) => void,
+): SpeculativeProjectChange {
+  const transaction = new TransactionBuilder();
+  callback(transaction);
+  if (transaction.operations.length === 0) return { project, affectedEntityIds: [] };
+  const draft = createDraft(project as AelionProject, transaction.operations);
+  applyOperations(draft, transaction.operations);
+  return {
+    project: deepFreeze(draft) as AelionProject,
+    affectedEntityIds: [...new Set(transaction.operations.map(operation => operation.id))],
+  };
+}
+
+/** {@link speculateProjectChange} for callers that only need the Project. */
+export function speculateProject(
+  project: Readonly<AelionProject>,
+  callback: (transaction: TransactionBuilder) => void,
+): Readonly<AelionProject> {
+  return speculateProjectChange(project, callback).project;
+}
+
 export class TransactionEngine {
   readonly #validate: ProjectValidation;
   readonly #prepareCommit: TransactionEngineOptions['prepareCommit'];
@@ -350,10 +418,13 @@ export class TransactionEngine {
     validate: ProjectValidation,
     options: TransactionEngineOptions = {},
   ) {
-    const cloned = canonicalClone(project);
-    const result = validate(cloned);
-    if (!result.ok) throw new AelionError(result.diagnostics);
-    this.#project = deepFreeze(cloned) as AelionProject;
+    const adopted = options.adoptValidatedProject === true;
+    const initial = adopted ? project : canonicalClone(project);
+    if (!adopted) {
+      const result = validate(initial);
+      if (!result.ok) throw new AelionError(result.diagnostics);
+    }
+    this.#project = deepFreeze(initial) as AelionProject;
     this.#validate = validate;
     this.#prepareCommit = options.prepareCommit;
   }

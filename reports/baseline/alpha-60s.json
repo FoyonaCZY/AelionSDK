@@ -15,7 +15,7 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 30052000,
+    "currentTimeUs": 30041333,
     "emittedFrames": 10,
     "firstTimestampUs": 29500000,
     "lastTimestampUs": 30041333
@@ -61,7 +61,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-8bb94bca-ec96-4e79-bbf0-7081ade629f6.webm",
+    "fileName": "aelion-alpha-44e4ce1c-8e7d-4812-9a22-24dfb9c2939c.webm",
     "writes": 135,
     "bytesWritten": 4746744,
     "maxInFlightWrites": 1,
@@ -4786,8 +4786,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 250,
-          "gpuCompletionUs": 95
+          "totalWorkerUs": 335,
+          "gpuCompletionUs": 110
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4843,8 +4843,8 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 250,
-          "gpuCompletionUs": 95
+          "totalWorkerUs": 335,
+          "gpuCompletionUs": 110
         },
         "lastResources": {
           "activeRequests": 0,
@@ -4929,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 15746461,
-      "totalJsHeapBytes": 22725853
+      "usedJsHeapBytes": 17369589,
+      "totalJsHeapBytes": 26332697
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 40231504,
-      "totalJsHeapBytes": 82803092
+      "usedJsHeapBytes": 40769405,
+      "totalJsHeapBytes": 85636369
     }
   },
-  "elapsedMs": 10621.280000001192,
-  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+  "elapsedMs": 9633.160000000149,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-08-23T22:01:07.341Z",
+  "generatedAt": "2026-09-03T18:57:53.609Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",
@@ -4959,11 +4959,11 @@
         "physical core count and hardware model are unavailable from portable node:os"
       ]
     },
-    "browser": "Google Chrome 151.0.7922.170",
-    "browserVersion": "151.0.7922.170",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+    "browser": "Google Chrome 152.0.7977.65",
+    "browserVersion": "152.0.7977.65",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36"
   },
-  "browserVersion": "151.0.7922.170",
+  "browserVersion": "152.0.7977.65",
   "artifact": {
     "file": "reports/baseline/alpha-60s.webm",
     "bytes": 4746356,

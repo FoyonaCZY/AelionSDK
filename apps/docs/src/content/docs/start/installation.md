@@ -1,6 +1,6 @@
 ---
 title: Install and configure
-description: Install the AelionSDK 1.2 stable release, run the examples, and configure a production host.
+description: Install the AelionSDK 2.0 stable release, run the examples, and configure a production host.
 ---
 
 ## Requirements
@@ -17,11 +17,11 @@ npm install @aelionsdk/sdk @aelionsdk/export
 npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-`latest` currently resolves to `1.2.0`. After validation, pin the exact version:
+`latest` currently resolves to `2.0.0`. After validation, pin the exact version:
 
 ```bash
-npm install @aelionsdk/sdk@1.2.0 @aelionsdk/export@1.2.0
-npm install --save-dev @aelionsdk/vite-plugin@1.2.0
+npm install @aelionsdk/sdk@2.0.0 @aelionsdk/export@2.0.0
+npm install --save-dev @aelionsdk/vite-plugin@2.0.0
 ```
 
 All `@aelionsdk/*` packages in one application should use the same release.
@@ -85,7 +85,7 @@ four runtime assets to your static deployment, then pass absolute URLs through
 - `loadAelionRuntimeAssets()` for a custom copy pipeline;
 - `aelionRuntimeAssetUrls()` for a Next client boundary or pinned CDN layout.
 
-CDN paths must pin the exact SDK version, for example `@aelionsdk/sdk/1.2.0/`.
+CDN paths must pin the exact SDK version, for example `@aelionsdk/sdk/2.0.0/`.
 
 ## TypeScript
 
@@ -118,13 +118,13 @@ before changing versions.
 ## Verify release identity
 
 ```bash
-npm view @aelionsdk/sdk@1.2.0 \
+npm view @aelionsdk/sdk@2.0.0 \
   version dist.integrity dist.attestations --json
 npm view @aelionsdk/sdk dist-tags --json
 ```
 
-Cross-check the [Git tag `v1.2.0`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0),
+Cross-check the [Git tag `v2.0.0`](https://github.com/FoyonaCZY/AelionSDK/tree/v2.0.0),
 the [release workflow](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270), and the
-[GitHub release](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0).
+[GitHub release](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v2.0.0).
 
 Continue with [From a local video to MP4](/AelionSDK/start/getting-started/).

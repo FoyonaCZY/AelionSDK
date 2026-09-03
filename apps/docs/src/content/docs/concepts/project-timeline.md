@@ -1,11 +1,11 @@
 ---
 title: Project and timeline data
-description: Understand Sequence, Track, Item, Asset, Link Group, Marker, and time mapping in Project v1.
+description: Understand Sequence, Track, Item, Asset, Link Group, Marker, and time mapping in Project v2.
 ---
 
 ## What a Project contains
 
-Project v1 is normalized JSON: entity maps hold values and ordered ID arrays define presentation
+Project v2 is normalized JSON: entity maps hold values and ordered ID arrays define presentation
 order. References are validated on load, so missing, duplicated, cyclic, cross-owner, or
 host-mismatched entities fail before execution.
 
@@ -20,6 +20,11 @@ to another sequence but cycles are rejected.
 Visual, audio, and caption tracks control order, visibility, lock state, and mixer behavior. Items
 carry actual timed content. Visual items may reference media, text, shapes, nested sequences,
 materials, masks, animation, or transitions; audio items reference source ranges and mixer data.
+
+A Track can be an `overlay` with free occupancy or the Sequence's single `storyline`, whose
+exclusive occupancy is packed by the timeline planner. A Sequence may contain at most one
+storyline Track. Explicit Transition pairs may overlap on an exclusive Track; other overlaps are
+rejected. A `gap` Item reserves intentional empty time without rendering content.
 
 ## Timeline time and source time
 
@@ -40,7 +45,7 @@ editing. Markers annotate sequence or item time without rendering into the outpu
 ## Build instead of hand-writing JSON
 
 Use `createProject()` for media-oriented construction or `createComposition()` for product-level
-creative authoring. Both produce the same Project v1 format and pass the same validator.
+creative authoring. Both produce the same Project v2 format and pass the same validator.
 
-See [Project v1 field reference](/AelionSDK/reference/project-schema/) for exact fields and
+See [Project v2 field reference](/AelionSDK/reference/project-schema/) for exact fields and
 [Timeline editing](/AelionSDK/guides/timeline-editing/) for commands.

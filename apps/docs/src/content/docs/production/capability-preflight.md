@@ -38,7 +38,7 @@ change it. Re-run checks after source, settings, permission, or output changes.
 ## Software codec capability descriptors
 
 `CodecFallbackDescriptor`, `CodecFallbackRegistry` and `selectCodecAvailability()` describe a
-host-owned software codec capability. They do **not** execute or route media work. The 1.2 media and
+host-owned software codec capability. They do **not** execute or route media work. The 2.0 media and
 export pipelines ship no WASM codec backend and do not invoke registered descriptors.
 
 Use this registry for product-level availability decisions only. If hardware support is absent,

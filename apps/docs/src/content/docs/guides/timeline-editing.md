@@ -31,6 +31,67 @@ promises synchronized behavior. Explicit unlink is preferable to silently editin
 Use track commands for add/remove/reorder, visibility, lock, mute, and solo behavior. Markers are
 non-rendering time annotations and can be sequence- or item-scoped.
 
+In 2.0, `role: 'storyline'` marks the lane whose clips pack without accidental holes. An
+`occupancy: 'exclusive'` Track rejects overlap; `occupancy: 'free'` permits it. Missing occupancy
+defaults to exclusive on the storyline and free on overlay Tracks. A deliberate blank interval on
+a packed Track is a real `gap` Item, not an unrepresented hole.
+
+Use the exported factories when a finished Project needs a new entity. They fill required schema
+defaults and take owned copies of nested values:
+
+```ts
+import { createGapItem, createTrack, createVideoItem } from '@aelionsdk/sdk';
+```
+
+Pass the returned Item to `session.transaction.commands.insertItem()`. IDs remain host-assigned so
+collaboration, replay, and tests can stay deterministic.
+
+## Plan, preview, and commit one drag
+
+`planTimelineMove()` is pure: call it for each pointer position, draw `plan.ghost`, and reject the
+drop if it returns `undefined`. It packs the storyline, carries linked A/V by default, respects
+Track occupancy, and returns only placements that differ from the committed Project.
+
+```ts
+import { planTimelineMove, writeTimelinePlacements } from '@aelionsdk/sdk';
+
+const project = session.getSnapshot().project;
+if (project === null) throw new Error('No Project is loaded');
+
+const plan = planTimelineMove(project, {
+  movedItemId,
+  targetTrackId,
+  targetStartUs,
+});
+
+if (plan !== undefined) {
+  drawDragGhost(plan.ghost, plan.insertAtUs);
+
+  if (plan.placements.size > 0) {
+    const frame = await session.preview.renderFrame({
+      timeUs: playheadUs,
+      overlay: transaction => {
+        writeTimelinePlacements(transaction, project, plan.placements);
+      },
+    });
+    presentThenClose(frame.bitmap);
+  }
+}
+```
+
+The overlay creates no revision, history entry, or change event. On pointer-up, commit the exact
+same map once:
+
+```ts
+if (plan !== undefined && plan.placements.size > 0) {
+  session.transaction.commands.applyPlacements({
+    placements: plan.placements,
+    baseRevision: session.revision!,
+    label: 'Move clips',
+  });
+}
+```
+
 ## Smooth drag behavior
 
 Keep pointer state and the proposed position in view state. Open one history interaction group,

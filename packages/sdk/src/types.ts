@@ -42,6 +42,8 @@ import type {
 export interface AelionProjectSchemas {
   /** Canonical schema for newly created and migrated Project documents. */
   readonly project: JsonObject;
+  /** Frozen immutable v1.2 schema for explicitly validating stable 1.2 documents. */
+  readonly previousProject?: JsonObject;
   /** Frozen immutable v1.0 schema for explicitly validating pre-1.1 documents. */
   readonly legacyProject?: JsonObject;
   readonly materialInstance: JsonObject;
@@ -219,6 +221,21 @@ export interface AelionPreviewQualityOptions {
 export interface AelionPreviewOptions extends AelionPreviewQualityOptions {
   readonly timeUs: number;
   readonly signal?: AbortSignal;
+  /**
+   * Renders an edit that has not been made.
+   *
+   * The callback describes a transaction exactly as `transaction.edit` would,
+   * but nothing is committed: no revision, no history entry, no change event.
+   * The frame shows the Project as it *would* be, and the loaded Project is
+   * untouched whether the interaction is completed or abandoned.
+   *
+   * This is what a drag needs. Committing on every pointer move to see the
+   * result rearranges the timeline under the cursor and fills the undo stack
+   * with states nobody chose; without it, a host can only preview a proposed
+   * edit by making it. Pair with `transaction.commands.applyPlacements` on
+   * release to write the layout the user was looking at.
+   */
+  readonly overlay?: (transaction: TransactionBuilder) => void;
 }
 
 export interface AelionPlayerFrame {
@@ -227,6 +244,12 @@ export interface AelionPlayerFrame {
   readonly timestampUs: number;
   readonly droppedFrames: number;
   readonly result: RenderIrFrameResult;
+}
+
+/** A playhead observation. Carries no frame, so any number of listeners may take it. */
+export interface AelionPlayerTime {
+  readonly timeUs: number;
+  readonly state: AelionPlayerState;
 }
 
 export interface AelionPlayerApi {
@@ -238,7 +261,22 @@ export interface AelionPlayerApi {
   scrub(timeUs: number): Promise<RenderIrFrameResult>;
   setPreviewQuality(options: AelionPreviewQualityOptions): void;
   getStats(): AelionPlayerStats;
+  /**
+   * Takes ownership of presented frames. Exclusive: the listener must close
+   * each `result.bitmap`, and exactly one consumer can be responsible for that.
+   */
   subscribe(listener: (frame: AelionPlayerFrame) => void): () => void;
+  /** Follows the playhead without owning a frame. Any number of listeners. */
+  subscribeTime(listener: (time: AelionPlayerTime) => void): () => void;
+  /**
+   * Releases the audio and video transport and returns the Player to `idle`.
+   *
+   * Pausing keeps the runtime alive so playback can resume instantly. Resetting
+   * gives it back, which is what a host wants when the timeline is no longer
+   * being watched -- switching Projects, closing the editor, or settling after
+   * a batch of edits.
+   */
+  reset(): Promise<void>;
 }
 
 export interface AelionPlayerStats {
@@ -432,6 +470,55 @@ export interface AelionPreviewApi {
   renderFrame(options: AelionPreviewOptions): Promise<RenderIrFrameResult>;
 }
 
+/** Sampling window and bounded output dimensions for a timeline filmstrip. */
+export interface AelionFilmstripOptions {
+  /** Visual Item to sample. Sampling follows its time mapping, so speed ramps stay honest. */
+  readonly itemId: string;
+  /** Number of evenly spaced samples across the Item's timeline range, from 1 to 128. */
+  readonly count: number;
+  /** Height of each sample in pixels, from 1 to 512. Width follows the source aspect. */
+  readonly frameHeight?: number;
+  readonly signal?: AbortSignal;
+}
+
+/** Owned filmstrip bitmap plus the exact source times sampled into it. */
+export interface AelionFilmstripResult {
+  readonly itemId: string;
+  /** Samples composed left to right into one image. The caller closes it. */
+  readonly bitmap: ImageBitmap;
+  readonly frameWidth: number;
+  readonly frameHeight: number;
+  readonly frameCount: number;
+  /** Item-local time each sample was taken at, in Sequence time. */
+  readonly timesUs: readonly number[];
+}
+
+/** Source location and maximum output dimension for one thumbnail. */
+export interface AelionThumbnailOptions {
+  readonly assetId: string;
+  readonly streamIndex?: number;
+  readonly sourceTimeUs?: number;
+  /** Largest output dimension, from 1 to 8192. Defaults to 320. */
+  readonly maxDimension?: number;
+  readonly signal?: AbortSignal;
+}
+
+/**
+ * Decoding for the parts of an editor that are not the program monitor.
+ *
+ * Clip filmstrips and library thumbnails have to share one media pipeline with
+ * playback without stalling it, which means a transient decode budget, serial
+ * ordering, and cancellation the moment playback starts. Every host needs the
+ * same thing, and a host that reaches for `frameAt` directly gets none of it --
+ * it competes with the playback decoder and freezes preview.
+ */
+export interface AelionMediaApi {
+  /** One decoded still, right-sized. The caller closes the returned bitmap. */
+  thumbnail(options: AelionThumbnailOptions): Promise<ImageBitmap>;
+  /** Evenly spaced samples across an Item, composed into one strip. */
+  filmstrip(options: AelionFilmstripOptions): Promise<AelionFilmstripResult>;
+}
+
 export interface AelionSessionStats {
   readonly schemaVersion: '1.0.0';
   readonly revision: bigint | null;
@@ -511,6 +598,7 @@ export interface AelionSessionApi {
   readonly transaction: AelionTransactionApi;
   readonly player: AelionPlayerApi;
   readonly preview: AelionPreviewApi;
+  readonly media: AelionMediaApi;
   readonly export: AelionExportApi;
   readonly audio: AelionAudioApi;
   loadProject(project: unknown): Promise<void>;

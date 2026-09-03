@@ -3,7 +3,7 @@ title: Diagnostic codes
 description: Look up stable error codes, recoverability, location fields, and recommended handling.
 ---
 
-This catalog describes `1.2.0`. Product branches must use `code` and structured fields, not
+This catalog describes `2.0.0`. Product branches must use `code` and structured fields, not
 the English `message`. `recoverable: true` means retry can make sense after the caller changes a
 condition; it does not mean the SDK already retried.
 
@@ -43,7 +43,7 @@ cancelled browser operation may be a `DOMException` named `AbortError`.
 
 | Code                                     | Meaning                                                       |
 | ---------------------------------------- | ------------------------------------------------------------- |
-| `PROJECT_SCHEMA_INVALID`                 | Project failed v1 JSON Schema                                 |
+| `PROJECT_SCHEMA_INVALID`                 | Project failed its versioned JSON Schema                      |
 | `PROJECT_INPUT_INVALID`                  | Non-plain, cyclic/aliased, accessor, sparse, or unsafe input  |
 | `PROJECT_INPUT_LIMIT_EXCEEDED`           | Pre-schema depth/value/array/object/string budget exceeded    |
 | `PROJECT_ENTITY_KEY_MISMATCH`            | Map key differs from entity ID                                |
@@ -53,6 +53,8 @@ cancelled browser operation may be a `DOMException` named `AbortError`.
 | `PROJECT_MATERIAL_MULTIPLE_OWNERS`       | Material instance has more than one owner                     |
 | `PROJECT_MATERIAL_ORPHAN`                | Material instance has no valid owner                          |
 | `PROJECT_VISUAL_TRANSITION_OVERLAP`      | Ambiguous overlapping transitions                             |
+| `PROJECT_TRACK_OCCUPANCY_OVERLAP`        | Items overlap on a Track declared exclusive                   |
+| `PROJECT_MULTIPLE_STORYLINE_TRACKS`      | One Sequence declares more than one packed storyline Track    |
 | `PROJECT_TIME_MAPPING_ENDPOINT_INVALID`  | Curve endpoints do not cover the required range               |
 | `PROJECT_TIME_MAPPING_ORDER_INVALID`     | Curve points are not a deterministic monotonic mapping        |
 | `PROJECT_NESTED_SEQUENCE_CYCLE`          | Nested sequences form a cycle                                 |
@@ -84,6 +86,8 @@ Semantic command codes include `COMMAND_TIME_INVALID`, `COMMAND_ITEM_MISSING`,
 `COMMAND_ITEM_EXISTS`, `COMMAND_TRACK_MISSING`, `COMMAND_TRACK_LOCKED`,
 `COMMAND_TRACK_KIND_MISMATCH`, `COMMAND_ITEM_ANCHOR_*`, `COMMAND_TRACK_ANCHOR_MISSING`,
 `COMMAND_TRACK_SEQUENCE_MISMATCH`, `COMMAND_TRACK_AUDIO_REQUIRED`, `COMMAND_NO_CHANGE`,
+`COMMAND_PLACEMENTS_EMPTY`, `COMMAND_TRACK_OCCUPANCY_OVERLAP`,
+`COMMAND_TRANSITION_PAIR_SEPARATED`,
 `COMMAND_TIME_MAPPING_UNSUPPORTED`, `COMMAND_SOURCE_RANGE_EMPTY`,
 `COMMAND_SOURCE_SPLIT_OUT_OF_RANGE`, `COMMAND_TRIM_*`, `COMMAND_SPLIT_*`,
 `COMMAND_REPLACE_TOPOLOGY_CHANGED`, `COMMAND_REPLACE_OWNERSHIP_CHANGED`, and

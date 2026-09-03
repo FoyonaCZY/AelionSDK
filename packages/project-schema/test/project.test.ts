@@ -27,6 +27,7 @@ async function readJson(path: string): Promise<JsonObject> {
 
 let project: JsonObject;
 let projectSchema: JsonObject;
+let previousProjectSchema: JsonObject;
 let legacyProjectSchema: JsonObject;
 let materialSchema: JsonObject;
 let validator: ProjectValidator;
@@ -74,21 +75,28 @@ function addTransition(
 }
 
 beforeAll(async () => {
-  const [loadedProjectSchema, loadedLegacySchema, materialInstanceSchema, fixture] =
-    await Promise.all([
-      readJson('schemas/project/v1.2/project.schema.json'),
-      readJson('schemas/project/v1/project.schema.json'),
-      readJson('schemas/material/v1/instance.schema.json'),
-      readJson('examples/aelion-project-v1.example.json'),
-    ]);
+  const [
+    loadedProjectSchema,
+    loadedPreviousSchema,
+    loadedLegacySchema,
+    materialInstanceSchema,
+    fixture,
+  ] = await Promise.all([
+    readJson('schemas/project/v2.0/project.schema.json'),
+    readJson('schemas/project/v1.2/project.schema.json'),
+    readJson('schemas/project/v1/project.schema.json'),
+    readJson('schemas/material/v1/instance.schema.json'),
+    readJson('examples/aelion-project-v1.example.json'),
+  ]);
   projectSchema = loadedProjectSchema;
+  previousProjectSchema = loadedPreviousSchema;
   legacyProjectSchema = loadedLegacySchema;
   materialSchema = materialInstanceSchema;
   project = fixture;
   validator = new ProjectValidator({ projectSchema, materialInstanceSchema });
 });
 
-describe('Aelion Project v1.2', () => {
+describe('Aelion Project v2.0', () => {
   it('keeps every public collection and array schema within the admission budgets', () => {
     const definitions = projectSchema.$defs as JsonObject;
     const idList = definitions.idList as JsonObject;
@@ -157,7 +165,19 @@ describe('Aelion Project v1.2', () => {
     expect(project.$schema).toBe('https://schemas.aelion.dev/project/v1.json');
   });
 
-  it('keeps the published v1.0 dialect immutable while v1.2 accepts additive fields', () => {
+  it('migrates the immutable stable v1.2 identity without mutating its input', () => {
+    const stable = canonicalClone(project);
+    stable.$schema = 'https://schemas.aelion.dev/project/v1.2.json';
+    stable.schemaVersion = '1.2.0';
+    const migration = migrateProjectToCurrent(stable);
+    expect(migration.migrated).toBe(true);
+    expect(migration.project.$schema).toBe(CURRENT_PROJECT_SCHEMA_URI);
+    expect(migration.project.schemaVersion).toBe(CURRENT_PROJECT_SCHEMA_VERSION);
+    expect(stable.$schema).toBe('https://schemas.aelion.dev/project/v1.2.json');
+    expect(stable.schemaVersion).toBe('1.2.0');
+  });
+
+  it('keeps the published v1.0 dialect immutable while v2 accepts additive fields', () => {
     const candidate = canonicalClone(project);
     const assets = candidate.assets as JsonObject;
     assets.asset_img = {
@@ -176,6 +196,25 @@ describe('Aelion Project v1.2', () => {
       materialInstanceSchema: materialSchema,
     });
     expect(legacy.validate(candidate).ok).toBe(false);
+    expect(validator.validate(candidate).ok).toBe(true);
+  });
+
+  it('keeps the published v1.2 dialect immutable while v2 accepts timeline roles', () => {
+    const candidate = canonicalClone(project);
+    candidate.$schema = CURRENT_PROJECT_SCHEMA_URI;
+    candidate.schemaVersion = CURRENT_PROJECT_SCHEMA_VERSION;
+    const tracks = candidate.tracks as JsonObject;
+    const storyline = tracks.track_video_main as JsonObject;
+    storyline.role = 'storyline';
+    storyline.occupancy = 'exclusive';
+    const previous = new ProjectValidator({
+      projectSchema: previousProjectSchema,
+      materialInstanceSchema: materialSchema,
+    });
+    const previousCandidate = canonicalClone(candidate);
+    previousCandidate.$schema = 'https://schemas.aelion.dev/project/v1.2.json';
+    previousCandidate.schemaVersion = '1.2.0';
+    expect(previous.validate(previousCandidate).ok).toBe(false);
     expect(validator.validate(candidate).ok).toBe(true);
   });
 

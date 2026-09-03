@@ -1,9 +1,4 @@
-import {
-  canonicalStringify,
-  type AelionProject,
-  type ItemEntity,
-  type TrackEntity,
-} from '@aelionsdk/project-schema';
+import { type AelionProject, type ItemEntity, type TrackEntity } from '@aelionsdk/project-schema';
 import type { JsonObject } from '@aelionsdk/core';
 
 import type {
@@ -49,16 +44,28 @@ const COMPILABLE_ITEM_TYPES: ReadonlySet<string> = new Set([
   'shape',
   'material-content',
   'adjustment',
+  // Compiles to no clip at all; see the Gap branch in the Track loop below.
+  'gap',
 ]);
 
 function deepFreezePlain<T>(value: T, seen = new WeakSet<object>()): Readonly<T> {
   if (value === null || typeof value !== 'object') return value;
   if (deepFrozen.has(value)) return value;
   if (seen.has(value)) return value;
-  const prototype: unknown = Object.getPrototypeOf(value);
-  if (!Array.isArray(value) && prototype !== Object.prototype && prototype !== null) return value;
-  seen.add(value);
-  for (const entry of Object.values(value)) deepFreezePlain(entry, seen);
+  if (Array.isArray(value)) {
+    seen.add(value);
+    for (const entry of value) deepFreezePlain(entry, seen);
+  } else {
+    const prototype: unknown = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) return value;
+    seen.add(value);
+    // `for...in` over a plain object walks V8's enumeration cache without
+    // materializing a key or value array for every node in the IR, which at a
+    // thousand clips is tens of thousands of throwaway arrays per compile.
+    for (const key in value) {
+      deepFreezePlain((value as Record<string, unknown>)[key], seen);
+    }
+  }
   // Recorded only after the whole subtree is frozen, so membership never
   // promises more than has actually been done.
   deepFrozen.add(value);
@@ -248,6 +255,22 @@ function nestedSequenceSource(item: ItemEntity): IrNestedSequenceSource {
   };
 }
 
+/**
+ * Serializes a value for fingerprint comparison.
+ *
+ * A fingerprint is only ever compared against the fingerprint the previous
+ * compile recorded for the same entity, so it needs one property: two entities
+ * that differ must serialize differently. Canonical ordering buys the stronger
+ * property that two *equal* entities always agree even if their keys were
+ * written in a different order -- which here would at worst cause a recompile
+ * that produces the same clip, and costs a hand-written walk over every value
+ * in the Sequence to avoid. `JSON.stringify` is exact for the plain JSON an
+ * admitted Project contains, and the engine runs it natively.
+ */
+function fingerprintOf(value: unknown): string {
+  return JSON.stringify(value);
+}
+
 function clipFingerprint(
   item: ItemEntity,
   materials: Readonly<Record<string, IrMaterialInstance>>,
@@ -257,17 +280,17 @@ function clipFingerprint(
   const sourceAssetId = typeof source.assetId === 'string' ? source.assetId : undefined;
   const sourceAsset = sourceAssetId === undefined ? undefined : assets[sourceAssetId];
   return [
-    canonicalStringify(item),
+    fingerprintOf(item),
     ...(sourceAsset?.kind === 'image-sequence'
-      ? [canonicalStringify(sourceAsset.imageSequence ?? null)]
+      ? [fingerprintOf(sourceAsset.imageSequence ?? null)]
       : []),
     ...item.materialInstanceIds.map(id => materialFingerprint(materials[id])),
   ].join('|');
 }
 
 function materialFingerprint(instance: IrMaterialInstance | undefined): string {
-  if (instance === undefined) return canonicalStringify(null);
-  return canonicalStringify({
+  if (instance === undefined) return 'null';
+  return fingerprintOf({
     id: instance.id,
     definition: {
       packageId: instance.definition.packageId,
@@ -513,7 +536,7 @@ export class IncrementalRenderCompiler {
   /**
    * Track fingerprints keyed by the source track object.
    *
-   * A track fingerprint is `canonicalStringify(track)`, and a track carries every
+   * A track fingerprint serializes the whole Track, and a Track carries every
    * item id on it, so recomputing it for a thousand-clip track dominated the cost
    * of an incremental compile even when nothing on that track changed. Commits
    * share structure: editing one item leaves every untouched track at the same
@@ -535,7 +558,7 @@ export class IncrementalRenderCompiler {
   #trackFingerprint(track: TrackEntity): string {
     const cached = this.#trackFingerprints.get(track);
     if (cached !== undefined) return cached;
-    const fingerprint = canonicalStringify(track);
+    const fingerprint = fingerprintOf(track);
     this.#trackFingerprints.set(track, fingerprint);
     return fingerprint;
   }
@@ -607,6 +630,11 @@ export class IncrementalRenderCompiler {
           if (!COMPILABLE_ITEM_TYPES.has(item.type)) {
             throw new TypeError(`Render IR cannot compile item type ${item.type}`);
           }
+          // A Gap is time and nothing else. It still lengthens the Sequence,
+          // because `contentDuration` reads the Project rather than the clip
+          // list, but it produces no clip for the renderer or the mixer to
+          // consider.
+          if (item.type === 'gap') continue;
           const previous = previousClips.get(itemId);
           if (
             canReuseByEntity &&
@@ -664,7 +692,7 @@ export class IncrementalRenderCompiler {
           materialInstanceId: value.materialInstanceId,
           dependencyEntityIds: [id, value.fromItemId, value.toItemId, value.materialInstanceId],
           fingerprint: [
-            canonicalStringify(value),
+            fingerprintOf(value),
             materialFingerprint(materials[value.materialInstanceId]),
           ].join('|'),
         };

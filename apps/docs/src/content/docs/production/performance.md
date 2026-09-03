@@ -11,6 +11,12 @@ representative codecs, duration, resolution, frame rate, devices, and network.
 
 Report latency distributions and terminal resource counts, not only an average FPS.
 
+The nightly GitHub-hosted runner stores a complete raw performance observation for regression
+triage, but its shared CPU load and virtualized GPU are not a controlled reference device. Absolute
+SLOs remain fail-closed in the source-bound release gate on the reviewed reference machine. A
+nightly observation may therefore carry an Actions notice without making the correctness CI red;
+it never substitutes for release evidence.
+
 ## Preview priorities
 
 Cancel stale requests, use proxies, keep one main preview pipeline, lower interactive resolution,

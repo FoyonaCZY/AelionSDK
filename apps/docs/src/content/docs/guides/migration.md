@@ -1,6 +1,6 @@
 ---
 title: Migrate from WebAV and Diffusion Studio
-description: Convert WebAV sprites or Diffusion checkpoints into Project v1 with an explicit loss report.
+description: Convert WebAV sprites or Diffusion checkpoints into Project v2 with an explicit loss report.
 ---
 
 ## WebAV

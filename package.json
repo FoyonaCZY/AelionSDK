@@ -1,6 +1,6 @@
 {
   "name": "aelion-sdk",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Browser-first real-time editing, rendering and export SDK",
   "license": "MIT",
@@ -68,6 +68,7 @@
     "test:security": "vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts",
     "test:soak": "vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts",
     "bench": "vitest bench --run",
+    "bench:report": "node benchmarks/report.mjs",
     "bench:competitors": "node scripts/benchmark-competitors.mjs",
     "dev:lab": "vite --config apps/capability-lab/vite.config.ts",
     "dev:editor": "vite --config apps/editor-demo/vite.config.ts",

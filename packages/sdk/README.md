@@ -2,14 +2,14 @@
 
 Browser-first video editing, preview, playback and export APIs for AelionSDK.
 
-## Install 1.2
+## Install 2.0
 
 ```bash
 npm install @aelionsdk/sdk
 npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-`latest` currently resolves to `1.2.0`. Pin the exact version after
+`latest` currently resolves to `2.0.0`. Pin the exact version after
 validation instead of following a moving dist-tag.
 
 ## Vite setup
@@ -48,8 +48,9 @@ const builder = createProject({
 await session.loadProject(builder.build());
 ```
 
-New Projects use Project Schema v1.2. `migrateProjectToCurrent()` upgrades the
-ambiguous legacy identity emitted by 1.1/1.2 rc.1 without mutating input data.
+New Projects use the immutable Project Schema `v2.0.json / 2.0.0` identity.
+`migrateProjectToCurrent()` upgrades supported v1.0 and stable v1.2 documents
+from an ownership-isolated snapshot without mutating caller data.
 Large automatic-proxy sources require the RangeReader encoder contract; the
 legacy whole-buffer path has a bounded default input limit.
 

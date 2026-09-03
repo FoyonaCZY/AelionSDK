@@ -3,9 +3,11 @@ import test from 'node:test';
 
 import {
   RELEASE_LOCKFILE_INSTALL_ARGS,
+  RELEASE_STATUS_DOCUMENTS,
   RELEASE_VERSION_DOCUMENTS,
   updateDocumentVersion,
   updateManifestVersion,
+  updateReleaseStatusVersion,
 } from './release-version-lib.mjs';
 
 test('version updates can intentionally refresh a frozen workspace lockfile', () => {
@@ -69,8 +71,11 @@ test('curated release documents replace every current-version occurrence', () =>
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/sdk/api-snapshot.md'));
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('packages/material-sdk/README.md'));
   assert.ok(RELEASE_VERSION_DOCUMENTS.includes('compatibility/device-matrix.json'));
-  assert.ok(RELEASE_VERSION_DOCUMENTS.includes('README.zh-CN.md'));
-  assert.ok(RELEASE_VERSION_DOCUMENTS.includes('apps/docs/src/content/docs/project/status.md'));
+  assert.ok(
+    RELEASE_VERSION_DOCUMENTS.includes('apps/docs/src/content/docs/reference/diagnostic-codes.md'),
+  );
+  assert.ok(RELEASE_STATUS_DOCUMENTS.includes('README.zh-CN.md'));
+  assert.ok(RELEASE_STATUS_DOCUMENTS.includes('apps/docs/src/content/docs/project/status.md'));
   for (const packageName of [
     'audio',
     'capability',
@@ -88,4 +93,16 @@ test('curated release documents replace every current-version occurrence', () =>
     assert.ok(RELEASE_VERSION_DOCUMENTS.includes(`packages/${packageName}/README.md`));
   }
   assert.ok(!RELEASE_VERSION_DOCUMENTS.includes('CHANGELOG.md'));
+});
+
+test('narrative release documents update only their marked current-version block', () => {
+  const source = `History 1.2.0\n<!-- aelion-current-version:start -->\nCurrent 1.2.0\n<!-- aelion-current-version:end -->\nReleased 1.2.0\n`;
+  assert.equal(
+    updateReleaseStatusVersion(source, '1.2.0', '2.0.0', 'README.md'),
+    `History 1.2.0\n<!-- aelion-current-version:start -->\nCurrent 2.0.0\n<!-- aelion-current-version:end -->\nReleased 1.2.0\n`,
+  );
+  assert.throws(
+    () => updateReleaseStatusVersion('Current 1.2.0', '1.2.0', '2.0.0', 'README.md'),
+    /marker block/u,
+  );
 });

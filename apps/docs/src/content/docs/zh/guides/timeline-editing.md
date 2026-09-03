@@ -154,6 +154,59 @@ session.transaction.commands.reorderTrack({
 
 Locked 轨不允许编辑；enabled 决定轨道是否参与工程；muted/solo 只适用于音频轨。这些是 Project 状态，会随工程保存。
 
+2.0 新增了轨道布局语义：`role: 'storyline'` 表示需要连续排列的主故事线；`occupancy: 'exclusive'` 禁止 Item 重叠，`occupancy: 'free'` 允许重叠。省略 occupancy 时，storyline 默认 exclusive，overlay 轨默认 free。主故事线里有意保留的空白必须使用真正的 `gap` Item，否则重新排列时会被当作普通空洞收起。
+
+给已有工程新增实体时，优先使用 SDK 导出的工厂。它们会补齐 schema 必填默认值，并复制传入的嵌套对象：
+
+```ts
+import { createGapItem, createTrack, createVideoItem } from '@aelionsdk/sdk';
+```
+
+把工厂返回的 Item 交给 `session.transaction.commands.insertItem()`。ID 仍由宿主生成，这样协作、重放和测试可以使用确定的标识。
+
+## 一次拖拽的规划、预览与提交
+
+`planTimelineMove()` 是纯函数。每次 pointermove 都可以重新调用；用 `plan.ghost` 绘制拖拽影子，返回 `undefined` 时拒绝落点。它会排列 storyline、默认携带联动音频、检查轨道 occupancy，并且只返回相对已提交工程真正发生变化的 placements。
+
+```ts
+import { planTimelineMove, writeTimelinePlacements } from '@aelionsdk/sdk';
+
+const project = session.getSnapshot().project;
+if (project === null) throw new Error('还没有加载工程');
+
+const plan = planTimelineMove(project, {
+  movedItemId,
+  targetTrackId,
+  targetStartUs,
+});
+
+if (plan !== undefined) {
+  drawDragGhost(plan.ghost, plan.insertAtUs);
+
+  if (plan.placements.size > 0) {
+    const frame = await session.preview.renderFrame({
+      timeUs: playheadUs,
+      overlay: transaction => {
+        writeTimelinePlacements(transaction, project, plan.placements);
+      },
+    });
+    presentThenClose(frame.bitmap);
+  }
+}
+```
+
+overlay 不会产生 revision、撤销记录或 change event。pointer-up 时只提交一次同一份 placements：
+
+```ts
+if (plan !== undefined && plan.placements.size > 0) {
+  session.transaction.commands.applyPlacements({
+    placements: plan.placements,
+    baseRevision: session.revision!,
+    label: '移动片段',
+  });
+}
+```
+
 ## Marker
 
 Marker 适合章节、审核意见、节拍点和业务锚点。它不会自动显示在成片中。

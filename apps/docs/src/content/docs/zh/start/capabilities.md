@@ -157,7 +157,7 @@ Shader、WASM 和网络访问默认没有执行权限。签名只证明发布者
 - HDR/10-bit 尚未实现；
 - 保音高策略只支持线性 TimeMap；
 - Vite、Webpack 5/Rspack 有构建适配器；Next.js 与 CDN 采用显式、版本一致的 runtime asset URL，仍需在最终部署做 200/MIME/CSP 验证；
-- 公开包通过 npm `latest` tag 发布，当前版本是 1.2 正式版；
+- 公开包通过 npm `latest` tag 发布，当前版本是 2.0 正式版；
 - 公开 API 变更遵循 SemVer；Project/Material 协议变化必须配迁移。
 
 浏览器和平台细节见[兼容性与部署](/AelionSDK/zh/production/compatibility/)。

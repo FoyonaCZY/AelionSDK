@@ -19,6 +19,8 @@ description: 为解码、Canvas、GPU、缩略图、Material、播放和导出�
 
 把浏览器版本、OS、GPU、是否跨源隔离和素材 hash 一起记录，否则回归数据很难比较。
 
+Nightly 会在 GitHub 托管 runner 上保存完整的原始性能观测，用于排查回归；但共享 CPU 负载和虚拟化 GPU 不是受控参考设备。绝对 SLO 仍只在经过审阅的参考机器上、绑定源清单的发布门禁中 fail closed。因此 nightly 观测可能产生 Actions notice 而不把正确性 CI 标红，但它绝不能替代正式发布证据。
+
 ## 预览的第一层优化
 
 ```ts

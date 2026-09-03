@@ -9,7 +9,7 @@ evaluation for AelionSDK.
 npm install @aelionsdk/render-ir
 ```
 
-`latest` currently resolves to `1.2.0`. Product applications should use
+`latest` currently resolves to `2.0.0`. Product applications should use
 `@aelionsdk/sdk`; direct use is for custom renderers, exporters and engine
 instrumentation.
 

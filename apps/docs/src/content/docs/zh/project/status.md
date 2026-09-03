@@ -3,8 +3,18 @@ title: 当前状态
 description: 发布身份、已验证范围、补救内容和仍未认证的边界。
 ---
 
-仓库版本：`1.2.0`。这是首个稳定 1.2 版本。13 个 `@aelionsdk/*` 包通过 npm `latest`
+<!-- aelion-current-version:start -->
+
+仓库版本：`2.0.0`。13 个 `@aelionsdk/*` 包通过 npm `latest`
 tag 分发；当前实际发布版本以 npm badge 和 registry 为准。
+
+<!-- aelion-current-version:end -->
+
+## 2.0 时间线与编辑器基础能力
+
+本版本新增不可变 Project v2.0 Schema、storyline/overlay 轨道角色、exclusive/free 占用规则、
+Gap Item、可复用布局解算、安全 Item 工厂、拖拽推测编译、播放器时间订阅和 Session
+缩略图/filmstrip API。支持的 v1.0 与 v1.2 Project 会从所有权隔离快照迁移，不修改调用方对象。
 
 ## 1.2.0 编译冻结与播放
 
@@ -80,7 +90,7 @@ rc.2 修复了 1.1/1.2 发布后审计发现的问题：
 - 代理流程仍需要宿主提供编码器。
 - WebGPU 尚未具备完整 WebGL2 多 pass parity 和实体设备认证。
 - 脱离页面的长任务和 24 小时实体设备 soak 证据尚未交付。
-- 1.2.0 之后，公开 API 变更遵循 SemVer、CHANGELOG 和文档化弃用窗口。
+- 2.0.0 之后，公开 API 变更遵循 SemVer、CHANGELOG 和文档化弃用窗口。
 
 ## 本地复核
 

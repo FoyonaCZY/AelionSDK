@@ -160,7 +160,7 @@ function migrateProject(input: unknown): unknown {
 - 有真实旧工程 fixture 测试；
 - 迁移失败时保留原始文件，不能覆盖。
 
-当前公共 Schema 是 Project v1。升级 SDK 前用真实 Project corpus 回归，而不是只测试一个空工程。
+当前公共 Schema 是 Project v2。升级 SDK 前用真实 Project corpus 回归，而不是只测试一个空工程。
 
 ## 业务扩展放在哪里
 

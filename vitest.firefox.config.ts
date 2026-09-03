@@ -19,6 +19,7 @@ export default defineConfig({
       enabled: true,
       provider: 'playwright',
       headless: true,
+      api: { host: '127.0.0.1', port: 63315, strictPort: false },
       instances: [
         {
           browser: 'firefox',

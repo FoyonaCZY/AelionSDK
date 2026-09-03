@@ -46,23 +46,29 @@ Session Transaction Commands。
 
 ## 先跑起来
 
-仓库中的 1.2 正式版是 `1.2.0`。稳定版通过 npm 的 `latest` tag 分发，
+<!-- aelion-current-version:start -->
+
+仓库当前版本是 `2.0.0`。稳定版通过 npm 的 `latest` tag 分发，
 当前实际发布版本以 npm badge 和 registry 为准。Vite 应用安装 SDK、导出入口和运行时资源插件：
+
+<!-- aelion-current-version:end -->
 
 ```bash
 npm install @aelionsdk/sdk @aelionsdk/export
 npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-### rc.2 补救重点
+### 2.0 重点
 
 > `1.1.0-rc.1` 与 `1.2.0-rc.1` 已被替代，请勿新采用这两个版本。`1.2.0-rc.2`
-> 完成了契约补救；当前仓库版本是 `1.2.0`，发布后通过 npm `latest` dist-tag 分发。
+> 完成了契约补救；`1.2.0` 是第一个稳定的 1.2 版本。
 > rc.4 加快交互提交，并补上文字背景板、transient 解码和更稳的播放/seek。
 > rc.5 池化 WebGL2 资源、复用合成 bypass，并让预览 `maxDimension` 真正缩小上传。
 > 1.2.0 冻结已复用的 Render IR、预览帧零拷贝交接，并复用音频 PCM session。
 
-- 新 Project 使用独立的 `v1.2.json / 1.2.0` Schema；旧 RC 文档会先隔离快照再兼容迁移。
+- 新 Project 使用独立且不可变的 `v2.0.json / 2.0.0` Schema；v1.0 与稳定 v1.2 文档会先隔离快照再迁移。
+- 新增 storyline/overlay 轨道语义、exclusive/free 占用规则、Gap Item 和可复用布局解算。
+- 新增安全 Item 工厂、拖拽推测编译、播放器时间订阅，以及缩略图/filmstrip API。
 - 图像序列已经进入实际预览和导出路径，不再只是 Project 建模辅助函数。
 - 字幕导入、Bézier 手柄、双向速率、代理内存边界和音频分析命名都已修正。
 - 内置软件 codec、ASS/SSA、真机矩阵、24 小时后台任务和完整 WebGPU parity 仍未交付；详见
