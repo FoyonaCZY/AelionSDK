@@ -281,7 +281,7 @@ test(
 
 test('the final runner policy is exactly fourteen gates plus seven evidence refreshes', () => {
   assert.equal(PHASE_1_REQUIRED_GATE_COMMANDS.length, 14);
-  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 93, firefox: 76 });
+  assert.deepEqual(PHASE_1_EXPECTED_BROWSER_TESTS, { chromium: 102, firefox: 76 });
   assert.deepEqual(PHASE_1_EVIDENCE_REFRESH_COMMANDS, [
     'corepack pnpm report:performance',
     'corepack pnpm report:browser:chromium',

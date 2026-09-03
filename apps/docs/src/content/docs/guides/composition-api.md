@@ -3,7 +3,7 @@ title: Author with the Composition API
 description: Create images, text, shapes, captions, effects, masks, keyframes, and transitions.
 ---
 
-The Composition API is the product-level authoring surface. It produces the same Project v1 used
+The Composition API is the product-level authoring surface. It produces the same Project v2 used
 by media import, Session, persistence, preview, and export.
 
 ## Create a Composition

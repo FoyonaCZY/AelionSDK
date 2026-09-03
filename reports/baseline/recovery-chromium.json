@@ -1,7 +1,7 @@
 {
   "evidenceVersion": "1.0.0",
   "command": "corepack pnpm report:recovery",
-  "generatedAt": "2026-08-23T22:00:36.188Z",
+  "generatedAt": "2026-09-03T18:57:24.573Z",
   "fixture": "Aelion deterministic segmented A/V",
   "durationUs": 2000000,
   "sampleRate": 48000,
@@ -38,12 +38,12 @@
         "physical core count and hardware model are unavailable from portable node:os"
       ]
     },
-    "browser": "Google Chrome 151.0.7922.170",
-    "browserVersion": "151.0.7922.170",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+    "browser": "Google Chrome 152.0.7977.65",
+    "browserVersion": "152.0.7977.65",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36"
   },
-  "browserVersion": "151.0.7922.170",
-  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+  "browserVersion": "152.0.7977.65",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
   "profiles": [
     {
       "profile": "webm-vp9-opus",
@@ -408,7 +408,7 @@
         "firstRenderedFrame": 0,
         "rerenderedCommittedFrames": 60,
         "bytes": 46198,
-        "artifactSha256": "da759dee73d24262d91200e0690dbdafc48b76b18a6ef242b99f902863cdb014",
+        "artifactSha256": "055be34f13573f5c51842f1d5e09239f0d650757bf82f8730d65aec7b9facb7c",
         "readback": {
           "videoFrames": 60,
           "videoFrameMd5": [
@@ -495,7 +495,7 @@
           "firstRenderedFrame": 18,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "da759dee73d24262d91200e0690dbdafc48b76b18a6ef242b99f902863cdb014",
+          "artifactSha256": "afe161ef96833d14cf46712c0a8266a9acec1ab674ab8eec4b8b234a6e998bb5",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [
@@ -581,7 +581,7 @@
           "firstRenderedFrame": 30,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "d4b43c3c5bd1929823c08d7c4a70ddc4fd5728a42d16e3ca4c5e97a587e02394",
+          "artifactSha256": "afe161ef96833d14cf46712c0a8266a9acec1ab674ab8eec4b8b234a6e998bb5",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [
@@ -667,7 +667,7 @@
           "firstRenderedFrame": 54,
           "rerenderedCommittedFrames": 0,
           "bytes": 46198,
-          "artifactSha256": "d4b43c3c5bd1929823c08d7c4a70ddc4fd5728a42d16e3ca4c5e97a587e02394",
+          "artifactSha256": "afe161ef96833d14cf46712c0a8266a9acec1ab674ab8eec4b8b234a6e998bb5",
           "readback": {
             "videoFrames": 60,
             "videoFrameMd5": [

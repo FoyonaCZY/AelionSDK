@@ -10,9 +10,11 @@ import { corepackArguments, corepackExecutable } from './corepack-command.mjs';
 import { parseReleaseVersion } from './release-policy.mjs';
 import {
   RELEASE_LOCKFILE_INSTALL_ARGS,
+  RELEASE_STATUS_DOCUMENTS,
   RELEASE_VERSION_DOCUMENTS,
   updateDocumentVersion,
   updateManifestVersion,
+  updateReleaseStatusVersion,
 } from './release-version-lib.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -56,6 +58,7 @@ const original = new Map();
 for (const path of [
   ...manifestPaths,
   ...RELEASE_VERSION_DOCUMENTS.map(path => join(root, path)),
+  ...RELEASE_STATUS_DOCUMENTS.map(path => join(root, path)),
   join(root, 'pnpm-lock.yaml'),
 ]) {
   original.set(path, await readFile(path, 'utf8'));
@@ -74,10 +77,17 @@ for (const documentPath of RELEASE_VERSION_DOCUMENTS) {
     updateDocumentVersion(original.get(path), currentVersion, nextVersion, documentPath),
   );
 }
+for (const documentPath of RELEASE_STATUS_DOCUMENTS) {
+  const path = join(root, documentPath);
+  changed.set(
+    path,
+    updateReleaseStatusVersion(original.get(path), currentVersion, nextVersion, documentPath),
+  );
+}
 
 if (checkOnly) {
   process.stdout.write(
-    `Release version ${currentVersion} is synchronized across ${manifestPaths.length.toString()} manifests and ${RELEASE_VERSION_DOCUMENTS.length.toString()} documents.\n`,
+    `Release version ${currentVersion} is synchronized across ${manifestPaths.length.toString()} manifests and ${(RELEASE_VERSION_DOCUMENTS.length + RELEASE_STATUS_DOCUMENTS.length).toString()} documents.\n`,
   );
   process.exit(0);
 }
@@ -106,5 +116,5 @@ try {
 }
 
 process.stdout.write(
-  `Updated ${manifestPaths.length.toString()} manifests, ${RELEASE_VERSION_DOCUMENTS.length.toString()} documents, the lockfile and API snapshot from ${currentVersion} to ${nextVersion}.\n`,
+  `Updated ${manifestPaths.length.toString()} manifests, ${(RELEASE_VERSION_DOCUMENTS.length + RELEASE_STATUS_DOCUMENTS.length).toString()} documents, the lockfile and API snapshot from ${currentVersion} to ${nextVersion}.\n`,
 );

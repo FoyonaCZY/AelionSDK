@@ -86,14 +86,69 @@ export interface TrackAudioProperties extends JsonObject {
   solo?: boolean;
 }
 
+/**
+ * What a Track is for, which decides how a layout may rearrange it.
+ *
+ * A `storyline` Track carries the cut everything else is timed against: it is
+ * kept packed, so removing a clip closes the hole and inserting one displaces
+ * its neighbours. An `overlay` Track is freely positioned and never repacked.
+ */
+export type TrackRole = 'storyline' | 'overlay';
+
+/**
+ * Whether two Items may occupy the same instant on a Track.
+ *
+ * `exclusive` Tracks reject overlap, which is what makes a single lane readable
+ * as a sequence of cuts. `free` Tracks permit it, which stacked titles and
+ * layered audio need. Missing means `exclusive` for a storyline and `free`
+ * otherwise, so documents written before this field keep their behaviour.
+ */
+export type TrackOccupancy = 'exclusive' | 'free';
+
 export interface TrackEntity extends ProjectEntity {
   sequenceId: EntityId;
   kind: 'visual' | 'audio' | 'caption';
+  /** Defaults to `overlay`; see {@link trackRole}. */
+  role?: TrackRole;
+  /** Defaults to the role's implied policy; see {@link trackOccupancy}. */
+  occupancy?: TrackOccupancy;
   enabled: boolean;
   locked: boolean;
   itemIds: EntityId[];
   materialInstanceIds: EntityId[];
   audio?: TrackAudioProperties;
+}
+
+/** The Track's role, defaulting to `overlay` for documents that predate the field. */
+export function trackRole(track: TrackEntity): TrackRole {
+  return track.role === 'storyline' ? 'storyline' : 'overlay';
+}
+
+/** The Track's occupancy policy, defaulting to what its role implies. */
+export function trackOccupancy(track: TrackEntity): TrackOccupancy {
+  if (track.occupancy !== undefined) return track.occupancy;
+  return trackRole(track) === 'storyline' ? 'exclusive' : 'free';
+}
+
+/** Order-independent key for a pair of Items. */
+export function itemPairKey(left: EntityId, right: EntityId): string {
+  return left < right ? `${left}\0${right}` : `${right}\0${left}`;
+}
+
+/**
+ * Item pairs joined by a Transition, which are supposed to overlap.
+ *
+ * A cross dissolve is exactly two clips playing at once, so the Items carrying
+ * it overlap by the length of the Transition. That is the one overlap an
+ * exclusive Track has to permit -- forbidding it would make a storyline and a
+ * dissolve mutually exclusive, which is not a trade any editor would accept.
+ */
+export function transitionJoinedPairs(project: AelionProject): ReadonlySet<string> {
+  const pairs = new Set<string>();
+  for (const transition of Object.values(project.transitions)) {
+    pairs.add(itemPairKey(transition.fromItemId, transition.toItemId));
+  }
+  return pairs;
 }
 
 export interface ItemEntity extends ProjectEntity {

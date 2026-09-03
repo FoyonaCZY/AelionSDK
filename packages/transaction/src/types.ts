@@ -107,4 +107,19 @@ export type TransactionCommitPreparer = (
 
 export interface TransactionEngineOptions {
   readonly prepareCommit?: TransactionCommitPreparer;
+  /**
+   * Adopts the Project as the first snapshot instead of copying and checking it.
+   *
+   * The constructor otherwise clones the document and runs `validate` over the
+   * copy, because any object can be handed to it. A host that has just admitted
+   * and validated the document pays for all of that a second time, and on a long
+   * timeline that is most of the cost of opening a Project --
+   * `ProjectValidator.validate` already returns an owned, checked snapshot that
+   * nothing else holds a reference to.
+   *
+   * The adopted document is frozen in place. Passing one that is still reachable
+   * and mutable somewhere else, or that has not been validated, breaks the
+   * invariant every later commit is checked against.
+   */
+  readonly adoptValidatedProject?: boolean;
 }

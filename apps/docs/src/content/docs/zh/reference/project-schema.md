@@ -4,19 +4,28 @@ description: 不可变 Schema 身份、迁移、顶层集合、实体关系与�
 ---
 
 日常创建工程时优先使用 `createProject()` 或 `createComposition()`。当前机器可读定义是
-[`schemas/project/v1.2/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1.2/project.schema.json)。
+[`schemas/project/v2.0/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v2.0/project.schema.json)。
 
 ## Schema 身份
 
-| 方言      | `$schema`                                      | `schemaVersion` | 用途                                     |
-| --------- | ---------------------------------------------- | --------------- | ---------------------------------------- |
-| 旧 v1.0   | `https://schemas.aelion.dev/project/v1.json`   | `1.0.0`         | 1.0 发布后保持不可变的 Schema            |
-| 当前 v1.2 | `https://schemas.aelion.dev/project/v1.2.json` | `1.2.0`         | 图像序列、字幕 cue settings 和关键帧手柄 |
+| 方言      | `$schema`                                      | `schemaVersion` | 用途                                    |
+| --------- | ---------------------------------------------- | --------------- | --------------------------------------- |
+| 旧 v1.0   | `https://schemas.aelion.dev/project/v1.json`   | `1.0.0`         | 1.0 发布后保持不可变的 Schema           |
+| 稳定 v1.2 | `https://schemas.aelion.dev/project/v1.2.json` | `1.2.0`         | 不可变的 1.2 图像序列与字幕契约         |
+| 当前 v2.0 | `https://schemas.aelion.dev/project/v2.0.json` | `2.0.0`         | 轨道角色、占用规则、Gap Item 与布局契约 |
 
-1.1/1.2 rc.1 曾错误地用旧身份写入新字段。rc.2 默认校验器会识别这组精确的旧身份，先制作
-所有权隔离快照，只修改两个身份字段，再按 v1.2 校验；调用方对象不会被修改。需要持久化升级
-结果时调用 `migrateProjectToCurrent(value)`。严格验证原始 v1.0 时可使用
-`defaultSchemas.legacyProject`。
+默认校验器会识别支持的 v1.0 与稳定 v1.2 身份，先制作所有权隔离快照，只修改两个身份字段，
+再按 v2.0 校验；调用方对象不会被修改。需要持久化升级结果时调用
+`migrateProjectToCurrent(value)`。严格验证历史文档时可使用
+`defaultSchemas.previousProject` 或 `defaultSchemas.legacyProject`。
+
+## 轨道与 Gap
+
+Track 可以声明 `role: 'storyline' | 'overlay'` 和
+`occupancy: 'exclusive' | 'free'`。省略 role 时按 overlay；省略 occupancy 时，storyline
+按 exclusive，其他轨道按 free。每个 Sequence 最多声明一条 storyline。exclusive 轨会拒绝重叠
+Item，显式 Transition 连接的片段对除外。
+`gap` Item 只占据时间线空间、不渲染内容，使 packing 和 ripple 操作可以保留有意留出的空档。
 
 ## 顶层模型
 

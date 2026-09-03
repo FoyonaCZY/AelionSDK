@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/capability
 ```
 
-`latest` currently resolves to `1.2.0`. Product applications should normally
+`latest` currently resolves to `2.0.0`. Product applications should normally
 use the capability APIs exposed by `@aelionsdk/sdk`; this package is for custom
 preflight screens and execution hosts.
 

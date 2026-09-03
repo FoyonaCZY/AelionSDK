@@ -25,6 +25,7 @@ import {
   evaluateAnimatedValue,
   resolveMediaSourceFrame,
   evaluateVisualState,
+  mapClipSourceTime,
   IncrementalRenderCompiler,
   type CompileStats,
   type RenderIr,
@@ -32,9 +33,11 @@ import {
 import {
   RenderIrFrameRenderer,
   type RenderIrFrameRendererSnapshot,
+  type RenderIrFrameResult,
 } from '@aelionsdk/renderer-worker';
 import {
   EditingCommands,
+  speculateProjectChange,
   TransactionEngine,
   TransactionHistory,
   type TransactionBuilder,
@@ -59,7 +62,11 @@ import type {
   AelionExportOptions,
   AelionInteractiveEdit,
   AelionInteractiveEditOptions,
+  AelionFilmstripOptions,
+  AelionFilmstripResult,
+  AelionMediaApi,
   AelionMediaProvider,
+  AelionThumbnailOptions,
   AelionProfileExportJob,
   AelionProfileExportOptions,
   AelionProfileExportResult,
@@ -254,6 +261,11 @@ export class AelionSession implements AelionSessionApi {
   #unsubscribeHistory: (() => void) | undefined;
   #ir: RenderIr | undefined;
   #compileStats: CompileStats | undefined;
+  #speculationCompiler: IncrementalRenderCompiler | undefined;
+  #speculationBase: IncrementalRenderCompiler | undefined;
+  #speculationPreviousIds: readonly string[] = [];
+  #transientMediaTail: Promise<unknown> = Promise.resolve();
+  #transientMediaAbort = new AbortController();
   #sequenceId: string | undefined;
   #previewRequestedFrames = 0;
   #previewRenderedFrames = 0;
@@ -290,6 +302,7 @@ export class AelionSession implements AelionSessionApi {
   public readonly audio: AelionAudioApi;
   public readonly transaction: AelionTransactionApi;
   public readonly preview: AelionPreviewApi;
+  public readonly media: AelionMediaApi;
   public readonly export: AelionExportApi;
 
   public constructor(options: AelionSessionOptions = {}) {
@@ -327,6 +340,10 @@ export class AelionSession implements AelionSessionApi {
     });
     this.preview = {
       renderFrame: options => this.#renderPreviewFrame(options),
+    };
+    this.media = {
+      thumbnail: mediaOptions => this.#thumbnail(mediaOptions),
+      filmstrip: mediaOptions => this.#filmstrip(mediaOptions),
     };
     const commands = (): EditingCommands => this.#requireCommands();
     const canUndo = (): boolean => this.#history?.state.canUndo ?? false;
@@ -412,6 +429,12 @@ export class AelionSession implements AelionSessionApi {
   async #installProject(project: AelionProject, generation: number): Promise<void> {
     this.#assertLoadCurrent(generation);
     this.#invalidateInteractiveEdit();
+    // Timeline decorations from the previous Project must not decode against
+    // the new Project's IR or keep its media work alive after replacement.
+    this.#transientMediaAbort.abort(
+      new DOMException('Project media sampling was replaced', 'AbortError'),
+    );
+    this.#transientMediaAbort = new AbortController();
     await this.player.reset();
     this.#assertLoadCurrent(generation);
 
@@ -427,6 +450,10 @@ export class AelionSession implements AelionSessionApi {
         return { ok: result.ok, diagnostics: result.diagnostics };
       },
       {
+        // `loadProject` validated this exact snapshot, and nothing else holds a
+        // reference to it, so copying and revalidating it here would repeat the
+        // most expensive half of opening a Project for no added guarantee.
+        adoptValidatedProject: true,
         prepareCommit: commit => {
           const current = engineRef.current;
           if (current === undefined) throw new Error('Transaction engine is not installed');
@@ -504,15 +531,287 @@ export class AelionSession implements AelionSessionApi {
     return this.#renderPreviewFrame(options);
   }
 
+  /**
+   * Compiles a Project that has not been committed, reusing what did not change.
+   *
+   * Forked from the live compiler so speculation cannot disturb the committed
+   * Render IR, and kept across calls so a drag recompiling on every pointer move
+   * pays only for the clips the move actually touched.
+   *
+   * The declared ids are the union of this speculation's and the previous one's,
+   * because the fork's baseline is whatever it last compiled. Every speculation
+   * starts again from the committed Project, so the clips the previous one moved
+   * have to be named as changed a second time in order to move back -- naming
+   * only the current ones would leave them reused at a position the pointer has
+   * already left.
+   */
+  #speculativeIr(overlay: (transaction: TransactionBuilder) => void): RenderIr {
+    const engine = this.#engine;
+    const sequenceId = this.#sequenceId;
+    if (engine === undefined || sequenceId === undefined) throw unloaded();
+    const project = engine.getSnapshot();
+    const speculated = speculateProjectChange(project, overlay);
+    if (speculated.project === project) return this.requireIr();
+    if (this.#speculationBase !== this.#compiler || this.#speculationCompiler === undefined) {
+      this.#speculationCompiler = this.#compiler.fork();
+      this.#speculationBase = this.#compiler;
+      this.#speculationPreviousIds = [];
+    }
+    const affectedEntityIds = [
+      ...new Set([...this.#speculationPreviousIds, ...speculated.affectedEntityIds]),
+    ];
+    this.#speculationPreviousIds = speculated.affectedEntityIds;
+    return this.#speculationCompiler.compile(
+      speculated.project as AelionProject,
+      sequenceId,
+      engine.revision,
+      {
+        affectedEntityIds,
+        resolveMaterialProgram: (definition, parameters) =>
+          this.#options.materials?.resolveProgram(definition, parameters),
+      },
+    ).ir;
+  }
+
+  /**
+   * A frame of nothing, at the Sequence's own size and background.
+   *
+   * An empty timeline is an ordinary state -- a new Project, or one whose last
+   * clip was just deleted -- and asking for a frame of it is an ordinary
+   * request. Throwing instead forces every host to special-case emptiness and
+   * to suppress the resulting diagnostic, so preview answers with the picture
+   * an empty Sequence actually has.
+   */
+  async #blankPreviewFrame(ir: RenderIr, renderScale: number): Promise<RenderIrFrameResult> {
+    const width = Math.max(1, Math.round(ir.width * renderScale));
+    const height = Math.max(1, Math.round(ir.height * renderScale));
+    const canvas = new OffscreenCanvas(width, height);
+    const context = canvas.getContext('2d');
+    if (context === null) throw new Error('OffscreenCanvas 2D context is unavailable');
+    const raw: unknown = objectValue(ir.backgroundColor).rgba;
+    const rgba: readonly unknown[] = Array.isArray(raw) ? (raw as readonly unknown[]) : [];
+    const component = (index: number): number => {
+      const value = rgba[index];
+      return typeof value === 'number' && Number.isFinite(value) ? value : index === 3 ? 1 : 0;
+    };
+    const channel = (index: number): number =>
+      Math.round(Math.min(1, Math.max(0, component(index))) * 255);
+    context.fillStyle = `rgba(${channel(0)}, ${channel(1)}, ${channel(2)}, ${component(3)})`;
+    context.fillRect(0, 0, width, height);
+    return {
+      bitmap: await createImageBitmap(canvas),
+      backend:
+        this.#renderer?.snapshot().adaptiveBackend.selected ??
+        (this.#options.preferredBackend === 'webgpu' ? 'webgpu' : 'webgl2'),
+      materialIds: [],
+      width,
+      height,
+      renderScale,
+    };
+  }
+
+  /**
+   * Runs a transient decode after every other transient decode.
+   *
+   * Filmstrips and thumbnails are speculative work for parts of the UI nobody
+   * is staring at, and they share the media pipeline with the frame the user
+   * *is* staring at. Serialising them keeps a burst of clip strips from
+   * saturating the decoder, and `transient` keeps them off the persistent
+   * playback decoder entirely -- aborting them there would otherwise leave its
+   * serial queue walking toward a late timestamp and freeze preview.
+   */
+  #transientDecode<T>(work: () => Promise<T>): Promise<T> {
+    const task = this.#transientMediaTail.then(work, work);
+    this.#transientMediaTail = task.then(
+      () => undefined,
+      () => undefined,
+    );
+    return task;
+  }
+
+  #transientSignal(signal: AbortSignal | undefined): AbortSignal {
+    const sessionSignal = this.#transientMediaAbort.signal;
+    return signal === undefined ? sessionSignal : AbortSignal.any([signal, sessionSignal]);
+  }
+
+  static #fit(
+    frame: VideoFrame,
+    maxDimension: number,
+  ): { readonly width: number; readonly height: number } {
+    const sourceWidth = Math.max(1, frame.displayWidth);
+    const sourceHeight = Math.max(1, frame.displayHeight);
+    const scale = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
+    return {
+      width: Math.max(1, Math.round(sourceWidth * scale)),
+      height: Math.max(1, Math.round(sourceHeight * scale)),
+    };
+  }
+
+  async #thumbnail(options: AelionThumbnailOptions): Promise<ImageBitmap> {
+    const media = this.requireMedia();
+    const maxDimension = options.maxDimension ?? 320;
+    if (!Number.isFinite(maxDimension) || maxDimension <= 0 || maxDimension > 8_192) {
+      throw new RangeError('maxDimension must be from 1 to 8192');
+    }
+    if (
+      options.sourceTimeUs !== undefined &&
+      (!Number.isSafeInteger(options.sourceTimeUs) || options.sourceTimeUs < 0)
+    ) {
+      throw new RangeError('sourceTimeUs must be a non-negative safe integer');
+    }
+    if (
+      options.streamIndex !== undefined &&
+      (!Number.isSafeInteger(options.streamIndex) || options.streamIndex < 0)
+    ) {
+      throw new RangeError('streamIndex must be a non-negative safe integer');
+    }
+    const signal = this.#transientSignal(options.signal);
+    const frame = await this.#transientDecode(() => {
+      signal.throwIfAborted();
+      return media.frameAt(
+        options.assetId,
+        options.streamIndex ?? 0,
+        options.sourceTimeUs ?? 0,
+        signal,
+        {
+          purpose: 'preview',
+          maxDimension,
+          transient: true,
+        },
+      );
+    });
+    try {
+      const size = AelionSession.#fit(frame, maxDimension);
+      const bitmap = await createImageBitmap(frame, {
+        resizeWidth: size.width,
+        resizeHeight: size.height,
+        resizeQuality: 'medium',
+      });
+      if (signal.aborted) {
+        bitmap.close();
+        signal.throwIfAborted();
+      }
+      return bitmap;
+    } finally {
+      frame.close();
+    }
+  }
+
+  async #filmstrip(options: AelionFilmstripOptions): Promise<AelionFilmstripResult> {
+    const ir = this.requireIr();
+    const media = this.requireMedia();
+    if (!Number.isSafeInteger(options.count) || options.count < 1 || options.count > 128) {
+      throw new RangeError('count must be an integer from 1 to 128');
+    }
+    const count = options.count;
+    const requestedHeight = options.frameHeight ?? 64;
+    if (!Number.isFinite(requestedHeight) || requestedHeight < 1 || requestedHeight > 512) {
+      throw new RangeError('frameHeight must be from 1 to 512');
+    }
+    const frameHeight = Math.round(requestedHeight);
+    const signal = this.#transientSignal(options.signal);
+    const clip = ir.tracks
+      .flatMap(track => track.clips)
+      .find(candidate => candidate.id === options.itemId);
+    if (clip === undefined || clip.kind !== 'visual-clip') {
+      throw new RangeError(`Item ${options.itemId} is not a sampleable visual clip`);
+    }
+
+    // Sampled through the clip's own time mapping rather than by adding to its
+    // source in-point, so a retimed or reversed clip shows the frames it
+    // actually plays.
+    const timesUs: number[] = [];
+    const decoded: { readonly timeUs: number; readonly frame: VideoFrame }[] = [];
+    const step = clip.range.durationUs / count;
+    try {
+      for (let index = 0; index < count; index += 1) {
+        signal.throwIfAborted();
+        const timeUs = Math.round(clip.range.startUs + step * (index + 0.5));
+        const sourceTimeUs = mapClipSourceTime(clip, timeUs);
+        if (sourceTimeUs === null) continue;
+        const resolved = resolveMediaSourceFrame(clip.source, sourceTimeUs);
+        if (resolved === null) continue;
+        const frame = await this.#transientDecode(() =>
+          media.frameAt(resolved.assetId, resolved.streamIndex, resolved.sourceTimeUs, signal, {
+            purpose: 'preview',
+            maxDimension: frameHeight * 4,
+            transient: true,
+          }),
+        );
+        decoded.push({ timeUs, frame });
+        timesUs.push(timeUs);
+        if (decoded.length === 1) {
+          const firstWidth = Math.max(
+            1,
+            Math.round(
+              frameHeight * (Math.max(1, frame.displayWidth) / Math.max(1, frame.displayHeight)),
+            ),
+          );
+          if (firstWidth * count > 32_768 || firstWidth * frameHeight * count > 32_000_000) {
+            throw new RangeError('filmstrip output exceeds the 32768px / 32MP resource budget');
+          }
+        }
+      }
+      const first = decoded[0]?.frame;
+      if (first === undefined) throw new RangeError(`Item ${options.itemId} decoded no frames`);
+      const aspect = Math.max(1, first.displayWidth) / Math.max(1, first.displayHeight);
+      const frameWidth = Math.max(1, Math.round(frameHeight * aspect));
+      const canvas = new OffscreenCanvas(frameWidth * decoded.length, frameHeight);
+      const context = canvas.getContext('2d');
+      if (context === null) throw new Error('OffscreenCanvas 2D context is unavailable');
+      decoded.forEach((entry, index) => {
+        context.drawImage(entry.frame, index * frameWidth, 0, frameWidth, frameHeight);
+      });
+      signal.throwIfAborted();
+      const bitmap = await createImageBitmap(canvas);
+      if (signal.aborted) {
+        bitmap.close();
+        signal.throwIfAborted();
+      }
+      return {
+        itemId: options.itemId,
+        bitmap,
+        frameWidth,
+        frameHeight,
+        frameCount: decoded.length,
+        timesUs,
+      };
+    } finally {
+      for (const entry of decoded) entry.frame.close();
+    }
+  }
+
   async #renderPreviewFrame(options: AelionPreviewOptions) {
     const startedAt = performance.now();
     this.#previewRequestedFrames += 1;
     this.#emitStats();
     try {
-      const ir = this.requireIr();
+      const ir =
+        options.overlay === undefined ? this.requireIr() : this.#speculativeIr(options.overlay);
       const media = this.#options.media;
       if (media === undefined) throw new Error('AelionSession requires a media provider to render');
       const previewQuality = normalizePreviewQuality(options);
+      if (!Number.isFinite(options.timeUs) || options.timeUs < 0) {
+        throw new RangeError('timeUs must be a non-negative finite number');
+      }
+      if (ir.durationUs <= 0) {
+        options.signal?.throwIfAborted();
+        const blank = await this.#blankPreviewFrame(ir, previewQuality.renderScale);
+        if (options.signal?.aborted === true) {
+          blank.bitmap.close();
+          options.signal.throwIfAborted();
+        }
+        this.#previewRenderedFrames += 1;
+        recordOperationTiming(this.#operationTimings.preview, startedAt, 'succeeded');
+        this.#emitStats();
+        return blank;
+      }
+      // Preview clamps rather than refuses. A playhead parked on the last frame
+      // and a Sequence that just got shorter are both normal, and a host that
+      // has to clamp for itself ends up filtering the diagnostic this would
+      // otherwise raise on an ordinary redraw.
+      const timeUs = Math.min(Math.round(options.timeUs), ir.durationUs - 1);
+      options = { ...options, timeUs };
       // Export already skips the compositor for a single untransformed opaque
       // clip; preview is the path that runs it sixty times a second. Only taken
       // at full scale, where the composited output would be the same size, so
@@ -729,6 +1028,11 @@ export class AelionSession implements AelionSessionApi {
     const cancelExport = this.#cancelExport(
       new DOMException('AelionSession disposed', 'AbortError'),
     );
+    this.#transientMediaAbort.abort(new DOMException('AelionSession disposed', 'AbortError'));
+    const drainTransientMedia = this.#transientMediaTail.then(
+      () => undefined,
+      () => undefined,
+    );
     this.#setState('disposed');
     this.#listeners.clear();
     this.#unsubscribeHistory?.();
@@ -744,6 +1048,7 @@ export class AelionSession implements AelionSessionApi {
       cancelExport,
       this.player.dispose(),
       drainLoads,
+      drainTransientMedia,
       ...(renderer === undefined ? [] : [renderer.dispose()]),
     ]);
     if (renderer !== undefined) this.#lastDisposedRenderer = renderer.snapshot();

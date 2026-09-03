@@ -203,7 +203,43 @@ function cancelOpacity(): void {
 3. 预取、后台分析和不可见区域缩略图；
 4. 本地导出或远程任务根据产品策略单独排队。
 
-主预览只创建一个 `PreviewCanvasController`。缩略图使用低 renderScale 的直接帧请求，并限制并发。滚出视口后取消，不要让后台列表把 decoder 和 GPU 占满。
+主预览只创建一个 `PreviewCanvasController`。2.0 的 `session.media.thumbnail()` 和 `session.media.filmstrip()` 会与播放共享有界、串行的解码预算，时间线不会为每个片段各启动一个竞争 decoder。单元格滚出可见时间带就取消请求，并关闭每一个返回的 bitmap：
+
+```ts
+const controller = new AbortController();
+const thumbnail = await session.media.thumbnail({
+  assetId,
+  sourceTimeUs: 2_000_000,
+  maxDimension: 320,
+  signal: controller.signal,
+});
+try {
+  paintThumbnail(thumbnail);
+} finally {
+  thumbnail.close();
+}
+
+const strip = await session.media.filmstrip({ itemId, count: 8, frameHeight: 64 });
+try {
+  paintFilmstrip(strip.bitmap, strip.frameWidth, strip.timesUs);
+} finally {
+  strip.bitmap.close();
+}
+```
+
+`player.subscribe()` 的唯一监听者拥有帧，必须关闭每一张 frame bitmap。只需要播放头时间的组件改用轻量且允许多个监听者的 `subscribeTime()`：
+
+```ts
+const unsubscribeTime = session.player.subscribeTime(({ timeUs, state }) => {
+  playheadStore.update(timeUs, state);
+});
+
+// 时间线不再被查看时：
+unsubscribeTime();
+await session.player.reset();
+```
+
+`pause()` 会保留 decoder 和音频 transport 以便快速继续播放；`reset()` 会释放它们，并让 Player 回到 `idle`。
 
 ## 异步任务状态
 

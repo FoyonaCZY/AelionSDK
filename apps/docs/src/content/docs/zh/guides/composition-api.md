@@ -5,7 +5,7 @@ description: 用 Composition、Layer 和 Clip 创建图片、文字、形状、�
 
 `createComposition()` 是面向产品代码的高层创作入口。它用
 `Composition`、`Layer` 和 `Clip` 表达“画布、轨道和片段”，最终仍生成经过
-Project v1 Schema 校验的普通 JSON。
+Project v2 Schema 校验的普通 JSON。
 
 如果你在生成模板、营销成片或以代码搭建时间线，优先从这里开始。需要批量导入
 媒体、编辑已有 Project 或操作底层实体时，再使用 `ProjectBuilder` 或 Session

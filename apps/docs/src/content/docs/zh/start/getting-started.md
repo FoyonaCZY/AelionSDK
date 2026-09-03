@@ -113,7 +113,7 @@ const project = builder.build();
 本教程需要先探测并导入用户选择的真实媒体，所以使用 `ProjectBuilder`。如果素材 ID
 和时间线结构已经由模板或业务代码确定，可以改从
 [Composition API](/AelionSDK/zh/guides/composition-api/)开始，用 Layer 和 Clip 创建
-图片、文字、形状、效果、遮罩、关键帧与转场；两种入口生成相同的 Project v1。
+图片、文字、形状、效果、遮罩、关键帧与转场；两种入口生成相同的 Project v2。
 
 ## 4. 创建 Session 并显示第一帧
 

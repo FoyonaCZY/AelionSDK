@@ -9,7 +9,7 @@ AelionSDK.
 npm install @aelionsdk/media
 ```
 
-`latest` currently resolves to `1.2.0`. Applications should prefer
+`latest` currently resolves to `2.0.0`. Applications should prefer
 `ProductionMediaProvider` from `@aelionsdk/sdk`; direct use is intended for
 custom media providers, cache implementations and decode hosts.
 

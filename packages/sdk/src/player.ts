@@ -15,6 +15,7 @@ import type {
   AelionPlayerApi,
   AelionPlayerFrame,
   AelionPlayerStats,
+  AelionPlayerTime,
   AelionPlayerResourceStats,
   AelionPlayerState,
   AelionRuntimeAssets,
@@ -88,6 +89,7 @@ export class AelionPlayer implements AelionPlayerApi {
   readonly #onRuntimeError: RuntimeErrorListener | undefined;
   readonly #runtimeAssets: AelionRuntimeAssets | undefined;
   readonly #listeners = new Set<(frame: AelionPlayerFrame) => void>();
+  readonly #timeListeners = new Set<(time: AelionPlayerTime) => void>();
   #state: AelionPlayerState = 'idle';
   #clock: Clock | undefined;
   #scheduler: AudioDrivenVideoScheduler | undefined;
@@ -150,6 +152,7 @@ export class AelionPlayer implements AelionPlayerApi {
         throw new DOMException('Player play became stale', 'AbortError');
       }
       this.#state = 'playing';
+      this.#publishTime();
       this.#session.notifyStatsChanged();
       this.#scheduler?.start();
       this.#fillHandle ??= globalThis.setInterval(() => {
@@ -175,6 +178,7 @@ export class AelionPlayer implements AelionPlayerApi {
     if (this.#state !== 'idle') this.#state = 'paused';
     this.#lastTimeUs = this.currentTimeUs;
     this.#session.notifyStatsChanged();
+    this.#publishTime();
   }
 
   public async seek(timeUs: number): Promise<void> {
@@ -294,21 +298,45 @@ export class AelionPlayer implements AelionPlayerApi {
     return () => this.#listeners.delete(listener);
   }
 
+  /**
+   * Observes the playhead without taking ownership of a frame.
+   *
+   * `subscribe` is exclusive because a presented frame carries a `VideoFrame`
+   * that exactly one consumer must close, and that consumer is normally the
+   * Canvas controller. Everything else that follows playback -- a timecode
+   * readout, a scrolling playhead, a transport button -- only wants the time,
+   * so it gets a channel that carries no resource and takes as many listeners
+   * as the host has places to show it. Without this, those callers are pushed
+   * into polling the clock on an animation frame.
+   */
+  public subscribeTime(listener: (time: AelionPlayerTime) => void): () => void {
+    if (this.#state === 'disposed') throw new ReferenceError('AelionPlayer is disposed');
+    this.#timeListeners.add(listener);
+    return () => this.#timeListeners.delete(listener);
+  }
+
   public invalidate(changeSet: ChangeSet): void {
     void changeSet;
     if (this.#state !== 'playing' && this.#state !== 'paused') return;
     const ir = this.#session.requireIr();
-    const timeUs = Math.min(Math.max(0, this.currentTimeUs), ir.durationUs - 1);
+    const timeUs = Math.min(Math.max(0, this.currentTimeUs), Math.max(0, ir.durationUs - 1));
     this.#advanceGeneration();
+    this.#nextAudioFrame = sampleIndexAtTime(timeUs, ir.sampleRate);
+    this.#lastTimeUs = timeUs;
+    // A paused transport must not be woken by an edit. Advancing the generation
+    // above already dropped the stale frames, which is the whole of what a
+    // paused Player owes an edit; reseating its clock instead spins the audio
+    // graph back up for a graph nobody is listening to, and an edit made while
+    // paused starts leaking sound.
+    if (this.#state !== 'playing') {
+      this.#publishTime();
+      return;
+    }
     const clock = this.#clock;
     if (clock instanceof AudioWorkletClock) clock.resetForSeek(timeUs);
     else clock?.seek(timeUs);
-    this.#nextAudioFrame = sampleIndexAtTime(timeUs, ir.sampleRate);
-    this.#lastTimeUs = timeUs;
-    // A paused graph is never fed. The edit already dropped the stale frames
-    // above, and play() fills before it reconnects the output, so refilling here
-    // would only push audio at a graph nobody is listening to.
-    if (this.#state === 'playing') void this.#requestAudioFill(false);
+    void this.#requestAudioFill(false);
+    this.#publishTime();
   }
 
   public async reset(): Promise<void> {
@@ -322,6 +350,7 @@ export class AelionPlayer implements AelionPlayerApi {
     this.#state = 'idle';
     this.#lastTimeUs = 0;
     this.#nextAudioFrame = 0;
+    this.#publishTime();
   }
 
   public dispose(): Promise<void> {
@@ -336,6 +365,7 @@ export class AelionPlayer implements AelionPlayerApi {
     // runtime initialization cannot revive the Player while Session disposal runs.
     this.#state = 'disposed';
     this.#listeners.clear();
+    this.#timeListeners.clear();
     await this.#disposeRuntime();
   }
 
@@ -401,6 +431,7 @@ export class AelionPlayer implements AelionPlayerApi {
       onEnd: () => {
         this.#state = 'ended';
         this.#lastTimeUs = ir.durationUs;
+        this.#publishTime();
         if (this.#fillHandle !== undefined) {
           globalThis.clearInterval(this.#fillHandle);
           this.#fillHandle = undefined;
@@ -504,6 +535,7 @@ export class AelionPlayer implements AelionPlayerApi {
     this.#renderedFrames += 1;
     this.#droppedFrames += scheduled.droppedFrames;
     this.#session.notifyStatsChanged();
+    this.#publishTime();
     if (this.#listeners.size === 0) {
       result.bitmap.close();
       return;
@@ -516,6 +548,18 @@ export class AelionPlayer implements AelionPlayerApi {
         result.bitmap.close();
         this.#failRuntime(error);
         return;
+      }
+    }
+  }
+
+  #publishTime(): void {
+    if (this.#timeListeners.size === 0) return;
+    const time: AelionPlayerTime = { timeUs: this.currentTimeUs, state: this.#state };
+    for (const listener of [...this.#timeListeners]) {
+      try {
+        listener(time);
+      } catch {
+        // A readout that throws must not stall playback or the transport.
       }
     }
   }
@@ -605,6 +649,7 @@ export class AelionPlayer implements AelionPlayerApi {
     this.#lastErrorCode = runtimeErrorCode(error);
     this.#state = 'error';
     this.#lastTimeUs = failureTimeUs;
+    this.#publishTime();
     this.#scheduler?.pause();
     if (this.#fillHandle !== undefined) {
       globalThis.clearInterval(this.#fillHandle);

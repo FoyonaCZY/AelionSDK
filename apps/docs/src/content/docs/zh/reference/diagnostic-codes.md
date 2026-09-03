@@ -3,7 +3,7 @@ title: Diagnostic 错误码
 description: 根据稳定 code 查询错误含义、可恢复性、定位字段和处理建议。
 ---
 
-本表对应源码版本 `1.2.0`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
+本表对应源码版本 `2.0.0`。捕获 `AelionError`、收到 Session diagnostic 或 export preflight issue 后，可以按 code 在这里查询。
 
 产品代码只依赖 `code` 和结构化字段，不解析英文 `message`：
 
@@ -69,7 +69,7 @@ interface Diagnostic {
 
 | Code                                     | 含义与建议                                                                                                                                                        |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PROJECT_SCHEMA_INVALID`                 | Project 不符合 v1 JSON Schema；查看 `path` 和校验 details                                                                                                         |
+| `PROJECT_SCHEMA_INVALID`                 | Project 不符合它所声明版本的 JSON Schema；查看 `path` 和校验 details                                                                                              |
 | `PROJECT_INPUT_INVALID`                  | Project 在 Schema 前包含非纯 JSON/不安全结构，例如 accessor、稀疏数组、symbol、循环/对象别名或非 canonical number；SDK 不调用 getter/iterator，并返回一条有界诊断 |
 | `PROJECT_INPUT_LIMIT_EXCEEDED`           | Project 在 Schema 前超过当前不可信输入预算：深度 64、262,144 values、数组 16,384、对象 4,096、单字符串 4 MiB 或字符串总量 16 MiB                                  |
 | `PROJECT_ENTITY_KEY_MISMATCH`            | normalized map key 与实体 `id` 不一致                                                                                                                             |
@@ -79,6 +79,8 @@ interface Diagnostic {
 | `PROJECT_MATERIAL_MULTIPLE_OWNERS`       | 同一 MaterialInstance 被多个 host 拥有                                                                                                                            |
 | `PROJECT_MATERIAL_ORPHAN`                | MaterialInstance 没有合法 owner                                                                                                                                   |
 | `PROJECT_VISUAL_TRANSITION_OVERLAP`      | 同一 Sequence 的 visual Transition 时间区间重叠；拆分或调整区间，避免运行时选择歧义                                                                               |
+| `PROJECT_TRACK_OCCUPANCY_OVERLAP`        | exclusive Track 上出现未由 Transition 连接的重叠 Item；调整落点或改用 free occupancy                                                                              |
+| `PROJECT_MULTIPLE_STORYLINE_TRACKS`      | 同一 Sequence 声明了多条 storyline；只保留一条，避免布局结果依赖轨道顺序                                                                                          |
 | `PROJECT_TIME_MAPPING_ENDPOINT_INVALID`  | curve TimeMap 未覆盖 Item/source 端点或端点越界                                                                                                                   |
 | `PROJECT_TIME_MAPPING_ORDER_INVALID`     | curve point 时间顺序无效，无法形成确定单调段                                                                                                                      |
 | `PROJECT_NESTED_SEQUENCE_CYCLE`          | Nested Sequence 引用形成循环                                                                                                                                      |
@@ -143,6 +145,9 @@ interface Diagnostic {
 | `COMMAND_REPLACE_TOPOLOGY_CHANGED`       | replace 改变 id/track；应改用 move/结构命令                    |
 | `COMMAND_REPLACE_OWNERSHIP_CHANGED`      | replace 改变 Material/Marker/Link ownership                    |
 | `COMMAND_TRANSITION_TRACK_CONFLICT`      | 跨 Track move 会使已有 Transition 非法；先移除/重建 Transition |
+| `COMMAND_PLACEMENTS_EMPTY`               | 批量布局没有实际移动；不要提交空 placements                    |
+| `COMMAND_TRACK_OCCUPANCY_OVERLAP`        | 批量布局会在 exclusive Track 上产生非法重叠                    |
+| `COMMAND_TRANSITION_PAIR_SEPARATED`      | 要求保留的 Transition 两端被移动到了不同 Track                 |
 
 Ripple/roll/slip/slide/link/group 的拒绝使用 `COMMAND_RIPPLE_*`、`COMMAND_ROLL_*`、`COMMAND_SLIDE_*`、`COMMAND_LINK_GROUP_*` 和 `COMMAND_SOURCE_HANDLE_UNAVAILABLE` 等细分 code。Linked split 仅在 group mapping 可确定时执行；否则 fail closed，不使用通用 `setField` 绕过所有权和 Transition 校验。
 

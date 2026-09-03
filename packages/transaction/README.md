@@ -9,13 +9,14 @@ AelionSDK.
 npm install @aelionsdk/transaction
 ```
 
-`latest` currently resolves to `1.2.0`. Product applications should edit
+`latest` currently resolves to `2.0.0`. Product applications should edit
 through an `@aelionsdk/sdk` Session; direct use is intended for custom hosts and
 engine integrations.
 
 ## Public surface
 
 - production timeline editing commands;
+- pure storyline/free-lane layout planning and speculative placement writing;
 - atomic transaction execution and inverse generation;
 - undo/redo history;
 - affected ranges and change sets;

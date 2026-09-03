@@ -1,6 +1,6 @@
 {
   "name": "@aelionsdk/capability",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Browser media capability probing for AelionSDK",
   "license": "MIT",
   "repository": {
@@ -40,6 +40,6 @@
     "postpack": "node ../../scripts/package-artifacts.mjs clean"
   },
   "dependencies": {
-    "@aelionsdk/core": "1.2.0"
+    "@aelionsdk/core": "2.0.0"
   }
 }

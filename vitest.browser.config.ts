@@ -22,6 +22,9 @@ export default defineConfig({
       enabled: true,
       provider: 'playwright',
       headless: true,
+      // An explicit IPv4 loopback avoids Windows resolving `localhost` to ::1
+      // while Vite's API server is listening only on IPv4.
+      api: { host: '127.0.0.1', port: 63315, strictPort: false },
       instances: [
         {
           browser: 'chromium',

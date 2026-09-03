@@ -18,6 +18,8 @@ import {
   type MaterialInstanceEntity,
   type MarkerEntity,
   type TrackEntity,
+  type TrackOccupancy,
+  type TrackRole,
   type TransitionEntity,
 } from '@aelionsdk/project-schema';
 
@@ -54,6 +56,10 @@ export interface AddTrackOptions {
   readonly id?: string;
   readonly kind: 'visual' | 'audio' | 'caption';
   readonly name?: string;
+  /** Marks the Track that carries the cut, so layouts keep it packed. */
+  readonly role?: TrackRole;
+  /** Whether Items may overlap. Defaults to what the role implies. */
+  readonly occupancy?: TrackOccupancy;
   readonly enabled?: boolean;
   readonly locked?: boolean;
 }
@@ -450,6 +456,8 @@ export class ProjectBuilder {
       sequenceId: this.sequenceId,
       kind: options.kind,
       ...(options.name === undefined ? {} : { name: options.name }),
+      ...(options.role === undefined ? {} : { role: options.role }),
+      ...(options.occupancy === undefined ? {} : { occupancy: options.occupancy }),
       enabled: options.enabled ?? true,
       locked: options.locked ?? false,
       itemIds: [],

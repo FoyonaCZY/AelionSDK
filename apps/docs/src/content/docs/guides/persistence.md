@@ -44,4 +44,4 @@ schema; never add arbitrary top-level fields.
 
 Confirm or cancel active export, await the latest required save, stop incoming commands, dispose
 runtime resources, and retain only durable data. See
-[Project v1 field reference](/AelionSDK/reference/project-schema/).
+[Project v2 field reference](/AelionSDK/reference/project-schema/).

@@ -14,13 +14,10 @@ export const RELEASE_LOCKFILE_INSTALL_ARGS = Object.freeze([
 ]);
 
 export const RELEASE_VERSION_DOCUMENTS = Object.freeze([
-  'README.md',
-  'README.zh-CN.md',
   'apps/docs/src/content/docs/index.mdx',
-  'apps/docs/src/content/docs/project/status.md',
   'apps/docs/src/content/docs/reference/packages.md',
+  'apps/docs/src/content/docs/reference/diagnostic-codes.md',
   'apps/docs/src/content/docs/zh/index.mdx',
-  'apps/docs/src/content/docs/zh/project/status.md',
   'apps/docs/src/content/docs/zh/reference/diagnostic-codes.md',
   'apps/docs/src/content/docs/zh/reference/packages.md',
   'apps/docs/src/content/docs/start/installation.md',
@@ -43,6 +40,14 @@ export const RELEASE_VERSION_DOCUMENTS = Object.freeze([
   'packages/sdk/api-snapshot.md',
   'packages/transaction/README.md',
   'packages/vite-plugin/README.md',
+]);
+
+/** Narrative files contain historical versions; only their marked current-release block is mutable. */
+export const RELEASE_STATUS_DOCUMENTS = Object.freeze([
+  'README.md',
+  'README.zh-CN.md',
+  'apps/docs/src/content/docs/project/status.md',
+  'apps/docs/src/content/docs/zh/project/status.md',
 ]);
 
 export function updateManifestVersion(manifest, currentVersion, nextVersion) {
@@ -73,4 +78,20 @@ export function updateDocumentVersion(source, currentVersion, nextVersion, path)
     throw new Error(`${path} does not contain the current release version ${currentVersion}`);
   }
   return source.replaceAll(currentVersion, nextVersion);
+}
+
+export function updateReleaseStatusVersion(source, currentVersion, nextVersion, path) {
+  const startMarker = '<!-- aelion-current-version:start -->';
+  const endMarker = '<!-- aelion-current-version:end -->';
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker);
+  if (start < 0 || end < start) {
+    throw new Error(`${path} is missing the current-version marker block`);
+  }
+  const contentStart = start + startMarker.length;
+  const block = source.slice(contentStart, end);
+  if (!block.includes(currentVersion)) {
+    throw new Error(`${path} current-version block does not contain ${currentVersion}`);
+  }
+  return `${source.slice(0, contentStart)}${block.replaceAll(currentVersion, nextVersion)}${source.slice(end)}`;
 }

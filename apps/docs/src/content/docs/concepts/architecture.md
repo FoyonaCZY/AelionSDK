@@ -11,7 +11,7 @@ engine contributors, custom hosts, and production debugging.
 ```mermaid
 flowchart LR
   Host["Host application"] --> SDK["@aelionsdk/sdk Session"]
-  SDK --> Project["Project v1"]
+  SDK --> Project["Project v2"]
   SDK --> Tx["Transaction and History"]
   Tx --> Project
   Project --> Compiler["Render IR compiler"]
@@ -27,7 +27,7 @@ flowchart LR
 
 ### Project: persistent data
 
-Project v1 is canonical JSON. It owns assets, sequences, tracks, items, link groups, markers,
+Project v2 is canonical JSON. It owns assets, sequences, tracks, items, link groups, markers,
 materials, settings, and project metadata. It stores stable media identities, never `File`,
 decoder, GPU, or DOM objects.
 

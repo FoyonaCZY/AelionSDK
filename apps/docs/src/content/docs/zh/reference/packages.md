@@ -3,7 +3,7 @@ title: 包和公开入口
 description: 查询 13 个 @aelionsdk 包的职责、主要导出和使用对象。
 ---
 
-当前所有公开包版本都是 `1.2.0`，通过 npm `latest` tag 分发。只有
+当前所有公开包版本都是 `2.0.0`，通过 npm `latest` tag 分发。只有
 `package.json` 的 `exports` 暴露的入口属于公共 API；`src/*`、`dist/*` 和测试
 helper 不在兼容范围内。
 
@@ -100,7 +100,7 @@ export default defineConfig({ plugins: [aelion()] });
 | 包                             | 主要内容                                                             | 谁会直接用                      |
 | ------------------------------ | -------------------------------------------------------------------- | ------------------------------- |
 | `@aelionsdk/core`              | `AelionError`、Diagnostic、时间/帧/采样换算、JSON 类型               | 错误处理、底层扩展              |
-| `@aelionsdk/project-schema`    | Project v1 类型、`ProjectValidator`、canonical clone、输入 admission | 自定义 Project 工具、服务端校验 |
+| `@aelionsdk/project-schema`    | Project v2 类型、`ProjectValidator`、canonical clone、输入 admission | 自定义 Project 工具、服务端校验 |
 | `@aelionsdk/transaction`       | `EditingCommands`、Transaction Engine、History、ChangeSet            | 引擎贡献者、自定义宿主          |
 | `@aelionsdk/render-ir`         | Project 编译、音视频求值、色彩描述、compile stats                    | 自定义 renderer/exporter        |
 | `@aelionsdk/media`             | RangeReader、MP4/WebM 索引、seek/decode、CacheStore、proxy/governor  | 自定义媒体来源和缓存            |

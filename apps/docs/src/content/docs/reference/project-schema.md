@@ -4,20 +4,30 @@ description: Immutable schema identities, migration, collections, relationships 
 ---
 
 Use `createProject()` or `createComposition()` for normal authoring. The current machine-readable
-schema is [`schemas/project/v1.2/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v1.2/project.schema.json).
+schema is [`schemas/project/v2.0/project.schema.json`](https://github.com/FoyonaCZY/AelionSDK/blob/main/schemas/project/v2.0/project.schema.json).
 
 ## Schema identities
 
-| Dialect      | `$schema`                                      | `schemaVersion` | Purpose                                                    |
-| ------------ | ---------------------------------------------- | --------------- | ---------------------------------------------------------- |
-| Legacy v1.0  | `https://schemas.aelion.dev/project/v1.json`   | `1.0.0`         | Immutable schema published with 1.0                        |
-| Current v1.2 | `https://schemas.aelion.dev/project/v1.2.json` | `1.2.0`         | Image sequences, caption cue settings and keyframe handles |
+| Dialect      | `$schema`                                      | `schemaVersion` | Purpose                                                      |
+| ------------ | ---------------------------------------------- | --------------- | ------------------------------------------------------------ |
+| Legacy v1.0  | `https://schemas.aelion.dev/project/v1.json`   | `1.0.0`         | Immutable schema published with 1.0                          |
+| Stable v1.2  | `https://schemas.aelion.dev/project/v1.2.json` | `1.2.0`         | Immutable 1.2 image-sequence and caption contract            |
+| Current v2.0 | `https://schemas.aelion.dev/project/v2.0.json` | `2.0.0`         | Track roles, occupancy, gap Items and editor layout contract |
 
-The 1.1/1.2 rc.1 packages accidentally emitted new fields with the legacy identity. The default
-rc.2 validator recognizes that exact legacy identity, captures an ownership-isolated snapshot,
-changes only the two identity fields, and validates the document against v1.2. It never mutates the
-caller object. Use `migrateProjectToCurrent(value)` when the upgraded document should be persisted.
-`defaultSchemas.legacyProject` remains available for strict v1.0 validation.
+The default validator recognizes supported v1.0 and stable v1.2 identities, captures an
+ownership-isolated snapshot, changes only the two identity fields, and validates the result against
+v2.0. It never mutates the caller object. Use `migrateProjectToCurrent(value)` when the upgraded
+document should be persisted. `defaultSchemas.previousProject` and
+`defaultSchemas.legacyProject` remain available for strict historical validation.
+
+## Tracks and gaps
+
+A Track may declare `role: 'storyline' | 'overlay'` and
+`occupancy: 'exclusive' | 'free'`. Missing `role` means `overlay`; missing occupancy means
+`exclusive` for a storyline and `free` otherwise. An exclusive Track rejects overlapping Items
+except pairs joined by an explicit Transition. Each Sequence may declare at most one storyline
+Track. A `gap` Item occupies timeline space without rendering content, so packing and ripple
+operations can preserve an intentional hole.
 
 ## Top-level model
 

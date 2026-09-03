@@ -5,6 +5,7 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      '.perf/**',
       '**/coverage/**',
       '**/.astro/**',
       '**/node_modules/**',
@@ -57,6 +58,7 @@ export default tseslint.config(
   {
     files: [
       'scripts/**/*.mjs',
+      'benchmarks/**/*.mjs',
       'apps/docs/scripts/**/*.mjs',
       'packages/*/check-*.mjs',
       'packages/*/test/**/*.mjs',

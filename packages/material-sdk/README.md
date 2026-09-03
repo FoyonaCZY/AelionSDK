@@ -50,6 +50,6 @@ import {
 See the [Material guide](https://foyonaczy.github.io/AelionSDK/guides/materials/)
 and [AMP v1 reference](https://foyonaczy.github.io/AelionSDK/reference/material-protocol-v1/).
 
-Version `1.2.0` is the current stable release. Public API changes follow SemVer
+Version `2.0.0` is the current stable release. Public API changes follow SemVer
 and are recorded in the repository changelog and migration documentation.
 Licensed under MIT.

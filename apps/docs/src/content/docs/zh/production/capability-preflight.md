@@ -115,7 +115,7 @@ Preflight 会考虑当前 revision 的 width、height、frameRate、声道、色
 ## 软件编解码能力描述符
 
 `CodecFallbackDescriptor`、`CodecFallbackRegistry` 和 `selectCodecAvailability()` 只描述宿主
-拥有的软件 codec 能力，**不会**执行或路由媒体任务。1.2 的媒体与导出管线不内置 WASM codec，
+拥有的软件 codec 能力，**不会**执行或路由媒体任务。2.0 的媒体与导出管线不内置 WASM codec，
 也不会调用注册的描述符。
 
 因此注册表只能用于产品层能力判断。硬件不支持时，应由宿主真正集成并测试 codec 后端、改选

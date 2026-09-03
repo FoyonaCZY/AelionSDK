@@ -53,7 +53,7 @@ Webpack 5-compatible hooks exposed by Rspack. Pass `runtimeAssets` to `Aelion.cr
 
 For a custom build or CDN copy step, use `loadAelionRuntimeAssets(outputDirectory)`. For an
 already-deployed versioned CDN directory, use
-`aelionRuntimeAssetUrls('https://cdn.example/sdk/1.2.0/')`; keep application modules and all four
+`aelionRuntimeAssetUrls('https://cdn.example/sdk/2.0.0/')`; keep application modules and all four
 runtime entries on the same SDK version.
 
 Production pages should use HTTPS. For the SharedArrayBuffer audio path, also return `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. CSP must allow same-origin `worker-src` and `script-src`.

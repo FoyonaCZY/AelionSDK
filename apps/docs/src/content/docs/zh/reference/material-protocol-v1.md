@@ -1385,7 +1385,7 @@ trusted-code 是“宿主允许注册的代码”，不是“获得浏览器和�
 
 ## 18. 协议状态与兼容规则
 
-AMP v1 当前由 `@aelionsdk/material-compiler`、`@aelionsdk/material-sdk`、Project v1 Material Instance 和 renderer runtime 共同实现。声明式 Graph 是默认、可移植路径；trusted Shader/WASM 仍由宿主执行策略控制。
+AMP v1 当前由 `@aelionsdk/material-compiler`、`@aelionsdk/material-sdk`、Project v2 Material Instance 和 renderer runtime 共同实现。声明式 Graph 是默认、可移植路径；trusted Shader/WASM 仍由宿主执行策略控制。
 
 协议演进遵守以下规则：
 

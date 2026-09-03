@@ -14,34 +14,47 @@ remote media export.
 [Roadmap](https://foyonaczy.github.io/AelionSDK/project/roadmap/) ·
 [Current status](https://foyonaczy.github.io/AelionSDK/project/status/)
 
-## Install 1.2
+## Install 2.0
 
 ```bash
 npm install @aelionsdk/sdk @aelionsdk/export
 npm install --save-dev @aelionsdk/vite-plugin vite
 ```
 
-Repository version: `1.2.0`. The npm badge shows the currently published `latest` version. Pin
+<!-- aelion-current-version:start -->
+
+Repository version: `2.0.0`. The npm badge shows the currently published `latest` version. Pin
 the exact release after validating it on your target devices.
 
-> **Remediation notice:** `1.1.0-rc.1` and `1.2.0-rc.1` are superseded. Do not newly adopt either
+<!-- aelion-current-version:end -->
+
+> **1.x remediation notice:** `1.1.0-rc.1` and `1.2.0-rc.1` are superseded. Do not newly adopt either
 > RC. `1.2.0-rc.2` corrected their schema identity/migration, image-sequence runtime, signed-rate,
 > subtitle, Bézier, streaming-proxy, audio-analysis and codec-fallback contract issues.
 > `1.2.0-rc.3` kept those remediations and fixed preview transforms, still-image indexing, Vite 7
-> worker URLs, and `historyGroup` forwarding. `1.2.0-rc.4` adds faster interactive commits, text
+> worker URLs, and `historyGroup` forwarding. `1.2.0-rc.4` added faster interactive commits, text
 > background plates, transient thumbnail decodes, and steadier playback/seek. rc.5 pools
 > WebGL2 compositor resources, reuses the export bypass on preview, and honours preview
 > `maxDimension` at the provider boundary. `1.2.0` is the first stable 1.2: it freezes reused
 > Render IR, hands preview frames over uncopied, and reuses audio PCM sessions. Stable releases
 > publish to npm under the `latest` dist-tag.
 
-The 1.2.0 gate passed all 21 serial commands with unchanged source manifest
-`faf025df7c06350bba8eb5e8ea9df1e265dc9dd0d3dbb9fff8a566a179e17781`. The independently reviewed,
-exact-bound evidence record in `reports/baseline` was approved before publication.
+AelionSDK 2.0 adds an explicit storyline/overlay timeline model, reusable layout planning, safe
+Item factories, speculative drag compilation, thumbnail/filmstrip APIs and lower-cost validation.
+The Project schema has a new immutable `v2.0.json` / `2.0.0` identity; v1.0 and v1.2 documents are
+migrated from ownership-isolated snapshots.
+
+The 2.0.0 final gate passed all 21 serial commands with unchanged source manifest
+`9ff6cf17f2ae5f11c0e245e6b534b90d647db623dd7f7905318077d84b3de8ab`. It includes 598 Node
+tests, 118 Project-schema tests, Chromium 102/102 and Firefox 76/76 browser conformance, WebKit and
+mobile contract checks, all 13 package tarball consumers, release dry-run and byte-for-byte
+reproducibility. Publication additionally requires an independently approved review bound to this
+exact source, gate result and artifact set.
 
 ## What it provides
 
 - Transactional timeline editing, revisions, undo/redo, markers, linked A/V and nested Sequences.
+- Storyline packing, exclusive/free occupancy, gap Items and reusable drag/drop layout planning.
 - Image, video, audio, text, caption, shape, generator, mask, transition and Material composition.
 - WebCodecs-backed media indexing/decoding, HTTP Range and OPFS access, bounded caches and proxies.
 - WebGL2/WebGPU worker composition, Canvas preview, AudioWorklet playback and shared Render IR.
@@ -79,11 +92,11 @@ const project = createProject({
 await session.loadProject(project);
 ```
 
-New Projects use the immutable `v1.2.json` / `1.2.0` schema identity. The rc.2 validator safely
-upgrades documents emitted by 1.1/1.2 rc.1 with the ambiguous v1.0 identity; call
+New Projects use the immutable `v2.0.json` / `2.0.0` schema identity. The validator safely upgrades
+supported v1.0 and stable v1.2 documents without mutating caller-owned data; call
 `migrateProjectToCurrent()` when the upgraded document should be persisted.
 
-## Important RC boundaries
+## Known boundaries
 
 - Physical Safari/iOS/Android and broad GPU/driver matrices are not certified.
 - Local color execution is RGBA8 SDR; HDR/10-bit contracts fail closed when unsupported.
@@ -92,7 +105,7 @@ upgrades documents emitted by 1.1/1.2 rc.1 with the ambiguous v1.0 identity; cal
 - SRT/WebVTT are supported; ASS/SSA is not yet part of the subtitle contract.
 - Audio beat/energy analysis is not pixel-based video scene detection.
 - WebGPU supports documented paths but does not yet have complete WebGL2 parity certification.
-- RC APIs may still change through documented migration/deprecation before the first stable release.
+- Public APIs follow SemVer; Project schema identities are immutable once published.
 
 See the [audited 1.1](https://foyonaczy.github.io/AelionSDK/project/roadmap/1-1/) and
 [1.2](https://foyonaczy.github.io/AelionSDK/project/roadmap/1-2/) delivery tables for exact status.

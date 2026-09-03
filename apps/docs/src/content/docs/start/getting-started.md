@@ -65,7 +65,7 @@ const project = builder.build();
 ```
 
 `build()` validates builder output. Product-level authored graphics can use
-[Composition API](/AelionSDK/guides/composition-api/); both paths produce Project v1.
+[Composition API](/AelionSDK/guides/composition-api/); both paths produce Project v2.
 
 ## 4. Create Session and render the first frame
 

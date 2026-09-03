@@ -1,9 +1,9 @@
 ---
 title: 安装与工程配置
-description: 从 npm 安装 AelionSDK 1.2 正式版，启动 Quickstart，并配置自己的 Vite 应用。
+description: 从 npm 安装 AelionSDK 2.0 正式版，启动 Quickstart，并配置自己的 Vite 应用。
 ---
 
-AelionSDK 的 1.2 正式版通过 npm `latest` tag 分发。普通应用至少安装 SDK；需要直接
+AelionSDK 的 2.0 正式版通过 npm `latest` tag 分发。普通应用至少安装 SDK；需要直接
 使用导出 Sink/Profile 时安装导出包；Vite 应用同时安装官方插件：
 
 ```bash
@@ -169,7 +169,7 @@ import { aelionRuntimeAssetUrls } from '@aelionsdk/vite-plugin';
 
 const session = await Aelion.createSession({
   media,
-  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/1.2.0/'),
+  runtimeAssets: aelionRuntimeAssetUrls('https://cdn.example.com/aelionsdk/2.0.0/'),
 });
 ```
 
@@ -238,8 +238,8 @@ corepack pnpm --filter @example/my-editor build
 生产集成不应长期跟随可移动的 `latest` tag。验证完成后，把依赖锁定到当前正式版：
 
 ```bash
-pnpm add @aelionsdk/sdk@1.2.0 @aelionsdk/export@1.2.0
-pnpm add -D @aelionsdk/vite-plugin@1.2.0
+pnpm add @aelionsdk/sdk@2.0.0 @aelionsdk/export@2.0.0
+pnpm add -D @aelionsdk/vite-plugin@2.0.0
 ```
 
 `npm install @aelionsdk/sdk` 默认读取 `latest`，当前指向本正式版。接下来打开
@@ -252,18 +252,18 @@ pnpm add -D @aelionsdk/vite-plugin@1.2.0
 锁文件：
 
 ```bash
-npm install @aelionsdk/sdk@1.2.0
-npm view @aelionsdk/sdk@1.2.0 version dist.integrity dist.attestations --json
+npm install @aelionsdk/sdk@2.0.0
+npm view @aelionsdk/sdk@2.0.0 version dist.integrity dist.attestations --json
 npm view @aelionsdk/sdk dist-tags --json
 ```
 
-预期精确版本为 `1.2.0`，`latest` 指向该版本，`dist.attestations` 包含来自
+预期精确版本为 `2.0.0`，`latest` 指向该版本，`dist.attestations` 包含来自
 GitHub Actions 的 provenance。完整发布还应交叉核对：
 
-- [Git Tag `v1.2.0`](https://github.com/FoyonaCZY/AelionSDK/tree/v1.2.0)；
+- [Git Tag `v2.0.0`](https://github.com/FoyonaCZY/AelionSDK/tree/v2.0.0)；
 - [发布工作流](https://github.com/FoyonaCZY/AelionSDK/actions/runs/30343884270)；
-- [GitHub Release](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v1.2.0)。
+- [GitHub Release](https://github.com/FoyonaCZY/AelionSDK/releases/tag/v2.0.0)。
 
-使用多个 Aelion 包时，逐个运行 `npm view <包名>@1.2.0 version
+使用多个 Aelion 包时，逐个运行 `npm view <包名>@2.0.0 version
 dist.integrity dist.attestations --json`。不要混用不同版本，也不要把可移动的
 `latest` tag 写入生产锁定策略。

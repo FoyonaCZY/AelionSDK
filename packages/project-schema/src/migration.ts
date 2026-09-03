@@ -7,10 +7,14 @@ import type { AelionProject } from './types.js';
 export const LEGACY_PROJECT_SCHEMA_URI = 'https://schemas.aelion.dev/project/v1.json';
 /** Version paired with the immutable legacy Project schema URI. */
 export const LEGACY_PROJECT_SCHEMA_VERSION = '1.0.0';
-/** Canonical schema URI for Projects containing the admitted 1.2 additions. */
-export const CURRENT_PROJECT_SCHEMA_URI = 'https://schemas.aelion.dev/project/v1.2.json';
-/** Version paired with the canonical Project v1.2 schema URI. */
-export const CURRENT_PROJECT_SCHEMA_VERSION = '1.2.0';
+/** Immutable schema URI emitted by the stable AelionSDK 1.2 release. */
+export const PROJECT_SCHEMA_V1_2_URI = 'https://schemas.aelion.dev/project/v1.2.json';
+/** Version paired with the immutable stable 1.2 Project schema URI. */
+export const PROJECT_SCHEMA_V1_2_VERSION = '1.2.0';
+/** Canonical schema URI for Projects containing the 2.0 timeline model. */
+export const CURRENT_PROJECT_SCHEMA_URI = 'https://schemas.aelion.dev/project/v2.0.json';
+/** Version paired with the canonical Project v2.0 schema URI. */
+export const CURRENT_PROJECT_SCHEMA_VERSION = '2.0.0';
 
 /** Result of isolating and, when necessary, migrating a Project identity. */
 export interface ProjectIdentityMigration {
@@ -41,13 +45,15 @@ export function migrateAdmittedProjectToCurrent(value: JsonValue): ProjectIdenti
   const fromVersion = typeof project.schemaVersion === 'string' ? project.schemaVersion : undefined;
   const legacy =
     fromSchema === LEGACY_PROJECT_SCHEMA_URI && fromVersion === LEGACY_PROJECT_SCHEMA_VERSION;
-  if (legacy) {
+  const stableV1_2 =
+    fromSchema === PROJECT_SCHEMA_V1_2_URI && fromVersion === PROJECT_SCHEMA_V1_2_VERSION;
+  if (legacy || stableV1_2) {
     project.$schema = CURRENT_PROJECT_SCHEMA_URI;
     project.schemaVersion = CURRENT_PROJECT_SCHEMA_VERSION;
   }
   return {
     project: project as unknown as AelionProject,
-    migrated: legacy,
+    migrated: legacy || stableV1_2,
     ...(fromSchema === undefined ? {} : { fromSchema }),
     ...(fromVersion === undefined ? {} : { fromVersion }),
     toSchema: CURRENT_PROJECT_SCHEMA_URI,
@@ -56,9 +62,10 @@ export function migrateAdmittedProjectToCurrent(value: JsonValue): ProjectIdenti
 }
 
 /**
- * Capture an ownership-isolated Project snapshot and upgrade the ambiguous
- * v1/1.0 identity emitted by AelionSDK 1.1/1.2 RCs to the immutable v1.2
- * identity. Content is preserved byte-for-byte at the JSON-value level.
+ * Capture an ownership-isolated Project snapshot and upgrade either supported
+ * 1.x identity to the immutable v2.0 identity. Content is preserved at the
+ * JSON-value level; v2 fields are optional so legacy documents retain their
+ * established overlay/free behavior until a product assigns roles explicitly.
  */
 export function migrateProjectToCurrent(value: unknown): ProjectIdentityMigration {
   const snapshot = snapshotProjectInput(value);
