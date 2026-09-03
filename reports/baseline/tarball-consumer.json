@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "sdkVersion": "2.0.0",
-  "generatedAt": "2026-09-03T18:54:34.816Z",
+  "generatedAt": "2026-09-03T19:18:39.607Z",
   "command": "corepack pnpm test:consumer",
   "bundlerAdapter": {
     "id": "@aelionsdk/vite-plugin",
@@ -58,7 +58,7 @@
       "undici-types": "undici-types-6.21.0.tgz",
       "vite": "vite-7.3.6.tgz"
     },
-    "packageJsonSha256": "55ef153f69ddb96b7cf160fca6d53c0371a0f35698991d26bbf6385462b3534b",
+    "packageJsonSha256": "a398aefdbf65e1428939931ab33e49a08bfa0f9cc75fca84ef920e468bf1a9a4",
     "sourceSha256": "e9e9008eb3a07329afc5e1c1ca679b59203ea88106d8731782c1edb772eb3e76",
     "tsconfigSha256": "bfa47bc27b36ca006fd91e775f3addc674bf84571edb71776e40e5336e1b8048"
   },
@@ -73,7 +73,7 @@
       "status": "passed",
       "dryRun": true,
       "projectSha256": "e8f0622460cc10d659a268cceff306830476ec974f1bc4d712dfb5131e1f468e",
-      "reportSha256": "38825269ae713f5b397cd768e526636f90aa8314f7be820e69e43fe0870bfdbf"
+      "reportSha256": "84b5f8ae29d3353ba48681a2608ee013c0e28458075ad890248fe27ed119541b"
     }
   },
   "packages": [
@@ -188,7 +188,7 @@
             225,
             255
           ],
-          "workerTimingUs": 126605
+          "workerTimingUs": 132355
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -196,10 +196,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 22464,
-          "playedFrames": 1536,
+          "availableReadFrames": 22976,
+          "playedFrames": 1024,
           "underrunFrames": 0,
-          "timeUs": 32000
+          "timeUs": 21333
         },
         "sessionFacade": {
           "revision": "3",
@@ -218,7 +218,7 @@
               225,
               255
             ],
-            "workerTimingUs": 5355
+            "workerTimingUs": 5170
           },
           "sharedClock": {
             "contextState": "suspended",
@@ -226,10 +226,10 @@
             "quantumFrames": 128,
             "queuedFrames": 24000,
             "capacityFrames": 96000,
-            "availableReadFrames": 22080,
-            "playedFrames": 1920,
+            "availableReadFrames": 22464,
+            "playedFrames": 1536,
             "underrunFrames": 0,
-            "timeUs": 40000
+            "timeUs": 32000
           },
           "transferableWorkletLoaded": true,
           "exportWorker": {
@@ -262,7 +262,7 @@
             225,
             255
           ],
-          "workerTimingUs": 10140
+          "workerTimingUs": 10420
         },
         "audioWorkletClock": {
           "contextState": "suspended",
@@ -270,10 +270,10 @@
           "quantumFrames": 128,
           "queuedFrames": 24000,
           "capacityFrames": 96000,
-          "availableReadFrames": 23488,
-          "playedFrames": 512,
+          "availableReadFrames": 23616,
+          "playedFrames": 384,
           "underrunFrames": 0,
-          "timeUs": 10667
+          "timeUs": 8000
         },
         "sessionFacade": {
           "revision": "3",
@@ -292,7 +292,7 @@
               225,
               255
             ],
-            "workerTimingUs": 5680
+            "workerTimingUs": 6360
           },
           "sharedClock": {
             "contextState": "suspended",

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "3.0.0",
   "generatedBy": "scripts/run-phase-1-final-gates.mjs",
-  "startedAt": "2026-09-03T18:50:50.590Z",
+  "startedAt": "2026-09-03T19:14:57.456Z",
   "sourceIdentityBefore": {
     "kind": "workspace-input-manifest",
-    "policyVersion": "3.4.0",
+    "policyVersion": "3.5.0",
     "algorithm": "sha256(stable-json(canonical-lf(files)))",
     "textNormalization": "Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF",
     "symbolicLinks": "reject every non-excluded symbolic link",
@@ -15,15 +15,16 @@
       "generated TypeDoc projection: apps/docs/src/content/docs/api/**",
       "browser snapshot output directories named __screenshots__",
       "generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}",
+      "root architecture visualization outputs: aelionsdk-architecture*",
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 552,
-    "totalBytes": 11544272,
-    "manifestSha256": "9ff6cf17f2ae5f11c0e245e6b534b90d647db623dd7f7905318077d84b3de8ab",
+    "fileCount": 544,
+    "totalBytes": 10078491,
+    "manifestSha256": "067afa2c6d61b013856b77e9b3dd56189067d7d2338522064790a8ba313db07d",
     "vcs": {
-      "commit": "3b807f505f677b999b0615e9234247799184fd6f",
-      "tree": "966a2e33b3f02a8562609f10a72d9bdfdb87b4a9"
+      "commit": "60bee2614ae8fa5d3d1ea0c88ad71031c51236cf",
+      "tree": "38424945117b5ff23906c4313e44de2502da694a"
     },
     "files": [
       {
@@ -110,46 +111,6 @@
         "path": "THIRD_PARTY_NOTICES.md",
         "bytes": 969,
         "sha256": "c468f1b2aa46fc1eb29fde367a13148145c8ea6d0c0b00cd56668a022dd1a45b"
-      },
-      {
-        "path": "aelionsdk-architecture.html",
-        "bytes": 728110,
-        "sha256": "adceb7893346079801969be9ee879f2280816c4f1f61268a01f6c97a48b7986d"
-      },
-      {
-        "path": "aelionsdk-architecture.json",
-        "bytes": 9260,
-        "sha256": "23e1ae68256d20aab40297189568ced2a70d5ed736c0df318aa529325cb78bc1"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.1440x900.dark.png",
-        "bytes": 150849,
-        "sha256": "9af9dad80ac9204221f3d2aafbbefbb833c75eacfd661ecce9249c3920f7fb03"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.1440x900.light.png",
-        "bytes": 158294,
-        "sha256": "920ceb5796a759cb76f1c60022a0b7d4b84d798dcbd23fe66350bad59b9599c4"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.2048x1320.dark.png",
-        "bytes": 195734,
-        "sha256": "9c00420909413d9ee7784bc8d6636cb70d0777706bea20052c21a80a599d48e2"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.2048x1320.light.png",
-        "bytes": 205706,
-        "sha256": "5f279b102b7aa078c3a5509427d418a2261c2a2bbbdedb094f3360a65ace01fb"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.html",
-        "bytes": 1976,
-        "sha256": "c470b3a6bcbb4b5b1459787be2f8097f45437a36f3846acd13040039999becfb"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.json",
-        "bytes": 17277,
-        "sha256": "3bafeb4ef9db51ec723c3a745b55eba2282dc46779213448ad3483dca11b2883"
       },
       {
         "path": "apps/capability-lab/index.html",
@@ -2513,8 +2474,8 @@
       },
       {
         "path": "scripts/capture-phase-1-final-gates.mjs",
-        "bytes": 12887,
-        "sha256": "805d67a44e446185c9609330b472d68121a3ac3a623910c2fadc6d22d2edc9b4"
+        "bytes": 13012,
+        "sha256": "40a2f95b08e08be03a7e1464f5cf1befbe16a2162957dcd3db60e8812a03f0f6"
       },
       {
         "path": "scripts/capture-recovery-evidence.mjs",
@@ -2648,13 +2609,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 111071,
-        "sha256": "8a5170b20a6b8650bfb3c04ccde7512a92118f109607e86189578c4e5fce1893"
+        "bytes": 111254,
+        "sha256": "90544575eb5391aea8b4abaaf264dff3eb4c3f91830968b6f7989eaa58063f9b"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 45494,
-        "sha256": "3053e126d1787cfe30b5647ba31d22824b84291ffae8e8655cc5a9d56a027976"
+        "bytes": 46611,
+        "sha256": "7a9d4a0be901c51c3c4da6b2a331ab323987e444091a60c68f0106b18f17a942"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -2791,107 +2752,107 @@
   "commands": [
     {
       "command": "corepack pnpm run ci",
-      "startedAt": "2026-09-03T18:50:50.769Z",
-      "endedAt": "2026-09-03T18:52:40.899Z",
+      "startedAt": "2026-09-03T19:14:57.641Z",
+      "endedAt": "2026-09-03T19:16:48.069Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "validation > agrees about a time that is not a safe integer  328ms\n   ✓ split validation agrees with whole-document validation > agrees about a collection that is not an object  328ms\n   ✓ split validation agrees with whole-document validation > agrees on randomly damaged documents  328ms\n ✓ packages/render-ir/test/compiler.test.ts (23 tests) 288ms\n ✓ packages/transaction/test/vertical-slice.test.ts (1 test) 258ms\n ✓ packages/project-schema/test/tracks-and-items.test.ts (14 tests) 247ms\n ✓ packages/render-ir/test/production-soak.test.ts (1 test) 469ms\n   ✓ large Project accelerated soak > compiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly  467ms\n ✓ packages/audio/test/ir-mixer.test.ts (21 tests) 117ms\n ✓ packages/sdk/test/media-provider.test.ts (19 tests) 177ms\n ✓ packages/material-sdk/test/material-cli.test.ts (3 tests) 237ms\n ✓ packages/media/test/corpus.test.ts (21 tests) 285ms\n ✓ packages/material-sdk/test/material-production.test.ts (6 tests) 37ms\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 191ms\n ✓ packages/export/test/fuzz.test.ts (1 test) 146ms\n ✓ packages/sdk/test/item-factories.test.ts (27 tests) 27ms\n ✓ packages/material-sdk/test/material-sdk.test.ts (34 tests) 158ms\n ✓ packages/sdk/test/production-media-provider.test.ts (3 tests) 24ms\n ✓ packages/material-compiler/test/compiler.test.ts (10 tests) 13ms\n ✓ packages/sdk/test/extension-host.test.ts (3 tests) 32ms\n ✓ packages/audio/test/processing.test.ts (6 tests) 24ms\n ✓ packages/audio/test/analysis.test.ts (8 tests) 16ms\n ✓ packages/core/test/resource.test.ts (3 tests) 13ms\n ✓ packages/audio/test/worklet-clock-race.test.ts (7 tests) 18ms\n ✓ packages/render-ir/test/text-caption.test.ts (6 tests) 12ms\n ✓ packages/sdk/test/preview-controller.test.ts (4 tests) 9ms\n ✓ packages/media/test/media.test.ts (8 tests) 11ms\n ✓ packages/transaction/test/layout.test.ts (26 tests) 10ms\n ✓ packages/material-compiler/test/webgpu-parity.test.ts (3 tests) 9ms\n ✓ packages/export/test/audio-export.test.ts (2 tests) 8ms\n ✓ packages/sdk/test/proxy-automation.test.ts (7 tests) 7ms\n ✓ packages/render-ir/test/time-map.test.ts (6 tests) 6ms\n ✓ packages/media/test/resource-governor.test.ts (2 tests) 5ms\n ✓ apps/evidence-runner/src/long-task-window.test.ts (4 tests) 5ms\n ✓ packages/capability/test/fallback.test.ts (8 tests) 6ms\n ✓ packages/export/test/export-protocols.test.ts (7 tests) 9ms\n ✓ packages/render-ir/test/bezier-handle.test.ts (7 tests) 4ms\n ✓ packages/media/test/cache-proxy.test.ts (3 tests) 6ms\n ✓ packages/audio/test/video-scheduler.test.ts (4 tests) 5ms\n ✓ packages/audio/test/device-state.test.ts (2 tests) 5ms\n ✓ packages/capability/test/gate.test.ts (2 tests) 3ms\n ✓ packages/core/test/diagnostic-localization.test.ts (6 tests) 2ms\n ✓ packages/render-ir/test/color.test.ts (2 tests) 3ms\n ✓ packages/project-schema/test/image-sequence.test.ts (5 tests) 2ms\n ✓ packages/audio/test/transferable-pcm-queue.test.ts (3 tests) 3ms\n\n Test Files  67 passed (67)\n      Tests  598 passed (598)\n   Start at  02:52:24\n   Duration  6.52s (transform 2.04s, setup 0ms, collect 18.57s, tests 29.75s, environment 11ms, prepare 7.58s)\n\n\n> @aelionsdk/vite-plugin@2.0.0 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: Vite, Webpack/Rspack, and explicit CDN assets\n\n> aelion-sdk@2.0.0 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\n✔ versioned compatibility matrix requires all product decision axes (1.2599ms)\n✔ matrix cannot claim tested without evidence or use unsafe evidence paths (0.1841ms)\n✔ Darwin parsers return only approved non-identifying fields (1.4729ms)\n✔ reference-device probe uses Darwin data and records explicit fallback limitations (0.5532ms)\n✔ browser identity requires Playwright and page versions to agree (0.4658ms)\n✔ failed staged JSON validation preserves the published artifact (7.5729ms)\n✔ Alpha pair publication restores both old artifacts when report publish fails (67.1112ms)\n✔ Alpha pair publication serializes canonical path aliases in one process (103.6598ms)\n✔ Alpha pair publication serializes the same canonical pair across processes (249.1108ms)\n✔ Alpha pair publication rolls back when published bytes fail readback binding (23.8816ms)\n✔ an approved blocker review applies only to its exact source manifest (1.0826ms)\n✔ workspace identity excludes only the exact post-gate projections plus generated evidence (0.4469ms)\n✔ post-gate projections do not churn source identity but every other document remains bound (124.0088ms)\n✔ source identity is stable across Git-normalized text checkouts and generated Astro state (78.5909ms)\n✔ source identity preserves binary CRLF bytes (77.9292ms)\n✔ source identity rejects every non-excluded symbolic link (2.3619ms)\n✔ source identity equality binds every policy field (0.2613ms)\n﹣ source identity rejects non-regular filesystem entries (0.0586ms) # SKIP\n✔ the final runner policy is exactly fourteen gates plus seven evidence refreshes (0.6454ms)\n✔ seek and performance validators fail closed on resource or SLO drift (3.5154ms)\n✔ strict browser summaries require exact reviewed counts and zero skipped work (0.2456ms)\n✔ Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes (1.2063ms)\n✔ gate record must be serial and bound to one source identity (2.2192ms)\n✔ tarball consumer validator checks exact package, asset and browser contracts (1.116ms)\n✔ Alpha cleanup and blocker review both fail closed (1.8739ms)\n✔ blocker review gate binding requires fresh exact artifacts from the serial run (1.5937ms)\n✔ postflight fails closed on command, freshness, semantic and binding drift (0.7556ms)\n✔ postflight validation is stable across checkout mtimes and fails on byte drift (11.8087ms)\n✔ publisher submits every missing package before waiting for registry consistency (1.5368ms)\n✔ publisher fails closed when a visible version has different bytes (0.4526ms)\n✔ publisher times out when npm never exposes an accepted version (0.8366ms)\n✔ only immutable-version conflicts are treated as an accepted publish (0.2233ms)\n✔ stable versions publish to latest as full GitHub releases (1.619ms)\n✔ prerelease versions publish to next as GitHub prereleases (0.4021ms)\n✔ release versions reject non-canonical or unsafe forms (0.3475ms)\n✔ version updates can intentionally refresh a frozen workspace lockfile (1.0217ms)\n✔ manifest updates exact public package pins and preserves workspace links (0.276ms)\n✔ manifest update fails closed on an independently drifted package pin (0.3943ms)\n✔ curated release documents replace every current-version occurrence (0.2966ms)\n✔ narrative release documents update only their marked current-version block (0.6946ms)\nℹ tests 40\nℹ suites 0\nℹ pass 39\nℹ fail 0\nℹ cancelled 0\nℹ skipped 1\nℹ todo 0\nℹ duration_ms 532.4884\n\n> aelion-sdk@2.0.0 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/project-schema/test/image-sequence.test.ts (5 tests) 3ms\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 144ms\n ✓ packages/project-schema/test/tracks-and-items.test.ts (14 tests) 228ms\n ✓ packages/project-schema/test/project.test.ts (42 tests) 495ms\n ✓ packages/project-schema/test/canonical.test.ts (11 tests) 559ms\n   ✓ canonical key ordering > matches the reference code-point comparator on adversarial keys  556ms\n   ✓ canonical key ordering > matches the reference comparator on arbitrary unicode keys  556ms\n   ✓ canonical key ordering > orders a prefix before the string that extends it  556ms\n   ✓ canonical key ordering > orders an astral code point above every BMP code point  556ms\n   ✓ canonicalClone > produces exactly what encoding and reparsing would  556ms\n ✓ packages/project-schema/test/admitted-fast-path.test.ts (8 tests) 604ms\n   ✓ ProjectValidator.validateAdmitted > accepts an admitted Project and returns the same canonical document  341ms\n   ✓ ProjectValidator.validateAdmitted > reports the same schema and semantic diagnostics as the cloning path  353ms\n   ✓ ProjectValidator.validateAdmitted > still refuses a document that outgrew the admission budget  357ms\n ✓ packages/project-schema/test/validation-cache.test.ts (13 tests) 767ms\n   ✓ the entity schema cache cannot go stale > judges a replacement object rather than trusting the id it reuses  622ms\n   ✓ the entity schema cache cannot go stale > re-checks an entity that was accepted while it was still mutable  622ms\n   ✓ the entity schema cache cannot go stale > does not carry a verdict from one schema to another  621ms\n   ✓ the entity schema cache cannot go stale > re-runs the per-Item semantic rules for a replacement object  621ms\n   ✓ the entity schema cache cannot go stale > does not cache a per-Item verdict reached while the Item was mutable  621ms\n ✓ packages/project-schema/test/schema-decomposition.test.ts (23 tests) 605ms\n   ✓ decomposeProjectSchema > accepts the shipped Project schema and dispatches Items by type  346ms\n   ✓ decomposeProjectSchema > refuses a map that names its values inline instead of by reference  345ms\n   ✓ decomposeProjectSchema > refuses a map with an annotation keyword that reaches into its values  345ms\n   ✓ decomposeProjectSchema > refuses a map that also matches keys by pattern  345ms\n   ✓ decomposeProjectSchema > refuses a document without an identity to hang entity references on  345ms\n\n Test Files  8 passed (8)\n      Tests  118 passed (118)\n   Start at  02:52:35\n   Duration  1.43s (transform 293ms, setup 0ms, collect 2.25s, tests 3.40s, environment 1ms, prepare 840ms)\n\n\n> aelion-sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@2.0.0 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 369 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                                                       1.99 kB │ gzip:   0.97 kB\ndist/assets/index-CaSGBhjJ.css                                        1.96 kB │ gzip:   0.99 kB\ndist/assets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js    2.02 kB │ gzip:   0.90 kB │ map:     0.14 kB\ndist/assets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js            4.00 kB │ gzip:   1.42 kB │ map:    12.28 kB\ndist/assets/aelion-export-mux-export-worker.js-CoPpuTcc.js            9.61 kB │ gzip:   3.56 kB │ map:    27.79 kB\ndist/assets/aelion-renderer-worker-webgl2-worker.js-CSoLE2T9.js      22.19 kB │ gzip:   7.02 kB │ map:     0.15 kB\ndist/assets/sink-completion-DaBvwO72.js                             514.31 kB │ gzip: 130.11 kB │ map: 2,320.38 kB\ndist/assets/index--Iw6fDDk.js                                       558.75 kB │ gzip: 145.89 kB │ map: 1,833.47 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n✓ built in 2.07s\n\n> aelion-sdk@2.0.0 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@2.0.0 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
+        "outputTail": "leaved writes into planar reads without allocation growth  715ms\n   ✓ SharedPcmRingBuffer > records underrun frames and zero-fills output  715ms\n   ✓ SharedPcmRingBuffer > runs a ten-minute equivalent bounded producer/consumer simulation without underrun  715ms\n   ✓ SharedPcmRingBuffer > does not accept writes after end or close  715ms\n   ✓ SharedPcmRingBuffer > drops all queued PCM when closed  715ms\n ✓ packages/audio/test/ir-mixer.test.ts (21 tests) 135ms\n ✓ packages/media/test/corpus.test.ts (21 tests) 240ms\n ✓ packages/material-sdk/test/material-cli.test.ts (3 tests) 160ms\n ✓ packages/sdk/test/media-provider.test.ts (19 tests) 186ms\n ✓ packages/render-ir/test/production-soak.test.ts (1 test) 494ms\n   ✓ large Project accelerated soak > compiles 1,000 clips, reuses unaffected IR and evaluates a long timeline repeatedly  492ms\n ✓ packages/export/test/fuzz.test.ts (1 test) 134ms\n ✓ packages/material-sdk/test/material-production.test.ts (6 tests) 36ms\n ✓ packages/material-sdk/test/material-sdk.test.ts (34 tests) 172ms\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 193ms\n ✓ packages/audio/test/analysis.test.ts (8 tests) 16ms\n ✓ packages/core/test/resource.test.ts (3 tests) 14ms\n ✓ packages/audio/test/processing.test.ts (6 tests) 19ms\n ✓ packages/material-compiler/test/compiler.test.ts (10 tests) 16ms\n ✓ packages/sdk/test/production-media-provider.test.ts (3 tests) 25ms\n ✓ packages/audio/test/worklet-clock-race.test.ts (7 tests) 19ms\n ✓ packages/sdk/test/item-factories.test.ts (27 tests) 29ms\n ✓ packages/sdk/test/extension-host.test.ts (3 tests) 33ms\n ✓ packages/render-ir/test/text-caption.test.ts (6 tests) 13ms\n ✓ packages/media/test/media.test.ts (8 tests) 12ms\n ✓ packages/sdk/test/preview-controller.test.ts (4 tests) 10ms\n ✓ packages/material-compiler/test/webgpu-parity.test.ts (3 tests) 10ms\n ✓ packages/transaction/test/layout.test.ts (26 tests) 9ms\n ✓ packages/capability/test/fallback.test.ts (8 tests) 6ms\n ✓ packages/render-ir/test/time-map.test.ts (6 tests) 8ms\n ✓ packages/media/test/cache-proxy.test.ts (3 tests) 5ms\n ✓ packages/sdk/test/proxy-automation.test.ts (7 tests) 8ms\n ✓ packages/export/test/export-protocols.test.ts (7 tests) 9ms\n ✓ packages/export/test/audio-export.test.ts (2 tests) 10ms\n ✓ apps/evidence-runner/src/long-task-window.test.ts (4 tests) 4ms\n ✓ packages/render-ir/test/bezier-handle.test.ts (7 tests) 4ms\n ✓ packages/audio/test/device-state.test.ts (2 tests) 5ms\n ✓ packages/media/test/resource-governor.test.ts (2 tests) 6ms\n ✓ packages/audio/test/video-scheduler.test.ts (4 tests) 5ms\n ✓ packages/capability/test/gate.test.ts (2 tests) 3ms\n ✓ packages/project-schema/test/image-sequence.test.ts (5 tests) 2ms\n ✓ packages/render-ir/test/color.test.ts (2 tests) 3ms\n ✓ packages/core/test/diagnostic-localization.test.ts (6 tests) 2ms\n ✓ packages/audio/test/transferable-pcm-queue.test.ts (3 tests) 3ms\n\n Test Files  67 passed (67)\n      Tests  598 passed (598)\n   Start at  03:16:32\n   Duration  6.57s (transform 1.84s, setup 0ms, collect 18.48s, tests 30.69s, environment 11ms, prepare 7.59s)\n\n\n> @aelionsdk/vite-plugin@2.0.0 test C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> corepack pnpm run build && node test/vite-plugin.test-runner.mjs\n\n\n> @aelionsdk/vite-plugin@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\vite-plugin\n> tsc -b\n\n@aelionsdk/vite-plugin tests passed: Vite, Webpack/Rspack, and explicit CDN assets\n\n> aelion-sdk@2.0.0 test:evidence-scripts C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/run-evidence-tests.mjs\n\n✔ versioned compatibility matrix requires all product decision axes (1.2596ms)\n✔ matrix cannot claim tested without evidence or use unsafe evidence paths (0.2333ms)\n✔ Darwin parsers return only approved non-identifying fields (1.3286ms)\n✔ reference-device probe uses Darwin data and records explicit fallback limitations (0.5155ms)\n✔ browser identity requires Playwright and page versions to agree (0.4669ms)\n✔ failed staged JSON validation preserves the published artifact (6.9983ms)\n✔ Alpha pair publication restores both old artifacts when report publish fails (26.0749ms)\n✔ Alpha pair publication serializes canonical path aliases in one process (94.5901ms)\n✔ Alpha pair publication serializes the same canonical pair across processes (232.2162ms)\n✔ Alpha pair publication rolls back when published bytes fail readback binding (26.0664ms)\n✔ an approved blocker review applies only to its exact source manifest (1.063ms)\n✔ workspace identity excludes only the exact post-gate projections plus generated evidence (0.4095ms)\n✔ root architecture visualization outputs cannot change the source identity (84.3585ms)\n✔ post-gate projections do not churn source identity but every other document remains bound (117.8531ms)\n✔ source identity is stable across Git-normalized text checkouts and generated Astro state (77.2164ms)\n✔ source identity preserves binary CRLF bytes (76.2595ms)\n✔ source identity rejects every non-excluded symbolic link (4.3014ms)\n✔ source identity equality binds every policy field (0.2115ms)\n﹣ source identity rejects non-regular filesystem entries (0.0624ms) # SKIP\n✔ the final runner policy is exactly fourteen gates plus seven evidence refreshes (0.5095ms)\n✔ seek and performance validators fail closed on resource or SLO drift (2.6396ms)\n✔ strict browser summaries require exact reviewed counts and zero skipped work (0.6019ms)\n✔ Phase 3 recovery evidence requires persistent reuse and exact FFmpeg hashes (1.3045ms)\n✔ gate record must be serial and bound to one source identity (2.2162ms)\n✔ tarball consumer validator checks exact package, asset and browser contracts (1.075ms)\n✔ Alpha cleanup and blocker review both fail closed (1.8343ms)\n✔ blocker review gate binding requires fresh exact artifacts from the serial run (1.7086ms)\n✔ postflight fails closed on command, freshness, semantic and binding drift (0.6133ms)\n✔ postflight validation is stable across checkout mtimes and fails on byte drift (12.458ms)\n✔ publisher submits every missing package before waiting for registry consistency (1.9297ms)\n✔ publisher fails closed when a visible version has different bytes (0.4253ms)\n✔ publisher times out when npm never exposes an accepted version (0.8573ms)\n✔ only immutable-version conflicts are treated as an accepted publish (0.197ms)\n✔ stable versions publish to latest as full GitHub releases (1.2994ms)\n✔ prerelease versions publish to next as GitHub prereleases (0.2026ms)\n✔ release versions reject non-canonical or unsafe forms (0.3387ms)\n✔ version updates can intentionally refresh a frozen workspace lockfile (1.3231ms)\n✔ manifest updates exact public package pins and preserves workspace links (0.1872ms)\n✔ manifest update fails closed on an independently drifted package pin (0.2668ms)\n✔ curated release documents replace every current-version occurrence (0.2344ms)\n✔ narrative release documents update only their marked current-version block (0.6201ms)\nℹ tests 41\nℹ suites 0\nℹ pass 40\nℹ fail 0\nℹ cancelled 0\nℹ skipped 1\nℹ todo 0\nℹ duration_ms 472.6021\n\n> aelion-sdk@2.0.0 test:schema C:\\Users\\zhongyu\\Documents\\AelionSDK\n> node scripts/validate-material-examples.mjs && vitest run packages/project-schema\n\nValidated 3 material packages and the project example successfully.\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/project-schema/test/image-sequence.test.ts (5 tests) 3ms\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 135ms\n ✓ packages/project-schema/test/tracks-and-items.test.ts (14 tests) 234ms\n ✓ packages/project-schema/test/project.test.ts (42 tests) 478ms\n ✓ packages/project-schema/test/canonical.test.ts (11 tests) 585ms\n   ✓ canonical key ordering > matches the reference code-point comparator on adversarial keys  583ms\n   ✓ canonical key ordering > matches the reference comparator on arbitrary unicode keys  582ms\n   ✓ canonical key ordering > orders a prefix before the string that extends it  582ms\n   ✓ canonical key ordering > orders an astral code point above every BMP code point  582ms\n   ✓ canonicalClone > produces exactly what encoding and reparsing would  582ms\n ✓ packages/project-schema/test/admitted-fast-path.test.ts (8 tests) 606ms\n   ✓ ProjectValidator.validateAdmitted > accepts an admitted Project and returns the same canonical document  341ms\n   ✓ ProjectValidator.validateAdmitted > reports the same schema and semantic diagnostics as the cloning path  352ms\n   ✓ ProjectValidator.validateAdmitted > still refuses a document that outgrew the admission budget  354ms\n ✓ packages/project-schema/test/validation-cache.test.ts (13 tests) 738ms\n   ✓ the entity schema cache cannot go stale > judges a replacement object rather than trusting the id it reuses  593ms\n   ✓ the entity schema cache cannot go stale > re-checks an entity that was accepted while it was still mutable  593ms\n   ✓ the entity schema cache cannot go stale > does not carry a verdict from one schema to another  593ms\n   ✓ the entity schema cache cannot go stale > re-runs the per-Item semantic rules for a replacement object  593ms\n   ✓ the entity schema cache cannot go stale > does not cache a per-Item verdict reached while the Item was mutable  593ms\n ✓ packages/project-schema/test/schema-decomposition.test.ts (23 tests) 573ms\n   ✓ decomposeProjectSchema > accepts the shipped Project schema and dispatches Items by type  325ms\n   ✓ decomposeProjectSchema > refuses a map that names its values inline instead of by reference  325ms\n   ✓ decomposeProjectSchema > refuses a map with an annotation keyword that reaches into its values  325ms\n   ✓ decomposeProjectSchema > refuses a map that also matches keys by pattern  325ms\n   ✓ decomposeProjectSchema > refuses a document without an identity to hang entity references on  325ms\n\n Test Files  8 passed (8)\n      Tests  118 passed (118)\n   Start at  03:16:42\n   Duration  1.39s (transform 242ms, setup 0ms, collect 2.25s, tests 3.35s, environment 1ms, prepare 832ms)\n\n\n> aelion-sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\n\n> aelion-sdk@2.0.0 build:quickstart C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/quickstart build\n\n\n> @aelionsdk/quickstart@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\apps\\quickstart\n> vite build\n\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 369 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                                                       1.99 kB │ gzip:   0.97 kB\ndist/assets/index-CaSGBhjJ.css                                        1.96 kB │ gzip:   0.99 kB\ndist/assets/aelion-audio-pcm-message-player.worklet.js-ChYh0fYn.js    2.02 kB │ gzip:   0.90 kB │ map:     0.14 kB\ndist/assets/aelion-audio-pcm-player.worklet.js-BXcfWx6Z.js            4.00 kB │ gzip:   1.42 kB │ map:    12.28 kB\ndist/assets/aelion-export-mux-export-worker.js-CoPpuTcc.js            9.61 kB │ gzip:   3.56 kB │ map:    27.79 kB\ndist/assets/aelion-renderer-worker-webgl2-worker.js-CSoLE2T9.js      22.19 kB │ gzip:   7.02 kB │ map:     0.15 kB\ndist/assets/sink-completion-DaBvwO72.js                             514.31 kB │ gzip: 130.11 kB │ map: 2,320.38 kB\ndist/assets/index--Iw6fDDk.js                                       558.75 kB │ gzip: 145.89 kB │ map: 1,833.47 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n✓ built in 2.06s\n\n> aelion-sdk@2.0.0 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm --filter @aelionsdk/sdk run api:snapshot\n\n\n> @aelionsdk/sdk@2.0.0 api:snapshot C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> corepack pnpm run build && node check-api-snapshot.mjs\n\n\n> @aelionsdk/sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\\packages\\sdk\n> tsc -b",
         "outputTailTruncated": true
       }
     },
     {
       "command": "corepack pnpm test:browser",
-      "startedAt": "2026-09-03T18:52:40.901Z",
-      "endedAt": "2026-09-03T18:52:56.066Z",
+      "startedAt": "2026-09-03T19:16:48.071Z",
+      "endedAt": "2026-09-03T19:17:03.291Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |chromium| packages/export/test/resumable-export.browser.test.ts (5 tests) 3522ms\n   ✓ resumable muxed export > encodes one complete fragmented MP4 unit or fails closed without runtime AAC  470ms\n   ✓ resumable muxed export > reuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' }  1603ms\n   ✓ resumable muxed export > reuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' }  1369ms\n ✓ |chromium| packages/renderer-worker/test/compose.browser.test.ts (17 tests) 1873ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  1087ms\n ✓ |chromium| packages/renderer-worker/test/ir-renderer.browser.test.ts (18 tests) 744ms\n ✓ |chromium| packages/sdk/test/session.browser.test.ts (1 test) 583ms\n   ✓ @aelionsdk/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  583ms\n ✓ |chromium| packages/export/test/export.browser.test.ts (15 tests) 475ms\n ✓ |chromium| packages/sdk/test/preview-speculation.browser.test.ts (9 tests) 457ms\n ✓ |chromium| packages/sdk/test/player-race.browser.test.ts (4 tests) 380ms\n ✓ |chromium| packages/renderer-worker/test/vertical-slice.browser.test.ts (1 test) 244ms\n ✓ |chromium| packages/capability/test/capability.browser.test.ts (2 tests) 140ms\n ✓ |chromium| packages/media/test/decode.browser.test.ts (13 tests) 118ms\n ✓ |chromium| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 96ms\n ✓ |chromium| packages/sdk/test/production-media-provider.browser.test.ts (3 tests) 77ms\n ✓ |chromium| packages/audio/test/worklet.browser.test.ts (6 tests) 73ms\n ✓ |chromium| packages/renderer-worker/test/client.browser.test.ts (4 tests) 21ms\n ✓ |chromium| packages/sdk/test/preview-downscale.browser.test.ts (1 test) 7ms\n ✓ |chromium| packages/media/test/image.browser.test.ts (1 test) 3ms\n\n Test Files  16 passed (16)\n      Tests  102 passed (102)\n   Start at  02:52:41\n   Duration  14.28s (transform 0ms, setup 0ms, collect 602ms, tests 8.81s, environment 0ms, prepare 194.89s)",
+        "outputTail": "> aelion-sdk@2.0.0 test:browser C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.browser.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |chromium| packages/export/test/resumable-export.browser.test.ts (5 tests) 3539ms\n   ✓ resumable muxed export > encodes one complete fragmented MP4 unit or fails closed without runtime AAC  477ms\n   ✓ resumable muxed export > reuses only committed 'webm-vp9-opus' units after 25%, 50% and 90% interruption { profile: 'webm-vp9-opus', container: 'webm' }  1615ms\n   ✓ resumable muxed export > reuses only committed 'mp4-h264-aac' units after 25%, 50% and 90% interruption { profile: 'mp4-h264-aac', container: 'mp4' }  1369ms\n ✓ |chromium| packages/renderer-worker/test/compose.browser.test.ts (17 tests) 1890ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  1089ms\n ✓ |chromium| packages/renderer-worker/test/ir-renderer.browser.test.ts (18 tests) 751ms\n ✓ |chromium| packages/sdk/test/session.browser.test.ts (1 test) 587ms\n   ✓ @aelionsdk/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  587ms\n ✓ |chromium| packages/export/test/export.browser.test.ts (15 tests) 475ms\n ✓ |chromium| packages/sdk/test/preview-speculation.browser.test.ts (9 tests) 433ms\n ✓ |chromium| packages/sdk/test/player-race.browser.test.ts (4 tests) 373ms\n ✓ |chromium| packages/renderer-worker/test/vertical-slice.browser.test.ts (1 test) 239ms\n ✓ |chromium| packages/capability/test/capability.browser.test.ts (2 tests) 138ms\n ✓ |chromium| packages/media/test/decode.browser.test.ts (13 tests) 131ms\n ✓ |chromium| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 93ms\n ✓ |chromium| packages/sdk/test/production-media-provider.browser.test.ts (3 tests) 73ms\n ✓ |chromium| packages/audio/test/worklet.browser.test.ts (6 tests) 74ms\n ✓ |chromium| packages/renderer-worker/test/client.browser.test.ts (4 tests) 21ms\n ✓ |chromium| packages/sdk/test/preview-downscale.browser.test.ts (1 test) 8ms\n ✓ |chromium| packages/media/test/image.browser.test.ts (1 test) 3ms\n\n Test Files  16 passed (16)\n      Tests  102 passed (102)\n   Start at  03:16:48\n   Duration  14.37s (transform 0ms, setup 0ms, collect 577ms, tests 8.83s, environment 0ms, prepare 197.29s)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:firefox",
-      "startedAt": "2026-09-03T18:52:56.068Z",
-      "endedAt": "2026-09-03T18:53:14.758Z",
+      "startedAt": "2026-09-03T19:17:03.294Z",
+      "endedAt": "2026-09-03T19:17:21.703Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |firefox| packages/renderer-worker/test/compose.browser.test.ts (17 tests) 3909ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  2347ms\n ✓ |firefox| packages/renderer-worker/test/ir-renderer.browser.test.ts (18 tests) 2800ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > applies alpha masks with invert, feather and consumed matte semantics  342ms\n ✓ |firefox| packages/sdk/test/session.browser.test.ts (1 test) 1934ms\n   ✓ @aelionsdk/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  1934ms\n ✓ |firefox| packages/sdk/test/player-race.browser.test.ts (4 tests) 1128ms\n   ✓ AelionPlayer asynchronous generations > closes an owned frame and enters error state when its subscriber throws  318ms\n   ✓ AelionPlayer asynchronous generations > does not enqueue or publish a stale PCM generation after a newer seek  304ms\n   ✓ AelionPlayer asynchronous generations > aborts and drains an in-flight PCM fill before Session disposal completes  315ms\n ✓ |firefox| packages/export/test/export.browser.test.ts (15 tests) 802ms\n ✓ |firefox| packages/audio/test/worklet.browser.test.ts (6 tests) 521ms\n ✓ |firefox| packages/media/test/decode.browser.test.ts (13 tests) 434ms\n ✓ |firefox| packages/capability/test/capability.browser.test.ts (2 tests) 208ms\n\n Test Files  8 passed (8)\n      Tests  76 passed (76)\n   Start at  02:52:56\n   Duration  17.54s (transform 0ms, setup 0ms, collect 785ms, tests 11.74s, environment 0ms, prepare 105.39s)",
+        "outputTail": "> aelion-sdk@2.0.0 test:browser:firefox C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.firefox.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |firefox| packages/renderer-worker/test/compose.browser.test.ts (17 tests) 3890ms\n   ✓ Worker WebGL2 compositor > releases Worker GPU resources across repeated compositor sessions  2345ms\n ✓ |firefox| packages/renderer-worker/test/ir-renderer.browser.test.ts (18 tests) 2779ms\n   ✓ Project → Render IR → Material Graph → Worker renderer > applies alpha masks with invert, feather and consumed matte semantics  345ms\n ✓ |firefox| packages/sdk/test/session.browser.test.ts (1 test) 1902ms\n   ✓ @aelionsdk/sdk public browser facade > loads, edits, previews and exports one frozen Project through public APIs  1901ms\n ✓ |firefox| packages/sdk/test/player-race.browser.test.ts (4 tests) 1138ms\n   ✓ AelionPlayer asynchronous generations > closes an owned frame and enters error state when its subscriber throws  311ms\n   ✓ AelionPlayer asynchronous generations > does not enqueue or publish a stale PCM generation after a newer seek  322ms\n   ✓ AelionPlayer asynchronous generations > aborts and drains an in-flight PCM fill before Session disposal completes  314ms\n ✓ |firefox| packages/export/test/export.browser.test.ts (15 tests) 739ms\n ✓ |firefox| packages/media/test/decode.browser.test.ts (13 tests) 446ms\n ✓ |firefox| packages/audio/test/worklet.browser.test.ts (6 tests) 505ms\n ✓ |firefox| packages/capability/test/capability.browser.test.ts (2 tests) 208ms\n\n Test Files  8 passed (8)\n      Tests  76 passed (76)\n   Start at  03:17:03\n   Duration  17.35s (transform 0ms, setup 0ms, collect 759ms, tests 11.60s, environment 0ms, prepare 104.42s)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:webkit",
-      "startedAt": "2026-09-03T18:53:14.760Z",
-      "endedAt": "2026-09-03T18:53:20.564Z",
+      "startedAt": "2026-09-03T19:17:21.706Z",
+      "endedAt": "2026-09-03T19:17:27.587Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |webkit| packages/capability/test/capability.browser.test.ts (2 tests) 170ms\n ✓ |webkit| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 4ms\n\n Test Files  2 passed (2)\n      Tests  4 passed (4)\n   Start at  02:53:15\n   Duration  5.07s (transform 0ms, setup 0ms, collect 228ms, tests 174ms, environment 0ms, prepare 7.07s)",
+        "outputTail": "> aelion-sdk@2.0.0 test:browser:webkit C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.webkit.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |webkit| packages/capability/test/capability.browser.test.ts (2 tests) 169ms\n ✓ |webkit| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 5ms\n\n Test Files  2 passed (2)\n      Tests  4 passed (4)\n   Start at  03:17:22\n   Duration  5.08s (transform 0ms, setup 0ms, collect 246ms, tests 174ms, environment 0ms, prepare 7.98s)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:browser:mobile",
-      "startedAt": "2026-09-03T18:53:20.566Z",
-      "endedAt": "2026-09-03T18:53:26.332Z",
+      "startedAt": "2026-09-03T19:17:27.589Z",
+      "endedAt": "2026-09-03T19:17:33.281Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |chromium| packages/capability/test/capability.browser.test.ts (2 tests) 460ms\n   ✓ browser capability report > probes real browser configurations and returns a serializable report  415ms\n ✓ |chromium| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 94ms\n\n Test Files  2 passed (2)\n      Tests  4 passed (4)\n   Start at  02:53:21\n   Duration  4.96s (transform 0ms, setup 0ms, collect 126ms, tests 555ms, environment 0ms, prepare 8.23s)",
+        "outputTail": "> aelion-sdk@2.0.0 test:browser:mobile C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.mobile.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ |chromium| packages/capability/test/capability.browser.test.ts (2 tests) 468ms\n   ✓ browser capability report > probes real browser configurations and returns a serializable report  423ms\n ✓ |chromium| packages/sdk/test/target-conformance.browser.test.ts (2 tests) 92ms\n\n Test Files  2 passed (2)\n      Tests  4 passed (4)\n   Start at  03:17:28\n   Duration  4.87s (transform 0ms, setup 0ms, collect 112ms, tests 560ms, environment 0ms, prepare 8.08s)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:golden",
-      "startedAt": "2026-09-03T18:53:26.334Z",
-      "endedAt": "2026-09-03T18:53:27.353Z",
+      "startedAt": "2026-09-03T19:17:33.284Z",
+      "endedAt": "2026-09-03T19:17:34.294Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/renderer-worker/test/material.golden.test.ts (1 test) 3ms\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  02:53:26\n   Duration  330ms (transform 56ms, setup 0ms, collect 72ms, tests 3ms, environment 0ms, prepare 90ms)",
+        "outputTail": "> aelion-sdk@2.0.0 test:golden C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run --config vitest.golden.config.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/renderer-worker/test/material.golden.test.ts (1 test) 3ms\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  03:17:33\n   Duration  331ms (transform 55ms, setup 0ms, collect 71ms, tests 3ms, environment 0ms, prepare 91ms)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:security",
-      "startedAt": "2026-09-03T18:53:27.356Z",
-      "endedAt": "2026-09-03T18:53:28.811Z",
+      "startedAt": "2026-09-03T19:17:34.295Z",
+      "endedAt": "2026-09-03T19:17:35.757Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 101ms\n ✓ packages/material-sdk/test/material-sdk.test.ts (34 tests) 102ms\n ✓ packages/media/test/corpus.test.ts (21 tests) 147ms\n\n Test Files  3 passed (3)\n      Tests  57 passed (57)\n   Start at  02:53:27\n   Duration  733ms (transform 295ms, setup 0ms, collect 939ms, tests 350ms, environment 0ms, prepare 253ms)",
+        "outputTail": "> aelion-sdk@2.0.0 test:security C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/project-schema/test/admission.fuzz.test.ts packages/media/test/corpus.test.ts packages/material-sdk/test/material-sdk.test.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/project-schema/test/admission.fuzz.test.ts (2 tests) 107ms\n ✓ packages/material-sdk/test/material-sdk.test.ts (34 tests) 111ms\n ✓ packages/media/test/corpus.test.ts (21 tests) 142ms\n\n Test Files  3 passed (3)\n      Tests  57 passed (57)\n   Start at  03:17:34\n   Duration  742ms (transform 299ms, setup 0ms, collect 964ms, tests 360ms, environment 0ms, prepare 261ms)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:soak",
-      "startedAt": "2026-09-03T18:53:28.813Z",
-      "endedAt": "2026-09-03T18:53:30.657Z",
+      "startedAt": "2026-09-03T19:17:35.759Z",
+      "endedAt": "2026-09-03T19:17:37.601Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/render-ir/test/production-soak.test.ts (1 test) 230ms\n ✓ packages/audio/test/pcm-ring.test.ts (6 tests) 317ms\n   ✓ SharedPcmRingBuffer > wraps interleaved writes into planar reads without allocation growth  316ms\n   ✓ SharedPcmRingBuffer > records underrun frames and zero-fills output  316ms\n   ✓ SharedPcmRingBuffer > runs a ten-minute equivalent bounded producer/consumer simulation without underrun  316ms\n   ✓ SharedPcmRingBuffer > does not accept writes after end or close  316ms\n   ✓ SharedPcmRingBuffer > drops all queued PCM when closed  316ms\n ✓ packages/transaction/test/soak.test.ts (1 test) 646ms\n   ✓ long-session restart recovery > round-trips every edit checkpoint through canonical persistence without drift  645ms\n\n Test Files  3 passed (3)\n      Tests  8 passed (8)\n   Start at  02:53:29\n   Duration  1.15s (transform 298ms, setup 0ms, collect 741ms, tests 1.19s, environment 0ms, prepare 258ms)",
+        "outputTail": "> aelion-sdk@2.0.0 test:soak C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest run packages/audio/test/pcm-ring.test.ts packages/render-ir/test/production-soak.test.ts packages/transaction/test/soak.test.ts\n\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n ✓ packages/render-ir/test/production-soak.test.ts (1 test) 235ms\n ✓ packages/audio/test/pcm-ring.test.ts (6 tests) 333ms\n   ✓ SharedPcmRingBuffer > wraps interleaved writes into planar reads without allocation growth  332ms\n   ✓ SharedPcmRingBuffer > records underrun frames and zero-fills output  332ms\n   ✓ SharedPcmRingBuffer > runs a ten-minute equivalent bounded producer/consumer simulation without underrun  332ms\n   ✓ SharedPcmRingBuffer > does not accept writes after end or close  332ms\n   ✓ SharedPcmRingBuffer > drops all queued PCM when closed  332ms\n ✓ packages/transaction/test/soak.test.ts (1 test) 651ms\n   ✓ long-session restart recovery > round-trips every edit checkpoint through canonical persistence without drift  650ms\n\n Test Files  3 passed (3)\n      Tests  8 passed (8)\n   Start at  03:17:36\n   Duration  1.16s (transform 293ms, setup 0ms, collect 742ms, tests 1.22s, environment 0ms, prepare 271ms)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm bench",
-      "startedAt": "2026-09-03T18:53:30.659Z",
-      "endedAt": "2026-09-03T18:53:46.516Z",
+      "startedAt": "2026-09-03T19:17:37.603Z",
+      "endedAt": "2026-09-03T19:17:52.272Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\nBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n\n ✓ benchmarks/scenarios.bench.ts > open a 1000-clip project 4160ms\n     name                                             hz      min      max     mean      p75      p99     p995     p999       rme  samples\n   · validate the document                       35.6896  24.4037  34.4127  28.0194  29.0967  34.4127  34.4127  34.4127    ±4.17%       18\n   · construct the transaction engine            41.4683  20.7443  27.5088  24.1148  25.3484  27.5088  27.5088  27.5088    ±3.45%       21\n   · whole load path (validate, adopt, compile)   9.5083  47.9086   365.33   105.17  90.1358   365.33   365.33   365.33   ±65.02%       10\n   · cold compile Render IR                      24.0199  14.0035   484.82  41.6322  20.3294   484.82   484.82   484.82  ±111.23%       21\n\n ✓ benchmarks/scenarios.bench.ts > edit a 1000-clip project 1260ms\n     name                                         hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · commit one field, validated              218.03  3.7162  7.1960  4.5865  4.9941  6.9452  7.1960  7.1960  ±3.83%      110\n   · commit one field, unvalidated (floor)  1,433.07  0.5288  1.4674  0.6978  0.7587  1.1000  1.1746  1.4674  ±1.52%      717\n\n ✓ benchmarks/scenarios.bench.ts > drag a clip across a 1000-clip timeline 1855ms\n     name                                                 hz     min      max    mean     p75      p99     p995     p999     rme  samples\n   · resolve the drop position                      1,507.10  0.5681   1.3461  0.6635  0.6702   0.9950   1.0149   1.3461  ±1.14%      754\n   · speculate the Project                            251.66  3.7061   6.3737  3.9736  4.0050   5.9557   6.3737   6.3737  ±1.88%      126\n   · one pointer move: plan, speculate and compile    145.47  6.3326  10.6229  6.8744  6.9452  10.6229  10.6229  10.6229  ±2.38%       73\n\n ✓ benchmarks/scenarios.bench.ts > play a 1000-clip timeline 1217ms\n     name                                           hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · evaluate the visual state of one frame  21,827.63  0.0425  0.1199  0.0458  0.0436  0.0815  0.0828  0.0951  ±0.32%    10914\n   · evaluate 60 consecutive frames             364.62  2.5654  4.7573  2.7426  2.7689  4.6054  4.7573  4.7573  ±1.59%      183\n\n ✓ benchmarks/scenarios.bench.ts > recompile a 1000-clip project after one edit 1288ms\n     name                                       hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · with the affected ids declared       1,138.91  0.7958  1.5478  0.8780  0.8918  1.3081  1.3299  1.5478  ±0.80%      570\n   · without them (fingerprint fallback)    196.64  4.8156  6.8590  5.0854  5.0830  6.8590  6.8590  6.8590  ±1.31%       99\n\n ✓ benchmarks/render-ir.bench.ts > Render IR compilation 3086ms\n     name                                                hz     min      max     mean      p75      p99     p995     p999      rme  samples\n   · cold compile 1,000 clips                        175.50  3.6153  71.2657   5.6980   4.2948  71.2657  71.2657  71.2657  ±29.00%       88\n   · incremental no-op compile 1,000 clips         3,255.19  0.2117   0.8969   0.3072   0.3186   0.5456   0.6307   0.7997   ±1.05%     1628\n   · session initialization 1,000 clips              197.52  3.9061   8.3131   5.0627   5.4379   8.3131   8.3131   8.3131   ±3.22%       99\n   · single-field transaction commit 1,000 clips  18,289.27  0.0411   0.4003   0.0547   0.0550   0.1330   0.1467   0.1902   ±0.74%     9146\n   · schema-validated field commit 1,000 clips      93.0035  8.1517  15.2165  10.7523  13.0063  15.2165  15.2165  15.2165   ±5.96%       47\n\n ✓ benchmarks/render-ir.bench.ts > Render IR evaluation 606ms\n     name                                    hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · evaluateVisualState 1,000 clips  25,077.18  0.0319  0.3687  0.0399  0.0491  0.0651  0.0700  0.0850  ±0.52%    12539\n\n BENCH  Summary\n\n  single-field transaction commit 1,000 clips - benchmarks/render-ir.bench.ts > Render IR compilation\n    5.62x faster than incremental no-op compile 1,000 clips\n    92.59x faster than session initialization 1,000 clips\n    104.21x faster than cold compile 1,000 clips\n    196.65x faster than schema-validated field commit 1,000 clips\n\n  evaluateVisualState 1,000 clips - benchmarks/render-ir.bench.ts > Render IR evaluation\n\n  construct the transaction engine - benchmarks/scenarios.bench.ts > open a 1000-clip project\n    1.16x faster than validate the document\n    1.73x faster than cold compile Render IR\n    4.36x faster than whole load path (validate, adopt, compile)\n\n  commit one field, unvalidated (floor) - benchmarks/scenarios.bench.ts > edit a 1000-clip project\n    6.57x faster than commit one field, validated\n\n  resolve the drop position - benchmarks/scenarios.bench.ts > drag a clip across a 1000-clip timeline\n    5.99x faster than speculate the Project\n    10.36x faster than one pointer move: plan, speculate and compile\n\n  evaluate the visual state of one frame - benchmarks/scenarios.bench.ts > play a 1000-clip timeline\n    59.86x faster than evaluate 60 consecutive frames\n\n  with the affected ids declared - benchmarks/scenarios.bench.ts > recompile a 1000-clip project after one edit\n    5.79x faster than without them (fingerprint fallback)",
+        "outputTail": "> aelion-sdk@2.0.0 bench C:\\Users\\zhongyu\\Documents\\AelionSDK\n> vitest bench --run\n\nBenchmarking is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest's version when using it.\n\n RUN  v3.2.7 C:/Users/zhongyu/Documents/AelionSDK\n\n\n ✓ benchmarks/scenarios.bench.ts > open a 1000-clip project 2954ms\n     name                                             hz      min      max     mean      p75      p99     p995     p999      rme  samples\n   · validate the document                       40.3353  23.0610  29.0182  24.7922  25.6070  29.0182  29.0182  29.0182   ±2.52%       21\n   · construct the transaction engine            47.2596  19.5638  23.8570  21.1597  21.8620  23.8570  23.8570  23.8570   ±2.02%       24\n   · whole load path (validate, adopt, compile)  19.3170  42.0276  99.6571  51.7679  51.3445  99.6571  99.6571  99.6571  ±23.99%       10\n   · cold compile Render IR                      61.3816  11.2299  62.2659  16.2915  12.8161  62.2659  62.2659  62.2659  ±26.52%       32\n\n ✓ benchmarks/scenarios.bench.ts > edit a 1000-clip project 1266ms\n     name                                         hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · commit one field, validated              258.50  3.5800  4.8888  3.8685  3.9571  4.8524  4.8888  4.8888  ±1.04%      130\n   · commit one field, unvalidated (floor)  1,690.98  0.5060  1.0939  0.5914  0.6131  0.9005  0.9631  1.0939  ±0.85%      846\n\n ✓ benchmarks/scenarios.bench.ts > drag a clip across a 1000-clip timeline 1897ms\n     name                                                 hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · resolve the drop position                      1,667.57  0.5460  1.0397  0.5997  0.5925  0.8463  0.8675  1.0397  ±0.75%      834\n   · speculate the Project                            259.16  3.6320  4.8398  3.8585  3.9135  4.7875  4.8398  4.8398  ±1.09%      130\n   · one pointer move: plan, speculate and compile    146.57  6.3792  7.7907  6.8225  7.0028  7.7907  7.7907  7.7907  ±1.08%       74\n\n ✓ benchmarks/scenarios.bench.ts > play a 1000-clip timeline 1226ms\n     name                                           hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · evaluate the visual state of one frame  22,647.83  0.0412  0.2942  0.0442  0.0427  0.0780  0.0821  0.1052  ±0.31%    11324\n   · evaluate 60 consecutive frames             388.59  2.4851  3.0268  2.5734  2.5847  2.9746  3.0268  3.0268  ±0.46%      195\n\n ✓ benchmarks/scenarios.bench.ts > recompile a 1000-clip project after one edit 1220ms\n     name                                       hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · with the affected ids declared       1,205.42  0.7695  1.6708  0.8296  0.8259  1.3484  1.3751  1.6708  ±0.87%      603\n   · without them (fingerprint fallback)    192.95  4.9710  6.1249  5.1826  5.2419  6.1249  6.1249  6.1249  ±0.81%       97\n\n ✓ benchmarks/render-ir.bench.ts > Render IR compilation 3087ms\n     name                                                hz     min      max    mean     p75      p99     p995     p999      rme  samples\n   · cold compile 1,000 clips                        159.47  3.8149  82.0241  6.2708  4.5378  82.0241  82.0241  82.0241  ±33.52%       80\n   · incremental no-op compile 1,000 clips         3,435.03  0.2542   0.8638  0.2911  0.2980   0.4867   0.5933   0.8219   ±0.75%     1718\n   · session initialization 1,000 clips              203.72  4.3922   6.3417  4.9088  5.0041   6.3287   6.3417   6.3417   ±1.71%      102\n   · single-field transaction commit 1,000 clips  17,257.69  0.0428   0.3625  0.0579  0.0582   0.1167   0.1329   0.1955   ±0.60%     8629\n   · schema-validated field commit 1,000 clips       117.29  8.1396   9.6637  8.5262  8.6491   9.6637   9.6637   9.6637   ±1.03%       59\n\n ✓ benchmarks/render-ir.bench.ts > Render IR evaluation 607ms\n     name                                    hz     min     max    mean     p75     p99    p995    p999     rme  samples\n   · evaluateVisualState 1,000 clips  30,629.93  0.0314  0.1134  0.0326  0.0324  0.0476  0.0579  0.0621  ±0.14%    15315\n\n BENCH  Summary\n\n  single-field transaction commit 1,000 clips - benchmarks/render-ir.bench.ts > Render IR compilation\n    5.02x faster than incremental no-op compile 1,000 clips\n    84.71x faster than session initialization 1,000 clips\n    108.22x faster than cold compile 1,000 clips\n    147.14x faster than schema-validated field commit 1,000 clips\n\n  evaluateVisualState 1,000 clips - benchmarks/render-ir.bench.ts > Render IR evaluation\n\n  cold compile Render IR - benchmarks/scenarios.bench.ts > open a 1000-clip project\n    1.30x faster than construct the transaction engine\n    1.52x faster than validate the document\n    3.18x faster than whole load path (validate, adopt, compile)\n\n  commit one field, unvalidated (floor) - benchmarks/scenarios.bench.ts > edit a 1000-clip project\n    6.54x faster than commit one field, validated\n\n  resolve the drop position - benchmarks/scenarios.bench.ts > drag a clip across a 1000-clip timeline\n    6.43x faster than speculate the Project\n    11.38x faster than one pointer move: plan, speculate and compile\n\n  evaluate the visual state of one frame - benchmarks/scenarios.bench.ts > play a 1000-clip timeline\n    58.28x faster than evaluate 60 consecutive frames\n\n  with the affected ids declared - benchmarks/scenarios.bench.ts > recompile a 1000-clip project after one edit\n    6.25x faster than without them (fingerprint fallback)",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm test:pack",
-      "startedAt": "2026-09-03T18:53:46.519Z",
-      "endedAt": "2026-09-03T18:54:08.015Z",
+      "startedAt": "2026-09-03T19:17:52.274Z",
+      "endedAt": "2026-09-03T19:18:13.205Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2901,19 +2862,19 @@
     },
     {
       "command": "corepack pnpm test:consumer",
-      "startedAt": "2026-09-03T18:54:08.018Z",
-      "endedAt": "2026-09-03T18:54:34.971Z",
+      "startedAt": "2026-09-03T19:18:13.207Z",
+      "endedAt": "2026-09-03T19:18:39.754Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
-        "outputTail": "> aelion-sdk@2.0.0 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 126605\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22464,\n        \"playedFrames\": 1536,\n        \"underrunFrames\": 0,\n        \"timeUs\": 32000\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 5355\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22080,\n          \"playedFrames\": 1920,\n          \"underrunFrames\": 0,\n          \"timeUs\": 40000\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 10140\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 23488,\n        \"playedFrames\": 512,\n        \"underrunFrames\": 0,\n        \"timeUs\": 10667\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 5680\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 23488,\n          \"playedFrames\": 512,\n          \"underrunFrames\": 0,\n          \"timeUs\": 10667\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
+        "outputTail": "> aelion-sdk@2.0.0 test:consumer C:\\Users\\zhongyu\\Documents\\AelionSDK\n> corepack pnpm run build && node scripts/test-package-consumer.mjs --browser\n\n\n> aelion-sdk@2.0.0 build C:\\Users\\zhongyu\\Documents\\AelionSDK\n> tsc -b\n\nPackage consumer smoke passed: @aelionsdk/audio, @aelionsdk/capability, @aelionsdk/core, @aelionsdk/export, @aelionsdk/material-compiler, @aelionsdk/material-sdk, @aelionsdk/media, @aelionsdk/project-schema, @aelionsdk/render-ir, @aelionsdk/renderer-worker, @aelionsdk/sdk, @aelionsdk/transaction, @aelionsdk/vite-plugin\nTarball browser consumer passed:\n[\n  {\n    \"browser\": \"chromium\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 132355\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 22976,\n        \"playedFrames\": 1024,\n        \"underrunFrames\": 0,\n        \"timeUs\": 21333\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 5170\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 22464,\n          \"playedFrames\": 1536,\n          \"underrunFrames\": 0,\n          \"timeUs\": 32000\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 598,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  },\n  {\n    \"browser\": \"firefox\",\n    \"report\": {\n      \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:153.0) Gecko/20100101 Firefox/153.0\",\n      \"crossOriginIsolated\": true,\n      \"workerCompositor\": {\n        \"backend\": \"webgl2\",\n        \"graphHash\": \"a080cd2e\",\n        \"pixel\": [\n          245,\n          235,\n          225,\n          255\n        ],\n        \"workerTimingUs\": 10420\n      },\n      \"audioWorkletClock\": {\n        \"contextState\": \"suspended\",\n        \"sampleRate\": 48000,\n        \"quantumFrames\": 128,\n        \"queuedFrames\": 24000,\n        \"capacityFrames\": 96000,\n        \"availableReadFrames\": 23616,\n        \"playedFrames\": 384,\n        \"underrunFrames\": 0,\n        \"timeUs\": 8000\n      },\n      \"sessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      },\n      \"explicitRuntimeAssets\": {\n        \"compositor\": {\n          \"backend\": \"webgl2\",\n          \"graphHash\": \"a080cd2e\",\n          \"pixel\": [\n            245,\n            235,\n            225,\n            255\n          ],\n          \"workerTimingUs\": 6360\n        },\n        \"sharedClock\": {\n          \"contextState\": \"suspended\",\n          \"sampleRate\": 48000,\n          \"quantumFrames\": 128,\n          \"queuedFrames\": 24000,\n          \"capacityFrames\": 96000,\n          \"availableReadFrames\": 23488,\n          \"playedFrames\": 512,\n          \"underrunFrames\": 0,\n          \"timeUs\": 10667\n        },\n        \"transferableWorkletLoaded\": true,\n        \"exportWorker\": {\n          \"bytes\": 573,\n          \"videoFrames\": 3,\n          \"audioFrames\": 4800,\n          \"profile\": \"webm-vp9-opus\"\n        }\n      },\n      \"explicitSessionFacade\": {\n        \"revision\": \"3\",\n        \"state\": \"ready\",\n        \"backend\": \"webgl2\",\n        \"width\": 16,\n        \"height\": 16\n      }\n    }\n  }\n]\nWrote tarball consumer evidence to reports/baseline/tarball-consumer.json",
         "outputTailTruncated": false
       }
     },
     {
       "command": "corepack pnpm release:dry-run",
-      "startedAt": "2026-09-03T18:54:34.973Z",
-      "endedAt": "2026-09-03T18:55:55.791Z",
+      "startedAt": "2026-09-03T19:18:39.756Z",
+      "endedAt": "2026-09-03T19:20:09.589Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2923,8 +2884,8 @@
     },
     {
       "command": "corepack pnpm release:reproducibility",
-      "startedAt": "2026-09-03T18:55:55.793Z",
-      "endedAt": "2026-09-03T18:56:14.294Z",
+      "startedAt": "2026-09-03T19:20:09.591Z",
+      "endedAt": "2026-09-03T19:20:28.588Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2934,8 +2895,8 @@
     },
     {
       "command": "corepack pnpm format:check",
-      "startedAt": "2026-09-03T18:56:14.296Z",
-      "endedAt": "2026-09-03T18:56:18.635Z",
+      "startedAt": "2026-09-03T19:20:28.590Z",
+      "endedAt": "2026-09-03T19:20:32.965Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2945,8 +2906,8 @@
     },
     {
       "command": "corepack pnpm report:performance",
-      "startedAt": "2026-09-03T18:56:18.637Z",
-      "endedAt": "2026-09-03T18:56:33.573Z",
+      "startedAt": "2026-09-03T19:20:32.967Z",
+      "endedAt": "2026-09-03T19:20:47.124Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2956,8 +2917,8 @@
     },
     {
       "command": "corepack pnpm report:browser:chromium",
-      "startedAt": "2026-09-03T18:56:33.575Z",
-      "endedAt": "2026-09-03T18:56:50.655Z",
+      "startedAt": "2026-09-03T19:20:47.127Z",
+      "endedAt": "2026-09-03T19:21:03.012Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2967,8 +2928,8 @@
     },
     {
       "command": "corepack pnpm report:browser:firefox",
-      "startedAt": "2026-09-03T18:56:50.658Z",
-      "endedAt": "2026-09-03T18:57:10.684Z",
+      "startedAt": "2026-09-03T19:21:03.014Z",
+      "endedAt": "2026-09-03T19:21:23.525Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2978,8 +2939,8 @@
     },
     {
       "command": "corepack pnpm report:seek",
-      "startedAt": "2026-09-03T18:57:10.687Z",
-      "endedAt": "2026-09-03T18:57:15.644Z",
+      "startedAt": "2026-09-03T19:21:23.527Z",
+      "endedAt": "2026-09-03T19:21:28.782Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -2989,8 +2950,8 @@
     },
     {
       "command": "corepack pnpm report:recovery",
-      "startedAt": "2026-09-03T18:57:15.646Z",
-      "endedAt": "2026-09-03T18:57:24.883Z",
+      "startedAt": "2026-09-03T19:21:28.784Z",
+      "endedAt": "2026-09-03T19:21:38.506Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -3000,8 +2961,8 @@
     },
     {
       "command": "corepack pnpm report:phase3:check",
-      "startedAt": "2026-09-03T18:57:24.885Z",
-      "endedAt": "2026-09-03T18:57:25.170Z",
+      "startedAt": "2026-09-03T19:21:38.508Z",
+      "endedAt": "2026-09-03T19:21:38.818Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -3011,8 +2972,8 @@
     },
     {
       "command": "corepack pnpm report:alpha",
-      "startedAt": "2026-09-03T18:57:25.173Z",
-      "endedAt": "2026-09-03T18:57:54.055Z",
+      "startedAt": "2026-09-03T19:21:38.821Z",
+      "endedAt": "2026-09-03T19:22:08.246Z",
       "exitCode": 0,
       "summary": {
         "status": "passed",
@@ -3021,10 +2982,10 @@
       }
     }
   ],
-  "updatedAt": "2026-09-03T18:57:54.055Z",
+  "updatedAt": "2026-09-03T19:22:08.246Z",
   "postflight": {
     "schemaVersion": "1.0.0",
-    "generatedAt": "2026-09-03T18:57:54.058Z",
+    "generatedAt": "2026-09-03T19:22:08.249Z",
     "expectedVersion": "2.0.0",
     "passed": true,
     "checks": [
@@ -3048,7 +3009,7 @@
         "id": "browser-smoke-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:56:49.616Z",
+          "value": "2026-09-03T19:21:01.976Z",
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -3056,7 +3017,7 @@
         "id": "browser-smoke-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1788461794121,
+          "value": 1788463247705,
           "command": "corepack pnpm report:browser:chromium"
         }
       },
@@ -3076,7 +3037,7 @@
         "id": "browser-smoke-firefox-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:09.649Z",
+          "value": "2026-09-03T19:21:22.483Z",
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -3084,7 +3045,7 @@
         "id": "browser-smoke-firefox-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": 1788461811283,
+          "value": 1788463263603,
           "command": "corepack pnpm report:browser:firefox"
         }
       },
@@ -3104,7 +3065,7 @@
         "id": "media-seek-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:15.379Z",
+          "value": "2026-09-03T19:21:28.533Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -3112,7 +3073,7 @@
         "id": "media-seek-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:15.376Z",
+          "value": "2026-09-03T19:21:28.531Z",
           "command": "corepack pnpm report:seek"
         }
       },
@@ -3145,7 +3106,7 @@
         "id": "performance-1080p30-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:56:33.307Z",
+          "value": "2026-09-03T19:20:46.882Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -3153,7 +3114,7 @@
         "id": "performance-1080p30-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:56:33.302Z",
+          "value": "2026-09-03T19:20:46.879Z",
           "command": "corepack pnpm report:performance"
         }
       },
@@ -3161,8 +3122,8 @@
         "id": "performance-1080p30-chromium-json-semantic",
         "passed": true,
         "details": {
-          "webGl2P95Ms": 0.8300000000745058,
-          "exportRealtimeMultiple": 8.969494748356029,
+          "webGl2P95Ms": 1.1349999997764826,
+          "exportRealtimeMultiple": 9.392405301061721,
           "steadyLongTasksOver50Ms": 0,
           "initializationLongTasksOver50Ms": 0,
           "pcm": {
@@ -3187,7 +3148,7 @@
         "id": "recovery-chromium-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:24.574Z",
+          "value": "2026-09-03T19:21:38.151Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -3195,7 +3156,7 @@
         "id": "recovery-chromium-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:24.573Z",
+          "value": "2026-09-03T19:21:38.148Z",
           "command": "corepack pnpm report:recovery"
         }
       },
@@ -3229,7 +3190,7 @@
         "id": "tarball-consumer-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:54:34.821Z",
+          "value": "2026-09-03T19:18:39.610Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -3237,7 +3198,7 @@
         "id": "tarball-consumer-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:54:34.816Z",
+          "value": "2026-09-03T19:18:39.607Z",
           "command": "corepack pnpm test:consumer"
         }
       },
@@ -3289,7 +3250,7 @@
         "id": "alpha-60s-json-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:53.613Z",
+          "value": "2026-09-03T19:22:07.751Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3297,7 +3258,7 @@
         "id": "alpha-60s-json-embedded-time-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:53.609Z",
+          "value": "2026-09-03T19:22:07.750Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3355,7 +3316,7 @@
                 "lastHeight": 180,
                 "lastRenderScale": 1,
                 "lastTiming": {
-                  "totalWorkerUs": 335,
+                  "totalWorkerUs": 305,
                   "gpuCompletionUs": 110
                 },
                 "lastResources": {
@@ -3412,7 +3373,7 @@
                 "lastHeight": 180,
                 "lastRenderScale": 1,
                 "lastTiming": {
-                  "totalWorkerUs": 335,
+                  "totalWorkerUs": 305,
                   "gpuCompletionUs": 110
                 },
                 "lastResources": {
@@ -3490,7 +3451,7 @@
         "id": "alpha-60s-webm-mtime-fresh",
         "passed": true,
         "details": {
-          "value": "2026-09-03T18:57:53.338Z",
+          "value": "2026-09-03T19:22:07.469Z",
           "command": "corepack pnpm report:alpha"
         }
       },
@@ -3505,66 +3466,66 @@
         {
           "file": "reports/baseline/browser-smoke-chromium.json",
           "command": "corepack pnpm report:browser:chromium",
-          "bytes": 37539,
-          "sha256": "b1b6ecfd4820ecbc88a32b0d4752da4c6ba1ccd000f0befd53370a9e10c91f9f",
-          "mtime": "2026-09-03T18:56:49.616Z"
+          "bytes": 37538,
+          "sha256": "8653830e7d86ac522653af8e4ec8b7965c2b091fce8c5805d8ac17170d242d3b",
+          "mtime": "2026-09-03T19:21:01.976Z"
         },
         {
           "file": "reports/baseline/browser-smoke-firefox.json",
           "command": "corepack pnpm report:browser:firefox",
-          "bytes": 27307,
-          "sha256": "f9996b9ed72f7d463bc4e63aa878effeba0f594c1a369116cdffebcce0dddf0a",
-          "mtime": "2026-09-03T18:57:09.649Z"
+          "bytes": 27292,
+          "sha256": "ad4327a488606aa4f5f910d0622c5b289f451af8559c7868ba81007e33b25382",
+          "mtime": "2026-09-03T19:21:22.483Z"
         },
         {
           "file": "reports/baseline/media-seek-chromium.json",
           "command": "corepack pnpm report:seek",
-          "bytes": 21576,
-          "sha256": "89ae69b92787d3a90740c653bceb35ec3586e6da7d64cfe2325bf2ae757aa1ed",
-          "mtime": "2026-09-03T18:57:15.379Z"
+          "bytes": 21557,
+          "sha256": "96553d59b5e0ac87efa798750ea948eacfd748dbd4de1b6e7c8d52c6a2f29db3",
+          "mtime": "2026-09-03T19:21:28.533Z"
         },
         {
           "file": "reports/baseline/performance-1080p30-chromium.json",
           "command": "corepack pnpm report:performance",
-          "bytes": 67025,
-          "sha256": "dbec8d980ac39fb76d3426b9115cb96b65baaa46f20ec14811e17b85cfead125",
-          "mtime": "2026-09-03T18:56:33.307Z"
+          "bytes": 66359,
+          "sha256": "5e725d53269346c66bc1190074eaaefe9fef48dd0ded96fc8d0553035f7f9ebb",
+          "mtime": "2026-09-03T19:20:46.882Z"
         },
         {
           "file": "reports/baseline/recovery-chromium.json",
           "command": "corepack pnpm report:recovery",
           "bytes": 33159,
-          "sha256": "66aff361d136e27ed105a7aa55ed2e85388c998b6bfe60e8ba3d8fe984c15920",
-          "mtime": "2026-09-03T18:57:24.574Z"
+          "sha256": "94bea5c84ab824908c13336a1de5735c7ff8e88b0dae16ab8ac4ce5589691a19",
+          "mtime": "2026-09-03T19:21:38.151Z"
         },
         {
           "file": "reports/baseline/tarball-consumer.json",
           "command": "corepack pnpm test:consumer",
-          "bytes": 11505,
-          "sha256": "70c251cf5a7d635af9ef153c850b011375cafbabc6971626afd0e0e538a9d3b7",
-          "mtime": "2026-09-03T18:54:34.821Z"
+          "bytes": 11504,
+          "sha256": "bb95aff758fda65602b5cf3101c01fdbee2089cc98056381efb23462dad2c144",
+          "mtime": "2026-09-03T19:18:39.610Z"
         },
         {
           "file": "reports/baseline/alpha-60s.json",
           "command": "corepack pnpm report:alpha",
           "bytes": 115961,
-          "sha256": "a576e80d57458c34906b37a278356abc33e90d4b63fffb7afd4ba9f08b173ff0",
-          "mtime": "2026-09-03T18:57:53.613Z"
+          "sha256": "9546715d2917e16536e1b752e3ee22c64e0054c224173eb9d3ad62b646b51780",
+          "mtime": "2026-09-03T19:22:07.751Z"
         },
         {
           "file": "reports/baseline/alpha-60s.webm",
           "command": "corepack pnpm report:alpha",
           "bytes": 4746356,
           "sha256": "c7be75a0360e90868cb71aa9d6f4559aff8545b01af218813349f684adc19b0c",
-          "mtime": "2026-09-03T18:57:53.338Z"
+          "mtime": "2026-09-03T19:22:07.469Z"
         }
       ],
-      "setSha256": "2ad9e3132f4f0d43d68a3e898262351a98befe0d264235bd4755a1d52be28578"
+      "setSha256": "ad259830d6fa6269ebc39fe5d76d236515b22919c61a1047967def1ded7e0374"
     }
   },
   "sourceIdentityAfter": {
     "kind": "workspace-input-manifest",
-    "policyVersion": "3.4.0",
+    "policyVersion": "3.5.0",
     "algorithm": "sha256(stable-json(canonical-lf(files)))",
     "textNormalization": "Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF",
     "symbolicLinks": "reject every non-excluded symbolic link",
@@ -3575,15 +3536,16 @@
       "generated TypeDoc projection: apps/docs/src/content/docs/api/**",
       "browser snapshot output directories named __screenshots__",
       "generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}",
+      "root architecture visualization outputs: aelionsdk-architecture*",
       "OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo",
       "post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound"
     ],
-    "fileCount": 552,
-    "totalBytes": 11544272,
-    "manifestSha256": "9ff6cf17f2ae5f11c0e245e6b534b90d647db623dd7f7905318077d84b3de8ab",
+    "fileCount": 544,
+    "totalBytes": 10078491,
+    "manifestSha256": "067afa2c6d61b013856b77e9b3dd56189067d7d2338522064790a8ba313db07d",
     "vcs": {
-      "commit": "3b807f505f677b999b0615e9234247799184fd6f",
-      "tree": "966a2e33b3f02a8562609f10a72d9bdfdb87b4a9"
+      "commit": "60bee2614ae8fa5d3d1ea0c88ad71031c51236cf",
+      "tree": "38424945117b5ff23906c4313e44de2502da694a"
     },
     "files": [
       {
@@ -3670,46 +3632,6 @@
         "path": "THIRD_PARTY_NOTICES.md",
         "bytes": 969,
         "sha256": "c468f1b2aa46fc1eb29fde367a13148145c8ea6d0c0b00cd56668a022dd1a45b"
-      },
-      {
-        "path": "aelionsdk-architecture.html",
-        "bytes": 728110,
-        "sha256": "adceb7893346079801969be9ee879f2280816c4f1f61268a01f6c97a48b7986d"
-      },
-      {
-        "path": "aelionsdk-architecture.json",
-        "bytes": 9260,
-        "sha256": "23e1ae68256d20aab40297189568ced2a70d5ed736c0df318aa529325cb78bc1"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.1440x900.dark.png",
-        "bytes": 150849,
-        "sha256": "9af9dad80ac9204221f3d2aafbbefbb833c75eacfd661ecce9249c3920f7fb03"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.1440x900.light.png",
-        "bytes": 158294,
-        "sha256": "920ceb5796a759cb76f1c60022a0b7d4b84d798dcbd23fe66350bad59b9599c4"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.2048x1320.dark.png",
-        "bytes": 195734,
-        "sha256": "9c00420909413d9ee7784bc8d6636cb70d0777706bea20052c21a80a599d48e2"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.2048x1320.light.png",
-        "bytes": 205706,
-        "sha256": "5f279b102b7aa078c3a5509427d418a2261c2a2bbbdedb094f3360a65ace01fb"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.html",
-        "bytes": 1976,
-        "sha256": "c470b3a6bcbb4b5b1459787be2f8097f45437a36f3846acd13040039999becfb"
-      },
-      {
-        "path": "aelionsdk-architecture.visual-check.json",
-        "bytes": 17277,
-        "sha256": "3bafeb4ef9db51ec723c3a745b55eba2282dc46779213448ad3483dca11b2883"
       },
       {
         "path": "apps/capability-lab/index.html",
@@ -6073,8 +5995,8 @@
       },
       {
         "path": "scripts/capture-phase-1-final-gates.mjs",
-        "bytes": 12887,
-        "sha256": "805d67a44e446185c9609330b472d68121a3ac3a623910c2fadc6d22d2edc9b4"
+        "bytes": 13012,
+        "sha256": "40a2f95b08e08be03a7e1464f5cf1befbe16a2162957dcd3db60e8812a03f0f6"
       },
       {
         "path": "scripts/capture-recovery-evidence.mjs",
@@ -6208,13 +6130,13 @@
       },
       {
         "path": "scripts/phase-1-evidence-lib.mjs",
-        "bytes": 111071,
-        "sha256": "8a5170b20a6b8650bfb3c04ccde7512a92118f109607e86189578c4e5fce1893"
+        "bytes": 111254,
+        "sha256": "90544575eb5391aea8b4abaaf264dff3eb4c3f91830968b6f7989eaa58063f9b"
       },
       {
         "path": "scripts/phase-1-evidence-lib.test.mjs",
-        "bytes": 45494,
-        "sha256": "3053e126d1787cfe30b5647ba31d22824b84291ffae8e8655cc5a9d56a027976"
+        "bytes": 46611,
+        "sha256": "7a9d4a0be901c51c3c4da6b2a331ab323987e444091a60c68f0106b18f17a942"
       },
       {
         "path": "scripts/prepare-release-packages.mjs",
@@ -6349,5 +6271,5 @@
     ]
   },
   "sourceIdentityMatches": true,
-  "endedAt": "2026-09-03T18:57:54.272Z"
+  "endedAt": "2026-09-03T19:22:08.475Z"
 }
