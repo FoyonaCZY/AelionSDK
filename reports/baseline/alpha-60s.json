@@ -15,10 +15,10 @@
   },
   "player": {
     "state": "paused",
-    "currentTimeUs": 30041333,
+    "currentTimeUs": 30012000,
     "emittedFrames": 10,
     "firstTimestampUs": 29500000,
-    "lastTimestampUs": 30041333
+    "lastTimestampUs": 30001333
   },
   "preview": {
     "width": 320,
@@ -61,7 +61,7 @@
     }
   },
   "sink": {
-    "fileName": "aelion-alpha-44e4ce1c-8e7d-4812-9a22-24dfb9c2939c.webm",
+    "fileName": "aelion-alpha-98493d8b-9197-42cb-ab64-f60d3eb7279d.webm",
     "writes": 135,
     "bytesWritten": 4746744,
     "maxInFlightWrites": 1,
@@ -4786,7 +4786,7 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 335,
+          "totalWorkerUs": 305,
           "gpuCompletionUs": 110
         },
         "lastResources": {
@@ -4843,7 +4843,7 @@
         "lastHeight": 180,
         "lastRenderScale": 1,
         "lastTiming": {
-          "totalWorkerUs": 335,
+          "totalWorkerUs": 305,
           "gpuCompletionUs": 110
         },
         "lastResources": {
@@ -4929,18 +4929,18 @@
   },
   "memory": {
     "before": {
-      "usedJsHeapBytes": 17369589,
-      "totalJsHeapBytes": 26332697
+      "usedJsHeapBytes": 20777293,
+      "totalJsHeapBytes": 26594841
     },
     "beforeDispose": {
-      "usedJsHeapBytes": 40769405,
-      "totalJsHeapBytes": 85636369
+      "usedJsHeapBytes": 33499794,
+      "totalJsHeapBytes": 84169618
     }
   },
-  "elapsedMs": 9633.160000000149,
+  "elapsedMs": 10425.74499999918,
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
   "command": "corepack pnpm report:alpha",
-  "generatedAt": "2026-09-03T18:57:53.609Z",
+  "generatedAt": "2026-09-03T19:22:07.750Z",
   "referenceDevice": {
     "model": "Windows_NT x86_64",
     "cpu": "AMD Ryzen 5 7500F 6-Core Processor, 12 logical CPUs",

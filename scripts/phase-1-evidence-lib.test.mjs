@@ -173,9 +173,33 @@ test('workspace identity excludes only the exact post-gate projections plus gene
     false,
   );
   assert.equal(excludedWorkspacePath(root, '/workspace/apps/editor-demo/src/main.ts'), true);
+  assert.equal(excludedWorkspacePath(root, '/workspace/aelionsdk-architecture.html'), true);
+  assert.equal(
+    excludedWorkspacePath(root, '/workspace/aelionsdk-architecture.visual-check.dark.png'),
+    true,
+  );
+  assert.equal(excludedWorkspacePath(root, '/workspace/docs/aelionsdk-architecture.html'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/architecture.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/docs/reference/other.md'), false);
   assert.equal(excludedWorkspacePath(root, '/workspace/packages/sdk/src/index.ts'), false);
+});
+
+test('root architecture visualization outputs cannot change the source identity', async () => {
+  const workspace = await mkdtemp(join(tmpdir(), 'aelion-phase-1-architecture-output-'));
+  try {
+    await writeFile(join(workspace, 'source.ts'), 'export const value = 1;\n');
+    const before = await sourceIdentity(workspace);
+    await writeFile(join(workspace, 'aelionsdk-architecture.html'), '<svg>generated</svg>\n');
+    await writeFile(
+      join(workspace, 'aelionsdk-architecture.visual-check.dark.png'),
+      Buffer.from([0, 1, 2, 3]),
+    );
+    const after = await sourceIdentity(workspace);
+    assert.equal(after.manifestSha256, before.manifestSha256);
+    assert.equal(after.fileCount, before.fileCount);
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
+  }
 });
 
 test('post-gate projections do not churn source identity but every other document remains bound', async () => {

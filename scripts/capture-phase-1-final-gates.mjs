@@ -345,4 +345,9 @@ const report = {
 
 await writeJsonAtomic(options.output, report);
 process.stdout.write(`Wrote ${relative(root, options.output)} (${report.result.status})\n`);
-if (!passed) process.exitCode = 1;
+if (!passed) {
+  process.stderr.write(
+    `Phase 1 final gate validation failed:\n${JSON.stringify(report.result, null, 2)}\n`,
+  );
+  process.exitCode = 1;
+}

@@ -45,7 +45,7 @@ The Project schema has a new immutable `v2.0.json` / `2.0.0` identity; v1.0 and 
 migrated from ownership-isolated snapshots.
 
 The 2.0.0 final gate passed all 21 serial commands with unchanged source manifest
-`9ff6cf17f2ae5f11c0e245e6b534b90d647db623dd7f7905318077d84b3de8ab`. It includes 598 Node
+`067afa2c6d61b013856b77e9b3dd56189067d7d2338522064790a8ba313db07d`. It includes 598 Node
 tests, 118 Project-schema tests, Chromium 102/102 and Firefox 76/76 browser conformance, WebKit and
 mobile contract checks, all 13 package tarball consumers, release dry-run and byte-for-byte
 reproducibility. Publication additionally requires an independently approved review bound to this

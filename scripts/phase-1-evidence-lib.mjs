@@ -129,7 +129,7 @@ export const PHASE_1_BLOCKER_REVIEW_ARTIFACTS = Object.freeze([
 ]);
 
 export const WORKSPACE_IDENTITY_POLICY = Object.freeze({
-  version: '3.4.0',
+  version: '3.5.0',
   algorithm: 'sha256(stable-json(canonical-lf(files)))',
   textNormalization:
     'Git-compatible text detection (no NUL in first 8000 bytes) with CRLF canonicalized to LF',
@@ -141,6 +141,7 @@ export const WORKSPACE_IDENTITY_POLICY = Object.freeze({
     'generated TypeDoc projection: apps/docs/src/content/docs/api/**',
     'browser snapshot output directories named __screenshots__',
     'generated app Vite declarations: apps/*/vite.config.{js,d.ts,d.ts.map}',
+    'root architecture visualization outputs: aelionsdk-architecture*',
     'OS/log/compiler transients: .DS_Store, *.log, *.tsbuildinfo',
     'post-gate status projections listed by PHASE_1_POST_GATE_DOCUMENTS; exact bytes/hash/mtime are blocker-review bound',
   ]),
@@ -168,6 +169,9 @@ function normalizedPath(root, path) {
 export function excludedWorkspacePath(root, path) {
   const relativePath = normalizedPath(root, path);
   if (PHASE_1_POST_GATE_DOCUMENTS.includes(relativePath)) return true;
+  if (!relativePath.includes('/') && relativePath.startsWith('aelionsdk-architecture')) {
+    return true;
+  }
   if (relativePath === 'apps/editor-demo' || relativePath.startsWith('apps/editor-demo/')) {
     return true;
   }
